@@ -1,0 +1,23 @@
+Package: bidux
+Title: Behavior Insight Design: A Toolkit for Integrating Behavioral Science in UI/UX Design
+Version: 0.1.0
+Authors@R: 
+    person(
+        given = "Jeremy",
+        family = "Winget", 
+        role = c("aut", "cre"),
+        email="contact@jrwinget.com",
+        comment = c(ORCID = "0000-0002-3783-4354")
+    )
+Description: Provides a framework and toolkit to guide Shiny developers in 
+    implementing the Behavior Insight Design (BID) framework. The package offers
+    functions for documenting each of the five stages—Notice, Interpret,
+    Structure, Anticipate, and Validate—along with a comprehensive concept
+    dictionary.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports: 
+    dplyr,
+    tibble

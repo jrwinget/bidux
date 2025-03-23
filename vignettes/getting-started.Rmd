@@ -1,0 +1,60 @@
+---
+title: "Getting Started with bidux"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with bidux}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Getting Started with bidux
+
+This vignette provides a quick guide on how to use the **bidux** package to document and guide your Shiny app design process using the BID framework.
+
+## Example Workflow
+
+```r
+library(bidux)
+
+# Stage 1: Notice the Problem
+notice <- bid_notice(
+  problem = "Users find the interface cluttered and hard to navigate",
+  theory = "Cognitive Load Theory",
+  evidence = "User tests showed increased time to locate key features"
+)
+
+# Stage 2: Interpret the User's Need
+interpret <- bid_interpret(
+  previous_stage = notice,
+  central_question = "How can we improve navigation clarity?",
+  data_story = list(
+    hook = "Interface overload",
+    context = "Too many options on screen",
+    tension = "User frustration",
+    resolution = "Simplify and group related elements"
+  )
+)
+
+# Stage 3: Structure the Dashboard
+structure <- bid_structure(
+  previous_stage = interpret,
+  layout = "dual_process",
+  concepts = c("principle_of_proximity", "default_effect")
+)
+
+# Stage 4: Anticipate User Behavior
+anticipate <- bid_anticipate(
+  previous_stage = structure,
+  bias_mitigations = list(
+    anchoring = "Use baseline comparisons",
+    framing = "Present data with positive framing"
+  )
+)
+
+# Stage 5: Validate & Empower the User
+validate <- bid_validate(
+  previous_stage = anticipate,
+  summary_panel = "Key insights are summarized here",
+  collaboration = "Annotations enabled for team feedback"
+)
+```
