@@ -11,20 +11,26 @@ bid_validate(previous_stage, summary_panel, collaboration)
 
 \item{summary_panel}{A character string summarizing key insights.}
 
-\item{collaboration}{A character string describing collaboration or annotation features.}
+\item{collaboration}{A character string describing collaboration or
+annotation features.}
 }
 \value{
-A tibble containing the documented information for the "Validate" stage.
+A tibble containing the documented information for the "Validate"
+stage.
 }
 \description{
-This function documents the validation and empowerment stage by capturing how the dashboard is validated,
-including summary takeaways and collaborative annotations.
+This function documents the validation and empowerment stage by capturing how
+the dashboard is validated, including summary takeaways and collaborative
+annotations.
 }
 \examples{
 anticipate_info <- bid_anticipate(
   bid_structure(
     bid_interpret(
-      bid_notice("Users confused by interface", "Visual Hierarchies", "Multiple clicks observed"),
+      bid_notice(
+        "Users confused by interface",
+        evidence = "Multiple clicks observed"
+      ),
       central_question = "How can we enhance clarity?",
       data_story = list(
         hook = "Lack of focus",
@@ -34,7 +40,7 @@ anticipate_info <- bid_anticipate(
       )
     ),
     layout = "dual_process",
-    concepts = c("default_effect", "aesthetic_usability")
+    concepts = c("principle_of_proximity", "default_effect")
   ),
   bias_mitigations = list(
     anchoring = "Reference baseline values",
@@ -43,7 +49,8 @@ anticipate_info <- bid_anticipate(
 )
 bid_validate(
   previous_stage = anticipate_info,
-  summary_panel = "Key insights include improved clarity and user satisfaction",
+  summary_panel = "Key insights include clarity and user satisfaction",
   collaboration = "Annotations enabled for team feedback"
 )
+
 }

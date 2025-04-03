@@ -9,22 +9,23 @@ bid_structure(previous_stage, layout, concepts)
 \arguments{
 \item{previous_stage}{A tibble or list output from \code{bid_interpret()}.}
 
-\item{layout}{A character string indicating the layout type (e.g., "dual_process", "grid").}
+\item{layout}{A character string indicating the layout type (e.g.,
+"dual_process", "grid").}
 
 \item{concepts}{A character vector of BID concepts applied in this stage.}
 }
 \value{
-A tibble containing the documented information for the "Structure" stage.
+A tibble containing the documented information for the "Structure"
+stage.
 }
 \description{
-This function documents the structure of the dashboard, including layout and design elements
-such as proximity, dual-processing, and default effects.
+This function documents the structure of the dashboard, including layout and
+design elements such as proximity, dual-processing, and default effects.
 }
 \examples{
 interpret <- bid_interpret(
   bid_notice(
     problem = "Users struggle with information overload",
-    theory = "Cognitive Load Theory",
     evidence = "Survey results indicate delays"
   ),
   central_question = "How can we simplify data presentation?",

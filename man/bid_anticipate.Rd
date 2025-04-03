@@ -12,16 +12,20 @@ bid_anticipate(previous_stage, bias_mitigations)
 \item{bias_mitigations}{A named list of bias mitigation strategies.}
 }
 \value{
-A tibble containing the documented information for the "Anticipate" stage.
+A tibble containing the documented information for the "Anticipate"
+stage.
 }
 \description{
-This function documents the anticipated user behavior by listing bias mitigation strategies related
-to anchoring, framing, confirmation bias, etc.
+This function documents the anticipated user behavior by listing bias
+mitigation strategies related to anchoring, framing, confirmation bias, etc.
 }
 \examples{
 structure_info <- bid_structure(
   bid_interpret(
-    bid_notice("Issue with dropdown menus", "Hick's Law", "User testing indicated delays"),
+    bid_notice(
+      "Issue with dropdown menus",
+      evidence = "User testing indicated delays"
+    ),
     central_question = "How can we improve selection efficiency?",
     data_story = list(
       hook = "Too many options",
@@ -31,7 +35,7 @@ structure_info <- bid_structure(
     )
   ),
   layout = "dual_process",
-  concepts = c("anchoring", "framing", "confirmation_bias")
+  concepts = c("principle_of_proximity", "default_effect")
 )
 bid_anticipate(
   previous_stage = structure_info,
@@ -40,4 +44,5 @@ bid_anticipate(
     framing = "Toggle between positive and negative framing"
   )
 )
+
 }

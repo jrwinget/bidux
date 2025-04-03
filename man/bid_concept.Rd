@@ -13,8 +13,12 @@ bid_concept(concept_name)
 A tibble with details for the specified concept.
 }
 \description{
-This function retrieves detailed information about a specific concept within the BID framework.
+This function retrieves detailed information about a specific concept within
+the BID framework. If the concept is not found, it suggests similar concepts
+based on fuzzy matching.
 }
 \examples{
 bid_concept("Cognitive Load Theory")
+bid_concept("cognitive load") # Case insensitive, partial matching
+
 }

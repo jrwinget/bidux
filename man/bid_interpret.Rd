@@ -9,21 +9,25 @@ bid_interpret(previous_stage, central_question, data_story)
 \arguments{
 \item{previous_stage}{A tibble or list output from \code{bid_notice()}.}
 
-\item{central_question}{A character string representing the main question to be answered.}
+\item{central_question}{A character string representing the main question to
+be answered.}
 
-\item{data_story}{A list containing elements such as \code{hook}, \code{context}, \code{tension}, and \code{resolution}.}
+\item{data_story}{A list containing elements such as \code{hook},
+\code{context}, \code{tension}, \code{resolution}, and optionally
+\code{audience}, \code{metrics}, and \code{visual_approach}.}
 }
 \value{
-A tibble containing the documented information for the "Interpret" stage.
+A tibble containing the documented information for the "Interpret"
+stage.
 }
 \description{
-This function documents the interpretation of user needs, capturing the central question and
-the data storytelling narrative. It represents stage 2 in the BID framework.
+This function documents the interpretation of user needs, capturing the
+central question and the data storytelling narrative. It represents stage 2
+in the BID framework.
 }
 \examples{
 notice <- bid_notice(
   problem = "Users struggle with complex data",
-  theory = "Cognitive Load Theory",
   evidence = "Test results indicate delays"
 )
 bid_interpret(
@@ -33,7 +37,11 @@ bid_interpret(
     hook = "Declining trend in engagement",
     context = "Previous high engagement levels",
     tension = "Unexpected drop",
-    resolution = "Investigate new UI changes"
+    resolution = "Investigate new UI changes",
+    audience = "Marketing team",
+    metrics = c("Daily Active Users", "Session Duration"),
+    visual_approach = "Comparison charts showing before/after UI change"
   )
 )
+
 }

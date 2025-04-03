@@ -4,23 +4,34 @@
 \alias{bid_notice}
 \title{Document Problem Notice Stage in BID Framework}
 \usage{
-bid_notice(problem, theory, evidence)
+bid_notice(problem, theory = NULL, evidence)
 }
 \arguments{
 \item{problem}{A character string describing the identified problem.}
 
-\item{theory}{A character string representing the underlying psychological theory (e.g., "Cognitive Load Theory", "Hick's Law").}
+\item{theory}{Optional character string representing the underlying
+psychological theory.}
 
-\item{evidence}{A character string providing evidence or example (e.g., results from user testing).}
+\item{evidence}{A character string providing evidence or example (e.g.,
+results from user testing).}
 }
 \value{
-A tibble containing the documented information for the "Notice" stage.
+A tibble containing the documented information for the "Notice"
+stage.
 }
 \description{
-This function documents the problem area by capturing insights related to cognitive load,
-Hick's Law, and visual hierarchies. It forms the first stage in the Behavior Insight Design framework.
+This function documents the problem area by capturing insights related to
+cognitive load, Hick's Law, and visual hierarchies. It forms the first stage
+in the Behavior Insight Design framework. If no theory is specified, it will
+suggest appropriate theories based on the problem description.
 }
 \examples{
+bid_notice(
+  problem = "Users struggle to navigate cluttered dashboards",
+  evidence = "User testing showed increased time to locate key metrics."
+)
+
+# With specified theory
 bid_notice(
   problem = "Users struggle to navigate cluttered dashboards",
   theory = "Cognitive Load Theory",

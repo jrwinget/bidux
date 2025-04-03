@@ -4,7 +4,10 @@
 \alias{bid_concepts}
 \title{List all BID Framework Concepts}
 \usage{
-bid_concepts()
+bid_concepts(search = NULL)
+}
+\arguments{
+\item{search}{Optional search term to filter concepts}
 }
 \value{
 A tibble with concept details.
@@ -15,4 +18,5 @@ including their descriptions, categories, references, and example applications.
 }
 \examples{
 bid_concepts()
+bid_concepts("cognitive")
 }
