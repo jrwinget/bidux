@@ -55,7 +55,7 @@ bid_interpret <- function(previous_stage, central_question, data_story) {
     c("hook", "context", "tension", "resolution") %in% names(data_story)
   )
 
-  story_completeness <- story_completeness/4 # Normalize to 0-1
+  story_completeness <- story_completeness / 4 # Normalize to 0-1
 
   if (story_completeness < 0.5) {
     story_suggestion <- paste(
