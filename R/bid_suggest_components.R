@@ -162,41 +162,41 @@ bid_suggest_components <- function(
       stage = "Notice",
       component = "e_title",
       description = "Clear titles help establish visual hierarchy",
-      code_example = 'e_charts(data) %>% e_line(x) %>% e_title("Main Metric Trend", "Supporting context")'
+      code_example = 'e_charts(data) |> e_line(x) |> e_title("Main Metric Trend", "Supporting context")'
     ))
 
     suggestions <- rbind(suggestions, tibble::tibble(
       stage = "Interpret",
       component = "e_tooltip",
       description = "Tooltips provide additional context without cluttering interface",
-      code_example = 'e_charts(data) %>% e_bar(y) %>% e_tooltip(trigger = "item", formatter = "{b}: {c}")'
+      code_example = 'e_charts(data) |> e_bar(y) |> e_tooltip(trigger = "item", formatter = "{b}: {c}")'
     ))
 
     suggestions <- rbind(suggestions, tibble::tibble(
       stage = "Structure",
       component = "e_grid",
       description = "Control chart layout precisely",
-      code_example = 'e_charts(data) %>% e_line(x) %>% e_grid(height = "50%", top = "10%")'
+      code_example = 'e_charts(data) |> e_line(x) |> e_grid(height = "50%", top = "10%")'
     ))
 
     suggestions <- rbind(suggestions, tibble::tibble(
       stage = "Anticipate",
       component = "e_mark_line",
       description = "Add reference lines to address Anchoring Effect",
-      code_example = "e_charts(data) %>% e_bar(y) %>% e_mark_line(data = list(yAxis = 50))"
+      code_example = "e_charts(data) |> e_bar(y) |> e_mark_line(data = list(yAxis = 50))"
     ))
 
     suggestions <- rbind(suggestions, tibble::tibble(
       stage = "Validate",
       component = "e_toolbox",
       description = "Add export options for sharing insights",
-      code_example = 'e_charts(data) %>% e_line(x) %>% e_toolbox_feature(feature = "saveAsImage")'
+      code_example = 'e_charts(data) |> e_line(x) |> e_toolbox_feature(feature = "saveAsImage")'
     ))
   }
 
   # Filter suggestions by current stage if available
   if (stage != "Unknown") {
-    result <- suggestions %>% dplyr::filter(stage == !!stage)
+    result <- dplyr::filter(suggestions, stage == !!stage)
 
     # If no matches for specific stage, return all
     if (nrow(result) == 0) {
