@@ -1,0 +1,215 @@
+---
+title: "Getting Started with {bidux}"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with {bidux}}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+
+The `{bidux}` package helps Shiny developers create more effective dashboards using the **Behavior Insight Design (BID) Framework**. This framework integrates psychological principles, UX best practices, and data storytelling techniques to guide the development of dashboards that are easier to understand, more engaging, and more effective at supporting user decisions.
+
+```{r setup}
+library(bidux)
+library(dplyr)
+```
+
+## The BID Framework
+
+The BID framework consists of 5 sequential stages:
+
+1. **Notice** the Problem - Identify friction points and user struggles
+2. **Interpret** the User's Need - Understand the core questions and insights needed
+3. **Structure** the Dashboard - Organize information for intuitive comprehension
+4. **Anticipate** User Behavior - Consider cognitive biases that influence perception
+5. **Validate** & Empower the User - Provide clear takeaways and collaborative features
+
+Each stage incorporates specific psychological principles and design concepts, making the entire development process more intentional and user-centered.
+
+## Exploring the Concept Dictionary
+
+The BID framework is built on established psychological and design principles. To explore these concepts, use `bid_concepts()` to list all available concepts, or search for specific terms:
+
+```{r concepts}
+# List all concepts
+all_concepts <- bid_concepts()
+head(all_concepts[, c("concept", "category", "description")], 3)
+
+# Search for specific concepts
+bid_concepts("cognitive") %>% 
+  select(concept, description, implementation_tips)
+```
+
+For detailed information about a specific concept, use `bid_concept()`:
+
+```{r concept_detail}
+# Get information about a specific concept
+bid_concept("Processing Fluency") %>%
+  select(concept, description, implementation_tips, recommendations)
+```
+
+The `bid_concept()` function supports case-insensitive and partial matching:
+
+```{r concept_matching}
+# Case-insensitive matching
+bid_concept("hick's law") %>% select(concept, description)
+
+# Partial matching
+bid_concept("proximity") %>% select(concept, description)
+```
+
+## Documenting a Dashboard Project with BID
+
+Let's walk through a complete example of using the BID framework to document and improve a dashboard project.
+
+### Stage 1: Notice the Problem
+
+Start by identifying the specific problems users are encountering with your dashboard or interface:
+
+```{r notice}
+# Document the problem
+notice_result <- bid_notice(
+  problem = "Users are overwhelmed by too many filter options and struggle to find relevant insights",
+  evidence = "User testing shows 65% of first-time users fail to complete their intended task within 2 minutes"
+)
+
+notice_result %>% select(theory, suggestions)
+```
+
+Notice that the function automatically selected an appropriate theory based on our problem description. It also provides suggestions for addressing cognitive load.
+
+### Stage 2: Interpret the User's Need
+
+Next, clarify the central question your dashboard needs to answer and structure the data story:
+
+```{r interpret}
+# Document the user's need
+interpret_result <- bid_interpret(
+  previous_stage = notice_result,
+  central_question = "How are our marketing campaigns performing across different channels?",
+  data_story = list(
+    hook = "Recent campaign performance varies significantly across channels",
+    context = "We've invested in 6 different marketing channels over the past quarter",
+    tension = "ROI metrics show inconsistent results, with some channels underperforming",
+    resolution = "Identify top-performing channels and key performance drivers",
+    audience = "Marketing team and executives",
+    metrics = c("Channel ROI", "Conversion Rate", "Cost per Acquisition"),
+    visual_approach = "Comparative analysis with historical benchmarks"
+  )
+)
+
+interpret_result %>% select(central_question, hook, tension, resolution, suggestions)
+```
+
+The function evaluates our data story elements and provides suggestions for improvement.
+
+### Stage 3: Structure the Dashboard
+
+Now determine the layout and key design principles to implement:
+
+```{r structure}
+# Document the dashboard structure
+structure_result <- bid_structure(
+  previous_stage = interpret_result,
+  layout = "dual_process",
+  concepts = c("Principle of Proximity", "Default Effect", "Aesthetic-Usability")
+)
+
+structure_result %>% select(layout, concepts, suggestions)
+```
+
+The function provides layout-specific suggestions based on the psychological concepts we've chosen to apply.
+
+### Stage 4: Anticipate User Behavior
+
+Identify potential cognitive biases that might affect how users interpret your dashboard:
+
+```{r anticipate}
+# Document bias mitigation strategies
+anticipate_result <- bid_anticipate(
+  previous_stage = structure_result,
+  bias_mitigations = list(
+    anchoring = "Include previous period performance as reference points",
+    framing = "Provide toggle between ROI improvement vs. ROI gap views",
+    confirmation_bias = "Highlight unexpected patterns that contradict common assumptions"
+  )
+)
+
+anticipate_result %>% select(bias_mitigations, suggestions)
+```
+
+The function evaluates our bias mitigation strategies and provides implementation suggestions.
+
+### Stage 5: Validate & Empower the User
+
+Finally, document how you'll ensure users leave with clear insights and the ability to collaborate:
+
+```{r validate}
+# Document validation approach
+validate_result <- bid_validate(
+  previous_stage = anticipate_result,
+  summary_panel = "Executive summary highlighting top and bottom performers, key trends, and recommended actions for the next marketing cycle",
+  collaboration = "Team annotation capability allowing marketing team members to add context and insights to specific data points"
+)
+
+validate_result %>% select(summary_panel, collaboration, suggestions)
+```
+
+## Generating Implementation Suggestions
+
+Once you've documented your dashboard with the BID framework, you can generate concrete suggestions for implementing the principles using common R packages:
+
+```{r suggestions}
+# Get bslib component suggestions
+bid_suggest_components(structure_result, package = "bslib") %>%
+  select(component, description, code_example) %>%
+  head(2)
+
+# Get reactable suggestions for showing data
+bid_suggest_components(anticipate_result, package = "reactable") %>%
+  select(component, description) %>%
+  head(2)
+```
+
+## Creating a Complete BID Report
+
+You can generate a complete report summarizing all stages of your BID process:
+
+```{r report, eval=FALSE}
+# Generate a text report
+report <- bid_report(validate_result)
+cat(report)
+
+# Generate an HTML report
+html_report <- bid_report(validate_result, format = "html")
+```
+
+## Using BID in Your Shiny Development Workflow
+
+Here's how to integrate the BID framework into your development process:
+
+1. **Planning Phase**: Use the BID framework to document your design decisions before writing code
+2. **Development Phase**: Reference your BID documentation to implement appropriate UI patterns
+3. **Testing Phase**: Validate that your implementation addresses the issues identified in Stage 1
+4. **Iteration Phase**: Update your BID documentation as you refine the dashboard
+
+## Conclusion
+
+The `{bidux}` package makes it easier to apply psychological principles and UX best practices to your Shiny dashboards. By following the 5-stage BID framework, you can create applications that are more intuitive, engaging, and effective for your users.
+
+Future versions of `{bidux}` will include:
+
+- LLM integration for more intelligent suggestions
+- A UI component library implementing BID principles
+- Testing and validation tools for dashboard evaluation
+
+Visit [github.com/jrwinget/bidux](https://github.com/jrwinget/bidux) for updates and to contribute to the package.
