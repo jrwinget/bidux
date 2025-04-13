@@ -15,13 +15,13 @@
 #' \dontrun{
 #' # After completing all 5 stages
 #' validation_result <- bid_validate(...)
-#' 
+#'
 #' # Generate a text report
 #' bid_report(validation_result)
-#' 
+#'
 #' # Generate an HTML report
 #' bid_report(validation_result, format = "html")
-#' 
+#'
 #' # Generate a markdown report without diagrams
 #' bid_report(validation_result, format = "markdown", include_diagrams = FALSE)
 #' }
@@ -32,9 +32,9 @@ bid_report <- function(
     format = c("text", "html", "markdown"),
     include_diagrams = TRUE) {
   format <- match.arg(format)
-  
+
   if (
-    !tibble::is_tibble(validate_stage) || 
+    !tibble::is_tibble(validate_stage) ||
       !("stage" %in% names(validate_stage)) ||
       validate_stage$stage[1] != "Validate"
   ) {
@@ -67,7 +67,7 @@ bid_report <- function(
     report <- c(report, "```")
     report <- c(report, "")
   }
-  
+
   # stage 5: validate
   report <- c(report, "## Stage 5: Validate & Empower the User")
 
@@ -80,7 +80,7 @@ bid_report <- function(
     report,
     paste0("- **Collaboration Features**: ", validate_stage$collaboration[1])
   )
-  
+
   if (!is.na(validate_stage$next_steps[1])) {
     next_steps <- unlist(strsplit(validate_stage$next_steps[1], ";"))
     report <- c(report, "- **Next Steps**:")
@@ -88,14 +88,14 @@ bid_report <- function(
       report <- c(report, paste0("  - ", trimws(step)))
     }
   }
-  
+
   report <- c(
     report,
     paste0("- **Suggestions**: ", validate_stage$suggestions[1])
   )
 
   report <- c(report, "")
-  
+
   # stage 4: anticipate
   if ("previous_bias" %in% names(validate_stage)) {
     report <- c(report, "## Stage 4: Anticipate User Behavior")
@@ -103,7 +103,7 @@ bid_report <- function(
       report,
       paste0("- **Bias Mitigations**: ", validate_stage$previous_bias[1])
     )
-    
+
     if (!is.na(validate_stage$previous_interaction[1])) {
       report <- c(
         report,
@@ -113,10 +113,10 @@ bid_report <- function(
         )
       )
     }
-    
+
     report <- c(report, "")
   }
-  
+
   # stage 3: structure (try to reconstruct from available data)
   if ("previous_layout" %in% names(validate_stage)) {
     report <- c(report, "## Stage 3: Structure the Dashboard")
@@ -134,15 +134,15 @@ bid_report <- function(
         )
       )
     }
-    
+
     if (
-      "previous_accessibility" %in% names(validate_stage) && 
+      "previous_accessibility" %in% names(validate_stage) &&
         !is.na(validate_stage$previous_accessibility[1])
     ) {
       report <- c(
         report,
         paste0(
-          "- **Accessibility Considerations**: ", 
+          "- **Accessibility Considerations**: ",
           validate_stage$previous_accessibility[1]
         )
       )
@@ -150,7 +150,7 @@ bid_report <- function(
 
     report <- c(report, "")
   }
-  
+
   # recommendations
   report <- c(report, "## Implementation Recommendations")
   report <- c(
@@ -161,64 +161,70 @@ bid_report <- function(
     )
   )
   report <- c(report, "")
-  
+
   # UI suggestions
   report <- c(report, "### Recommended UI Components")
-  
+
   # {bslib} suggestions
   if (requireNamespace("dplyr", quietly = TRUE)) {
-    tryCatch({
-      bslib_suggestions <- bid_suggest_components(
-        validate_stage,
-        package = "bslib"
-      )
+    tryCatch(
+      {
+        bslib_suggestions <- bid_suggest_components(
+          validate_stage,
+          package = "bslib"
+        )
 
-      top_bslib <- head(bslib_suggestions, 3)
+        top_bslib <- head(bslib_suggestions, 3)
 
-      if (nrow(top_bslib) > 0) {
-        report <- c(report, "**bslib Components:**")
-        for (i in 1:nrow(top_bslib)) {
-          report <- c(
-            report,
-            paste0(
-              "- ", top_bslib$component[i], ": ", 
-              top_bslib$description[i]
+        if (nrow(top_bslib) > 0) {
+          report <- c(report, "**bslib Components:**")
+          for (i in 1:nrow(top_bslib)) {
+            report <- c(
+              report,
+              paste0(
+                "- ", top_bslib$component[i], ": ",
+                top_bslib$description[i]
+              )
             )
-          )
+          }
+          report <- c(report, "")
         }
-        report <- c(report, "")
+      },
+      error = function(e) {
+        # silently fail
       }
-    }, error = function(e) {
-      # silently fail
-    })
-    
+    )
+
     # {shiny} suggestions
-    tryCatch({
-      shiny_suggestions <- bid_suggest_components(
-        validate_stage,
-        package = "shiny"
-      )
+    tryCatch(
+      {
+        shiny_suggestions <- bid_suggest_components(
+          validate_stage,
+          package = "shiny"
+        )
 
-      top_shiny <- head(shiny_suggestions, 3)
+        top_shiny <- head(shiny_suggestions, 3)
 
-      if (nrow(top_shiny) > 0) {
-        report <- c(report, "**Shiny Components:**")
-        for (i in 1:nrow(top_shiny)) {
-          report <- c(
-            report,
-            paste0(
-              "- ", top_shiny$component[i], ": ", 
-              top_shiny$description[i]
+        if (nrow(top_shiny) > 0) {
+          report <- c(report, "**Shiny Components:**")
+          for (i in 1:nrow(top_shiny)) {
+            report <- c(
+              report,
+              paste0(
+                "- ", top_shiny$component[i], ": ",
+                top_shiny$description[i]
+              )
             )
-          )
+          }
+          report <- c(report, "")
         }
-        report <- c(report, "")
+      },
+      error = function(e) {
+        # silently fail
       }
-    }, error = function(e) {
-      # silently fail
-    })
+    )
   }
-  
+
   # next steps suggestions
   report <- c(report, "## Next Steps")
   report <- c(report, "1. Implement key BID principles identified in this analysis")
@@ -226,7 +232,7 @@ bid_report <- function(
   report <- c(report, "3. Iterate based on feedback")
   report <- c(report, "4. Document successful patterns for future projects")
   report <- c(report, "")
-  
+
   # learning resources
   report <- c(report, "## Learning Resources")
   report <- c(report, "To learn more about the BID framework concepts used in this report:")
@@ -234,7 +240,7 @@ bid_report <- function(
   report <- c(report, "- Explore the concept dictionary with `bid_concepts()`")
   report <- c(report, "- Check the package documentation at https://github.com/jrwinget/bidux")
   report <- c(report, "")
-  
+
   # format report
   if (format == "html") {
     html_report <- paste(

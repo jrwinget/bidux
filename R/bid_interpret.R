@@ -22,7 +22,7 @@
 #'   problem = "Users struggle with complex data",
 #'   evidence = "Test results indicate delays"
 #' )
-#' 
+#'
 #' # Basic usage
 #' bid_interpret(
 #'   previous_stage = notice,
@@ -37,12 +37,12 @@
 #'     visual_approach = "Comparison charts showing before/after UI change"
 #'   )
 #' )
-#' 
+#'
 #' # Let the function suggest content based on previous stage
 #' bid_interpret(
 #'   previous_stage = notice
 #' )
-#' 
+#'
 #' # With user personas
 #' bid_interpret(
 #'   previous_stage = notice,
@@ -106,10 +106,10 @@ bid_interpret <- function(
       } else {
         NA_character_
       }
-      
+
       if (!is.na(problem)) {
         problem_lower <- tolower(problem)
-        
+
         if (grepl("struggl|difficult|hard|confus|unclear", problem_lower)) {
           central_question <- paste0(
             "How can we simplify the interface to address ", problem, "?"
@@ -131,10 +131,10 @@ bid_interpret <- function(
             "How can we address the issue where ", problem, "?"
           )
         }
-        
+
         if (!is.na(theory)) {
           theory_lower <- tolower(theory)
-          
+
           if (grepl("cognitive load", theory_lower)) {
             central_question <- paste0(
               "How can we reduce cognitive load to address ", problem, "?"
@@ -154,12 +154,12 @@ bid_interpret <- function(
           "How can we improve the user experience of the dashboard?"
         )
       }
-      
+
       cli::cli_alert_info(
         paste0("Suggested central question: ", central_question)
       )
     } else if (
-      previous_stage$stage[1] == "Structure" || 
+      previous_stage$stage[1] == "Structure" ||
         previous_stage$stage[1] == "Anticipate"
     ) {
       central_question <- paste0(
@@ -173,7 +173,7 @@ bid_interpret <- function(
 
   if (is.null(data_story)) {
     data_story <- list()
-    
+
     if (previous_stage$stage[1] == "Notice") {
       problem <- if ("problem" %in% names(previous_stage)) {
         previous_stage$problem[1]
@@ -202,36 +202,36 @@ bid_interpret <- function(
       if (!is.na(problem)) {
         # hook
         data_story$hook <- paste0("Users are experiencing problems with ", problem)
-        
+
         # context
         if (!is.na(evidence)) {
           data_story$context <- paste0("According to our evidence: ", evidence)
         } else {
           data_story$context <- "Our current interface may be contributing to this issue."
         }
-        
+
         # tension
         data_story$tension <- paste0(
           "This is creating friction in the user experience",
           if (!is.na(theory)) paste0(" related to ", theory) else ""
         )
-        
+
         # resolution
         data_story$resolution <- paste0(
           "We need to redesign the interface",
           if (!is.na(theory)) paste0(" using principles from ", theory) else "",
           " to address this problem."
         )
-        
+
         # audience
         if (!is.na(target_audience)) {
           data_story$audience <- target_audience
         }
-        
+
         # visual approach
         if (!is.na(theory)) {
           theory_lower <- tolower(theory)
-          
+
           if (grepl("cognitive load", theory_lower)) {
             data_story$visual_approach <- "Simplified visualizations with reduced clutter"
           } else if (grepl("hick", theory_lower)) {
@@ -250,7 +250,7 @@ bid_interpret <- function(
           resolution = "Redesign interface using behavioral science principles"
         )
       }
-      
+
       cli::cli_alert_info("Suggested data story elements based on previous stage information")
     } else if (previous_stage$stage[1] == "Structure" || previous_stage$stage[1] == "Anticipate") {
       data_story <- list(
@@ -259,14 +259,14 @@ bid_interpret <- function(
         tension = "User needs may have evolved or been incompletely understood",
         resolution = "Gather additional user feedback and refine our interpretation"
       )
-      
+
       cli::cli_alert_info("Suggested generic data story for iteration cycle")
     }
   }
 
   required_story_elements <- c("hook", "context", "tension", "resolution")
   provided_elements <- required_story_elements %in% names(data_story)
-  story_completeness <- sum(provided_elements) / length(required_story_elements)
+  story_completeness <- sum(provided_elements)/length(required_story_elements)
 
   if (story_completeness < 0.5) {
     missing_elements <- required_story_elements[!provided_elements]
@@ -299,23 +299,23 @@ bid_interpret <- function(
 
   if (is.null(user_personas)) {
     audience <- NULL
-    
+
     # try to get audience from data_story
     if (!is.null(data_story) && "audience" %in% names(data_story) && !is.na(data_story$audience)) {
       audience <- data_story$audience
-    } 
+    }
     # try to get audience from previous_stage
     else if (
-      previous_stage$stage[1] == "Notice" && 
-      "target_audience" %in% names(previous_stage) &&
-      !is.na(previous_stage$target_audience[1])
+      previous_stage$stage[1] == "Notice" &&
+        "target_audience" %in% names(previous_stage) &&
+        !is.na(previous_stage$target_audience[1])
     ) {
       audience <- previous_stage$target_audience[1]
     }
 
     if (!is.null(audience) && !is.na(audience)) {
       audience_lower <- tolower(audience)
-      
+
       # nuanced user type
       user_type <- if (grepl("analyst|data scientist|technical|developer|engineer", audience_lower)) {
         "Data Analyst"
@@ -330,7 +330,7 @@ bid_interpret <- function(
       } else {
         "Dashboard User"
       }
-      
+
       # technical level
       technical_level <- if (grepl("analyst|data scientist|technical|developer|engineer", audience_lower)) {
         "Advanced"
@@ -339,7 +339,7 @@ bid_interpret <- function(
       } else {
         "Intermediate"
       }
-      
+
       # specific goals based on role
       goals <- if (grepl("executive|leadership", audience_lower)) {
         "Needs quick insights for strategic decisions"
@@ -352,7 +352,7 @@ bid_interpret <- function(
       } else {
         "Needs to extract relevant insights efficiently"
       }
-      
+
       # specific pain points based on role
       pain_points <- if (grepl("executive|leadership", audience_lower)) {
         "Limited time to analyze detailed reports"
@@ -365,7 +365,7 @@ bid_interpret <- function(
       } else {
         "Gets overwhelmed by complex dashboards with too many options"
       }
-      
+
       # complete persona
       user_personas <- list(
         list(
@@ -375,7 +375,7 @@ bid_interpret <- function(
           technical_level = technical_level
         )
       )
-      
+
       cli::cli_alert_info(paste0("Created user persona '", user_personas[[1]]$name, "' based on audience information"))
     }
   }
@@ -418,16 +418,19 @@ bid_interpret <- function(
   }
 
   personas_formatted <- if (!is.null(user_personas) && length(user_personas) > 0) {
-    tryCatch({
-      jsonlite::toJSON(user_personas)
-    }, error = function(e) {
-      cli::cli_warn(c(
-        "Could not convert user_personas to JSON format",
-        "i" = "Using default NA value instead",
-        "x" = paste0(e$message)
-      ))
-      NA_character_
-    })
+    tryCatch(
+      {
+        jsonlite::toJSON(user_personas)
+      },
+      error = function(e) {
+        cli::cli_warn(c(
+          "Could not convert user_personas to JSON format",
+          "i" = "Using default NA value instead",
+          "x" = paste0(e$message)
+        ))
+        NA_character_
+      }
+    )
   } else {
     NA_character_
   }
@@ -443,12 +446,21 @@ bid_interpret <- function(
     metrics = metrics,
     visual_approach = visual_approach,
     user_personas = personas_formatted,
-    previous_problem = if (previous_stage$stage[1] == "Notice" && "problem" %in% names(previous_stage)) 
-      previous_stage$problem[1] %||% NA_character_ else NA_character_,
-    previous_theory = if (previous_stage$stage[1] == "Notice" && "theory" %in% names(previous_stage)) 
-      previous_stage$theory[1] %||% NA_character_ else NA_character_,
-    previous_audience = if (previous_stage$stage[1] == "Notice" && "target_audience" %in% names(previous_stage)) 
-      previous_stage$target_audience[1] %||% NA_character_ else NA_character_,
+    previous_problem = if (previous_stage$stage[1] == "Notice" && "problem" %in% names(previous_stage)) {
+      previous_stage$problem[1] %||% NA_character_
+    } else {
+      NA_character_
+    },
+    previous_theory = if (previous_stage$stage[1] == "Notice" && "theory" %in% names(previous_stage)) {
+      previous_stage$theory[1] %||% NA_character_
+    } else {
+      NA_character_
+    },
+    previous_audience = if (previous_stage$stage[1] == "Notice" && "target_audience" %in% names(previous_stage)) {
+      previous_stage$target_audience[1] %||% NA_character_
+    } else {
+      NA_character_
+    },
     suggestions = suggestions,
     timestamp = Sys.time()
   )
@@ -457,10 +469,11 @@ bid_interpret <- function(
     "Stage 2 (Interpret) completed.",
     paste0(
       "Central question: ",
-      if(nchar(central_question) > 60) 
-        paste0(substring(central_question, 1, 60), "...") 
-      else 
+      if (nchar(central_question) > 60) {
+        paste0(substring(central_question, 1, 60), "...")
+      } else {
         central_question
+      }
     ),
     story_suggestion,
     question_suggestion,
@@ -485,24 +498,24 @@ validate_user_personas <- function(user_personas) {
 
   for (i in seq_along(user_personas)) {
     persona <- user_personas[[i]]
-    
+
     if (!is.list(persona)) {
       cli::cli_abort(c(
         "Each persona in user_personas must be a list",
         "x" = paste0("Persona at position ", i, " is ", class(persona)[1])
       ))
     }
-    
+
     if (!"name" %in% names(persona)) {
       cli::cli_abort(c(
         "Each persona must have at least a 'name' field",
         "x" = paste0("Persona at position ", i, " is missing the required 'name' field")
       ))
     }
-    
+
     recommended_fields <- c("goals", "pain_points", "technical_level")
     missing_recommended <- recommended_fields[!recommended_fields %in% names(persona)]
-    
+
     if (length(missing_recommended) > 0) {
       cli::cli_warn(c(
         paste0("Recommended fields are missing from persona '", persona$name, "'"),

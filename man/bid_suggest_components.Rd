@@ -25,17 +25,17 @@ recommendations for various UI packages.
 }
 \examples{
 \dontrun{
-  # Get suggestions from a specific stage
-  notice_result <- bid_notice(
-    problem = "Too many filter options",
-    evidence = "Users take 30+ seconds to configure dashboard"
-  )
+# Get suggestions from a specific stage
+notice_result <- bid_notice(
+  problem = "Too many filter options",
+  evidence = "Users take 30+ seconds to configure dashboard"
+)
 
-  bid_suggest_components(notice_result, package = "shiny")
-  
-  # Get suggestions for all packages
-  final_result <- bid_validate(...)
-  all_suggestions <- bid_suggest_components(final_result, package = "all")
+bid_suggest_components(notice_result, package = "shiny")
+
+# Get suggestions for all packages
+final_result <- bid_validate(...)
+all_suggestions <- bid_suggest_components(final_result, package = "all")
 }
 
 }

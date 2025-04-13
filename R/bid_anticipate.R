@@ -6,7 +6,7 @@
 #' It also supports adding interaction hints and visual feedback elements.
 #'
 #' @param previous_stage A tibble or list output from an earlier BID stage function.
-#' @param bias_mitigations A named list of bias mitigation strategies. If NULL, the 
+#' @param bias_mitigations A named list of bias mitigation strategies. If NULL, the
 #'        function will suggest bias mitigations based on information from previous stages.
 #' @param interaction_principles A named list of interaction principles (optional).
 #'
@@ -31,7 +31,7 @@
 #'   layout = "dual_process",
 #'   concepts = c("principle_of_proximity", "default_effect")
 #' )
-#' 
+#'
 #' # Basic usage
 #' bid_anticipate(
 #'   previous_stage = structure_info,
@@ -40,12 +40,12 @@
 #'     framing = "Toggle between positive and negative framing"
 #'   )
 #' )
-#' 
+#'
 #' # Let the function suggest bias mitigations based on previous stages
 #' bid_anticipate(
 #'   previous_stage = structure_info
 #' )
-#' 
+#'
 #' # With interaction principles
 #' bid_anticipate(
 #'   previous_stage = structure_info,
@@ -68,18 +68,18 @@ bid_anticipate <- function(
   validate_required_params(
     previous_stage = previous_stage
   )
-  
+
   validate_previous_stage(previous_stage, "Anticipate")
 
   bias_concepts <- bid_concepts("bias|anchor|fram|confirm")
-  
+
   if (is.null(bias_mitigations)) {
     suggested_biases <- list()
-    
+
     if (previous_stage$stage[1] == "Structure") {
       concepts <- strsplit(previous_stage$concepts[1], ", ")[[1]]
       layout <- previous_stage$layout[1]
-      
+
       concept_bias_map <- list(
         "Dual-Processing Theory" = c("framing", "anchoring"),
         "Visual Hierarchy" = c("attention bias", "belief perseverance"),
@@ -88,7 +88,7 @@ bid_anticipate <- function(
         "Aesthetic-Usability" = c("beautiful-is-good stereotype", "halo effect"),
         "Information Hierarchy" = c("availability bias", "prominence effect")
       )
-      
+
       for (concept in concepts) {
         concept <- trimws(concept)
         for (known_concept in names(concept_bias_map)) {
@@ -100,31 +100,33 @@ bid_anticipate <- function(
           }
         }
       }
-      
+
       layout_bias_map <- list(
         "dual_process" = c("framing" = "Toggle between high-level insights and detailed analysis views"),
         "grid" = c("anchoring" = "Provide multiple reference points across grid cells"),
         "card" = c("beautiful-is-good stereotype" = "Ensure card aesthetics don't overshadow content quality"),
         "tabs" = c("availability bias" = "Make important information available in the default tab")
       )
-      
+
       if (layout %in% names(layout_bias_map)) {
         for (bias_name in names(layout_bias_map[[layout]])) {
           suggested_biases[[bias_name]] <- layout_bias_map[[layout]][[bias_name]]
         }
       }
-    } 
-    else if (previous_stage$stage[1] == "Interpret") {
+    } else if (previous_stage$stage[1] == "Interpret") {
       story_elements <- list(
-        central_question = if ("central_question" %in% names(previous_stage)) 
-          previous_stage$central_question[1] else NA,
+        central_question = if ("central_question" %in% names(previous_stage)) {
+          previous_stage$central_question[1]
+        } else {
+          NA
+        },
         hook = if ("hook" %in% names(previous_stage)) previous_stage$hook[1] else NA,
         tension = if ("tension" %in% names(previous_stage)) previous_stage$tension[1] else NA,
         resolution = if ("resolution" %in% names(previous_stage)) previous_stage$resolution[1] else NA
       )
-      
+
       combined_text <- tolower(paste(unlist(story_elements), collapse = " "))
-      
+
       bias_keywords <- list(
         "anchoring" = c("compar", "reference", "previous", "baseline", "target"),
         "framing" = c("positiv", "negativ", "gain", "loss", "perspective"),
@@ -133,18 +135,18 @@ bid_anticipate <- function(
         "loss aversion" = c("risk", "loss", "gain", "averse", "avoid"),
         "recency bias" = c("recent", "latest", "new", "trend", "last")
       )
-      
+
       for (bias_name in names(bias_keywords)) {
         keywords <- bias_keywords[[bias_name]]
         if (any(sapply(keywords, function(k) grepl(k, combined_text)))) {
           suggested_biases[[bias_name]] <- paste(
-            "Address", bias_name, "based on", 
+            "Address", bias_name, "based on",
             if (!is.na(story_elements$tension)) "tension" else "data story"
           )
         }
       }
     }
-    
+
     common_biases <- c("anchoring", "framing", "confirmation bias")
     if (length(suggested_biases) < 2) {
       for (bias in common_biases) {
@@ -153,7 +155,7 @@ bid_anticipate <- function(
         }
       }
     }
-    
+
     if (length(suggested_biases) == 0) {
       suggested_biases <- list(
         anchoring = "Provide multiple reference points to reduce anchoring effect",
@@ -161,21 +163,21 @@ bid_anticipate <- function(
         confirmation_bias = "Include evidence that challenges common assumptions"
       )
     }
-    
+
     bias_mitigations <- suggested_biases
-    
+
     message(paste0(
       "Automatically suggested bias mitigations: ",
       paste(names(bias_mitigations), collapse = ", "), "."
     ))
   }
-  
+
   if (is.null(interaction_principles)) {
     suggested_principles <- list()
-    
+
     if (previous_stage$stage[1] == "Structure") {
       layout <- previous_stage$layout[1]
-      
+
       layout_interaction_map <- list(
         "dual_process" = c(
           "progressive_disclosure" = "Reveal detailed analysis only when users want to explore further",
@@ -198,7 +200,7 @@ bid_anticipate <- function(
           "contextual_controls" = "Show controls only when relevant to reduce visual noise"
         )
       )
-      
+
       if (layout %in% names(layout_interaction_map)) {
         for (principle_name in names(layout_interaction_map[[layout]])) {
           suggested_principles[[principle_name]] <- layout_interaction_map[[layout]][[principle_name]]
@@ -207,7 +209,7 @@ bid_anticipate <- function(
 
       if ("concepts" %in% names(previous_stage)) {
         concepts <- strsplit(previous_stage$concepts[1], ", ")[[1]]
-        
+
         concept_interaction_map <- list(
           "Visual Hierarchy" = c(
             "visual_prominence" = "Give interactive elements visual prominence proportional to importance"
@@ -224,7 +226,7 @@ bid_anticipate <- function(
             "state_indicators" = "Use clear visual indicators for different states"
           )
         )
-        
+
         for (concept in concepts) {
           concept <- trimws(concept)
           for (known_concept in names(concept_interaction_map)) {
@@ -238,10 +240,10 @@ bid_anticipate <- function(
         }
       }
     }
-    
+
     if (length(suggested_principles) > 0) {
       interaction_principles <- suggested_principles
-      
+
       message(paste0(
         "Automatically suggested interaction principles: ",
         paste(names(interaction_principles), collapse = ", "), "."
@@ -283,7 +285,7 @@ bid_anticipate <- function(
   }
 
   interaction_suggestions <- character(0)
-  
+
   if (!is.null(interaction_principles) && length(interaction_principles) > 0) {
     for (principle_name in names(interaction_principles)) {
       interaction_suggestions <- c(
@@ -291,7 +293,7 @@ bid_anticipate <- function(
         paste0(principle_name, ": ", interaction_principles[[principle_name]])
       )
     }
-    
+
     interaction_msg <- paste0(
       "Good job including interaction principles. ",
       "These will help users understand how to interact with your dashboard."
@@ -301,10 +303,10 @@ bid_anticipate <- function(
       "Consider adding interaction principles like hover effects,",
       "selection feedback, and progressive disclosure to guide users."
     )
-    
+
     interaction_suggestions <- c(interaction_suggestions, interaction_msg)
   }
-  
+
   interaction_formatted <- if (!is.null(interaction_principles) && length(interaction_principles) > 0) {
     if (is.list(interaction_principles)) {
       jsonlite::toJSON(interaction_principles)
@@ -338,8 +340,9 @@ bid_anticipate <- function(
   bid_message(
     "Stage 4 (Anticipate) completed.",
     paste0("Bias mitigations: ", length(names(bias_mitigations)), " defined"),
-    if (!is.null(interaction_principles)) 
-      paste0("Interaction principles: ", length(names(interaction_principles)), " defined"),
+    if (!is.null(interaction_principles)) {
+      paste0("Interaction principles: ", length(names(interaction_principles)), " defined")
+    },
     paste("Key suggestions:", paste(bias_suggestions[1:min(3, length(bias_suggestions))], collapse = ", "))
   )
 

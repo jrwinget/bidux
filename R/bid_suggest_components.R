@@ -13,17 +13,17 @@
 #'
 #' @examples
 #' \dontrun{
-#'   # Get suggestions from a specific stage
-#'   notice_result <- bid_notice(
-#'     problem = "Too many filter options",
-#'     evidence = "Users take 30+ seconds to configure dashboard"
-#'   )
-#' 
-#'   bid_suggest_components(notice_result, package = "shiny")
-#'   
-#'   # Get suggestions for all packages
-#'   final_result <- bid_validate(...)
-#'   all_suggestions <- bid_suggest_components(final_result, package = "all")
+#' # Get suggestions from a specific stage
+#' notice_result <- bid_notice(
+#'   problem = "Too many filter options",
+#'   evidence = "Users take 30+ seconds to configure dashboard"
+#' )
+#'
+#' bid_suggest_components(notice_result, package = "shiny")
+#'
+#' # Get suggestions for all packages
+#' final_result <- bid_validate(...)
+#' all_suggestions <- bid_suggest_components(final_result, package = "all")
 #' }
 #'
 #' @export
@@ -94,7 +94,7 @@ bid_suggest_components <- function(
     code_example = 'actionButton("share", "Share Insights", icon = icon("share-alt"))',
     relevance = 1.0
   ))
-  
+
   # {shiny} accessibility suggestions
   shiny_suggestions <- rbind(shiny_suggestions, tibble::tibble(
     stage = "Structure",
@@ -104,7 +104,7 @@ bid_suggest_components <- function(
     code_example = 'tags$div(id = "chart-container", role = "img", `aria-label` = "Chart showing sales trends over time", plotOutput("sales_chart"))',
     relevance = 0.9
   ))
-  
+
   shiny_suggestions <- rbind(shiny_suggestions, tibble::tibble(
     stage = "Anticipate",
     package = "shiny",
@@ -159,7 +159,7 @@ bid_suggest_components <- function(
     code_example = 'accordion(accordion_panel("Key Finding 1", "Details about finding 1"), accordion_panel("Key Finding 2", "Details about finding 2"))',
     relevance = 1.0
   ))
-  
+
   # {bslib} accessibility suggestions
   bslib_suggestions <- rbind(bslib_suggestions, tibble::tibble(
     stage = "Structure",
@@ -169,7 +169,7 @@ bid_suggest_components <- function(
     code_example = 'layout_column_wrap(width = 1/2, gap = "2rem", ...))',
     relevance = 0.9
   ))
-  
+
   bslib_suggestions <- rbind(bslib_suggestions, tibble::tibble(
     stage = "Structure",
     package = "bslib",
@@ -224,7 +224,7 @@ bid_suggest_components <- function(
     code_example = 'reactable(data, details = function(index) { div(style = list(padding = "1rem"), "Additional details for row ", index) })',
     relevance = 1.0
   ))
-  
+
   # {reactable} accessibility suggestions
   reactable_suggestions <- rbind(reactable_suggestions, tibble::tibble(
     stage = "Interpret",
@@ -280,7 +280,7 @@ bid_suggest_components <- function(
     code_example = 'e_charts(data) |> e_line(x) |> e_toolbox_feature(feature = "saveAsImage")',
     relevance = 1.0
   ))
-  
+
   # {echarts4r} accessibility suggestions
   echarts_suggestions <- rbind(echarts_suggestions, tibble::tibble(
     stage = "Interpret",
@@ -290,7 +290,7 @@ bid_suggest_components <- function(
     code_example = 'e_charts(data) |> e_bar(y) |> e_color(c("#4472C4", "#ED7D31", "#A5A5A5", "#FFC000", "#5B9BD5"))',
     relevance = 0.9
   ))
-  
+
   echarts_suggestions <- rbind(echarts_suggestions, tibble::tibble(
     stage = "Structure",
     package = "echarts4r",
@@ -299,7 +299,7 @@ bid_suggest_components <- function(
     code_example = 'e_charts(data) |> e_line(x) |> e_theme("custom") |> e_theme_custom("{\"color\":[\"#5B8FF9\",\"#5AD8A6\",\"#FFD666\"],\"backgroundColor\":\"rgba(0,0,0,0)\",\"textStyle\":{},\"title\":{\"textStyle\":{\"color\":\"#666666\"},\"subtextStyle\":{\"color\":\"#999999\"}},\"line\":{\"itemStyle\":{\"borderWidth\":2},\"lineStyle\":{\"width\":2},\"symbol\":\"emptyCircle\"}}")',
     relevance = 0.8
   ))
-  
+
   # final suggestions
   all_suggestions <- switch(package,
     "shiny" = shiny_suggestions,
@@ -313,7 +313,7 @@ bid_suggest_components <- function(
       echarts_suggestions
     )
   )
-  
+
   # filter suggestions by current stage
   if (stage != "Unknown" && package != "all") {
     stage_matches <- dplyr::filter(all_suggestions, stage == !!stage)
@@ -330,11 +330,11 @@ bid_suggest_components <- function(
   } else {
     result <- all_suggestions
   }
-  
+
   if ("relevance" %in% names(result)) {
     result <- dplyr::arrange(result, dplyr::desc(relevance))
   }
-  
+
   if ("relevance" %in% names(result)) {
     result <- dplyr::select(result, -relevance)
   }

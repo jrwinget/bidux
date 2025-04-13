@@ -5,11 +5,11 @@
 #'
 #' @param a The left-hand side value.
 #' @param b The right-hand side value.
-#' 
+#'
 #' @return a if it is not NULL, otherwise b.
-#' 
+#'
 #' @keywords internal
-#' 
+#'
 #' @noRd
 `%||%` <- function(a, b) {
   if (!is.null(a)) a else b
@@ -18,11 +18,11 @@
 #' Check if input is NULL, NA, or an empty string
 #'
 #' @param x The value to check
-#' 
+#'
 #' @return TRUE if x is NULL, NA, or an empty string, FALSE otherwise
-#' 
+#'
 #' @keywords internal
-#' 
+#'
 #' @noRd
 is_empty <- function(x) {
   is.null(x) || is.na(x) || (is.character(x) && nchar(trimws(x)) == 0)
@@ -35,19 +35,18 @@ is_empty <- function(x) {
 #' @param param_name The name of the parameter (if applicable)
 #' @param expected The expected value or type (if applicable)
 #' @param actual The actual value or type (if applicable)
-#' 
+#'
 #' @return A standardized error message
-#' 
+#'
 #' @keywords internal
-#' 
+#'
 #' @noRd
 standard_error_msg <- function(
     type,
     param_name = NULL,
     expected = NULL,
     actual = NULL) {
-  switch(
-    type,
+  switch(type,
     missing_param = paste0(
       "Required parameter",
       if (!is.null(param_name)) paste0(" '", param_name, "'"),
@@ -55,16 +54,17 @@ standard_error_msg <- function(
     ),
     invalid_param = paste0(
       "Parameter",
-      if (!is.null(param_name)) paste0(" '", param_name, "'"), 
+      if (!is.null(param_name)) paste0(" '", param_name, "'"),
       " is invalid.",
-      if (!is.null(expected) && !is.null(actual)) 
+      if (!is.null(expected) && !is.null(actual)) {
         paste0(" Expected: ", expected, ", Actual: ", actual, ".")
+      }
     ),
     invalid_stage = paste0(
-      "Expected previous_stage from '", 
-      expected, 
-      "', but got '", 
-      actual, 
+      "Expected previous_stage from '",
+      expected,
+      "', but got '",
+      actual,
       "'. Please ensure you're following the BID framework stages in order."
     ),
     paste0("An error occurred in the implementation of the BID framework.")
@@ -74,11 +74,11 @@ standard_error_msg <- function(
 #' Validate that required parameters are not missing
 #'
 #' @param ... Named parameters to check
-#' 
+#'
 #' @return NULL invisibly if all checks pass, otherwise stops with an error
-#' 
+#'
 #' @keywords internal
-#' 
+#'
 #' @noRd
 validate_required_params <- function(...) {
   args <- list(...)
@@ -88,7 +88,7 @@ validate_required_params <- function(...) {
       stop(standard_error_msg("missing_param", param_name))
     }
   }
-  
+
   invisible(NULL)
 }
 
@@ -109,15 +109,15 @@ validate_previous_stage <- function(previous_stage, current_stage) {
     stop(
       standard_error_msg(
         "invalid_param",
-        "previous_stage", 
-        "a tibble with a 'stage' column", 
+        "previous_stage",
+        "a tibble with a 'stage' column",
         "invalid input"
       )
     )
   }
-  
+
   prev_stage_name <- previous_stage$stage[1]
-  
+
   valid_prev_stages <- switch(current_stage,
     "Notice" = c(character(0), "Validate"),
     "Interpret" = c("Notice", "Structure", "Anticipate", "Validate"),

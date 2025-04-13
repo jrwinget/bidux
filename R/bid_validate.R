@@ -42,19 +42,19 @@
 #'     framing = "Use gain-framed messages"
 #'   )
 #' )
-#' 
+#'
 #' # Basic usage
 #' bid_validate(
 #'   previous_stage = anticipate_info,
 #'   summary_panel = "Key insights include clarity and user satisfaction",
 #'   collaboration = "Annotations enabled for team feedback"
 #' )
-#' 
+#'
 #' # Let the function suggest content based on previous stages
 #' bid_validate(
 #'   previous_stage = anticipate_info
 #' )
-#' 
+#'
 #' # With next steps
 #' bid_validate(
 #'   previous_stage = anticipate_info,
@@ -76,22 +76,28 @@ bid_validate <- function(
   validate_required_params(
     previous_stage = previous_stage
   )
-  
+
   validate_previous_stage(previous_stage, "Validate")
 
   validation_concepts <- bid_concepts("peak|end|beautiful|cooperation")
-  
+
   if (is.null(summary_panel)) {
     bias_mitigations <- previous_stage$bias_mitigations[1]
-    
-    previous_layout <- if ("previous_layout" %in% names(previous_stage)) 
-      previous_stage$previous_layout[1] else NA_character_
-    
-    previous_concepts <- if ("previous_concepts" %in% names(previous_stage)) 
-      previous_stage$previous_concepts[1] else NA_character_
-    
+
+    previous_layout <- if ("previous_layout" %in% names(previous_stage)) {
+      previous_stage$previous_layout[1]
+    } else {
+      NA_character_
+    }
+
+    previous_concepts <- if ("previous_concepts" %in% names(previous_stage)) {
+      previous_stage$previous_concepts[1]
+    } else {
+      NA_character_
+    }
+
     summary_parts <- character(0)
-    
+
     if (!is.na(previous_layout)) {
       layout_summary <- switch(previous_layout,
         "dual_process" = "The dashboard uses a dual-process layout, separating quick insights from detailed analysis.",
@@ -103,17 +109,17 @@ bid_validate <- function(
       )
       summary_parts <- c(summary_parts, layout_summary)
     }
-    
+
     if (!is.na(bias_mitigations)) {
       bias_names <- gsub(":.*?;", ";", bias_mitigations)
       bias_names <- gsub(":.*$", "", bias_names)
       bias_summary <- paste0(
-        "Cognitive biases are addressed through strategies for ", 
+        "Cognitive biases are addressed through strategies for ",
         bias_names, "."
       )
       summary_parts <- c(summary_parts, bias_summary)
     }
-    
+
     if (!is.na(previous_concepts)) {
       concept_list <- strsplit(previous_concepts, ", ")[[1]]
       if (length(concept_list) > 0) {
@@ -123,28 +129,28 @@ bid_validate <- function(
           )
         } else {
           concept_summary <- paste0(
-            "The design implements key concepts including ", 
+            "The design implements key concepts including ",
             paste(concept_list[1:min(3, length(concept_list))], collapse = ", "), "."
           )
         }
         summary_parts <- c(summary_parts, concept_summary)
       }
     }
-    
+
     if (length(summary_parts) == 0) {
       summary_parts <- c(
         "This dashboard implements behavioral science principles to enhance user experience.",
         "Key metrics are presented in an intuitive layout with appropriate context."
       )
     }
-    
+
     summary_parts <- c(
       summary_parts,
       "The design aims to minimize cognitive load while providing clear insights and actionable information."
     )
-    
+
     summary_panel <- paste(summary_parts, collapse = " ")
-    
+
     message("Automatically generated summary panel based on previous stages.")
   }
 
@@ -154,21 +160,21 @@ bid_validate <- function(
       "Include export and sharing options for key insights.",
       "Consider implementing saved view functionality for recurring analysis tasks."
     )
-    
+
     message("Automatically suggested collaboration features.")
   }
-  
+
   if (is.null(next_steps)) {
     suggested_steps <- character(0)
-    
+
     problem <- NA_character_
     biases <- NA_character_
-    
+
     if (!is.na(previous_stage$bias_mitigations[1])) {
       biases <- strsplit(previous_stage$bias_mitigations[1], ";")[[1]]
       biases <- gsub("^\\s*|\\s*$", "", biases)
     }
-    
+
     if (!is.na(biases[1])) {
       for (bias in biases) {
         if (grepl("anchor", bias, ignore.case = TRUE)) {
@@ -180,21 +186,22 @@ bid_validate <- function(
         }
       }
     }
-    
+
     if (length(suggested_steps) < 2) {
-      suggested_steps <- c(suggested_steps,
+      suggested_steps <- c(
+        suggested_steps,
         "Schedule user testing sessions to validate design improvements",
         "Document successful patterns for future projects",
         "Review dashboard with stakeholders to ensure it meets business needs"
       )
     }
-    
+
     if (length(suggested_steps) > 5) {
       suggested_steps <- suggested_steps[1:5]
     }
-    
+
     next_steps <- suggested_steps
-    
+
     message(paste0(
       "Automatically suggested ", length(next_steps), " next steps based on previous stages."
     ))
@@ -217,7 +224,7 @@ bid_validate <- function(
     "Please specify collaboration features for your dashboard."
   } else if (
     stringr::str_detect(
-      tolower(collaboration), 
+      tolower(collaboration),
       "annotation|comment|feedback|discuss|share|collaborate"
     )
   ) {
@@ -231,7 +238,7 @@ bid_validate <- function(
       "collaboration."
     )
   }
-  
+
   next_steps_suggestion <- if (!is.null(next_steps) && length(next_steps) > 0) {
     paste0(
       "Good job including ", length(next_steps), " next steps. ",
@@ -243,7 +250,7 @@ bid_validate <- function(
       "This helps implement the Peak-End Rule."
     )
   }
-  
+
   next_steps_formatted <- if (!is.null(next_steps) && length(next_steps) > 0) {
     paste(next_steps, collapse = "; ")
   } else {
@@ -251,8 +258,8 @@ bid_validate <- function(
   }
 
   suggestions <- paste(
-    summary_suggestion, 
-    collaboration_suggestion, 
+    summary_suggestion,
+    collaboration_suggestion,
     next_steps_suggestion,
     sep = " "
   )

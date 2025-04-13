@@ -29,7 +29,7 @@
 #'   theory = "Cognitive Load Theory",
 #'   evidence = "User testing showed increased time to locate key metrics."
 #' )
-#' 
+#'
 #' # With target audience
 #' bid_notice(
 #'   problem = "Sales team struggles with complex filter combinations",
