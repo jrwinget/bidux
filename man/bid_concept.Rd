@@ -20,5 +20,6 @@ based on fuzzy matching.
 \examples{
 bid_concept("Cognitive Load Theory")
 bid_concept("cognitive load") # Case insensitive, partial matching
+bid_concept("proximity") # Works with partial concept names
 
 }
