@@ -1,29 +1,62 @@
 #' List all BID Framework Concepts
 #'
 #' @description
-#' This function returns a tibble listing all the key concepts in the Behavior Insight Design framework,
-#' including their descriptions, categories, references, and example applications.
+#' This function returns a tibble listing all the key concepts in the Behavior
+#' Insight Design framework, including their descriptions, categories,
+#' references, and example applications.
 #'
 #' @param search Optional search term to filter concepts
 #' @return A tibble with concept details.
+#'
 #' @examples
 #' bid_concepts()
 #' bid_concepts("cognitive")
+#'
 #' @export
 bid_concepts <- function(search = NULL) {
   concepts <- tibble::tibble(
     concept = c(
-      "Cognitive Load Theory", "Hick's Law", "Visual Hierarchies",
-      "Data Storytelling Framework", "Processing Fluency", "Emotion & Fluency Effects",
-      "Principle of Proximity", "Dual-Processing Theory", "Default Effect",
-      "Aesthetic-Usability", "Beautiful-Is-Good Stereotype",
-      "Anchoring Effect", "Framing & Loss Aversion", "Confirmation Bias",
-      "Belief Perseverance", "Risk Perception",
-      "Peak-End Rule", "Cooperation & Coordination",
-      "Progressive Disclosure", "Fitts's Law", "Miller's Law",
-      "Information Scent", "Affordance", "Gestalt Principles",
-      "Preattentive Processing", "Shneiderman's Mantra", "Norman's Stages of Action",
-      "Information Hierarchy", "Cognitive Dimensions Framework", "Change Blindness"
+      "Cognitive Load Theory",
+      "Hick's Law",
+      "Visual Hierarchies",
+      "Data Storytelling Framework",
+      "Processing Fluency",
+      "Emotion & Fluency Effects",
+      "Principle of Proximity",
+      "Dual-Processing Theory",
+      "Default Effect",
+      "Aesthetic-Usability",
+      "Beautiful-Is-Good Stereotype",
+      "Anchoring Effect",
+      "Framing & Loss Aversion",
+      "Confirmation Bias",
+      "Belief Perseverance",
+      "Risk Perception",
+      "Peak-End Rule",
+      "Cooperation & Coordination",
+      "Progressive Disclosure",
+      "Fitts's Law",
+      "Miller's Law",
+      "Information Scent",
+      "Affordance",
+      "Gestalt Principles",
+      "Preattentive Processing",
+      "Shneiderman's Mantra",
+      "Norman's Stages of Action",
+      "Information Hierarchy",
+      "Cognitive Dimensions Framework",
+      "Change Blindness",
+      "Progressive Disclosure",
+      "Visual Hierarchy",
+      "Breathable Layouts",
+      "Gherkin Method",
+      "Interaction Hints",
+      "Visual Feedback",
+      "Accessibility Contrast",
+      "Keyboard Navigation",
+      "Screen Reader Compatibility",
+      "User Personas",
+      "User-Centric Design"
     ),
     description = c(
       "Theory that suggests minimizing extraneous load to improve user understanding.",
@@ -55,33 +88,104 @@ bid_concepts <- function(search = NULL) {
       "Seven-stage model of how users interact with systems.",
       "Organization of information by importance and relationships.",
       "Framework for analyzing notation systems and user interfaces.",
-      "Failure to notice visual changes when they occur gradually."
+      "Failure to notice visual changes when they occur gradually.",
+      "Revealing information gradually as needed to prevent overwhelming users.",
+      "Organizing visual elements by importance to guide the user's attention.",
+      "Using whitespace effectively to create visual rhythm and reduce cognitive load.",
+      "Structured format for creating user stories with Given-When-Then syntax.",
+      "Visual cues that suggest possible interactions to users.",
+      "Immediate visual response to user actions to confirm their effect.",
+      "Ensuring sufficient color contrast for users with visual impairments.",
+      "Supporting navigation and interaction without requiring a mouse.",
+      "Making content accessible to users with screen readers.",
+      "Fictional representations of user types to guide design decisions.",
+      "Design approach that prioritizes user needs and goals throughout the process."
     ),
     category = c(
-      "Stage 1", "Stage 1", "Stage 1",
-      "Stage 2", "Stage 2", "Stage 2",
-      "Stage 3", "Stage 3", "Stage 3",
-      "Stage 3", "Stage 3",
-      "Stage 4", "Stage 4", "Stage 4",
-      "Stage 4", "Stage 4",
-      "Stage 5", "Stage 5",
-      "Stage 1", "Stage 1", "Stage 1",
-      "Stage 2", "Stage 3", "Stage 3",
-      "Stage 2", "Stage 2", "Stage 1",
-      "Stage 3", "Stage 1", "Stage 4"
+      "Stage 1",
+      "Stage 1",
+      "Stage 1",
+      "Stage 2",
+      "Stage 2",
+      "Stage 2",
+      "Stage 3",
+      "Stage 3",
+      "Stage 3",
+      "Stage 3",
+      "Stage 3",
+      "Stage 4",
+      "Stage 4",
+      "Stage 4",
+      "Stage 4",
+      "Stage 4",
+      "Stage 5",
+      "Stage 5",
+      "Stage 1",
+      "Stage 1",
+      "Stage 1",
+      "Stage 2",
+      "Stage 3",
+      "Stage 3",
+      "Stage 2",
+      "Stage 2",
+      "Stage 1",
+      "Stage 3",
+      "Stage 1",
+      "Stage 4",
+      "Stage 3",
+      "Stage 1",
+      "Stage 3",
+      "Stage 2",
+      "Stage 4",
+      "Stage 4",
+      "Stage 3",
+      "Stage 3",
+      "Stage 3",
+      "Stage 2",
+      "All Stages"
     ),
     reference = c(
-      "Sweller (1988)", "Hick (1952)", "Tufte (1983)",
-      "Matei & Hunter (2021)", "Alter & Oppenheimer (2009)", "Song & Schwarz (2009)",
-      "Gestalt Principles", "Tversky & Kahneman (1979)", "Johnson & Goldstein (2003)",
-      "Norman (2002)", "Dion et al. (1972)",
-      "Tversky & Kahneman (1974)", "Tversky & Kahneman (1981)", "Nickerson (1998)",
-      "Ross & Lepper (1980)", "Slovic (1987)",
-      "Kahneman et al. (1993)", "Tindale & Kluwe (2015)",
-      "Krug (2014)", "Fitts (1954)", "Miller (1956)",
-      "Pirolli & Card (1999)", "Norman (1988)", "Wertheimer (1923)",
-      "Healey (1996)", "Shneiderman (1996)", "Norman (1986)",
-      "Djamasbi et al. (2010)", "Green & Petre (1996)", "Rensink et al. (1997)"
+      "Sweller (1988)",
+      "Hick (1952)",
+      "Tufte (1983)",
+      "Matei & Hunter (2021)",
+      "Alter & Oppenheimer (2009)",
+      "Song & Schwarz (2009)",
+      "Gestalt Principles",
+      "Tversky & Kahneman (1979)",
+      "Johnson & Goldstein (2003)",
+      "Norman (2002)",
+      "Dion et al. (1972)",
+      "Tversky & Kahneman (1974)",
+      "Tversky & Kahneman (1981)",
+      "Nickerson (1998)",
+      "Ross & Lepper (1980)",
+      "Slovic (1987)",
+      "Kahneman et al. (1993)",
+      "Tindale & Kluwe (2015)",
+      "Krug (2014)",
+      "Fitts (1954)",
+      "Miller (1956)",
+      "Pirolli & Card (1999)",
+      "Norman (1988)",
+      "Wertheimer (1923)",
+      "Healey (1996)",
+      "Shneiderman (1996)",
+      "Norman (1986)",
+      "Djamasbi et al. (2010)",
+      "Green & Petre (1996)",
+      "Rensink et al. (1997)",
+      "Nielsen (2006)",
+      "Djamasbi et al. (2010)",
+      "White (2011)",
+      "North (2006)",
+      "Norman (1988)",
+      "Shneiderman (2016)",
+      "WCAG 2.1",
+      "WCAG 2.1",
+      "WCAG 2.1",
+      "Cooper (1999)",
+      "Daly, Jasmine (2023)"
     ),
     example = c(
       "Reducing clutter in dashboards",
@@ -113,7 +217,18 @@ bid_concepts <- function(search = NULL) {
       "Reducing steps needed to complete common dashboard actions",
       "Making primary metrics visually dominant over secondary ones",
       "Evaluating dashboard complexity across multiple dimensions",
-      "Using animation to highlight data changes between states"
+      "Using animation to highlight data changes between states",
+      "Using collapsible sections to reveal details only when needed",
+      "Making key metrics larger and more prominent than supporting data",
+      "Adding appropriate spacing between dashboard sections",
+      "Documenting user stories in Given-When-Then format",
+      "Using hover effects to indicate clickable elements",
+      "Highlighting active filters or selections with visual cues",
+      "Ensuring text has a 4.5:1 contrast ratio against its background",
+      "Making all interactive elements focusable with the Tab key",
+      "Adding descriptive alt text to charts and visuals",
+      "Creating design personas representing different user types",
+      "Conducting user research before and during the design process"
     ),
     implementation_tips = c(
       "Use tabs or collapsible sections to organize complex information.",
@@ -145,7 +260,18 @@ bid_concepts <- function(search = NULL) {
       "Minimize the steps required to perform common dashboard interactions.",
       "Use font size, weight, and color to establish visual hierarchy.",
       "Evaluate your UI across visibility, abstraction, and consistency dimensions.",
-      "Use transitions or animations when filtering or changing data views."
+      "Use transitions or animations when filtering or changing data views.",
+      "Use bslib::accordion() or shiny::conditionalPanel() to implement progressive disclosure.",
+      "Apply different font sizes and weights to create clear information hierarchy.",
+      "Use bslib::card_body(padding = 4) to add consistent padding and whitespace.",
+      "Structure user stories as 'As a [user], I want to [action] so that [benefit]'.",
+      "Add CSS hover states to clickable elements using the :hover pseudo-class.",
+      "Use shinyFeedback to provide immediate validation feedback on inputs.",
+      "Test color combinations with WebAIM's contrast checker to meet WCAG standards.",
+      "Use tabindex attributes to ensure logical keyboard navigation flow.",
+      "Add aria-label attributes to interactive elements and charts.",
+      "Create 3-5 distinct personas representing your dashboard's primary users.",
+      "Conduct user interviews and usability testing throughout the development process."
     )
   )
 
@@ -181,13 +307,13 @@ bid_concepts <- function(search = NULL) {
 bid_concept <- function(concept_name) {
   all_concepts <- bid_concepts()
 
-  # Try exact match first (case insensitive)
+  # try case insensitive
   result <- dplyr::filter(
     all_concepts,
     stringr::str_to_lower(concept) == stringr::str_to_lower(concept_name)
   )
 
-  # If no exact match, try partial match
+  # try partial match
   if (nrow(result) == 0) {
     result <- dplyr::filter(
       all_concepts,
@@ -198,7 +324,7 @@ bid_concept <- function(concept_name) {
     )
   }
 
-  # If still no match, provide suggestions using fuzzy matching
+  # suggestions using fuzzy matching
   if (nrow(result) == 0) {
     distances <- stringdist::stringdistmatrix(
       concept_name,
@@ -209,36 +335,46 @@ bid_concept <- function(concept_name) {
     closest_matches <- all_concepts$concept[order(distances)[1:3]]
 
     message <- paste0(
-      "Concept '", concept_name, "' not found. Did you mean one of these?\n",
+      "Concept '",
+      concept_name,
+      "' not found. Did you mean one of these?\n",
       paste0("  - ", closest_matches, collapse = "\n")
     )
 
     message(message)
 
-    # Return NULL but with an attribute containing suggestions
     suggestions <- tibble::tibble(suggested_concept = closest_matches)
     return(structure(NULL, suggestions = suggestions))
   }
 
-  # Add usage recommendations based on the concept
+  # add recommendations
   result <- result |>
     dplyr::mutate(
       recommendations = dplyr::case_when(
-        category == "Stage 1" ~ paste(
-          "Consider how this concept can help identify friction points in",
-          "your UI."
-        ),
-        category == "Stage 2" ~ "
+        category == "Stage 1" ~
+          paste(
+            "Consider how this concept can help identify friction points in",
+            "your UI."
+          ),
+        category == "Stage 2" ~
+          "
           Apply this concept to improve how users interpret data.
         ",
-        category == "Stage 3" ~ "
+        category == "Stage 3" ~
+          "
           Use this concept to better structure dashboard elements.
         ",
-        category == "Stage 4" ~ "
+        category == "Stage 4" ~
+          "
           Consider how this concept influences user decision-making.
         ",
-        category == "Stage 5" ~ "
+        category == "Stage 5" ~
+          "
           Apply this concept to create a more memorable final impression.
+        ",
+        category == "All Stages" ~
+          "
+          This concept is relevant throughout the entire BID process.
         ",
         TRUE ~ "Consider how this concept can improve your dashboard."
       )

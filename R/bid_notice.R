@@ -11,10 +11,12 @@
 #'        psychological theory.
 #' @param evidence A character string providing evidence or example (e.g.,
 #'        results from user testing).
-
+#' @param target_audience Optional character string describing the primary users
+#'        of the dashboard.
+#'
 #' @return A tibble containing the documented information for the "Notice"
 #'         stage.
-
+#'
 #' @examples
 #' bid_notice(
 #'   problem = "Users struggle to navigate cluttered dashboards",
@@ -27,16 +29,28 @@
 #'   theory = "Cognitive Load Theory",
 #'   evidence = "User testing showed increased time to locate key metrics."
 #' )
-
+#' 
+#' # With target audience
+#' bid_notice(
+#'   problem = "Sales team struggles with complex filter combinations",
+#'   evidence = "Training sessions revealed confusion with multiple selections",
+#'   target_audience = "Sales representatives with varying technical skills"
+#' )
+#'
 #' @export
-bid_notice <- function(problem, theory = NULL, evidence) {
-  if (missing(problem) || missing(evidence)) {
-    stop("Both problem and evidence parameters must be provided.")
-  }
+bid_notice <- function(
+    problem,
+    theory = NULL,
+    evidence,
+    target_audience = NULL) {
+  validate_required_params(
+    problem = problem,
+    evidence = evidence
+  )
 
-  # If theory is not provided, suggest appropriate theories based on keywords
+  # suggest appropriate concepts/theories if not provided
   if (is.null(theory)) {
-    # Define keyword-to-theory mappings
+    # keyword-to-theory mappings
     theory_suggestions <- list(
       "clutter" = "Visual Hierarchies",
       "complex" = "Cognitive Load Theory",
@@ -60,7 +74,6 @@ bid_notice <- function(problem, theory = NULL, evidence) {
       "group" = "Principle of Proximity"
     )
 
-    # Check for keyword matches in problem and evidence
     problem_lower <- stringr::str_to_lower(problem)
     evidence_lower <- stringr::str_to_lower(evidence)
     combined_text <- paste(problem_lower, evidence_lower)
@@ -72,7 +85,7 @@ bid_notice <- function(problem, theory = NULL, evidence) {
       }
     }
 
-    # Use the most frequent theory or default to "Cognitive Load Theory"
+    # use the most frequent. default is "Cognitive Load Theory"
     if (length(matched_theories) > 0) {
       theory_counts <- table(matched_theories)
       theory <- names(theory_counts)[which.max(theory_counts)]
@@ -81,10 +94,7 @@ bid_notice <- function(problem, theory = NULL, evidence) {
     }
   }
 
-  # Get relevant insights about the theory
   theory_info <- bid_concept(theory)
-
-  # Generate suggestions based on the theory
   if (!is.null(theory_info) && nrow(theory_info) > 0) {
     suggestions <- theory_info$implementation_tips
   } else {
@@ -94,23 +104,36 @@ bid_notice <- function(problem, theory = NULL, evidence) {
     )
   }
 
-  # Create result tibble
   result <- tibble::tibble(
     stage = "Notice",
     problem = problem,
     theory = theory,
     evidence = evidence,
+    target_audience = target_audience %||% NA_character_,
     suggestions = suggestions,
     timestamp = Sys.time()
   )
 
-  # Add a message about the theory used/suggested
   if (is.null(theory)) {
-    message(
+    bid_message(
+      "Stage 1 (Notice) completed.",
       paste0(
         "Based on your problem description, the suggested theory is: ",
         theory
-      )
+      ),
+      paste0("Primary issue: ", problem),
+      if (!is.null(target_audience)) {
+        paste0("Target audience: ", target_audience)
+      }
+    )
+  } else {
+    bid_message(
+      "Stage 1 (Notice) completed.",
+      paste0("Using theory: ", theory),
+      paste0("Primary issue: ", problem),
+      if (!is.null(target_audience)) {
+        paste0("Target audience: ", target_audience)
+      }
     )
   }
 
