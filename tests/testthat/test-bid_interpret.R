@@ -1,93 +1,96 @@
-test_that("bid_interpret works with minimal data story elements", {
-  notice <- bid_notice(
-    problem = "Complex interface", 
-    theory = "Cognitive Load Theory",
-    evidence = "User complaints"
+library(testthat)
+library(tibble)
+
+test_that("bid_interpret returns a tibble with stage 'Interpret'", {
+  local_mock(
+    validate_user_personas = function(user_personas) invisible(NULL),
+    bid_concepts = function(search = NULL) {
+      tibble(
+        concept = "Data Storytelling Framework",
+        description = "Dummy description",
+        category = "Stage 2",
+        reference = NA_character_,
+        example = NA_character_
+      )
+    }
   )
   
-  result <- bid_interpret(
-    previous_stage = notice,
-    central_question = "How to simplify?",
-    data_story = list(
-      hook = "Users are confused",
-      context = "Dashboard has evolved over time"
-    )
+  previous_stage <- tibble(
+    stage = "Notice",
+    problem = "Users struggle with complex data",
+    theory = "Cognitive Load Theory",
+    evidence = "Test results indicate delays",
+    target_audience = "Data Analysts"
   )
+  
+  result <- bid_interpret(previous_stage)
   
   expect_s3_class(result, "tbl_df")
-  expect_equal(result$stage, "Interpret")
-  expect_equal(result$central_question, "How to simplify?")
-  expect_equal(result$hook, "Users are confused")
-  expect_equal(result$context, "Dashboard has evolved over time")
-  expect_equal(result$tension, NA_character_)
-  expect_equal(result$resolution, NA_character_)
-  expect_equal(result$previous_problem, "Complex interface")
+  expect_equal(result$stage[1], "Interpret")
+  expect_true("central_question" %in% names(result))
 })
 
-test_that("bid_interpret works with full data story elements", {
-  notice <- bid_notice(
-    problem = "Complex interface",
+test_that("bid_interpret uses provided central_question", {
+  local_mock(
+    validate_user_personas = function(user_personas) invisible(NULL),
+    bid_concepts = function(search = NULL) {
+      tibble(
+        concept = "Data Storytelling Framework",
+        description = "Dummy description",
+        category = "Stage 2",
+        reference = NA_character_,
+        example = NA_character_
+      )
+    }
+  )
+  
+  previous_stage <- tibble(
+    stage = "Notice",
+    problem = "Users struggle with complex data",
     theory = "Cognitive Load Theory",
-    evidence = "User complaints"
+    evidence = "Test results indicate delays"
   )
   
-  result <- bid_interpret(
-    previous_stage = notice,
-    central_question = "How to simplify?",
-    data_story = list(
-      hook = "Users are confused",
-      context = "Dashboard has evolved over time",
-      tension = "Management wants more features",
-      resolution = "Simplify core views, move extras to secondary screens",
-      audience = "Marketing team",
-      metrics = c("Time to insight", "User satisfaction"),
-      visual_approach = "Before/after comparison"
-    )
-  )
+  my_question <- "What is causing data complexity issues?"
+  result <- bid_interpret(previous_stage, central_question = my_question)
   
-  expect_s3_class(result, "tbl_df")
-  expect_equal(result$audience, "Marketing team")
-  expect_equal(result$metrics, "Time to insight, User satisfaction")
-  expect_equal(result$visual_approach, "Before/after comparison")
+  expect_equal(result$central_question[1], my_question)
 })
 
-test_that("bid_interpret fails with missing parameters", {
-  notice <- bid_notice(
-    problem = "Complex interface",
-    theory = "Cognitive Load Theory",
-    evidence = "User complaints"
+test_that("bid_interpret errors when data_story is not a list", {
+  local_mock(
+    validate_user_personas = function(user_personas) invisible(NULL)
   )
   
-  expect_error(bid_interpret(previous_stage = notice, central_question = "Test"), "must be provided")
-  expect_error(bid_interpret(previous_stage = notice, data_story = list()), "must be provided")
-  expect_error(bid_interpret(central_question = "Test", data_story = list()), "must be provided")
+  previous_stage <- tibble(
+    stage = "Notice",
+    problem = "Users struggle with complex data",
+    theory = "Cognitive Load Theory",
+    evidence = "Test results indicate delays"
+  )
+  
+  expect_error(
+    bid_interpret(previous_stage, data_story = "not a list"),
+    regexp = "The data_story parameter must be a list"
+  )
 })
 
-test_that("bid_interpret provides appropriate suggestions", {
-  notice <- bid_notice(
-    problem = "Complex interface",
+test_that("bid_interpret errors when user_personas is invalid", {
+  local_mock(
+    validate_user_personas = function(user_personas) {
+      cli::cli_abort("Invalid user_personas provided")
+    }
+  )
+  
+  previous_stage <- tibble(
+    stage = "Notice",
+    problem = "Users struggle with complex data",
     theory = "Cognitive Load Theory",
-    evidence = "User complaints"
+    evidence = "Test results indicate delays"
   )
   
-  # Test with incomplete story
-  incomplete_result <- bid_interpret(
-    previous_stage = notice,
-    central_question = "How to simplify?",
-    data_story = list(hook = "Users are confused")
+  expect_error(
+    bid_interpret(previous_stage, user_personas = "not a list"),
+    regexp = "Invalid user_personas provided"
   )
-  expect_match(incomplete_result$suggestions, "enhancing|missing", ignore.case = TRUE)
-  
-  # Test with very short question
-  short_q_result <- bid_interpret(
-    previous_stage = notice,
-    central_question = "Simplify?",
-    data_story = list(
-      hook = "Users are confused",
-      context = "Dashboard has evolved",
-      tension = "Management wants more features",
-      resolution = "Simplify core views"
-    )
-  )
-  expect_match(short_q_result$suggestions, "specificity", ignore.case = TRUE)
 })

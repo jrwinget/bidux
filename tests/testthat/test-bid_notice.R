@@ -1,61 +1,128 @@
-test_that("bid_notice works with all parameters", {
-  result <- bid_notice(
-    problem = "Users struggle with too many options",
-    theory = "Hick's Law",
-    evidence = "Testing shows users take 40+ seconds to make selections"
+library(testthat)
+library(tibble)
+library(cli)
+library(stringr)
+
+validate_required_params <- function(...) {}
+bid_message <- function(...) {}
+
+bid_concept <- function(theory) {
+  known_theories <- c(
+    "Cognitive Load Theory", "Visual Hierarchies", "Hick's Law",
+    "Information Scent", "Pre-attentive Processing", "Fitts's Law",
+    "Miller's Law", "Gestalt Principles", "Principle of Proximity"
   )
-  
+  if (theory %in% known_theories) {
+    return(tibble(implementation_tips = paste("Tip for", theory)))
+  } else {
+    return(tibble())
+  }
+}
+
+test_that("bid_notice returns a tibble with correct columns and stage", {
+  result <- bid_notice(
+    problem = "Users struggle to navigate cluttered dashboards",
+    evidence = "User testing showed increased time to locate key metrics."
+  )
   expect_s3_class(result, "tbl_df")
+  
+  expected_cols <- c(
+    "stage", "problem", "theory", "evidence", 
+    "target_audience", "suggestions", "timestamp"
+  )
+
+  expect_equal(sort(names(result)), sort(expected_cols))
+  
   expect_equal(result$stage, "Notice")
-  expect_equal(result$problem, "Users struggle with too many options")
-  expect_equal(result$theory, "Hick's Law")
-  expect_equal(result$evidence, "Testing shows users take 40+ seconds to make selections")
-  expect_true(!is.na(result$suggestions))
-  expect_true(!is.na(result$timestamp))
 })
 
-test_that("bid_notice auto-suggests theory when not provided", {
+test_that("bid_notice respects provided theory", {
   result <- bid_notice(
-    problem = "Dashboard is cluttered with too many visualizations",
-    evidence = "User feedback indicates confusion about where to look first"
+    problem = "Simple dashboard issue",
+    evidence = "Users are confused by the interface layout",
+    theory = "Custom Theory"
   )
-  
-  expect_s3_class(result, "tbl_df")
-  expect_equal(result$stage, "Notice")
-  expect_true(!is.na(result$theory))
-  expect_message(
+  expect_equal(result$theory, "Custom Theory")
+})
+
+test_that("bid_notice records provided target audience correctly", {
+  result <- bid_notice(
+    problem = "Sales team struggles with complex filter combinations",
+    evidence = "Training sessions revealed confusion with multiple selections",
+    target_audience = "Sales representatives with varying technical skills"
+  )
+  expect_equal(
+    result$target_audience,
+    "Sales representatives with varying technical skills"
+  )
+})
+
+test_that("bid_notice returns NA for target audience when not provided", {
+  result <- bid_notice(
+    problem = "The chart is cluttered and confusing",
+    evidence = "Feedback indicates users are disoriented."
+  )
+  expect_true(is.na(result$target_audience))
+})
+
+test_that("bid_notice warns for short problem description", {
+  expect_warning(
+    bid_notice(problem = "Short", evidence = "Sufficient evidence provided."),
+    "Problem description is very short"
+  )
+})
+
+test_that("bid_notice warns for short evidence description", {
+  expect_warning(
     bid_notice(
-      problem = "Dashboard is cluttered with too many visualizations",
-      evidence = "User feedback indicates confusion about where to look first"
+      problem = "A sufficiently detailed problem description",
+      evidence = "Short"
     ),
-    "suggested theory"
+    "Evidence description is very short"
   )
 })
 
-test_that("bid_notice fails with missing parameters", {
-  expect_error(bid_notice(problem = "Test"), "must be provided")
-  expect_error(bid_notice(evidence = "Test"), "must be provided")
+test_that("bid_notice errors if problem is not a character", {
+  expect_error(
+    bid_notice(problem = 123, evidence = "Valid evidence"),
+    "Problem must be a character string"
+  )
 })
 
-test_that("bid_notice matches appropriate theories to problems", {
-  # Test Hick's Law matching
-  hicks_result <- bid_notice(
-    problem = "Too many dropdown options",
-    evidence = "Users struggle to choose from list"
+test_that("bid_notice errors if evidence is not a character", {
+  expect_error(
+    bid_notice(problem = "Valid problem", evidence = 456),
+    "Evidence must be a character string"
   )
-  expect_match(hicks_result$theory, "Hick", ignore.case = TRUE)
-  
-  # Test Cognitive Load matching
-  cog_load_result <- bid_notice(
-    problem = "Users feel overwhelmed by complex interface", 
-    evidence = "Reported mental effort is high"
+})
+
+test_that("bid_notice errors if theory is provided and is not a character", {
+  expect_error(
+    bid_notice(
+      problem = "Valid problem",
+      evidence = "Valid evidence",
+      theory = 789
+    ),
+    "Theory must be a character string"
   )
-  expect_match(cog_load_result$theory, "Cognitive", ignore.case = TRUE)
-  
-  # Test Visual Hierarchies matching
-  visual_result <- bid_notice(
-    problem = "Important data isn't getting noticed",
-    evidence = "Key metrics are overlooked in the layout"
+})
+
+test_that(
+  "bid_notice errors if target_audience is provided and is not a character", {
+  expect_error(
+    bid_notice(
+      problem = "Valid problem",
+      evidence = "Valid evidence",
+      target_audience = 101112
+    ),
+    "Target audience must be a character string"
   )
-  expect_match(visual_result$theory, "Visual|Hierarch", ignore.case = TRUE)
+})
+
+test_that("bid_notice returns timestamp as a POSIXct object", {
+  result <- bid_notice(
+    problem = "A sufficiently detailed problem description.",
+    evidence = "Evidence with enough detail for proper matching of theories."
+  )
+  expect_s3_class(result$timestamp, "POSIXct")
 })

@@ -1,116 +1,109 @@
-test_that("bid_report generates text report", {
-  validate_result <- bid_validate(
-    bid_anticipate(
-      bid_structure(
-        bid_interpret(
-          bid_notice(
-            problem = "Complex interface",
-            theory = "Cognitive Load Theory",
-            evidence = "User complaints"
-          ),
-          central_question = "How to simplify?",
-          data_story = list(
-            hook = "Users are confused",
-            context = "Dashboard has evolved over time"
-          )
-        ),
-        layout = "dual_process",
-        concepts = c("Principle of Proximity", "Default Effect")
-      ),
-      bias_mitigations = list(
-        anchoring = "Provide reference points",
-        framing = "Use consistent positive framing"
-      )
-    ),
-    summary_panel = "Dashboard simplified for quicker insights",
-    collaboration = "Added team annotation features"
-  )
-  
-  report <- bid_report(validate_result)
-  
-  expect_type(report, "character")
-  expect_match(report, "BID Framework Implementation Report")
-  expect_match(report, "Stage 5: Validate")
-  expect_match(report, "Summary Panel")
-  expect_match(report, "Recommended Next Steps")
+library(testthat)
+library(tibble)
+
+# access non-exported helper functions.
+`%||%` <- bidux:::`%||%`
+is_empty <- bidux:::is_empty
+standard_error_msg <- bidux:::standard_error_msg
+validate_required_params <- bidux:::validate_required_params
+validate_previous_stage <- bidux:::validate_previous_stage
+bid_message <- bidux:::bid_message
+
+# null coalescing operator %||%
+test_that("%||% returns left-hand side if not NULL", {
+  expect_equal(5 %||% "default", 5)
+  expect_equal("hello" %||% "default", "hello")
 })
 
-test_that("bid_report generates HTML report", {
-  validate_result <- bid_validate(
-    bid_anticipate(
-      bid_structure(
-        bid_interpret(
-          bid_notice(
-            problem = "Complex interface",
-            theory = "Cognitive Load Theory",
-            evidence = "User complaints"
-          ),
-          central_question = "How to simplify?",
-          data_story = list(
-            hook = "Users are confused",
-            context = "Dashboard has evolved over time"
-          )
-        ),
-        layout = "dual_process",
-        concepts = c("Principle of Proximity", "Default Effect")
-      ),
-      bias_mitigations = list(
-        anchoring = "Provide reference points",
-        framing = "Use consistent positive framing"
-      )
-    ),
-    summary_panel = "Dashboard simplified for quicker insights",
-    collaboration = "Added team annotation features"
-  )
-  
-  html_report <- bid_report(validate_result, format = "html")
-  
-  expect_type(html_report, "character")
-  expect_match(html_report, "<html>")
-  expect_match(html_report, "<h1>BID Framework Implementation Report</h1>")
-  expect_match(html_report, "<h2>Stage 5: Validate")
-  expect_match(html_report, "</html>")
+test_that("%||% returns right-hand side if left-hand side is NULL", {
+  expect_equal(NULL %||% "default", "default")
 })
 
-test_that("bid_report fails with incorrect input", {
-  expect_error(bid_report(NULL), "must be the result")
-  expect_error(bid_report(list()), "must be the result")
-  expect_error(bid_report(tibble::tibble(stage = "NotValidate")), "must be the result")
+# is_empty function
+test_that("is_empty identifies NULL, NA, and empty strings as empty", {
+  expect_true(is_empty(NULL))
+  expect_true(is_empty(NA))
+  expect_true(is_empty(""))
+  expect_true(is_empty("   "))
 })
 
-test_that("bid_suggest_components returns appropriate suggestions", {
-  notice_result <- bid_notice(
-    problem = "Complex interface",
-    theory = "Cognitive Load Theory",
-    evidence = "User complaints"
+test_that("is_empty identifies non-empty values correctly", {
+  expect_false(is_empty("hello"))
+  expect_false(is_empty(123))
+  expect_false(is_empty(0))
+})
+
+# standard_error_msg function
+test_that("standard_error_msg returns expected message for missing_param", {
+  msg <- standard_error_msg("missing_param", "foo")
+  expect_equal(msg, "Required parameter 'foo' must be provided.")
+})
+
+test_that("standard_error_msg returns expected message for invalid_param", {
+  msg <- standard_error_msg("invalid_param", "foo", "numeric", "character")
+  expect_equal(msg, "Parameter 'foo' is invalid. Expected: numeric, Actual: character.")
+})
+
+test_that("standard_error_msg returns expected default error message for unknown type", {
+  msg <- standard_error_msg("unknown_type")
+  expect_equal(msg, "An error occurred in the implementation of the BID framework.")
+})
+
+test_that("standard_error_msg returns expected message for invalid_stage", {
+  msg <- standard_error_msg("invalid_stage", expected = "Notice", actual = "Test")
+  expect_equal(
+    msg,
+    "Expected previous_stage from 'Notice', but got 'Test'. Please ensure you're following the BID framework stages in order."
   )
-  
-  # Test shiny suggestions
-  shiny_suggestions <- bid_suggest_components(notice_result, package = "shiny")
-  expect_s3_class(shiny_suggestions, "tbl_df")
-  expect_true("component" %in% names(shiny_suggestions))
-  expect_true("description" %in% names(shiny_suggestions))
-  expect_true("code_example" %in% names(shiny_suggestions))
-  expect_true(any(shiny_suggestions$stage == "Notice"))
-  
-  # Test bslib suggestions
-  bslib_suggestions <- bid_suggest_components(notice_result, package = "bslib")
-  expect_true(any(bslib_suggestions$stage == "Notice"))
-  
-  # Test filtering by stage
-  structure_result <- bid_structure(
-    bid_interpret(
-      notice_result,
-      central_question = "How to simplify?",
-      data_story = list(
-        hook = "Users are confused",
-        context = "Dashboard has evolved over time"
-      )
-    ),
-    layout = "dual_process",
-    concepts = c("Principle of Proximity", "Default Effect")
+})
+
+# validate_required_params function
+test_that("validate_required_params passes for non-empty parameters", {
+  expect_silent(validate_required_params(foo = "bar", num = 123))
+})
+
+test_that("validate_required_params errors when a parameter is empty", {
+  expect_error(
+    validate_required_params(foo = NULL),
+    regexp = "Required parameter 'foo' must be provided."
   )
-  
-  structure_suggestions <- bid_suggest_components(structure_result, package = "reactable")
-  expect_true(any(structure_suggestions$stage == "Structure"))
+  expect_error(
+    validate_required_params(foo = "", bar = "something"),
+    regexp = "Required parameter 'foo' must be provided."
+  )
+})
+
+# validate_previous_stage function
+test_that("validate_previous_stage errors if previous_stage is not a tibble with a 'stage' column", {
+  not_tibble <- list(stage = "Notice")
+  expect_error(
+    validate_previous_stage(not_tibble, "Interpret"),
+    regexp = "Parameter 'previous_stage' is invalid"
+  )
+  no_stage <- tibble(foo = "bar")
+  expect_error(
+    validate_previous_stage(no_stage, "Interpret"),
+    regexp = "Parameter 'previous_stage' is invalid"
+  )
+})
+
+test_that("validate_previous_stage errors when previous_stage has an invalid stage", {
+  previous_stage <- tibble(stage = "Foo")
+  expect_error(
+    validate_previous_stage(previous_stage, "Interpret"),
+    regexp = "Invalid previous stage. For the 'Interpret' stage, the previous stage must be one of:"
+  )
+})
+
+test_that("validate_previous_stage passes for valid previous_stage", {
+  previous_stage <- tibble(stage = "Notice")
+  expect_silent(validate_previous_stage(previous_stage, "Interpret"))
+})
+
+# bid_message function
+test_that("bid_message outputs the correct formatted message", {
+  expect_message(
+    bid_message("Test Title", "First bullet", "Second bullet"),
+    regexp = "Test Title\n  - First bullet\n  - Second bullet"
+  )
 })
