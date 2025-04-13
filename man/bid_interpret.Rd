@@ -4,7 +4,12 @@
 \alias{bid_interpret}
 \title{Document User Interpretation Stage in BID Framework}
 \usage{
-bid_interpret(previous_stage, central_question, data_story)
+bid_interpret(
+  previous_stage,
+  central_question,
+  data_story,
+  user_personas = NULL
+)
 }
 \arguments{
 \item{previous_stage}{A tibble or list output from \code{bid_notice()}.}
@@ -15,6 +20,8 @@ be answered.}
 \item{data_story}{A list containing elements such as \code{hook},
 \code{context}, \code{tension}, \code{resolution}, and optionally
 \code{audience}, \code{metrics}, and \code{visual_approach}.}
+
+\item{user_personas}{Optional list of user personas to consider in the design.}
 }
 \value{
 A tibble containing the documented information for the "Interpret"
@@ -30,6 +37,8 @@ notice <- bid_notice(
   problem = "Users struggle with complex data",
   evidence = "Test results indicate delays"
 )
+
+# Basic usage
 bid_interpret(
   previous_stage = notice,
   central_question = "What drives the decline in user engagement?",
@@ -41,6 +50,32 @@ bid_interpret(
     audience = "Marketing team",
     metrics = c("Daily Active Users", "Session Duration"),
     visual_approach = "Comparison charts showing before/after UI change"
+  )
+)
+
+# With user personas
+bid_interpret(
+  previous_stage = notice,
+  central_question = "How can we improve data discovery?",
+  data_story = list(
+    hook = "Users are missing key insights",
+    context = "Critical data is available but overlooked",
+    tension = "Time-sensitive decisions are delayed",
+    resolution = "Highlight key metrics more effectively"
+  ),
+  user_personas = list(
+    list(
+      name = "Sara, Data Analyst",
+      goals = "Needs to quickly find patterns in data",
+      pain_points = "Gets overwhelmed by too many visualizations",
+      technical_level = "Advanced"
+    ),
+    list(
+      name = "Marcus, Executive",
+      goals = "Wants high-level insights at a glance",
+      pain_points = "Limited time to analyze detailed reports",
+      technical_level = "Basic"
+    )
   )
 )
 

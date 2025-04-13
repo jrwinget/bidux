@@ -4,7 +4,7 @@
 \alias{bid_notice}
 \title{Document Problem Notice Stage in BID Framework}
 \usage{
-bid_notice(problem, theory = NULL, evidence)
+bid_notice(problem, theory = NULL, evidence, target_audience = NULL)
 }
 \arguments{
 \item{problem}{A character string describing the identified problem.}
@@ -14,6 +14,9 @@ psychological theory.}
 
 \item{evidence}{A character string providing evidence or example (e.g.,
 results from user testing).}
+
+\item{target_audience}{Optional character string describing the primary users
+of the dashboard.}
 }
 \value{
 A tibble containing the documented information for the "Notice"
@@ -37,4 +40,12 @@ bid_notice(
   theory = "Cognitive Load Theory",
   evidence = "User testing showed increased time to locate key metrics."
 )
+
+# With target audience
+bid_notice(
+  problem = "Sales team struggles with complex filter combinations",
+  evidence = "Training sessions revealed confusion with multiple selections",
+  target_audience = "Sales representatives with varying technical skills"
+)
+
 }

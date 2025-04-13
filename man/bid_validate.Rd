@@ -4,7 +4,7 @@
 \alias{bid_validate}
 \title{Document Validation and Empowerment Stage in BID Framework}
 \usage{
-bid_validate(previous_stage, summary_panel, collaboration)
+bid_validate(previous_stage, summary_panel, collaboration, next_steps = NULL)
 }
 \arguments{
 \item{previous_stage}{A tibble or list output from \code{bid_anticipate()}.}
@@ -13,6 +13,9 @@ bid_validate(previous_stage, summary_panel, collaboration)
 
 \item{collaboration}{A character string describing collaboration or
 annotation features.}
+
+\item{next_steps}{An optional character vector listing recommended next steps
+or actions for users (follows Peak-End Rule).}
 }
 \value{
 A tibble containing the documented information for the "Validate"
@@ -24,33 +27,47 @@ the dashboard is validated, including summary takeaways and collaborative
 annotations.
 }
 \examples{
-anticipate_info <- bid_anticipate(
+anticipate_info <- bid_notice(
+  problem = "Users confused by interface",
+  evidence = "Multiple clicks observed"
+) |>
+  bid_interpret(
+    central_question = "How can we enhance clarity?",
+    data_story = list(
+      hook = "Lack of focus",
+      context = "Too many visual elements",
+      tension = "User complaints",
+      resolution = "Improve layout"
+    )
+  ) |>
   bid_structure(
-    bid_interpret(
-      bid_notice(
-        "Users confused by interface",
-        evidence = "Multiple clicks observed"
-      ),
-      central_question = "How can we enhance clarity?",
-      data_story = list(
-        hook = "Lack of focus",
-        context = "Too many visual elements",
-        tension = "User complaints",
-        resolution = "Improve layout"
-      )
-    ),
     layout = "dual_process",
     concepts = c("principle_of_proximity", "default_effect")
-  ),
-  bias_mitigations = list(
-    anchoring = "Reference baseline values",
-    framing = "Use gain-framed messages"
+  ) |> 
+  bid_anticipate(
+    bias_mitigations = list(
+      anchoring = "Reference baseline values",
+      framing = "Use gain-framed messages"
+    )
   )
-)
+
+# Basic usage
 bid_validate(
   previous_stage = anticipate_info,
   summary_panel = "Key insights include clarity and user satisfaction",
   collaboration = "Annotations enabled for team feedback"
+)
+
+# With next steps
+bid_validate(
+  previous_stage = anticipate_info,
+  summary_panel = "Key insights include clarity and user satisfaction",
+  collaboration = "Annotations enabled for team feedback",
+  next_steps = c(
+    "Review performance metrics",
+    "Schedule team discussion",
+    "Implement suggested UI changes"
+  )
 )
 
 }

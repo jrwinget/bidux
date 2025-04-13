@@ -4,15 +4,17 @@
 \alias{bid_structure}
 \title{Document Dashboard Structure Stage in BID Framework}
 \usage{
-bid_structure(previous_stage, layout, concepts)
+bid_structure(previous_stage, layout, concepts, accessibility = NULL)
 }
 \arguments{
 \item{previous_stage}{A tibble or list output from \code{bid_interpret()}.}
 
 \item{layout}{A character string indicating the layout type (e.g.,
-"dual_process", "grid").}
+"dual_process", "grid", "card", "tabs", "breathable").}
 
 \item{concepts}{A character vector of BID concepts applied in this stage.}
+
+\item{accessibility}{A list of accessibility considerations (optional).}
 }
 \value{
 A tibble containing the documented information for the "Structure"
@@ -23,22 +25,37 @@ This function documents the structure of the dashboard, including layout and
 design elements such as proximity, dual-processing, and default effects.
 }
 \examples{
-interpret <- bid_interpret(
-  bid_notice(
-    problem = "Users struggle with information overload",
-    evidence = "Survey results indicate delays"
-  ),
-  central_question = "How can we simplify data presentation?",
-  data_story = list(
-    hook = "Data is too complex",
-    context = "Overloaded with charts",
-    tension = "Confusing layout",
-    resolution = "Introduce clear grouping"
+interpret <- bid_notice(
+  problem = "Users struggle with information overload",
+  evidence = "Survey results indicate delays"
+) |>
+  bid_interpret(
+    central_question = "How can we simplify data presentation?",
+    data_story = list(
+      hook = "Data is too complex",
+      context = "Overloaded with charts",
+      tension = "Confusing layout",
+      resolution = "Introduce clear grouping"
+    )
   )
-)
+
+# Basic usage
 bid_structure(
   previous_stage = interpret,
   layout = "dual_process",
   concepts = c("principle_of_proximity", "default_effect")
 )
+
+# With accessibility considerations
+bid_structure(
+  previous_stage = interpret,
+  layout = "dual_process",
+  concepts = c("principle_of_proximity", "default_effect"),
+  accessibility = list(
+    color_contrast = "Using WCAG AA-compliant color contrasts",
+    keyboard_navigation = "All interactive elements are keyboard accessible",
+    screen_reader = "Charts include descriptive alt text"
+  )
+)
+
 }

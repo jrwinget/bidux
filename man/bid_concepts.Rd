@@ -13,10 +13,12 @@ bid_concepts(search = NULL)
 A tibble with concept details.
 }
 \description{
-This function returns a tibble listing all the key concepts in the Behavior Insight Design framework,
-including their descriptions, categories, references, and example applications.
+This function returns a tibble listing all the key concepts in the Behavior
+Insight Design framework, including their descriptions, categories,
+references, and example applications.
 }
 \examples{
 bid_concepts()
 bid_concepts("cognitive")
+
 }
