@@ -30,21 +30,60 @@ The BID framework consists of 5 sequential stages:
 ```{r echo=FALSE, out.width="100%"}
 DiagrammeR::grViz("
   digraph bid_framework {
-    # Graph settings
-    graph [fontname = 'Arial', rankdir = LR, splines = true, fontsize = 12]
-    node [fontname = 'Arial', shape = rectangle, style = filled, fontsize = 12, 
-          fillcolor = '#e6f3ff', margin = 0.2, height = 1, width = 2, fixedsize = true]
-    edge [fontname = 'Arial', arrowsize = 0.8]
     
-    # Nodes with labels
-    n1 [label = 'STAGE 1:\nNOTICE\nIdentify friction points']
-    n2 [label = 'STAGE 2:\nINTERPRET\nUnderstand user needs']
-    n3 [label = 'STAGE 3:\nSTRUCTURE\nOrganize information']
-    n4 [label = 'STAGE 4:\nANTICIPATE\nMitigate biases']
-    n5 [label = 'STAGE 5:\nVALIDATE\nEmpower the user']
+    # Allow edges to connect to subgraphs themselves
+    graph [
+      compound = true,
+      fontname = 'Arial', 
+      fontsize = 12, 
+      rankdir = TB,  /* top-to-bottom layout */
+      splines = true
+    ];
+
+    node [
+      fontname = 'Arial',
+      shape = rectangle,
+      style = filled,
+      fillcolor = '#e6f3ff',
+      fontsize = 12
+    ];
+
+    edge [
+      fontname = 'Arial',
+      arrowsize = 0.8
+    ];
+
+    # Left
+    notice   [label = 'NOTICE'];
     
-    # Connect nodes
-    n1 -> n2 -> n3 -> n4 -> n5
+    # Dashed subgraph in the middle
+    subgraph cluster0 {
+      label = '';                 /* no label on the cluster */
+      style = 'rounded,dashed';   /* dashed outline */
+      color = 'black';            /* ensure border is visible */
+
+      interpret  [label = 'INTERPRET'];
+      structure  [label = 'STRUCTURE'];
+      anticipate [label = 'ANTICIPATE'];
+
+      /* Force INTERPRET up top, STRUCTURE & ANTICIPATE side-by-side below */
+      { rank = min; interpret }
+      { rank = same; structure; anticipate }
+
+      /* Connect them in a triangle */
+      interpret -> structure;
+      structure -> anticipate;
+      anticipate -> interpret;
+    }
+
+    # Right
+    validate [label = 'VALIDATE'];
+
+    # Connect NOTICE into the cluster boundary
+    notice -> interpret [lhead = cluster0, constraint = false];
+
+    # Connect from the cluster boundary out to VALIDATE
+    anticipate -> validate [ltail = cluster0, constraint = false];
   }
 ")
 ```
