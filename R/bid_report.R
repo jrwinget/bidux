@@ -33,31 +33,58 @@ bid_report <- function(
     include_diagrams = TRUE) {
   format <- match.arg(format)
 
-  if (
-    !tibble::is_tibble(validate_stage) ||
-      !("stage" %in% names(validate_stage)) ||
-      validate_stage$stage[1] != "Validate"
-  ) {
-    stop(
-      standard_error_msg(
-        "invalid_param",
-        "validate_stage",
-        "result from bid_validate()",
-        "invalid input"
-      )
-    )
-  }
+  cli::cli_h1("BID Framework Report")
 
-  # build report
+  tryCatch(
+    {
+      if (is.null(validate_stage)) {
+        cli::cli_abort(c(
+          "x" = "Invalid input: validate_stage cannot be NULL",
+          "i" = "Please provide a valid output from bid_validate()"
+        ))
+      }
+
+      if (!tibble::is_tibble(validate_stage)) {
+        cli::cli_abort(c(
+          "x" = "Invalid input: validate_stage must be a tibble",
+          "i" = "Did you provide the output from a BID framework function?",
+          "i" = "Current type: {.cls {class(validate_stage)[1]}}"
+        ))
+      }
+
+      if (!("stage" %in% names(validate_stage))) {
+        cli::cli_abort(c(
+          "x" = "Invalid input: validate_stage must contain a 'stage' column",
+          "i" = "Available columns: {.field {paste(names(validate_stage), collapse = ', ')}}"
+        ))
+      }
+
+      if (validate_stage$stage[1] != "Validate") {
+        cli::cli_abort(c(
+          "x" = "Invalid input: validate_stage must be the result from bid_validate()",
+          "i" = "Current stage: {.val {validate_stage$stage[1]}}",
+          "i" = "Use the output from bid_validate() as input to this function"
+        ))
+      }
+    },
+    error = function(e) {
+      stop(e$message, call. = FALSE)
+    }
+  )
+
+  cli::cli_alert_info("Generating {.field {toupper(format)}} report")
+
+  # initialize report
   report <- character(0)
 
-  # header
+  # add header
   report <- c(report, "# BID Framework Implementation Report")
   report <- c(report, paste0("Generated: ", Sys.time()))
   report <- c(report, "")
 
   # BID overview (with diagram if requested)
   if (include_diagrams) {
+    cli::cli_alert_info("Including BID framework diagram")
     report <- c(report, "## BID Framework Overview")
     report <- c(report, "```")
     report <- c(report, "┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐")
@@ -68,90 +95,145 @@ bid_report <- function(
     report <- c(report, "")
   }
 
-  # stage 5: validate
-  report <- c(report, "## Stage 5: Validate & Empower the User")
-
-  report <- c(
-    report,
-    paste0("- **Summary Panel**: ", validate_stage$summary_panel[1])
-  )
-
-  report <- c(
-    report,
-    paste0("- **Collaboration Features**: ", validate_stage$collaboration[1])
-  )
-
-  if (!is.na(validate_stage$next_steps[1])) {
-    next_steps <- unlist(strsplit(validate_stage$next_steps[1], ";"))
-    report <- c(report, "- **Next Steps**:")
-    for (step in next_steps) {
-      report <- c(report, paste0("  - ", trimws(step)))
+  # helper function to safely extract and format data
+  safe_extract <- function(data, field, default = NA_character_, prefix = "") {
+    if (field %in% names(data) && !is.null(data[[field]][1])) {
+      if (!is.na(data[[field]][1])) {
+        return(paste0(prefix, data[[field]][1]))
+      }
     }
+    if (is.na(default)) {
+      return(NA_character_)
+    }
+    return(paste0(prefix, default))
   }
 
-  report <- c(
-    report,
-    paste0("- **Suggestions**: ", validate_stage$suggestions[1])
-  )
+  # stage 5: validate
+  cli::cli_alert_info("Adding Stage 5: Validate information")
+  report <- c(report, "## Stage 5: Validate & Empower the User")
 
+  # add summary panel
+  summary_panel <- safe_extract(
+    validate_stage,
+    "summary_panel",
+    "No summary panel provided"
+  )
+  report <- c(report, paste0("- **Summary Panel**: ", summary_panel))
+
+  # add collaboration features
+  collaboration <- safe_extract(
+    validate_stage,
+    "collaboration",
+    "No collaboration features specified"
+  )
+  report <- c(report, paste0("- **Collaboration Features**: ", collaboration))
+
+  # add next steps
+  if (
+    "next_steps" %in% names(validate_stage) &&
+      !is.na(validate_stage$next_steps[1])
+  ) {
+    cli::cli_alert_success("Found {.field next_steps} information")
+    next_steps <- tryCatch(
+      {
+        unlist(strsplit(validate_stage$next_steps[1], ";"))
+      },
+      error = function(e) {
+        cli::cli_warn("Could not parse next_steps: {e$message}")
+        return(c("No next steps available or could not be parsed"))
+      }
+    )
+
+    report <- c(report, "- **Next Steps**:")
+    for (step in next_steps) {
+      step_text <- trimws(step)
+      if (nchar(step_text) > 0) {
+        report <- c(report, paste0("  - ", step_text))
+      }
+    }
+  } else {
+    cli::cli_alert_warning("No next steps found in validate_stage")
+    report <- c(report, "- **Next Steps**: None specified")
+  }
+
+  # add suggestions
+  suggestions <- safe_extract(
+    validate_stage,
+    "suggestions",
+    "No suggestions available"
+  )
+  report <- c(report, paste0("- **Suggestions**: ", suggestions))
   report <- c(report, "")
 
   # stage 4: anticipate
   if ("previous_bias" %in% names(validate_stage)) {
+    cli::cli_alert_info("Adding Stage 4: Anticipate information")
     report <- c(report, "## Stage 4: Anticipate User Behavior")
-    report <- c(
-      report,
-      paste0("- **Bias Mitigations**: ", validate_stage$previous_bias[1])
-    )
 
-    if (!is.na(validate_stage$previous_interaction[1])) {
+    bias_mitigations <- safe_extract(
+      validate_stage,
+      "previous_bias",
+      "No bias mitigations specified"
+    )
+    report <- c(report, paste0("- **Bias Mitigations**: ", bias_mitigations))
+
+    interaction_principles <- safe_extract(
+      validate_stage,
+      "previous_interaction",
+      "No interaction principles specified"
+    )
+    if (!is.na(interaction_principles)) {
       report <- c(
         report,
-        paste0(
-          "- **Interaction Principles**: ",
-          validate_stage$previous_interaction[1]
-        )
+        paste0("- **Interaction Principles**: ", interaction_principles)
       )
     }
 
     report <- c(report, "")
+  } else {
+    cli::cli_alert_warning("No Anticipate stage information found")
   }
 
-  # stage 3: structure (try to reconstruct from available data)
+  # stage 3: structure
   if ("previous_layout" %in% names(validate_stage)) {
+    cli::cli_alert_info("Adding Stage 3: Structure information")
     report <- c(report, "## Stage 3: Structure the Dashboard")
-    report <- c(
-      report,
-      paste0("- **Layout**: ", validate_stage$previous_layout[1])
-    )
 
-    if ("previous_concepts" %in% names(validate_stage)) {
-      report <- c(
-        report,
-        paste0(
-          "- **Applied Concepts**: ",
-          validate_stage$previous_concepts[1]
-        )
-      )
+    layout <- safe_extract(
+      validate_stage,
+      "previous_layout",
+      "No layout specified"
+    )
+    report <- c(report, paste0("- **Layout**: ", layout))
+
+    concepts <- safe_extract(
+      validate_stage,
+      "previous_concepts",
+      "No concepts specified"
+    )
+    if (!is.na(concepts)) {
+      report <- c(report, paste0("- **Applied Concepts**: ", concepts))
     }
 
-    if (
-      "previous_accessibility" %in% names(validate_stage) &&
-        !is.na(validate_stage$previous_accessibility[1])
-    ) {
+    accessibility <- safe_extract(
+      validate_stage,
+      "previous_accessibility",
+      "No accessibility considerations specified"
+    )
+    if (!is.na(accessibility)) {
       report <- c(
         report,
-        paste0(
-          "- **Accessibility Considerations**: ",
-          validate_stage$previous_accessibility[1]
-        )
+        paste0("- **Accessibility Considerations**: ", accessibility)
       )
     }
 
     report <- c(report, "")
+  } else {
+    cli::cli_alert_warning("No Structure stage information found")
   }
 
   # recommendations
+  cli::cli_alert_info("Adding implementation recommendations")
   report <- c(report, "## Implementation Recommendations")
   report <- c(
     report,
@@ -165,67 +247,76 @@ bid_report <- function(
   # UI suggestions
   report <- c(report, "### Recommended UI Components")
 
-  # {bslib} suggestions
-  if (requireNamespace("dplyr", quietly = TRUE)) {
+  # helper function to safely add component suggestions
+  add_component_suggestions <- function(report, validate_stage, package_name, title) {
     tryCatch(
       {
-        bslib_suggestions <- bid_suggest_components(
+        if (!requireNamespace("dplyr", quietly = TRUE)) {
+          cli::cli_alert_warning(
+            "Package {.pkg dplyr} not available, skipping {package_name} suggestions"
+          )
+          return(report)
+        }
+
+        suggestions <- bid_suggest_components(
           validate_stage,
-          package = "bslib"
+          package = package_name
         )
 
-        top_bslib <- head(bslib_suggestions, 3)
-
-        if (nrow(top_bslib) > 0) {
-          report <- c(report, "**bslib Components:**")
-          for (i in 1:nrow(top_bslib)) {
-            report <- c(
-              report,
-              paste0(
-                "- ", top_bslib$component[i], ": ",
-                top_bslib$description[i]
-              )
-            )
-          }
-          report <- c(report, "")
+        if (nrow(suggestions) == 0) {
+          cli::cli_alert_warning("No {package_name} suggestions available")
+          return(report)
         }
-      },
-      error = function(e) {
-        # silently fail
-      }
-    )
 
-    # {shiny} suggestions
-    tryCatch(
-      {
-        shiny_suggestions <- bid_suggest_components(
-          validate_stage,
-          package = "shiny"
+        top_suggestions <- head(suggestions, 3)
+
+        cli::cli_alert_success(
+          "Found {nrow(top_suggestions)} {package_name} components to recommend"
         )
 
-        top_shiny <- head(shiny_suggestions, 3)
-
-        if (nrow(top_shiny) > 0) {
-          report <- c(report, "**Shiny Components:**")
-          for (i in 1:nrow(top_shiny)) {
-            report <- c(
-              report,
-              paste0(
-                "- ", top_shiny$component[i], ": ",
-                top_shiny$description[i]
-              )
+        report <- c(report, paste0("**", title, "**"))
+        for (i in 1:nrow(top_suggestions)) {
+          report <- c(
+            report,
+            paste0(
+              "- ", top_suggestions$component[i], ": ",
+              top_suggestions$description[i]
             )
-          }
-          report <- c(report, "")
+          )
         }
+        report <- c(report, "")
       },
       error = function(e) {
-        # silently fail
+        cli::cli_alert_danger(
+          "Error getting {package_name} suggestions: {e$message}"
+        )
+        report <- c(report, paste0("**", title, "**"))
+        report <- c(
+          report,
+          paste0("- Could not generate suggestions: ", e$message)
+        )
+        report <- c(report, "")
       }
     )
+    return(report)
   }
 
-  # next steps suggestions
+  report <- add_component_suggestions(
+    report,
+    validate_stage,
+    "bslib",
+    "bslib Components:"
+  )
+
+  report <- add_component_suggestions(
+    report,
+    validate_stage,
+    "shiny",
+    "Shiny Components:"
+  )
+
+  # sext steps suggestions
+  cli::cli_alert_info("Adding next steps guidance")
   report <- c(report, "## Next Steps")
   report <- c(report, "1. Implement key BID principles identified in this analysis")
   report <- c(report, "2. Conduct user testing to validate improvements")
@@ -234,6 +325,7 @@ bid_report <- function(
   report <- c(report, "")
 
   # learning resources
+  cli::cli_alert_info("Adding learning resources")
   report <- c(report, "## Learning Resources")
   report <- c(report, "To learn more about the BID framework concepts used in this report:")
   report <- c(report, "- Review the {bidux} vignettes with `vignette('introduction-to-bid')`")
@@ -243,47 +335,268 @@ bid_report <- function(
 
   # format report
   if (format == "html") {
-    html_report <- paste(
-      "<html><head><style>",
-      "body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; }",
-      "h1, h2, h3 { color: #1c6d7d; }",
-      "ul, ol { margin-bottom: 20px; }",
-      "pre { background-color: #f5f5f5; padding: 10px; border-radius: 4px; overflow-x: auto; }",
-      "code { font-family: monospace; }",
-      ".diagram { font-family: monospace; white-space: pre; margin: 20px 0; }",
-      "</style></head><body>",
-      paste(
-        gsub(
-          "^# (.*)", "<h1>\\1</h1>",
-          gsub(
-            "^## (.*)", "<h2>\\1</h2>",
-            gsub(
-              "^### (.*)", "<h3>\\1</h3>",
-              gsub(
-                "^- \\*\\*(.*?)\\*\\*: (.*)", "<p><strong>\\1:</strong> \\2</p>",
-                gsub(
-                  "^\\d+\\. (.*)", "<li>\\1</li>",
-                  gsub(
-                    "^```(.*)```$", "<pre class=\"diagram\">\\1</pre>",
-                    report,
-                    perl = TRUE
-                  )
-                )
-              )
-            )
-          )
-        ),
-        collapse = "\n"
-      ),
-      "</body></html>",
-      sep = "\n"
-    )
+    cli::cli_alert_info("Formatting as HTML")
+    html_report <- generate_html_report(report)
+    cli::cli_alert_success("HTML report generated successfully")
     return(html_report)
   } else if (format == "markdown") {
+    cli::cli_alert_success("Markdown report generated successfully")
     return(paste(report, collapse = "\n"))
   } else {
+    cli::cli_alert_info("Formatting as plain text")
     text_report <- gsub("^#+ ", "", report)
     text_report <- gsub("\\*\\*", "", text_report)
+    cli::cli_alert_success("Text report generated successfully")
     return(paste(text_report, collapse = "\n"))
   }
+}
+
+# helper function to generate HTML report
+generate_html_report <- function(report) {
+  css <- '
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+    color: #333;
+    background-color: #fff;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    margin-top: 1.5em;
+    margin-bottom: 0.75em;
+    color: #2c3e50;
+    font-weight: 600;
+  }
+
+  h1 {
+    font-size: 2.2em;
+    border-bottom: 2px solid #eaecef;
+    padding-bottom: 0.3em;
+  }
+
+  h2 {
+    font-size: 1.8em;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 0.3em;
+  }
+
+  h3 {
+    font-size: 1.5em;
+  }
+
+  p {
+    margin-bottom: 1em;
+  }
+
+  ul, ol {
+    margin-bottom: 1.5em;
+    padding-left: 2em;
+  }
+
+  li {
+    margin-bottom: 0.5em;
+  }
+
+  pre {
+    background-color: #f6f8fa;
+    border-radius: 6px;
+    padding: 1em;
+    overflow: auto;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.9em;
+    line-height: 1.45;
+  }
+
+  code {
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    background-color: rgba(27, 31, 35, 0.05);
+    border-radius: 3px;
+    padding: 0.2em 0.4em;
+    font-size: 0.9em;
+  }
+
+  .diagram {
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    white-space: pre;
+    background-color: #f6f8fa;
+    border-radius: 6px;
+    padding: 1em;
+    margin: 1.5em 0;
+    overflow-x: auto;
+  }
+
+  strong {
+    font-weight: 600;
+    color: #24292e;
+  }
+
+  .section {
+    margin: 2em 0;
+    padding: 1em;
+    border-radius: 6px;
+    background-color: #f8f9fa;
+    border-left: 4px solid #007bff;
+  }
+
+  .container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5em;
+  }
+
+  .card {
+    flex: 1 1 300px;
+    border: 1px solid #e1e4e8;
+    border-radius: 6px;
+    padding: 1em;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+  }
+
+  .card h4 {
+    margin-top: 0;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 0.5em;
+  }
+
+  @media (max-width: 768px) {
+    body {
+      padding: 1rem;
+    }
+
+    h1 {
+      font-size: 1.8em;
+    }
+
+    h2 {
+      font-size: 1.5em;
+    }
+
+    h3 {
+      font-size: 1.3em;
+    }
+  }
+  '
+
+  convert_to_html <- function(md_lines) {
+    html_lines <- character(length(md_lines))
+
+    for (i in seq_along(md_lines)) {
+      line <- md_lines[i]
+
+      # headers
+      if (grepl("^# ", line)) {
+        html_lines[i] <- gsub("^# (.*?)$", "<h1>\\1</h1>", line)
+      } else if (grepl("^## ", line)) {
+        html_lines[i] <- gsub("^## (.*?)$", "<h2>\\1</h2>", line)
+      } else if (grepl("^### ", line)) {
+        html_lines[i] <- gsub("^### (.*?)$", "<h3>\\1</h3>", line)
+      }
+      # list items with strong elements
+      else if (grepl("^- \\*\\*(.*?)\\*\\*: (.*?)$", line)) {
+        html_lines[i] <- gsub(
+          "^- \\*\\*(.*?)\\*\\*: (.*?)$",
+          "<li><strong>\\1:</strong> \\2</li>",
+          line
+        )
+      }
+      # regular list items
+      else if (grepl("^- (.*?)$", line)) {
+        html_lines[i] <- gsub("^- (.*?)$", "<li>\\1</li>", line)
+      }
+      # numbered list items
+      else if (grepl("^\\d+\\. (.*?)$", line)) {
+        html_lines[i] <- gsub("^\\d+\\. (.*?)$", "<li>\\1</li>", line)
+      }
+      # code blocks
+      else if (line == "```") {
+        # start or end of code block
+        if (exists("in_code_block") && in_code_block) {
+          html_lines[i] <- "</pre>"
+          in_code_block <- FALSE
+        } else {
+          html_lines[i] <- "<pre class=\"diagram\">"
+          in_code_block <- TRUE
+        }
+      }
+      # empty lines to paragraph breaks
+      else if (line == "") {
+        html_lines[i] <- ""
+      }
+      # regular text becomes paragraphs
+      else {
+        if (exists("in_code_block") && in_code_block) {
+          # inside code block, preserve as is
+          html_lines[i] <- line
+        } else {
+          # wrap other lines in paragraph tags if not empty
+          if (nchar(trimws(line)) > 0) {
+            html_lines[i] <- paste0("<p>", line, "</p>")
+          } else {
+            html_lines[i] <- ""
+          }
+        }
+      }
+    }
+
+    # clean up any remaining code block state
+    if (exists("in_code_block") && in_code_block) {
+      html_lines <- c(html_lines, "</pre>")
+    }
+
+    return(html_lines)
+  }
+
+  html_content <- convert_to_html(report)
+
+  # group consecutive list items
+  html_content <- gsub(
+    "(<li>.*?</li>)\\s*(<li>.*?</li>)",
+    "\\1\\2",
+    paste(html_content, collapse = "\n"),
+    perl = TRUE
+  )
+
+  html_content <- gsub(
+    "(<li>.*?</li>)+",
+    "<ul>\\0</ul>",
+    html_content,
+    perl = TRUE
+  )
+
+  html_content <- gsub(
+    "<h2>(.*?)</h2>",
+    '<div class="section"><h2>\\1</h2>',
+    html_content
+  )
+  html_content <- gsub(
+    "<h2>(.*?)</h2>(.+?)(?=<div class=\"section\">|$)",
+    '<div class="section"><h2>\\1</h2>\\2</div>',
+    html_content,
+    perl = TRUE
+  )
+
+  # final HTML
+  html_report <- paste(
+    "<!DOCTYPE html>",
+    "<html lang=\"en\">",
+    "<head>",
+    "  <meta charset=\"UTF-8\">",
+    "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">",
+    "  <title>BID Framework Implementation Report</title>",
+    "  <style>",
+    css,
+    "  </style>",
+    "</head>",
+    "<body>",
+    html_content,
+    "</body>",
+    "</html>",
+    sep = "\n"
+  )
+
+  return(html_report)
 }
