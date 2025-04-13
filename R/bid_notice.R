@@ -7,10 +7,10 @@
 #' suggest appropriate theories based on the problem description.
 #'
 #' @param problem A character string describing the identified problem.
-#' @param theory Optional character string representing the underlying
-#'        psychological theory.
 #' @param evidence A character string providing evidence or example (e.g.,
 #'        results from user testing).
+#' @param theory Optional character string representing the underlying
+#'        psychological theory.
 #' @param target_audience Optional character string describing the primary users
 #'        of the dashboard.
 #'
@@ -37,20 +37,79 @@
 #'   target_audience = "Sales representatives with varying technical skills"
 #' )
 #'
+#' # Simple example
+#' \donttest{
+#' bid_notice(
+#'   problem = "Too many options",
+#'   evidence = "User feedback"
+#' )
+#' }
+#'
 #' @export
 bid_notice <- function(
     problem,
-    theory = NULL,
     evidence,
+    theory = NULL,
     target_audience = NULL) {
-  validate_required_params(
-    problem = problem,
-    evidence = evidence
-  )
+  validate_required_params(problem = problem, evidence = evidence)
 
-  # suggest appropriate concepts/theories if not provided
+  if (!is.character(problem)) {
+    cli::cli_abort(
+      c(
+        "Problem must be a character string",
+        "i" = "You provided {.cls {class(problem)}}"
+      )
+    )
+  }
+
+  if (!is.character(evidence)) {
+    cli::cli_abort(
+      c(
+        "Evidence must be a character string",
+        "i" = "You provided {.cls {class(evidence)}}"
+      )
+    )
+  }
+
+  if (!is.null(theory) && !is.character(theory)) {
+    cli::cli_abort(
+      c(
+        "Theory must be a character string",
+        "i" = "You provided {.cls {class(theory)}}"
+      )
+    )
+  }
+
+  if (!is.null(target_audience) && !is.character(target_audience)) {
+    cli::cli_abort(
+      c(
+        "Target audience must be a character string",
+        "i" = "You provided {.cls {class(target_audience)}}"
+      )
+    )
+  }
+
+  if (nchar(problem) < 10) {
+    cli::cli_warn(
+      c(
+        "Problem description is very short ({nchar(problem)} characters)",
+        "i" = "Consider providing more detail for better theory matching"
+      )
+    )
+  }
+
+  if (nchar(evidence) < 10) {
+    cli::cli_warn(
+      c(
+        "Evidence description is very short ({nchar(evidence)} characters)",
+        "i" = "Consider providing more specific evidence for better suggestions"
+      )
+    )
+  }
+
+  theory_was_suggested <- is.null(theory)
+
   if (is.null(theory)) {
-    # keyword-to-theory mappings
     theory_suggestions <- list(
       "clutter" = "Visual Hierarchies",
       "complex" = "Cognitive Load Theory",
@@ -67,8 +126,8 @@ bid_notice <- function(
       "click" = "Fitts's Law",
       "menu" = "Miller's Law",
       "remember" = "Miller's Law",
-      "attention" = "Preattentive Processing",
-      "notice" = "Preattentive Processing",
+      "attention" = "Pre-attentive Processing",
+      "notice" = "Pre-attentive Processing",
       "layout" = "Gestalt Principles",
       "organize" = "Gestalt Principles",
       "group" = "Principle of Proximity"
@@ -85,7 +144,6 @@ bid_notice <- function(
       }
     }
 
-    # use the most frequent. default is "Cognitive Load Theory"
     if (length(matched_theories) > 0) {
       theory_counts <- table(matched_theories)
       theory <- names(theory_counts)[which.max(theory_counts)]
@@ -102,6 +160,16 @@ bid_notice <- function(
       "Consider how this problem relates to user cognitive processes and",
       "interface design."
     )
+
+    if (!theory_was_suggested) {
+      cli::cli_warn(
+        c(
+          "Theory '{theory}' not found in the concept dictionary",
+          "i" = "Using generic implementation suggestions",
+          "i" = "Use {.fn bid_concepts} to see available concepts"
+        )
+      )
+    }
   }
 
   result <- tibble::tibble(
@@ -114,25 +182,25 @@ bid_notice <- function(
     timestamp = Sys.time()
   )
 
-  if (is.null(theory)) {
+  if (theory_was_suggested) {
     bid_message(
       "Stage 1 (Notice) completed.",
-      paste0(
-        "Based on your problem description, the suggested theory is: ",
+      paste(
+        "Based on your problem description, the suggested theory is:",
         theory
       ),
-      paste0("Primary issue: ", problem),
+      paste("Primary issue:", problem),
       if (!is.null(target_audience)) {
-        paste0("Target audience: ", target_audience)
+        paste("Target audience:", target_audience)
       }
     )
   } else {
     bid_message(
       "Stage 1 (Notice) completed.",
-      paste0("Using theory: ", theory),
-      paste0("Primary issue: ", problem),
+      paste("Using theory:", theory),
+      paste("Primary issue:", problem),
       if (!is.null(target_audience)) {
-        paste0("Target audience: ", target_audience)
+        paste("Target audience:", target_audience)
       }
     )
   }
