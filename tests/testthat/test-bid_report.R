@@ -25,13 +25,13 @@ test_that("bid_report generates text report with expected content", {
     summary_panel = "Dashboard simplified for quicker insights",
     collaboration = "Added team annotation features"
   )
-  
+
   report <- bid_report(validate_result)
-  
+
   # Check report type and format
   expect_type(report, "character")
   expect_true(grepl("\n", report)) # Should have line breaks
-  
+
   # Check report content
   expect_match(report, "BID Framework Implementation Report")
   expect_match(report, "Stage 5: Validate & Empower the User")
@@ -69,9 +69,9 @@ test_that("bid_report generates HTML report with correct format", {
     summary_panel = "Dashboard simplified for quicker insights",
     collaboration = "Added team annotation features"
   )
-  
+
   html_report <- bid_report(validate_result, format = "html")
-  
+
   # Check basic HTML structure
   expect_type(html_report, "character")
   expect_match(html_report, "<html>")
@@ -79,14 +79,14 @@ test_that("bid_report generates HTML report with correct format", {
   expect_match(html_report, "<style>")
   expect_match(html_report, "<body>")
   expect_match(html_report, "</html>")
-  
+
   # Check HTML content
   expect_match(html_report, "<h1>BID Framework Implementation Report</h1>")
   expect_match(html_report, "<h2>Stage 5: Validate & Empower the User</h2>")
   expect_match(html_report, "<strong>Summary Panel:</strong>")
   expect_match(html_report, "<strong>Collaboration Features:</strong>")
   expect_match(html_report, "<h2>Recommended Next Steps</h2>")
-  
+
   # Check for list items
   expect_match(html_report, "<li>Implement key BID principles")
 })
@@ -94,16 +94,16 @@ test_that("bid_report generates HTML report with correct format", {
 test_that("bid_report fails with incorrect input", {
   # Test with NULL
   expect_error(bid_report(NULL), "must be the result")
-  
+
   # Test with list
   expect_error(bid_report(list()), "must be the result")
-  
+
   # Test with non-validate tibble
   expect_error(
-    bid_report(tibble::tibble(stage = "NotValidate")), 
+    bid_report(tibble::tibble(stage = "NotValidate")),
     "must be the result"
   )
-  
+
   # Test with incorrect stage
   notice_result <- bid_notice(
     problem = "Complex interface",
@@ -122,9 +122,9 @@ test_that("bid_report handles minimal validate result", {
     previous_bias = NA_character_,
     timestamp = Sys.time()
   )
-  
+
   report <- bid_report(minimal_validate)
-  
+
   # Should still produce a report even with minimal data
   expect_type(report, "character")
   expect_match(report, "BID Framework Implementation Report")
