@@ -31,8 +31,9 @@ bid_suggest_components <- function(
     bid_result,
     package = c("shiny", "bslib", "reactable", "echarts4r", "all")) {
   validate_required_params(bid_result = bid_result)
-
   package <- match.arg(package)
+
+  cli::cli_alert_info("Generating suggestions for {.pkg {package}} package")
 
   stage <- if ("stage" %in% names(bid_result)) {
     bid_result$stage[1]
@@ -40,6 +41,122 @@ bid_suggest_components <- function(
     "Unknown"
   }
 
+  if (stage != "Unknown") {
+    cli::cli_alert_info("Tailoring suggestions for {.strong {stage}} stage")
+  }
+
+  layout <- extract_field(bid_result, "layout", "previous_layout")
+  concepts <- extract_field(bid_result, "concepts", "previous_concepts")
+  accessibility <- extract_field(
+    bid_result,
+    "accessibility",
+    "previous_accessibility"
+  )
+
+  component_suggestions <- get_suggestions(
+    package,
+    stage,
+    layout,
+    accessibility
+  )
+
+  result <- filter_suggestions(component_suggestions, stage, package)
+
+  if ("relevance" %in% names(result) && nrow(result) > 0) {
+    result <- dplyr::arrange(result, dplyr::desc(relevance))
+    result <- dplyr::select(result, -relevance)
+  }
+
+  if (nrow(result) > 0) {
+    cli::cli_alert_success("Generated {nrow(result)} component suggestions")
+  } else {
+    cli::cli_alert_warning("No suggestions available for the given criteria")
+  }
+
+  return(result)
+}
+
+# helper function to extract fields with fallbacks
+extract_field <- function(data, primary_field, fallback_field = NULL) {
+  result <- NA_character_
+
+  if (
+    primary_field %in% names(data) &&
+      !is.null(data[[primary_field]][1]) &&
+      !is.na(data[[primary_field]][1])
+  ) {
+    result <- data[[primary_field]][1]
+  } else if (
+    !is.null(fallback_field) &&
+      fallback_field %in% names(data) &&
+      !is.null(data[[fallback_field]][1]) &&
+      !is.na(data[[fallback_field]][1])
+  ) {
+    result <- data[[fallback_field]][1]
+  }
+
+  return(result)
+}
+
+# helper function to filter suggestions based on stage
+filter_suggestions <- function(suggestions, stage, package) {
+  if (stage != "Unknown" && package != "all") {
+    stage_matches <- dplyr::filter(suggestions, stage == !!stage)
+
+    if (nrow(stage_matches) > 0) {
+      cli::cli_alert_success(
+        "Found {nrow(stage_matches)} suggestions for {.val {stage}} stage"
+      )
+      return(stage_matches)
+    } else {
+      cli::cli_alert_warning(
+        "No suggestions specifically for {.val {stage}} stage, using all available suggestions"
+      )
+      return(suggestions)
+    }
+  } else {
+    return(suggestions)
+  }
+}
+
+# helper function to create a suggestion
+create_suggestion <- function(
+    stage,
+    package,
+    component,
+    description,
+    code_example,
+    relevance = 1.0) {
+  tibble::tibble(
+    stage = stage,
+    package = package,
+    component = component,
+    description = description,
+    code_example = code_example,
+    relevance = relevance
+  )
+}
+
+# helper function to get suggestions based on requested package
+get_suggestions <- function(package, stage, layout, accessibility) {
+  suggestions <- switch(package,
+    "shiny" = get_shiny_suggestions(stage, layout, accessibility),
+    "bslib" = get_bslib_suggestions(stage, layout, accessibility),
+    "reactable" = get_reactable_suggestions(stage, layout, accessibility),
+    "echarts4r" = get_echarts_suggestions(stage, layout, accessibility),
+    "all" = dplyr::bind_rows(
+      get_shiny_suggestions(stage, layout, accessibility),
+      get_bslib_suggestions(stage, layout, accessibility),
+      get_reactable_suggestions(stage, layout, accessibility),
+      get_echarts_suggestions(stage, layout, accessibility)
+    )
+  )
+
+  return(suggestions)
+}
+
+# helper function to get Shiny suggestions
+get_shiny_suggestions <- function(stage, layout, accessibility) {
   suggestions <- tibble::tibble(
     stage = character(),
     package = character(),
@@ -49,303 +166,287 @@ bid_suggest_components <- function(
     relevance = numeric()
   )
 
-  # {shiny} suggestions
-  shiny_suggestions <- tibble::tibble(
-    stage = "Notice",
-    package = "shiny",
-    component = "radioButtons",
-    description = "Use radio buttons instead of dropdown for small option sets",
-    code_example = 'radioButtons("selection", "Choose option:", choices = c("Option 1", "Option 2"), inline = TRUE)',
-    relevance = 1.0
+  # notice stage
+  suggestions <- rbind(suggestions, create_suggestion(
+    "Notice",
+    "shiny",
+    "radioButtons",
+    "Use radio buttons instead of dropdown for small option sets",
+    'radioButtons("selection", "Choose option:", choices = c("Option 1", "Option 2"), inline = TRUE)',
+    1.0
+  ))
+
+  # interpret stage
+  suggestions <- rbind(suggestions, create_suggestion(
+    "Interpret",
+    "shiny",
+    "valueBox",
+    "Highlight key metrics for instant comprehension",
+    'valueBox(value = "65%", subtitle = "Completion Rate", color = "info")',
+    1.0
+  ))
+
+  # structure stage
+  suggestions <- rbind(suggestions, create_suggestion(
+    "Structure",
+    "shiny",
+    "tabsetPanel",
+    "Group related content to reduce cognitive load",
+    'tabsetPanel(tabPanel("Overview", plotOutput("main_plot")), tabPanel("Details", dataTableOutput("details_table")))',
+    1.0
+  ))
+
+  # anticipate stage
+  suggestions <- rbind(suggestions, create_suggestion(
+    "Anticipate",
+    "shiny",
+    "conditionalPanel",
+    "Show context-appropriate insights based on user selection",
+    'conditionalPanel("input.view == \'comparison\'", plotOutput("comparison_chart"))',
+    1.0
+  ))
+
+  # validate stage
+  suggestions <- rbind(suggestions, create_suggestion(
+    "Validate",
+    "shiny",
+    "actionButton",
+    "Add export or sharing functionality",
+    'actionButton("share", "Share Insights", icon = icon("share-alt"))',
+    1.0
+  ))
+
+  # accessibility suggestion
+  suggestions <- rbind(suggestions, create_suggestion(
+    "Structure",
+    "shiny",
+    "tags$div with ARIA attributes",
+    "Add accessibility attributes to improve screen reader support",
+    'tags$div(id = "chart-container", role = "img", `aria-label` = "Chart showing sales trends over time", plotOutput("sales_chart"))',
+    0.9
+  ))
+
+  return(suggestions)
+}
+
+# helper function to get bslib suggestions
+get_bslib_suggestions <- function(stage, layout, accessibility) {
+  suggestions <- tibble::tibble(
+    stage = character(),
+    package = character(),
+    component = character(),
+    description = character(),
+    code_example = character(),
+    relevance = numeric()
   )
 
-  shiny_suggestions <- rbind(shiny_suggestions, tibble::tibble(
-    stage = "Interpret",
-    package = "shiny",
-    component = "valueBox",
-    description = "Highlight key metrics for instant comprehension",
-    code_example = 'valueBox(value = "65%", subtitle = "Completion Rate", color = "info")',
-    relevance = 1.0
+  # notice stage
+  suggestions <- rbind(suggestions, create_suggestion(
+    "Notice",
+    "bslib",
+    "layout_columns",
+    "Create responsive layouts that adapt to screen size",
+    'layout_columns(col_widths = c(4, 8), plotOutput("overview"), plotOutput("details"))',
+    1.0
   ))
 
-  shiny_suggestions <- rbind(shiny_suggestions, tibble::tibble(
-    stage = "Structure",
-    package = "shiny",
-    component = "tabsetPanel",
-    description = "Group related content to reduce cognitive load",
-    code_example = 'tabsetPanel(tabPanel("Overview", plotOutput("main_plot")), tabPanel("Details", dataTableOutput("details_table")))',
-    relevance = 1.0
+  # interpret stage
+  suggestions <- rbind(suggestions, create_suggestion(
+    "Interpret",
+    "bslib",
+    "card",
+    "Visually group related information",
+    'card(card_header("Key Metrics"), plotOutput("main_chart"), card_footer(actionLink("details", "View details")))',
+    1.0
   ))
 
-  shiny_suggestions <- rbind(shiny_suggestions, tibble::tibble(
-    stage = "Anticipate",
-    package = "shiny",
-    component = "conditionalPanel",
-    description = "Show context-appropriate insights based on user selection",
-    code_example = 'conditionalPanel("input.view == \'comparison\'", plotOutput("comparison_chart"))',
-    relevance = 1.0
+  # structure stage
+  suggestions <- rbind(suggestions, create_suggestion(
+    "Structure",
+    "bslib",
+    "navset_card_tab",
+    "Create tabbed interfaces within a card",
+    'navset_card_tab(nav_panel("Overview", plotOutput("main_plot")), nav_panel("Details", dataTableOutput("data_table")))',
+    1.0
   ))
 
-  shiny_suggestions <- rbind(shiny_suggestions, tibble::tibble(
-    stage = "Validate",
-    package = "shiny",
-    component = "actionButton",
-    description = "Add export or sharing functionality",
-    code_example = 'actionButton("share", "Share Insights", icon = icon("share-alt"))',
-    relevance = 1.0
+  # anticipate stage
+  suggestions <- rbind(suggestions, create_suggestion(
+    "Anticipate",
+    "bslib",
+    "nav_panel",
+    "Toggle between different framing perspectives",
+    'navset_pill(nav_panel("Progress View", progressOutput), nav_panel("Gap View", gapOutput))',
+    1.0
   ))
 
-  # {shiny} accessibility suggestions
-  shiny_suggestions <- rbind(shiny_suggestions, tibble::tibble(
-    stage = "Structure",
-    package = "shiny",
-    component = "tags$div with ARIA attributes",
-    description = "Add accessibility attributes to improve screen reader support",
-    code_example = 'tags$div(id = "chart-container", role = "img", `aria-label` = "Chart showing sales trends over time", plotOutput("sales_chart"))',
-    relevance = 0.9
+  # validate stage
+  suggestions <- rbind(suggestions, create_suggestion(
+    "Validate",
+    "bslib",
+    "accordion",
+    "Progressive disclosure of detailed information",
+    'accordion(accordion_panel("Key Finding 1", "Details about finding 1"), accordion_panel("Key Finding 2", "Details about finding 2"))',
+    1.0
   ))
 
-  shiny_suggestions <- rbind(shiny_suggestions, tibble::tibble(
-    stage = "Anticipate",
-    package = "shiny",
-    component = "shinyFeedback",
-    description = "Provide immediate visual feedback on user interactions",
-    code_example = 'shinyFeedback::useShinyFeedback()\nshinyFeedback::feedbackWarning("input_id", !is.numeric(input$value), "Please enter a number")',
-    relevance = 0.9
+  # accessibility suggestion
+  suggestions <- rbind(suggestions, create_suggestion(
+    "Structure",
+    "bslib",
+    "layout_column_wrap with variable gap",
+    "Create breathable layouts with appropriate spacing",
+    'layout_column_wrap(width = 1/2, gap = "2rem", ...)',
+    0.9
   ))
 
-  # {bslib} suggestions
-  bslib_suggestions <- tibble::tibble(
-    stage = "Notice",
-    package = "bslib",
-    component = "layout_columns",
-    description = "Create responsive layouts that adapt to screen size",
-    code_example = 'layout_columns(col_widths = c(4, 8), plotOutput("overview"), plotOutput("details"))',
-    relevance = 1.0
+  return(suggestions)
+}
+
+# hepper function to get reactable suggestions
+get_reactable_suggestions <- function(stage, layout, accessibility) {
+  suggestions <- tibble::tibble(
+    stage = character(),
+    package = character(),
+    component = character(),
+    description = character(),
+    code_example = character(),
+    relevance = numeric()
   )
 
-  bslib_suggestions <- rbind(bslib_suggestions, tibble::tibble(
-    stage = "Interpret",
-    package = "bslib",
-    component = "card",
-    description = "Visually group related information",
-    code_example = 'card(card_header("Key Metrics"), plotOutput("main_chart"), card_footer(actionLink("details", "View details")))',
-    relevance = 1.0
+  # notice stage
+  suggestions <- rbind(suggestions, create_suggestion(
+    "Notice",
+    "reactable",
+    "defaultColDef",
+    "Simplify table appearance to reduce cognitive load",
+    'reactable(data, defaultColDef = colDef(headerStyle = list(background = "#f7f7f7"), align = "center"))',
+    1.0
   ))
 
-  bslib_suggestions <- rbind(bslib_suggestions, tibble::tibble(
-    stage = "Structure",
-    package = "bslib",
-    component = "navset_card_tab",
-    description = "Create tabbed interfaces within a card",
-    code_example = 'navset_card_tab(nav_panel("Overview", plotOutput("main_plot")), nav_panel("Details", dataTableOutput("data_table")))',
-    relevance = 1.0
+  # interpret stage
+  suggestions <- rbind(suggestions, create_suggestion(
+    "Interpret",
+    "reactable",
+    "conditional style",
+    "Use color coding to enhance processing fluency",
+    'colDef(style = function(value) { if(value > 50) { list(color = "green") } else { list(color = "red") } })',
+    1.0
   ))
 
-  bslib_suggestions <- rbind(bslib_suggestions, tibble::tibble(
-    stage = "Anticipate",
-    package = "bslib",
-    component = "nav_panel",
-    description = "Toggle between different framing perspectives",
-    code_example = 'navset_pill(nav_panel("Progress View", progressOutput), nav_panel("Gap View", gapOutput))',
-    relevance = 1.0
+  # structure stage
+  suggestions <- rbind(suggestions, create_suggestion(
+    "Structure",
+    "reactable",
+    "groupBy",
+    "Group related data to implement Principle of Proximity",
+    'reactable(data, groupBy = "category")',
+    1.0
   ))
 
-  bslib_suggestions <- rbind(bslib_suggestions, tibble::tibble(
-    stage = "Validate",
-    package = "bslib",
-    component = "accordion",
-    description = "Progressive disclosure of detailed information",
-    code_example = 'accordion(accordion_panel("Key Finding 1", "Details about finding 1"), accordion_panel("Key Finding 2", "Details about finding 2"))',
-    relevance = 1.0
+  # anticipate stage
+  suggestions <- rbind(suggestions, create_suggestion(
+    "Anticipate",
+    "reactable",
+    "columns with reference indicators",
+    "Add benchmark indicators to address Anchoring Effect",
+    'colDef(cell = function(value) { div(value, div(style = list(width = "80%", height = "4px", background = ifelse(value > 50, "green", "red"))) })',
+    1.0
   ))
 
-  # {bslib} accessibility suggestions
-  bslib_suggestions <- rbind(bslib_suggestions, tibble::tibble(
-    stage = "Structure",
-    package = "bslib",
-    component = "layout_column_wrap with variable gap",
-    description = "Create breathable layouts with appropriate spacing",
-    code_example = 'layout_column_wrap(width = 1/2, gap = "2rem", ...))',
-    relevance = 0.9
+  # validate stage
+  suggestions <- rbind(suggestions, create_suggestion(
+    "Validate",
+    "reactable",
+    "details",
+    "Progressive disclosure for detailed information",
+    'reactable(data, details = function(index) { div(style = list(padding = "1rem"), "Additional details for row ", index) })',
+    1.0
   ))
 
-  bslib_suggestions <- rbind(bslib_suggestions, tibble::tibble(
-    stage = "Structure",
-    package = "bslib",
-    component = "value_box",
-    description = "Create visually prominent KPI displays with icons",
-    code_example = 'value_box(title = "Conversion Rate", value = "24.8%", showcase = bsicons::bs_icon("graph-up-arrow"), theme = "success")',
-    relevance = 0.9
+  # accessibility suggestion
+  suggestions <- rbind(suggestions, create_suggestion(
+    "Interpret",
+    "reactable",
+    "themed table with accessibility attributes",
+    "Create visually clean tables with proper accessibility markup",
+    'reactable(data, theme = reactableTheme(borderColor = "#dfe2e5", stripedColor = "#f6f8fa"), defaultColDef = colDef(headerStyle = list(fontWeight = "bold")))',
+    0.9
   ))
 
-  # {reactable} suggestions
-  reactable_suggestions <- tibble::tibble(
-    stage = "Notice",
-    package = "reactable",
-    component = "defaultColDef",
-    description = "Simplify table appearance to reduce cognitive load",
-    code_example = 'reactable(data, defaultColDef = colDef(headerStyle = list(background = "#f7f7f7"), align = "center"))',
-    relevance = 1.0
+  return(suggestions)
+}
+
+# helper function to get echarts4r suggestions
+get_echarts_suggestions <- function(stage, layout, accessibility) {
+  suggestions <- tibble::tibble(
+    stage = character(),
+    package = character(),
+    component = character(),
+    description = character(),
+    code_example = character(),
+    relevance = numeric()
   )
 
-  reactable_suggestions <- rbind(reactable_suggestions, tibble::tibble(
-    stage = "Interpret",
-    package = "reactable",
-    component = "conditional style",
-    description = "Use color coding to enhance processing fluency",
-    code_example = 'colDef(style = function(value) { if(value > 50) { list(color = "green") } else { list(color = "red") } })',
-    relevance = 1.0
+  # notice stage
+  suggestions <- rbind(suggestions, create_suggestion(
+    "Notice",
+    "echarts4r",
+    "e_title",
+    "Clear titles help establish visual hierarchy",
+    'e_charts(data) |> e_line(x) |> e_title("Main Metric Trend", "Supporting context")',
+    1.0
   ))
 
-  reactable_suggestions <- rbind(reactable_suggestions, tibble::tibble(
-    stage = "Structure",
-    package = "reactable",
-    component = "groupBy",
-    description = "Group related data to implement Principle of Proximity",
-    code_example = 'reactable(data, groupBy = "category")',
-    relevance = 1.0
+  # interpret stage
+  suggestions <- rbind(suggestions, create_suggestion(
+    "Interpret",
+    "echarts4r",
+    "e_tooltip",
+    "Tooltips provide additional context without cluttering interface",
+    'e_charts(data) |> e_bar(y) |> e_tooltip(trigger = "item", formatter = "{b}: {c}")',
+    1.0
   ))
 
-  reactable_suggestions <- rbind(reactable_suggestions, tibble::tibble(
-    stage = "Anticipate",
-    package = "reactable",
-    component = "columns with custom rendering",
-    description = "Add benchmark indicators to address Anchoring Effect",
-    code_example = 'colDef(cell = function(value) { div(value, div(style = list(width = "80%", height = "4px", background = ifelse(value > 50, "green", "red"))) })',
-    relevance = 1.0
+  # structure stage
+  suggestions <- rbind(suggestions, create_suggestion(
+    "Structure",
+    "echarts4r",
+    "e_grid",
+    "Control chart layout precisely",
+    'e_charts(data) |> e_line(x) |> e_grid(height = "50%", top = "10%")',
+    1.0
   ))
 
-  reactable_suggestions <- rbind(reactable_suggestions, tibble::tibble(
-    stage = "Validate",
-    package = "reactable",
-    component = "details",
-    description = "Progressive disclosure for detailed information",
-    code_example = 'reactable(data, details = function(index) { div(style = list(padding = "1rem"), "Additional details for row ", index) })',
-    relevance = 1.0
+  # anticipate stage
+  suggestions <- rbind(suggestions, create_suggestion(
+    "Anticipate",
+    "echarts4r",
+    "e_mark_line",
+    "Add reference lines to address Anchoring Effect",
+    "e_charts(data) |> e_bar(y) |> e_mark_line(data = list(yAxis = 50))",
+    1.0
   ))
 
-  # {reactable} accessibility suggestions
-  reactable_suggestions <- rbind(reactable_suggestions, tibble::tibble(
-    stage = "Interpret",
-    package = "reactable",
-    component = "themed table with accessibility attributes",
-    description = "Create visually clean tables with proper accessibility markup",
-    code_example = 'reactable(data, theme = reactableTheme(borderColor = "#dfe2e5", stripedColor = "#f6f8fa"), defaultColDef = colDef(headerStyle = list(fontWeight = "bold")), pagination = FALSE, highlight = TRUE, sortable = TRUE, filterable = TRUE, minRows = 1)',
-    relevance = 0.9
+  # validate stage
+  suggestions <- rbind(suggestions, create_suggestion(
+    "Validate",
+    "echarts4r",
+    "e_toolbox",
+    "Add export options for sharing insights",
+    'e_charts(data) |> e_line(x) |> e_toolbox_feature(feature = "saveAsImage")',
+    1.0
   ))
 
-  # {echarts4r} suggestions
-  echarts_suggestions <- tibble::tibble(
-    stage = "Notice",
-    package = "echarts4r",
-    component = "e_title",
-    description = "Clear titles help establish visual hierarchy",
-    code_example = 'e_charts(data) |> e_line(x) |> e_title("Main Metric Trend", "Supporting context")',
-    relevance = 1.0
-  )
-
-  echarts_suggestions <- rbind(echarts_suggestions, tibble::tibble(
-    stage = "Interpret",
-    package = "echarts4r",
-    component = "e_tooltip",
-    description = "Tooltips provide additional context without cluttering interface",
-    code_example = 'e_charts(data) |> e_bar(y) |> e_tooltip(trigger = "item", formatter = "{b}: {c}")',
-    relevance = 1.0
+  # accessibility suggestion
+  suggestions <- rbind(suggestions, create_suggestion(
+    "Interpret",
+    "echarts4r",
+    "e_color with accessible palette",
+    "Use a colorblind-friendly palette to enhance visual hierarchy and accessibility",
+    'e_charts(data) |> e_bar(y) |> e_color(c("#4472C4", "#ED7D31", "#A5A5A5", "#FFC000", "#5B9BD5"))',
+    0.9
   ))
 
-  echarts_suggestions <- rbind(echarts_suggestions, tibble::tibble(
-    stage = "Structure",
-    package = "echarts4r",
-    component = "e_grid",
-    description = "Control chart layout precisely",
-    code_example = 'e_charts(data) |> e_line(x) |> e_grid(height = "50%", top = "10%")',
-    relevance = 1.0
-  ))
-
-  echarts_suggestions <- rbind(echarts_suggestions, tibble::tibble(
-    stage = "Anticipate",
-    package = "echarts4r",
-    component = "e_mark_line",
-    description = "Add reference lines to address Anchoring Effect",
-    code_example = "e_charts(data) |> e_bar(y) |> e_mark_line(data = list(yAxis = 50))",
-    relevance = 1.0
-  ))
-
-  echarts_suggestions <- rbind(echarts_suggestions, tibble::tibble(
-    stage = "Validate",
-    package = "echarts4r",
-    component = "e_toolbox",
-    description = "Add export options for sharing insights",
-    code_example = 'e_charts(data) |> e_line(x) |> e_toolbox_feature(feature = "saveAsImage")',
-    relevance = 1.0
-  ))
-
-  # {echarts4r} accessibility suggestions
-  echarts_suggestions <- rbind(echarts_suggestions, tibble::tibble(
-    stage = "Interpret",
-    package = "echarts4r",
-    component = "e_color with designed palette",
-    description = "Use a coherent color palette to enhance visual hierarchy and accessibility",
-    code_example = 'e_charts(data) |> e_bar(y) |> e_color(c("#4472C4", "#ED7D31", "#A5A5A5", "#FFC000", "#5B9BD5"))',
-    relevance = 0.9
-  ))
-
-  echarts_suggestions <- rbind(echarts_suggestions, tibble::tibble(
-    stage = "Structure",
-    package = "echarts4r",
-    component = "e_theme with customization",
-    description = "Apply a consistent theme to enhance aesthetic-usability effect",
-    code_example = 'e_charts(data) |> e_line(x) |> e_theme("custom") |> e_theme_custom("{\"color\":[\"#5B8FF9\",\"#5AD8A6\",\"#FFD666\"],\"backgroundColor\":\"rgba(0,0,0,0)\",\"textStyle\":{},\"title\":{\"textStyle\":{\"color\":\"#666666\"},\"subtextStyle\":{\"color\":\"#999999\"}},\"line\":{\"itemStyle\":{\"borderWidth\":2},\"lineStyle\":{\"width\":2},\"symbol\":\"emptyCircle\"}}")',
-    relevance = 0.8
-  ))
-
-  # final suggestions
-  all_suggestions <- switch(package,
-    "shiny" = shiny_suggestions,
-    "bslib" = bslib_suggestions,
-    "reactable" = reactable_suggestions,
-    "echarts4r" = echarts_suggestions,
-    "all" = dplyr::bind_rows(
-      shiny_suggestions,
-      bslib_suggestions,
-      reactable_suggestions,
-      echarts_suggestions
-    )
-  )
-
-  # filter suggestions by current stage
-  if (stage != "Unknown" && package != "all") {
-    stage_matches <- dplyr::filter(all_suggestions, stage == !!stage)
-
-    if (nrow(stage_matches) > 0) {
-      result <- stage_matches
-    } else {
-      if (stage == "Validate") {
-        result <- all_suggestions
-      } else {
-        result <- all_suggestions
-      }
-    }
-  } else {
-    result <- all_suggestions
-  }
-
-  if ("relevance" %in% names(result)) {
-    result <- dplyr::arrange(result, dplyr::desc(relevance))
-  }
-
-  if ("relevance" %in% names(result)) {
-    result <- dplyr::select(result, -relevance)
-  }
-
-  # message about future capabilities
-  bid_message(
-    "UI Component Suggestions",
-    paste0("Generated suggestions for package: ", package),
-    if (stage != "Unknown") paste0("Current stage: ", stage),
-    "Phase 3 will include ready-to-use code templates and UI components based on your specific BID application."
-  )
-
-  return(result)
+  return(suggestions)
 }
