@@ -92,38 +92,57 @@ validate_required_params <- function(...) {
   invisible(NULL)
 }
 
-#' Validate previous stage is from expected function
+#' Validate previous stage follows BID framework flow
 #'
 #' @param previous_stage The previous stage tibble
-#' @param expected_stage The expected stage name
-#'
+#' @param current_stage The current stage name
+
 #' @return NULL invisibly if check passes, otherwise stops with an error
-#'
+
 #' @keywords internal
-#'
+
 #' @noRd
-validate_previous_stage <- function(previous_stage, expected_stage) {
-  if (!tibble::is_tibble(previous_stage) || 
-      !("stage" %in% names(previous_stage)) ||
-      previous_stage$stage[1] != expected_stage) {
-    
-    actual_stage <- if (
-      tibble::is_tibble(previous_stage) && "stage" %in% names(previous_stage)
-    ) {
-      previous_stage$stage[1]
-    } else {
-      "Unknown"
-    }
-    
+validate_previous_stage <- function(previous_stage, current_stage) {
+  if (
+    !tibble::is_tibble(previous_stage) || !("stage" %in% names(previous_stage))
+  ) {
     stop(
       standard_error_msg(
-        "invalid_stage",
-        expected = expected_stage,
-        actual = actual_stage
+        "invalid_param",
+        "previous_stage", 
+        "a tibble with a 'stage' column", 
+        "invalid input"
       )
     )
   }
   
+  prev_stage_name <- previous_stage$stage[1]
+  
+  valid_prev_stages <- switch(current_stage,
+    "Notice" = c(character(0), "Validate"),
+    "Interpret" = c("Notice", "Structure", "Anticipate", "Validate"),
+    "Structure" = c("Notice", "Interpret", "Anticipate"),
+    "Anticipate" = c("Notice", "Interpret", "Structure"),
+    "Validate" = c("Interpret", "Structure", "Anticipate"),
+    character(0)
+  )
+
+  if (
+    length(valid_prev_stages) > 0 && !(prev_stage_name %in% valid_prev_stages)
+  ) {
+    stop(
+      paste0(
+        "Invalid previous stage. For the '",
+        current_stage,
+        "' stage, the previous stage must be one of: ",
+        paste(valid_prev_stages, collapse = ", "),
+        ". Got '",
+        prev_stage_name,
+        "' instead."
+      )
+    )
+  }
+
   invisible(NULL)
 }
 
