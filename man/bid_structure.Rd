@@ -7,18 +7,22 @@
 bid_structure(previous_stage, layout, concepts = NULL, accessibility = NULL)
 }
 \arguments{
-\item{previous_stage}{A tibble or list output from an earlier BID stage function.}
+\item{previous_stage}{A tibble or list output from an earlier BID stage
+function.}
 
 \item{layout}{A character string indicating the layout type (e.g.,
 "dual_process", "grid", "card", "tabs", "breathable").}
 
 \item{concepts}{A character vector of BID concepts applied in this stage.
-Concepts can be provided in natural language (e.g., "Principle of Proximity")
-or with underscores (e.g., "principle_of_proximity"). The function uses
-fuzzy matching to identify the concepts. If NULL, will attempt to detect
-relevant concepts from previous stages.}
+Concepts can be provided in natural language (e.g., "Principle of
+Proximity") or with underscores (e.g., "principle_of_proximity"). The
+function uses fuzzy matching to identify the concepts. If NULL, will
+attempt to detect relevant concepts from previous stages.}
 
-\item{accessibility}{A list of accessibility considerations (optional).}
+\item{accessibility}{A list of accessibility considerations (optional).
+Common parameters include: color_contrast, keyboard_navigation,
+screen_reader, text_size, alternative_text, focus_indicators,
+semantic_markup, and aria_labels.}
 }
 \value{
 A tibble containing the documented information for the "Structure"
@@ -27,21 +31,24 @@ stage.
 \description{
 This function documents the structure of the dashboard, including layout and
 design elements such as proximity, dual-processing, and default effects.
+It supports modern layout approaches like breathable layouts and visual
+hierarchies, while ensuring accessibility considerations are properly
+documented.
 }
 \examples{
-interpret <- bid_interpret(
-  bid_notice(
-    problem = "Users struggle with information overload",
-    evidence = "Survey results indicate delays"
-  ),
-  central_question = "How can we simplify data presentation?",
-  data_story = list(
-    hook = "Data is too complex",
-    context = "Overloaded with charts",
-    tension = "Confusing layout",
-    resolution = "Introduce clear grouping"
+interpret <- bid_notice(
+  problem = "Users struggle with information overload",
+  evidence = "Survey results indicate delays"
+) |>
+  bid_interpret(
+    central_question = "How can we simplify data presentation?",
+    data_story = list(
+      hook = "Data is too complex",
+      context = "Overloaded with charts",
+      tension = "Confusing layout",
+      resolution = "Introduce clear grouping"
+    )
   )
-)
 
 # Basic usage with natural language concept names
 bid_structure(
@@ -56,15 +63,30 @@ bid_structure(
   layout = "dual_process"
 )
 
-# With accessibility considerations
+# With breathable layout and modern concepts
+bid_structure(
+  previous_stage = interpret,
+  layout = "breathable",
+  concepts = c(
+    "Visual Hierarchy",
+    "Breathable Layouts",
+    "Progressive Disclosure"
+  )
+)
+
+# With comprehensive accessibility considerations
 bid_structure(
   previous_stage = interpret,
   layout = "dual_process",
   concepts = c("Proximity", "Default Effect", "Visual Hierarchy"),
   accessibility = list(
-    color_contrast = "Using WCAG AA-compliant color contrasts",
-    keyboard_navigation = "All interactive elements are keyboard accessible",
-    screen_reader = "Charts include descriptive alt text"
+    color_contrast = "Using WCAG AA-compliant color contrasts (minimum 4.5:1 ratio)",
+    text_size = "Minimum 16px for body text, 20px for headings",
+    keyboard_navigation = "All interactive elements are keyboard accessible and follow logical tab order",
+    screen_reader = "Charts include descriptive alt text and ARIA landmarks for navigation",
+    focus_indicators = "Visible focus indicators for keyboard users",
+    semantic_markup = "Using proper HTML5 semantic elements for structure",
+    aria_labels = "ARIA labels for complex interactive components"
   )
 )
 
