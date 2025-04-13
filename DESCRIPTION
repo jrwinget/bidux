@@ -22,3 +22,7 @@ Imports:
     dplyr,
     stringdist,
     tibble
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

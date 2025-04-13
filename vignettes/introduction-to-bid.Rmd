@@ -1,11 +1,18 @@
 ---
-title: "Introduction to Behavior Insight Design (BID)"
+title: "introduction-to-bid"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Introduction to BID}
+  %\VignetteIndexEntry{introduction-to-bid}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
 
 # Introduction
 
@@ -19,3 +26,5 @@ The five stages of the BID framework are:
 5. **Validate & Empower the User**: Summarize insights and facilitate collaborative decision-making.
 
 This vignette introduces the core ideas behind each stage and how they interact to create effective, bias-aware dashboards.
+
+Visit [github.com/jrwinget/bid-framework](https://github.com/jrwinget/bid-framework) for resources and further information on the BID framework.

@@ -1,2 +1,4 @@
 ^bidux\.Rproj$
 ^\.Rproj\.user$
+^doc$
+^Meta$
