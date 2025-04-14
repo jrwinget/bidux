@@ -23,7 +23,9 @@ Imports:
     dplyr,
     jsonlite,
     stringdist,
-    tibble
+    stringr,
+    tibble,
+    utils
 Suggests: 
     DiagrammeR,
     knitr,
