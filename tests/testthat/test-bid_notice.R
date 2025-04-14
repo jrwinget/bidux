@@ -221,3 +221,21 @@ test_that("bid_notice handles edge cases in optional parameters", {
 
   expect_equal(result$theory, "My Custom Theory Framework")
 })
+
+test_that("bid_notice suggests appropriate theories based on combined text", {
+  result1 <- bid_notice(
+    problem = "Users struggle with finding information",
+    evidence = "Complex interface with too many options"
+  )
+
+  result2 <- bid_notice(
+    problem = "Users face difficulties",
+    evidence = "Too many choices in the dropdown menus"
+  )
+
+  expect_match(
+    paste(result1$theory, result2$theory),
+    "Hick|Cognitive Load|Visual Hierarchy",
+    ignore.case = TRUE
+  )
+})

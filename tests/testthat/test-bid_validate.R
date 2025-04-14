@@ -1,3 +1,6 @@
+library(testthat)
+library(tibble)
+
 test_that("bid_validate works with valid inputs", {
   anticipate_result <- bid_anticipate(
     bid_structure(
@@ -394,4 +397,23 @@ test_that("bid_validate handles edge cases in summary_panel and collaboration", 
     ignore.case = TRUE,
     perl = TRUE
   )
+})
+
+test_that("bid_validate properly parses interaction_principles JSON", {
+  anticipate_result <- tibble::tibble(
+    stage = "Anticipate",
+    bias_mitigations = "anchoring: Test",
+    interaction_principles = "{\"hover\":\"Show on hover\",\"selection\":\"Highlight selected\"}",
+    timestamp = Sys.time()
+  )
+
+  result <- bid_validate(
+    previous_stage = anticipate_result,
+    summary_panel = "Test summary",
+    collaboration = "Test collaboration"
+  )
+
+  expect_s3_class(result, "tbl_df")
+  expect_false(is.na(result$previous_interaction))
+  expect_match(result$suggestions, "collaboration", ignore.case = TRUE)
 })

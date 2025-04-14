@@ -1,6 +1,8 @@
 library(testthat)
 library(tibble)
 
+# bid_concepts ----
+
 test_that("bid_concepts returns a tibble with expected columns", {
   result <- bid_concepts()
 
@@ -102,6 +104,21 @@ test_that("bid_concepts returns results ordered by relevance", {
     expect_true(min(primary_match_positions) < min(secondary_match_positions))
   }
 })
+
+test_that("bid_concepts properly scores and ranks search results by relevance", {
+  results <- bid_concepts("visual hierarchy")
+  expect_true(
+    grepl("visual hierarchy", tolower(results$concept[1]), fixed = TRUE) ||
+      any(
+        sapply(
+          results$concept[1:3],
+          function(x) grepl("visual hierarchy", tolower(x), fixed = TRUE)
+        )
+      )
+  )
+})
+
+# bid_concept ----
 
 test_that("bid_concept handles exact, partial, and fuzzy matches", {
   result_exact <- bid_concept("cognitive load theory")
@@ -233,4 +250,10 @@ test_that("bid_concept handles synonyms appropriately", {
       }
     }
   }
+})
+
+test_that("bid_concept handles concepts with special characters", {
+  result <- bid_concept("Hick's Law")
+  expect_s3_class(result, "tbl_df")
+  expect_true(grepl("Hick", result$concept[1], fixed = TRUE))
 })

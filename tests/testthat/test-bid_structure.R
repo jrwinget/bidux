@@ -4,7 +4,7 @@ library(tibble)
 test_that("bid_structure returns a tibble with stage 'Structure'", {
   local_mock(
     bid_concepts = function(search = NULL) {
-      tibble(
+      tibble::tibble(
         concept = "Test Concept",
         description = "Dummy description",
         category = "Stage 1",
@@ -14,7 +14,7 @@ test_that("bid_structure returns a tibble with stage 'Structure'", {
     }
   )
 
-  previous_stage <- tibble(
+  previous_stage <- tibble::tibble(
     stage = "Interpret",
     problem = "The dashboard layout is cluttered.",
     theory = "Visual Hierarchies",
@@ -36,7 +36,7 @@ test_that("bid_structure returns a tibble with stage 'Structure'", {
 test_that("bid_structure warns on invalid layout", {
   local_mock(
     bid_concepts = function(search = NULL) {
-      tibble(
+      tibble::tibble(
         concept = "Test Concept",
         description = "Dummy description",
         category = "Stage 1",
@@ -46,7 +46,7 @@ test_that("bid_structure warns on invalid layout", {
     }
   )
 
-  previous_stage <- tibble(
+  previous_stage <- tibble::tibble(
     stage = "Notice",
     problem = "Dashboard elements are not arranged clearly.",
     theory = "Cognitive Load Theory",
@@ -64,7 +64,7 @@ test_that("bid_structure warns on invalid layout", {
 })
 
 test_that("bid_structure errors when accessibility parameter is not a list", {
-  previous_stage <- tibble(
+  previous_stage <- tibble::tibble(
     stage = "Interpret",
     problem = "Layout organization is suboptimal.",
     theory = "Dual-Processing Theory",
@@ -84,7 +84,7 @@ test_that("bid_structure errors when accessibility parameter is not a list", {
 test_that("bid_structure auto-detects concepts when not provided", {
   local_mock(
     bid_concepts = function(search = NULL) {
-      tibble(
+      tibble::tibble(
         concept = "Auto Detected Concept",
         description = "Automatically detected based on problem statement.",
         category = "Stage 1",
@@ -94,7 +94,7 @@ test_that("bid_structure auto-detects concepts when not provided", {
     }
   )
 
-  previous_stage <- tibble(
+  previous_stage <- tibble::tibble(
     stage = "Notice",
     problem = "Dashboard elements are scattered across the screen.",
     theory = "Principle of Proximity",
@@ -325,4 +325,36 @@ test_that("bid_structure handles various layout values", {
 
   expect_s3_class(result, "tbl_df")
   expect_equal(result$layout[1], "dual_process")
+})
+
+test_that("bid_structure handles complex accessibility parameter structures", {
+  previous_stage <- tibble::tibble(
+    stage = "Interpret",
+    central_question = "Test question",
+    timestamp = Sys.time()
+  )
+
+  nested_accessibility <- list(
+    vision = list(
+      color_contrast = "WCAG AA compliant (4.5:1)",
+      text_size = "16px minimum"
+    ),
+    motor = list(
+      keyboard_navigation = "Full keyboard support",
+      target_size = "44px minimum touch targets"
+    )
+  )
+
+  # should warn about structure but not fail
+  expect_warning(
+    result <- bid_structure(
+      previous_stage,
+      layout = "dual_process",
+      concepts = c("Visual Hierarchy"),
+      accessibility = nested_accessibility
+    )
+  )
+
+  expect_s3_class(result, "tbl_df")
+  expect_false(is.na(result$accessibility))
 })

@@ -5,7 +5,7 @@ test_that("bid_interpret returns a tibble with stage 'Interpret'", {
   local_mock(
     validate_user_personas = function(user_personas) invisible(NULL),
     bid_concepts = function(search = NULL) {
-      tibble(
+      tibble::tibble(
         concept = "Data Storytelling Framework",
         description = "Dummy description",
         category = "Stage 2",
@@ -15,7 +15,7 @@ test_that("bid_interpret returns a tibble with stage 'Interpret'", {
     }
   )
 
-  previous_stage <- tibble(
+  previous_stage <- tibble::tibble(
     stage = "Notice",
     problem = "Users struggle with complex data",
     theory = "Cognitive Load Theory",
@@ -34,7 +34,7 @@ test_that("bid_interpret uses provided central_question", {
   local_mock(
     validate_user_personas = function(user_personas) invisible(NULL),
     bid_concepts = function(search = NULL) {
-      tibble(
+      tibble::tibble(
         concept = "Data Storytelling Framework",
         description = "Dummy description",
         category = "Stage 2",
@@ -44,7 +44,7 @@ test_that("bid_interpret uses provided central_question", {
     }
   )
 
-  previous_stage <- tibble(
+  previous_stage <- tibble::tibble(
     stage = "Notice",
     problem = "Users struggle with complex data",
     theory = "Cognitive Load Theory",
@@ -62,7 +62,7 @@ test_that("bid_interpret errors when data_story is not a list", {
     validate_user_personas = function(user_personas) invisible(NULL)
   )
 
-  previous_stage <- tibble(
+  previous_stage <- tibble::tibble(
     stage = "Notice",
     problem = "Users struggle with complex data",
     theory = "Cognitive Load Theory",
@@ -82,7 +82,7 @@ test_that("bid_interpret errors when user_personas is invalid", {
     }
   )
 
-  previous_stage <- tibble(
+  previous_stage <- tibble::tibble(
     stage = "Notice",
     problem = "Users struggle with complex data",
     theory = "Cognitive Load Theory",
@@ -288,4 +288,44 @@ test_that("bid_interpret handles NA values in previous_stage", {
   expect_false(is.na(result$central_question[1]))
   expect_true(is.na(result$previous_problem[1]))
   expect_true(is.na(result$previous_audience[1]))
+})
+
+test_that("bid_interpret validates user_personas structure correctly", {
+  previous_stage <- tibble::tibble(
+    stage = "Notice",
+    problem = "Test problem",
+    evidence = "Test evidence",
+    timestamp = Sys.time()
+  )
+
+
+  expect_error(
+    bid_interpret(
+      previous_stage,
+      central_question = "Test question",
+      user_personas = list(
+        list(
+          # missing required persona 'name' field
+          goals = "Test goals",
+          pain_points = "Test pain points"
+        )
+      )
+    )
+  )
+
+  # multiple personas with missing recommended fields should warn but not error
+  expect_warning(
+    result <- bid_interpret(
+      previous_stage,
+      central_question = "Test question",
+      user_personas = list(
+        list(name = "Persona 1"),
+        list(name = "Persona 2", technical_level = "Advanced")
+      )
+    )
+  )
+
+  expect_s3_class(result, "tbl_df")
+  expect_match(result$user_personas, "Persona 1", fixed = TRUE)
+  expect_match(result$user_personas, "Persona 2", fixed = TRUE)
 })

@@ -18,7 +18,7 @@ test_that("bid_anticipate works with valid inputs", {
     layout = "dual_process",
     concepts = c("Principle of Proximity", "Default Effect")
   )
-  
+
   result <- bid_anticipate(
     previous_stage = structure_result,
     bias_mitigations = list(
@@ -26,7 +26,7 @@ test_that("bid_anticipate works with valid inputs", {
       framing = "Use consistent positive framing"
     )
   )
-  
+
   expect_s3_class(result, "tbl_df")
   expect_equal(result$stage, "Anticipate")
   expect_match(result$bias_mitigations, "anchoring: Provide reference points")
@@ -52,7 +52,7 @@ test_that("bid_anticipate fails with missing parameters", {
     layout = "dual_process",
     concepts = c("Principle of Proximity", "Default Effect")
   )
-  
+
   expect_error(bid_anticipate(previous_stage = structure_result), "must be provided")
   expect_error(bid_anticipate(bias_mitigations = list(anchoring = "Test")), "must be provided")
 })
@@ -74,12 +74,12 @@ test_that("bid_anticipate suggests missing common biases", {
     layout = "dual_process",
     concepts = c("Principle of Proximity", "Default Effect")
   )
-  
+
   result <- bid_anticipate(
     previous_stage = structure_result,
     bias_mitigations = list(anchoring = "Provide reference points")
   )
-  
+
   # should suggest other common biases
   expect_match(result$suggestions, "common biases", ignore.case = TRUE)
 })
@@ -101,23 +101,23 @@ test_that("bid_anticipate auto-suggests bias_mitigations when NULL", {
     layout = "dual_process",
     concepts = c("Principle of Proximity", "Default Effect")
   )
-  
+
   suppressMessages(
     result <- bid_anticipate(
       previous_stage = structure_result,
       bias_mitigations = NULL
     )
   )
-  
+
   expect_s3_class(result, "tbl_df")
   expect_false(is.na(result$bias_mitigations[1]))
   expect_true(nchar(result$bias_mitigations[1]) > 0)
-  
+
   # should suggest at least anchoring, framing or confirmation bias
   expect_match(
-    result$bias_mitigations, 
-    "anchoring|framing|confirm", 
-    ignore.case = TRUE, 
+    result$bias_mitigations,
+    "anchoring|framing|confirm",
+    ignore.case = TRUE,
     perl = TRUE
   )
 })
@@ -139,7 +139,7 @@ test_that("bid_anticipate auto-suggests interaction_principles when NULL", {
     layout = "dual_process",
     concepts = c("Principle of Proximity", "Default Effect")
   )
-  
+
   suppressMessages(
     result <- bid_anticipate(
       previous_stage = structure_result,
@@ -147,21 +147,21 @@ test_that("bid_anticipate auto-suggests interaction_principles when NULL", {
       interaction_principles = NULL
     )
   )
-  
+
   expect_s3_class(result, "tbl_df")
   expect_false(is.na(result$interaction_principles[1]))
-  
+
   expect_match(
-    result$interaction_principles, 
-    "hover|feedback|selection|progressive", 
-    ignore.case = TRUE, 
+    result$interaction_principles,
+    "hover|feedback|selection|progressive",
+    ignore.case = TRUE,
     perl = TRUE
   )
 })
 
 test_that("bid_anticipate handles different layout types appropriately", {
   layouts <- c("dual_process", "grid", "card", "tabs", "breathable")
-  
+
   for (layout in layouts) {
     structure_result <- tibble::tibble(
       stage = "Structure",
@@ -169,17 +169,17 @@ test_that("bid_anticipate handles different layout types appropriately", {
       concepts = "Visual Hierarchy",
       timestamp = Sys.time()
     )
-    
+
     suppressMessages(
       result <- bid_anticipate(
         previous_stage = structure_result,
         bias_mitigations = NULL
       )
     )
-    
+
     expect_s3_class(result, "tbl_df")
     expect_equal(result$previous_layout, layout)
-    
+
     expect_match(
       result$suggestions,
       layout,
@@ -196,7 +196,7 @@ test_that("bid_anticipate handles NA values in previous_stage fields", {
     accessibility = NA_character_,
     timestamp = Sys.time()
   )
-  
+
   suppressMessages(
     result <- bid_anticipate(
       previous_stage = structure_result,
@@ -206,12 +206,12 @@ test_that("bid_anticipate handles NA values in previous_stage fields", {
       )
     )
   )
-  
+
   expect_s3_class(result, "tbl_df")
   expect_true(is.na(result$previous_layout[1]))
   expect_true(is.na(result$previous_concepts[1]))
   expect_true(is.na(result$previous_accessibility[1]))
-  
+
   # should still generate valid suggestions
   expect_false(is.na(result$bias_mitigations[1]))
   expect_false(is.na(result$suggestions[1]))
@@ -224,7 +224,7 @@ test_that("bid_anticipate handles edge cases in bias_mitigations parameter", {
     concepts = "Visual Hierarchy",
     timestamp = Sys.time()
   )
-  
+
   expect_warning(
     result <- bid_anticipate(
       previous_stage = structure_result,
@@ -235,7 +235,7 @@ test_that("bid_anticipate handles edge cases in bias_mitigations parameter", {
     ),
     "bias_mitigations must be a non-empty named list"
   )
-  
+
   expect_warning(
     result <- bid_anticipate(
       previous_stage = structure_result,
@@ -246,7 +246,7 @@ test_that("bid_anticipate handles edge cases in bias_mitigations parameter", {
     ),
     "bias_mitigations must be a non-empty named list"
   )
-  
+
   suppressMessages(
     result <- bid_anticipate(
       previous_stage = structure_result,
@@ -256,7 +256,7 @@ test_that("bid_anticipate handles edge cases in bias_mitigations parameter", {
       )
     )
   )
-  
+
   expect_s3_class(result, "tbl_df")
   expect_match(result$bias_mitigations, "anchoring: 123")
   expect_match(result$bias_mitigations, "framing: TRUE")
@@ -269,19 +269,19 @@ test_that("bid_anticipate handles edge cases in interaction_principles param", {
     concepts = "Visual Hierarchy",
     timestamp = Sys.time()
   )
-  
+
   expect_warning(
     result <- bid_anticipate(
       previous_stage = structure_result,
       bias_mitigations = list(anchoring = "Test"),
       interaction_principles = list(
-        "" = "This has empty name",
+        "This has empty name",
         hover = "This has valid name"
       )
     ),
     "interaction_principles must be a non-empty named list"
   )
-  
+
   suppressMessages(
     result <- bid_anticipate(
       previous_stage = structure_result,
@@ -292,10 +292,34 @@ test_that("bid_anticipate handles edge cases in interaction_principles param", {
       )
     )
   )
-  
+
   expect_s3_class(result, "tbl_df")
   expect_match(result$interaction_principles, "hover")
   expect_match(result$interaction_principles, "123")
   expect_match(result$interaction_principles, "feedback")
   expect_match(result$interaction_principles, "TRUE")
+})
+
+test_that("bid_anticipate correctly parses JSON in interaction_principles", {
+  structure_result <- tibble::tibble(
+    stage = "Structure",
+    layout = "dual_process",
+    concepts = "Visual Hierarchy",
+    timestamp = Sys.time()
+  )
+
+  json_interaction <- list(
+    hover = "Show details on hover",
+    feedback = "Highlight selection"
+  )
+
+  result <- bid_anticipate(
+    previous_stage = structure_result,
+    bias_mitigations = list(anchoring = "Test"),
+    interaction_principles = json_interaction
+  )
+
+  expect_s3_class(result, "tbl_df")
+  expect_match(result$interaction_principles, "hover", fixed = TRUE)
+  expect_match(result$interaction_principles, "feedback", fixed = TRUE)
 })
