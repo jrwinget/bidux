@@ -222,7 +222,8 @@ structure_result <- bid_structure(
   )
 )
 
-structure_result |> select(layout, concepts, accessibility, suggestions)
+structure_result |> 
+  select(layout, concepts, accessibility, suggestions)
 ```
 
 The function provides layout-specific suggestions based on the psychological concepts we've chosen to apply, and acknowledges our accessibility considerations.

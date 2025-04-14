@@ -15,6 +15,23 @@
   if (!is.null(a)) a else b
 }
 
+#' Create standardized message output
+#'
+#' @param title The title or heading for the message
+#' @param ... Character strings to include as bullet points
+#'
+#' @return NULL invisibly, used for side effect of printing message
+#'
+#' @keywords internal
+#'
+#' @noRd
+bid_message <- function(title, ...) {
+  bullet_points <- unlist(list(...))
+  msg <- paste0(title, "\n", paste0("  - ", bullet_points, collapse = "\n"))
+  message(msg)
+  invisible(NULL)
+}
+
 #' Check if input is NULL, NA, or an empty string
 #'
 #' @param x The value to check
@@ -25,7 +42,22 @@
 #'
 #' @noRd
 is_empty <- function(x) {
-  is.null(x) || is.na(x) || (is.character(x) && nchar(trimws(x)) == 0)
+  # Use is.null first (this doesn't have length issues)
+  if (is.null(x)) {
+    return(TRUE)
+  }
+  
+  # Then check for NA - use all() for vectors
+  if (all(is.na(x))) {
+    return(TRUE)
+  }
+  
+  # Finally check for empty string if it's character
+  if (is.character(x) && all(nchar(trimws(x)) == 0)) {
+    return(TRUE)
+  }
+  
+  return(FALSE)
 }
 
 #' Standardize error messages
@@ -143,22 +175,5 @@ validate_previous_stage <- function(previous_stage, current_stage) {
     )
   }
 
-  invisible(NULL)
-}
-
-#' Create standardized message output
-#'
-#' @param title The title or heading for the message
-#' @param ... Character strings to include as bullet points
-#'
-#' @return NULL invisibly, used for side effect of printing message
-#'
-#' @keywords internal
-#'
-#' @noRd
-bid_message <- function(title, ...) {
-  bullet_points <- unlist(list(...))
-  msg <- paste0(title, "\n", paste0("  - ", bullet_points, collapse = "\n"))
-  message(msg)
   invisible(NULL)
 }

@@ -91,8 +91,6 @@ bid_interpret <- function(
     validate_user_personas(user_personas)
   }
 
-  storytelling_concepts <- bid_concepts("storytelling|fluency")
-
   if (is.null(central_question)) {
     if (previous_stage$stage[1] == "Notice") {
       problem <- if ("problem" %in% names(previous_stage)) {
