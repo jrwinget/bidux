@@ -1,8 +1,8 @@
 ---
-title: "getting-started"
+title: "Getting Started with bidux"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{getting-started}
+  %\VignetteIndexEntry{Getting Started with bidux}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -10,7 +10,8 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  eval = FALSE
 )
 ```
 
@@ -27,74 +28,13 @@ library(dplyr)
 
 The BID framework consists of 5 sequential stages:
 
-```{r echo=FALSE, out.width="100%"}
-DiagrammeR::grViz("
-  digraph bid_framework {
-    
-    # Allow edges to connect to subgraphs themselves
-    graph [
-      compound = true,
-      fontname = 'Arial', 
-      fontsize = 12, 
-      rankdir = TB,  /* top-to-bottom layout */
-      splines = true
-    ];
-
-    node [
-      fontname = 'Arial',
-      shape = rectangle,
-      style = filled,
-      fillcolor = '#e6f3ff',
-      fontsize = 12
-    ];
-
-    edge [
-      fontname = 'Arial',
-      arrowsize = 0.8
-    ];
-
-    # Left
-    notice   [label = 'NOTICE'];
-    
-    # Dashed subgraph in the middle
-    subgraph cluster0 {
-      label = '';                 /* no label on the cluster */
-      style = 'rounded,dashed';   /* dashed outline */
-      color = 'black';            /* ensure border is visible */
-
-      interpret  [label = 'INTERPRET'];
-      structure  [label = 'STRUCTURE'];
-      anticipate [label = 'ANTICIPATE'];
-
-      /* Force INTERPRET up top, STRUCTURE & ANTICIPATE side-by-side below */
-      { rank = min; interpret }
-      { rank = same; structure; anticipate }
-
-      /* Connect them in a triangle */
-      interpret -> structure;
-      structure -> anticipate;
-      anticipate -> interpret;
-    }
-
-    # Right
-    validate [label = 'VALIDATE'];
-
-    # Connect NOTICE into the cluster boundary
-    notice -> interpret [lhead = cluster0, constraint = false];
-
-    # Connect from the cluster boundary out to VALIDATE
-    anticipate -> validate [ltail = cluster0, constraint = false];
-  }
-")
-```
-
-Each stage incorporates specific psychological principles and design concepts, making the entire development process more intentional and user-centered:
-
 1. **Notice** the Problem - Identify friction points and user struggles
 2. **Interpret** the User's Need - Understand the core questions and insights needed
 3. **Structure** the Dashboard - Organize information for intuitive comprehension
 4. **Anticipate** User Behavior - Consider cognitive biases that influence perception
 5. **Validate** & Empower the User - Provide clear takeaways and collaborative features
+
+This sequential process forms a structured approach to dashboard design, with each stage building on the insights from previous stages.
 
 ## Exploring the Concept Dictionary
 
@@ -103,11 +43,11 @@ The BID framework is built on established psychological and design principles. T
 ```{r concepts}
 # List all concepts
 all_concepts <- bid_concepts()
-head(all_concepts[, c("concept", "category", "description")], 3)
+head(dplyr::select(all_concepts, concept, category, description), 3)
 
 # Search for specific concepts
 bid_concepts("cognitive") |> 
-  select(concept, description, implementation_tips)
+  dplyr::select(concept, description, implementation_tips)
 ```
 
 For detailed information about a specific concept, use `bid_concept()`:
@@ -115,7 +55,7 @@ For detailed information about a specific concept, use `bid_concept()`:
 ```{r concept_detail}
 # Get information about a specific concept
 bid_concept("Processing Fluency") |>
-  select(concept, description, implementation_tips, recommendations)
+  dplyr::select(concept, description, implementation_tips)
 ```
 
 The `bid_concept()` function supports case-insensitive and partial matching:
@@ -123,11 +63,11 @@ The `bid_concept()` function supports case-insensitive and partial matching:
 ```{r concept_matching}
 # Case-insensitive matching
 bid_concept("hick's law") |> 
-  select(concept, description)
+  dplyr::select(concept, description)
 
 # Partial matching
 bid_concept("proximity") |> 
-  select(concept, description)
+  dplyr::select(concept, description)
 ```
 
 You can also explore concepts that are new to the BID framework:
@@ -135,7 +75,7 @@ You can also explore concepts that are new to the BID framework:
 ```{r new_concepts}
 # Explore new concepts from user-centric design
 bid_concepts("visual hierarchy|breathable|gherkin") |>
-  select(concept, description) 
+  dplyr::select(concept, description) 
 ```
 
 ## Documenting a Dashboard Project with BID
@@ -155,10 +95,10 @@ notice_result <- bid_notice(
 )
 
 notice_result |> 
-  select(theory, target_audience, suggestions)
+  dplyr::select(problem, theory, evidence, target_audience)
 ```
 
-Notice that the function automatically selected an appropriate theory based on our problem description. It also provides suggestions for addressing cognitive load.
+Notice that the function automatically selected an appropriate theory based on our problem description. It also provides suggestions for addressing cognitive load which you can access from the `suggestions` column.
 
 ### Stage 2: Interpret the User's Need
 
@@ -195,10 +135,10 @@ interpret_result <- bid_interpret(
 )
 
 interpret_result |> 
-  select(central_question, hook, tension, resolution, suggestions)
+  dplyr::select(central_question, hook, tension, resolution)
 ```
 
-The function evaluates our data story elements and provides suggestions for improvement. We've also added user personas to better target our design.
+The function evaluates our data story elements and provides suggestions for improvement (in the `suggestions` column). We've also added user personas to better target our design.
 
 ### Stage 3: Structure the Dashboard
 
@@ -223,7 +163,7 @@ structure_result <- bid_structure(
 )
 
 structure_result |> 
-  select(layout, concepts, accessibility, suggestions)
+  dplyr::select(layout, concepts, accessibility)
 ```
 
 The function provides layout-specific suggestions based on the psychological concepts we've chosen to apply, and acknowledges our accessibility considerations.
@@ -249,7 +189,7 @@ anticipate_result <- bid_anticipate(
 )
 
 anticipate_result |> 
-  select(bias_mitigations, interaction_principles, suggestions)
+  dplyr::select(bias_mitigations, interaction_principles)
 ```
 
 The function evaluates our bias mitigation strategies and interaction principles, providing implementation suggestions for both.
@@ -273,7 +213,7 @@ validate_result <- bid_validate(
 )
 
 validate_result |> 
-  select(summary_panel, collaboration, next_steps, suggestions)
+  dplyr::select(summary_panel, collaboration, next_steps)
 ```
 
 The validate function acknowledges our implementation of the Peak-End Rule through next steps and provides suggestions for refining our approach.
@@ -285,12 +225,12 @@ Once you've documented your dashboard with the BID framework, you can generate c
 ```{r suggestions}
 # Get {bslib} component suggestions
 bid_suggest_components(structure_result, package = "bslib") |>
-  select(component, description, code_example) |>
+  dplyr::select(component, description) |>
   head(2)
 
 # Get {reactable} suggestions for showing data
 bid_suggest_components(anticipate_result, package = "reactable") |>
-  select(component, description) |>
+  dplyr::select(component, description) |>
   head(2)
 
 # Get suggestions from all supported packages
@@ -307,11 +247,10 @@ You can generate a complete report summarizing all stages of your BID process:
 report <- bid_report(validate_result)
 cat(report)
 
-# Generate an HTML report with diagrams
+# Generate an HTML report
 html_report <- bid_report(
   validate_result,
-  format = "html",
-  include_diagrams = TRUE
+  format = "html"
   )
 
 # Generate a markdown report
@@ -355,7 +294,6 @@ Future versions of `{bidux}` will include:
 - User stories workflow integration following the Gherkin method
 - Enhanced design patterns library
 - Accessibility framework integration with WCAG guidelines
-- LLM integration for more intelligent suggestions
 - A UI component library implementing BID principles
 - Testing and validation tools for dashboard evaluation
 
