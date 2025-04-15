@@ -4,12 +4,19 @@
 \alias{bid_anticipate}
 \title{Document User Behavior Anticipation Stage in BID Framework}
 \usage{
-bid_anticipate(previous_stage, bias_mitigations)
+bid_anticipate(
+  previous_stage,
+  bias_mitigations = NULL,
+  interaction_principles = NULL
+)
 }
 \arguments{
-\item{previous_stage}{A tibble or list output from \code{bid_structure()}.}
+\item{previous_stage}{A tibble or list output from an earlier BID stage function.}
 
-\item{bias_mitigations}{A named list of bias mitigation strategies.}
+\item{bias_mitigations}{A named list of bias mitigation strategies. If NULL, the
+function will suggest bias mitigations based on information from previous stages.}
+
+\item{interaction_principles}{A named list of interaction principles (optional).}
 }
 \value{
 A tibble containing the documented information for the "Anticipate"
@@ -18,6 +25,7 @@ stage.
 \description{
 This function documents the anticipated user behavior by listing bias
 mitigation strategies related to anchoring, framing, confirmation bias, etc.
+It also supports adding interaction hints and visual feedback elements.
 }
 \examples{
 structure_info <- bid_structure(
@@ -37,11 +45,32 @@ structure_info <- bid_structure(
   layout = "dual_process",
   concepts = c("principle_of_proximity", "default_effect")
 )
+
+# Basic usage
 bid_anticipate(
   previous_stage = structure_info,
   bias_mitigations = list(
     anchoring = "Use context-aware references",
     framing = "Toggle between positive and negative framing"
+  )
+)
+
+# Let the function suggest bias mitigations based on previous stages
+bid_anticipate(
+  previous_stage = structure_info
+)
+
+# With interaction principles
+bid_anticipate(
+  previous_stage = structure_info,
+  bias_mitigations = list(
+    anchoring = "Use context-aware references",
+    framing = "Toggle between positive and negative framing"
+  ),
+  interaction_principles = list(
+    hover_effects = "Show additional information on hover",
+    selection_feedback = "Highlight active filters with color change",
+    progressive_actions = "Reveal advanced options only when basic ones are used"
   )
 )
 

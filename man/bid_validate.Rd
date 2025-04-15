@@ -4,15 +4,26 @@
 \alias{bid_validate}
 \title{Document Validation and Empowerment Stage in BID Framework}
 \usage{
-bid_validate(previous_stage, summary_panel, collaboration)
+bid_validate(
+  previous_stage,
+  summary_panel = NULL,
+  collaboration = NULL,
+  next_steps = NULL
+)
 }
 \arguments{
-\item{previous_stage}{A tibble or list output from \code{bid_anticipate()}.}
+\item{previous_stage}{A tibble or list output from an earlier BID stage function.}
 
-\item{summary_panel}{A character string summarizing key insights.}
+\item{summary_panel}{A character string summarizing key insights. If NULL,
+the function will suggest a summary based on previous stages.}
 
 \item{collaboration}{A character string describing collaboration or
-annotation features.}
+annotation features. If NULL, the function will suggest collaboration
+features based on previous stages.}
+
+\item{next_steps}{An optional character vector listing recommended next steps or
+actions for users (follows Peak-End Rule). If NULL, the function will
+suggest next steps based on previous stages.}
 }
 \value{
 A tibble containing the documented information for the "Validate"
@@ -47,10 +58,29 @@ anticipate_info <- bid_anticipate(
     framing = "Use gain-framed messages"
   )
 )
+
+# Basic usage
 bid_validate(
   previous_stage = anticipate_info,
   summary_panel = "Key insights include clarity and user satisfaction",
   collaboration = "Annotations enabled for team feedback"
+)
+
+# Let the function suggest content based on previous stages
+bid_validate(
+  previous_stage = anticipate_info
+)
+
+# With next steps
+bid_validate(
+  previous_stage = anticipate_info,
+  summary_panel = "Key insights include clarity and user satisfaction",
+  collaboration = "Annotations enabled for team feedback",
+  next_steps = c(
+    "Review performance metrics",
+    "Schedule team discussion",
+    "Implement suggested UI changes"
+  )
 )
 
 }

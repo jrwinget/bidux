@@ -4,23 +4,40 @@
 \alias{bid_report}
 \title{Generate BID Framework Report}
 \usage{
-bid_report(validate_stage, format = "text")
+bid_report(
+  validate_stage,
+  format = c("text", "html", "markdown"),
+  include_diagrams = TRUE
+)
 }
 \arguments{
 \item{validate_stage}{A tibble output from \code{bid_validate()}.}
 
-\item{format}{Output format: "text" or "html"}
+\item{format}{Output format: "text", "html", or "markdown"}
+
+\item{include_diagrams}{Logical, whether to include ASCII diagrams in the
+report (default: TRUE)}
 }
 \value{
 A formatted report summarizing the entire BID process
 }
 \description{
-Creates a comprehensive report from a completed BID framework process
+Creates a comprehensive report from a completed BID framework process. This
+report summarizes all stages and provides recommendations for implementation.
 }
 \examples{
 \dontrun{
 # After completing all 5 stages
 validation_result <- bid_validate(...)
+
+# Generate a text report
 bid_report(validation_result)
+
+# Generate an HTML report
+bid_report(validation_result, format = "html")
+
+# Generate a markdown report without diagrams
+bid_report(validation_result, format = "markdown", include_diagrams = FALSE)
 }
+
 }

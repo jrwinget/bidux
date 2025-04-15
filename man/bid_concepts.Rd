@@ -7,16 +7,20 @@
 bid_concepts(search = NULL)
 }
 \arguments{
-\item{search}{Optional search term to filter concepts}
+\item{search}{Optional search term to filter concepts. Multiple terms can be provided
+separated by commas or spaces.}
 }
 \value{
 A tibble with concept details.
 }
 \description{
-This function returns a tibble listing all the key concepts in the Behavior Insight Design framework,
-including their descriptions, categories, references, and example applications.
+This function returns a tibble listing all the key concepts in the Behavior
+Insight Design framework, including their descriptions, categories,
+references, and example applications.
 }
 \examples{
 bid_concepts()
 bid_concepts("cognitive")
+bid_concepts("visual, hierarchy") # Multiple search terms
+
 }

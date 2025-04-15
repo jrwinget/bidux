@@ -1,2 +1,6 @@
 ^bidux\.Rproj$
 ^\.Rproj\.user$
+^doc$
+^Meta$
+^LICENSE\.md$
+^cran-comments\.md$

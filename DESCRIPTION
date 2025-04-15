@@ -19,6 +19,17 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports: 
+    cli,
     dplyr,
+    jsonlite,
     stringdist,
-    tibble
+    stringr,
+    tibble,
+    utils
+Suggests: 
+    DiagrammeR,
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr
+Config/testthat/edition: 3

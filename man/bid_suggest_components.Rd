@@ -6,31 +6,36 @@
 \usage{
 bid_suggest_components(
   bid_result,
-  package = c("shiny", "bslib", "reactable", "echarts4r")
+  package = c("shiny", "bslib", "reactable", "echarts4r", "all")
 )
 }
 \arguments{
 \item{bid_result}{A tibble from any BID stage function.}
 
 \item{package}{The UI package to generate suggestions for: "shiny", "bslib",
-"reactable", or "echarts4r".}
+"reactable", "echarts4r", or "all" for suggestions from all packages.}
 }
 \value{
 A tibble with component suggestions.
 }
 \description{
 This function provides concrete UI component suggestions based on your BID
-framework application. It's a preview of future capabilities that will be
-expanded in Phase 3.
+framework application. It generates code examples and component
+recommendations for various UI packages.
 }
 \examples{
 \dontrun{
-  notice_result <- bid_notice(
-    problem = "Too many filter options",
-    evidence = "Users take 30+ seconds to configure dashboard"
-  )
+# Get suggestions from a specific stage
+notice_result <- bid_notice(
+  problem = "Too many filter options",
+  evidence = "Users take 30+ seconds to configure dashboard"
+)
 
-  bid_suggest_components(notice_result, package = "shiny")
+bid_suggest_components(notice_result, package = "shiny")
+
+# Get suggestions for all packages
+final_result <- bid_validate(...)
+all_suggestions <- bid_suggest_components(final_result, package = "all")
 }
 
 }
