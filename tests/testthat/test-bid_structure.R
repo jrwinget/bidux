@@ -216,7 +216,7 @@ test_that("bid_structure handles NA values in previous_stage", {
   previous_stage <- tibble::tibble(
     stage = "Interpret",
     central_question = NA_character_,
-    hook = "Users struggle with navigation",
+    hook = "Users struggle with navigation",  # This has a value
     context = NA_character_,
     tension = "Complex structure confuses users",
     resolution = NA_character_,
@@ -232,8 +232,8 @@ test_that("bid_structure handles NA values in previous_stage", {
   )
 
   expect_s3_class(result, "tbl_df")
-  expect_true(is.na(result$previous_question[1]))
-  expect_true(is.na(result$previous_story_hook[1]))
+  expect_true(is.na(result$previous_question[1]))  # central_question is NA
+  expect_false(is.na(result$previous_story_hook[1]))  # hook has a value, so should NOT be NA
 })
 
 test_that("bid_structure handles edge cases in accessibility parameter", {
@@ -249,12 +249,12 @@ test_that("bid_structure handles edge cases in accessibility parameter", {
       previous_stage,
       layout = "dual_process",
       concepts = c("Visual Hierarchy"),
-      accessibility = list()
+      accessibility = list()  # Empty list should still be stored as JSON
     )
   )
 
   expect_s3_class(result, "tbl_df")
-  # should warn but still work
+  # Empty list should be stored as JSON, not NA
   expect_false(is.na(result$accessibility[1]))
 
   suppressMessages(
