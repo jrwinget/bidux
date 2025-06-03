@@ -575,7 +575,7 @@ bid_concept <- function(concept_name) {
     )
 
     suggestions <- tibble::tibble(suggested_concept = closest_matches)
-    return(structure(NULL, suggestions = suggestions))
+    return(structure(list(), suggestions = suggestions))
   }
 
   result <- result |>
