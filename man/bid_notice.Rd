@@ -2,58 +2,32 @@
 % Please edit documentation in R/bid_notice.R
 \name{bid_notice}
 \alias{bid_notice}
-\title{Document Problem Notice Stage in BID Framework}
+\title{Document User Notice Stage in BID Framework}
 \usage{
-bid_notice(problem, evidence, theory = NULL, target_audience = NULL)
+bid_notice(problem, theory = NULL, evidence = NULL, target_audience = NULL)
 }
 \arguments{
-\item{problem}{A character string describing the identified problem.}
+\item{problem}{A character string describing the observed user problem.}
 
-\item{evidence}{A character string providing evidence or example (e.g.,
-results from user testing).}
+\item{theory}{A character string describing the behavioral theory that might
+explain the problem.}
 
-\item{theory}{Optional character string representing the underlying
-psychological theory.}
+\item{evidence}{A character string describing evidence supporting the problem.}
 
-\item{target_audience}{Optional character string describing the primary users
-of the dashboard.}
+\item{target_audience}{Optional character string describing the target audience.}
 }
 \value{
-A tibble containing the documented information for the "Notice"
-stage.
+A tibble containing the documented information for the "Notice" stage.
 }
 \description{
-This function documents the problem area by capturing insights related to
-cognitive load, Hick's Law, and visual hierarchies. It forms the first stage
-in the Behavior Insight Design framework. If no theory is specified, it will
-suggest appropriate theories based on the problem description.
+This function documents the initial observation and problem identification
+stage. It represents stage 1 in the BID framework.
 }
 \examples{
 bid_notice(
-  problem = "Users struggle to navigate cluttered dashboards",
-  evidence = "User testing showed increased time to locate key metrics."
-)
-
-# With specified theory
-bid_notice(
-  problem = "Users struggle to navigate cluttered dashboards",
+  problem = "Users struggle with complex data",
   theory = "Cognitive Load Theory",
-  evidence = "User testing showed increased time to locate key metrics."
+  evidence = "User testing shows confusion with current interface"
 )
-
-# With target audience
-bid_notice(
-  problem = "Sales team struggles with complex filter combinations",
-  evidence = "Training sessions revealed confusion with multiple selections",
-  target_audience = "Sales representatives with varying technical skills"
-)
-
-# Simple example
-\donttest{
-bid_notice(
-  problem = "Too many options",
-  evidence = "User feedback"
-)
-}
 
 }

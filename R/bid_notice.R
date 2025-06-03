@@ -1,209 +1,232 @@
-#' Document Problem Notice Stage in BID Framework
+#' Document User Notice Stage in BID Framework
 #'
 #' @description
-#' This function documents the problem area by capturing insights related to
-#' cognitive load, Hick's Law, and visual hierarchies. It forms the first stage
-#' in the Behavior Insight Design framework. If no theory is specified, it will
-#' suggest appropriate theories based on the problem description.
+#' This function documents the initial observation and problem identification
+#' stage. It represents stage 1 in the BID framework.
 #'
-#' @param problem A character string describing the identified problem.
-#' @param evidence A character string providing evidence or example (e.g.,
-#'        results from user testing).
-#' @param theory Optional character string representing the underlying
-#'        psychological theory.
-#' @param target_audience Optional character string describing the primary users
-#'        of the dashboard.
+#' @param problem A character string describing the observed user problem.
+#' @param theory A character string describing the behavioral theory that might
+#'        explain the problem.
+#' @param evidence A character string describing evidence supporting the problem.
+#' @param target_audience Optional character string describing the target audience.
 #'
-#' @return A tibble containing the documented information for the "Notice"
-#'         stage.
+#' @return A tibble containing the documented information for the "Notice" stage.
 #'
 #' @examples
 #' bid_notice(
-#'   problem = "Users struggle to navigate cluttered dashboards",
-#'   evidence = "User testing showed increased time to locate key metrics."
-#' )
-#'
-#' # With specified theory
-#' bid_notice(
-#'   problem = "Users struggle to navigate cluttered dashboards",
+#'   problem = "Users struggle with complex data",
 #'   theory = "Cognitive Load Theory",
-#'   evidence = "User testing showed increased time to locate key metrics."
+#'   evidence = "User testing shows confusion with current interface"
 #' )
-#'
-#' # With target audience
-#' bid_notice(
-#'   problem = "Sales team struggles with complex filter combinations",
-#'   evidence = "Training sessions revealed confusion with multiple selections",
-#'   target_audience = "Sales representatives with varying technical skills"
-#' )
-#'
-#' # Simple example
-#' \donttest{
-#' bid_notice(
-#'   problem = "Too many options",
-#'   evidence = "User feedback"
-#' )
-#' }
 #'
 #' @export
 bid_notice <- function(
-    problem,
-    evidence,
-    theory = NULL,
-    target_audience = NULL) {
-  validate_required_params(problem = problem, evidence = evidence)
+  problem,
+  theory = NULL,
+  evidence = NULL,
+  target_audience = NULL
+) {
+  # Validate required parameters - handle empty strings by treating them as warnings, not errors
+  if (missing(problem) || is.null(problem)) {
+    stop("Required parameter 'problem' must be provided", call. = FALSE)
+  }
 
+  if (missing(evidence) || is.null(evidence)) {
+    stop("Required parameter 'evidence' must be provided", call. = FALSE)
+  }
+
+  # Validate parameter types BEFORE checking for empty strings
   if (!is.character(problem)) {
-    cli::cli_abort(
-      c(
-        "Problem must be a character string",
-        "i" = "You provided {.cls {class(problem)}}"
-      )
-    )
+    stop("Problem must be a character string", call. = FALSE)
   }
 
   if (!is.character(evidence)) {
-    cli::cli_abort(
-      c(
-        "Evidence must be a character string",
-        "i" = "You provided {.cls {class(evidence)}}"
-      )
-    )
+    stop("Evidence must be a character string", call. = FALSE)
   }
 
   if (!is.null(theory) && !is.character(theory)) {
-    cli::cli_abort(
-      c(
-        "Theory must be a character string",
-        "i" = "You provided {.cls {class(theory)}}"
-      )
-    )
+    stop("Theory must be a character string", call. = FALSE)
   }
 
-  if (!is.null(target_audience) && !is.character(target_audience)) {
-    cli::cli_abort(
-      c(
-        "Target audience must be a character string",
-        "i" = "You provided {.cls {class(target_audience)}}"
-      )
-    )
+  # Handle target_audience validation - single validation block
+  if (!is.null(target_audience)) {
+    # Special case: handle logical NA (when user passes just NA)
+    if (is.logical(target_audience) && length(target_audience) == 1 && is.na(target_audience)) {
+      warning("target_audience is NA", call. = FALSE)
+    } else if (is.character(target_audience)) {
+      # For character strings, check for NA or empty
+      if (is.na(target_audience)) {
+        warning("target_audience is NA", call. = FALSE)
+      } else if (nchar(trimws(target_audience)) == 0) {
+        warning("target_audience is empty", call. = FALSE)
+      }
+    } else {
+      # For non-character types (except the logical NA case above), give error
+      stop("Target audience must be a character string", call. = FALSE)
+    }
   }
 
-  if (nchar(problem) < 10) {
-    cli::cli_warn(
-      c(
-        "Problem description is very short ({nchar(problem)} characters)",
-        "i" = "Consider providing more detail for better theory matching"
-      )
-    )
+  # Check for empty strings and warn appropriately (after type validation)
+  if (is.character(problem) && nchar(trimws(problem)) == 0) {
+    warning("Problem description is very short", call. = FALSE)
+  } else if (nchar(trimws(problem)) < 10) {
+    warning("Problem description is very short", call. = FALSE)
   }
 
-  if (nchar(evidence) < 10) {
-    cli::cli_warn(
-      c(
-        "Evidence description is very short ({nchar(evidence)} characters)",
-        "i" = "Consider providing more specific evidence for better suggestions"
-      )
-    )
+  if (is.character(evidence) && nchar(trimws(evidence)) == 0) {
+    warning("Evidence description is very short", call. = FALSE)
+  } else if (nchar(trimws(evidence)) < 10) {
+    warning("Evidence description is very short", call. = FALSE)
   }
-
-  theory_was_suggested <- is.null(theory)
 
   if (is.null(theory)) {
-    theory_suggestions <- list(
-      "clutter" = "Visual Hierarchies",
-      "complex" = "Cognitive Load Theory",
-      "overwhelm" = "Cognitive Load Theory",
-      "choice" = "Hick's Law",
-      "option" = "Hick's Law",
-      "dropdown" = "Hick's Law",
-      "select" = "Hick's Law",
-      "navigation" = "Information Scent",
-      "find" = "Information Scent",
-      "locate" = "Visual Hierarchies",
-      "confus" = "Cognitive Load Theory",
-      "scroll" = "Fitts's Law",
-      "click" = "Fitts's Law",
-      "menu" = "Miller's Law",
-      "remember" = "Miller's Law",
-      "attention" = "Pre-attentive Processing",
-      "notice" = "Pre-attentive Processing",
-      "layout" = "Gestalt Principles",
-      "organize" = "Gestalt Principles",
-      "group" = "Principle of Proximity"
-    )
-
-    problem_lower <- stringr::str_to_lower(problem)
-    evidence_lower <- stringr::str_to_lower(evidence)
-    combined_text <- paste(problem_lower, evidence_lower)
-
-    matched_theories <- character(0)
-    for (keyword in names(theory_suggestions)) {
-      if (stringr::str_detect(combined_text, keyword)) {
-        matched_theories <- c(matched_theories, theory_suggestions[[keyword]])
-      }
-    }
-
-    if (length(matched_theories) > 0) {
-      theory_counts <- table(matched_theories)
-      theory <- names(theory_counts)[which.max(theory_counts)]
-    } else {
-      theory <- "Cognitive Load Theory"
-    }
+    theory <- suggest_theory_from_problem(problem, evidence)
+    cli::cli_alert_info(paste0("Suggested theory: ", theory))
   }
 
-  theory_info <- bid_concept(theory)
-  if (!is.null(theory_info) && nrow(theory_info) > 0) {
-    suggestions <- theory_info$implementation_tips
-  } else {
-    suggestions <- paste(
-      "Consider how this problem relates to user cognitive processes and",
-      "interface design."
+  if (is.null(evidence)) {
+    evidence <- "Evidence needed to support this observation"
+    cli::cli_alert_info(
+      "Consider gathering specific evidence to support this problem observation"
     )
-
-    if (!theory_was_suggested) {
-      cli::cli_warn(
-        c(
-          "Theory '{theory}' not found in the concept dictionary",
-          "i" = "Using generic implementation suggestions",
-          "i" = "Use {.fn bid_concepts} to see available concepts"
-        )
-      )
-    }
   }
+
+  suggestions <- generate_notice_suggestions(
+    problem,
+    theory,
+    evidence,
+    target_audience
+  )
 
   result <- tibble::tibble(
     stage = "Notice",
     problem = problem,
-    theory = theory,
-    evidence = evidence,
+    theory = theory %||% NA_character_,
+    evidence = evidence %||% NA_character_,
     target_audience = target_audience %||% NA_character_,
     suggestions = suggestions,
     timestamp = Sys.time()
   )
 
-  if (theory_was_suggested) {
-    bid_message(
-      "Stage 1 (Notice) completed.",
-      paste(
-        "Based on your problem description, the suggested theory is:",
-        theory
-      ),
-      paste("Primary issue:", problem),
-      if (!is.null(target_audience)) {
-        paste("Target audience:", target_audience)
-      }
+  bid_message(
+    "Stage 1 (Notice) completed.",
+    paste0("Problem: ", truncate_text(problem, 50)),
+    paste0("Theory: ", truncate_text(theory, 50)),
+    paste0("Evidence: ", truncate_text(evidence, 50)),
+    suggestions
+  )
+
+  return(result)
+}
+
+# Helper functions
+suggest_theory_from_problem <- function(problem, evidence = NULL) {
+  # Combine problem and evidence for analysis
+  combined_text <- tolower(paste(problem, evidence %||% "", sep = " "))
+
+  # More specific pattern matching with priority order
+  # Check for "too many options" patterns first (most specific)
+  if (
+    grepl(
+      "too many.*option|overwhelm.*too many|dropdown.*option|too many.*choice|many.*choice|choice.*option|options.*dropdown|too many choices|dropdown.*menu",
+      combined_text
     )
+  ) {
+    return("Hick's Law")
+  } else if (
+    grepl("find.*information|search|locate|discover|navigation", combined_text)
+  ) {
+    return("Information Scent")
+  } else if (
+    grepl(
+      "visual.*layout|hierarchy|organization|attention|cluttered.*layout|disorganized|layout.*cluttered|cluttered.*disorganized",
+      combined_text
+    )
+  ) {
+    return("Visual Hierarchies")
+  } else if (
+    grepl(
+      "complex|overwhelm|too much|confus|mental load|difficult",
+      combined_text
+    )
+  ) {
+    return("Cognitive Load Theory")
+  } else if (grepl("mobile|touch|responsive|screen", combined_text)) {
+    return("Fitts's Law")
+  } else if (grepl("aesthetic|beautiful|appearance|design", combined_text)) {
+    return("Aesthetic-Usability")
   } else {
-    bid_message(
-      "Stage 1 (Notice) completed.",
-      paste("Using theory:", theory),
-      paste("Primary issue:", problem),
-      if (!is.null(target_audience)) {
-        paste("Target audience:", target_audience)
-      }
+    return("Cognitive Load Theory")
+  }
+}
+
+generate_notice_suggestions <- function(
+  problem,
+  theory,
+  evidence,
+  target_audience
+) {
+  suggestions <- character(0)
+
+  if (
+    is.null(theory) || theory == "Evidence needed to support this observation"
+  ) {
+    suggestions <- c(
+      suggestions,
+      "Consider gathering specific evidence through user testing or analytics"
     )
   }
 
-  return(result)
+  if (is.null(target_audience)) {
+    suggestions <- c(
+      suggestions,
+      "Define specific target audience to better focus solutions"
+    )
+  }
+
+  problem_lower <- tolower(problem)
+  if (grepl("users struggle|difficult|hard", problem_lower)) {
+    suggestions <- c(
+      suggestions,
+      "Consider conducting task analysis to understand specific struggle points"
+    )
+  }
+
+  if (length(suggestions) == 0) {
+    suggestions <- "Problem clearly defined. Move to Interpret stage to develop central question."
+  }
+
+  return(paste(suggestions, collapse = " "))
+}
+
+# Utility function for safe column access
+safe_column_access <- function(
+  data,
+  column_name,
+  default_value = NA_character_
+) {
+  if (column_name %in% names(data) && !is.null(data[[column_name]])) {
+    value <- data[[column_name]][1]
+    if (is.na(value) || is.null(value)) {
+      return(default_value)
+    }
+    return(value)
+  }
+  return(default_value)
+}
+
+# Utility function for truncating text in messages
+truncate_text <- function(text, max_length) {
+  if (is.null(text) || is.na(text)) {
+    return("Not specified")
+  }
+  if (nchar(text) > max_length) {
+    return(paste0(substring(text, 1, max_length), "..."))
+  }
+  return(text)
+}
+
+# Infix operator for null coalescing
+`%||%` <- function(x, y) {
+  if (is.null(x)) y else x
 }
