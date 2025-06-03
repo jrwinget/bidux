@@ -2,7 +2,7 @@
 % Please edit documentation in R/bid_validate.R
 \name{bid_validate}
 \alias{bid_validate}
-\title{Document Validation and Empowerment Stage in BID Framework}
+\title{Document User Validation Stage in BID Framework}
 \usage{
 bid_validate(
   previous_stage,
@@ -14,72 +14,40 @@ bid_validate(
 \arguments{
 \item{previous_stage}{A tibble or list output from an earlier BID stage function.}
 
-\item{summary_panel}{A character string summarizing key insights. If NULL,
-the function will suggest a summary based on previous stages.}
+\item{summary_panel}{A character string describing the final summary panel
+or key insight presentation.}
 
-\item{collaboration}{A character string describing collaboration or
-annotation features. If NULL, the function will suggest collaboration
-features based on previous stages.}
+\item{collaboration}{A character string describing how the dashboard enables
+collaboration and sharing.}
 
-\item{next_steps}{An optional character vector listing recommended next steps or
-actions for users (follows Peak-End Rule). If NULL, the function will
-suggest next steps based on previous stages.}
+\item{next_steps}{A character vector or string describing recommended next
+steps for implementation and iteration.}
 }
 \value{
 A tibble containing the documented information for the "Validate"
 stage.
 }
 \description{
-This function documents the validation and empowerment stage by capturing how
-the dashboard is validated, including summary takeaways and collaborative
-annotations.
+This function documents the validation stage, where the user tests and
+refines the dashboard. It represents stage 5 in the BID framework.
 }
 \examples{
-anticipate_info <- bid_anticipate(
-  bid_structure(
-    bid_interpret(
-      bid_notice(
-        "Users confused by interface",
-        evidence = "Multiple clicks observed"
-      ),
-      central_question = "How can we enhance clarity?",
-      data_story = list(
-        hook = "Lack of focus",
-        context = "Too many visual elements",
-        tension = "User complaints",
-        resolution = "Improve layout"
-      )
-    ),
-    layout = "dual_process",
-    concepts = c("principle_of_proximity", "default_effect")
-  ),
+anticipate <- bid_anticipate(
+  previous_stage = structure_result,
   bias_mitigations = list(
-    anchoring = "Reference baseline values",
-    framing = "Use gain-framed messages"
+    anchoring = "Provide reference points",
+    framing = "Use gain-framed messaging"
   )
 )
 
-# Basic usage
 bid_validate(
-  previous_stage = anticipate_info,
-  summary_panel = "Key insights include clarity and user satisfaction",
-  collaboration = "Annotations enabled for team feedback"
-)
-
-# Let the function suggest content based on previous stages
-bid_validate(
-  previous_stage = anticipate_info
-)
-
-# With next steps
-bid_validate(
-  previous_stage = anticipate_info,
-  summary_panel = "Key insights include clarity and user satisfaction",
-  collaboration = "Annotations enabled for team feedback",
+  previous_stage = anticipate,
+  summary_panel = "Clear summary of key insights with action items",
+  collaboration = "Team annotation and sharing features",
   next_steps = c(
-    "Review performance metrics",
-    "Schedule team discussion",
-    "Implement suggested UI changes"
+    "Conduct user testing with target audience",
+    "Implement accessibility improvements",
+    "Add mobile responsiveness"
   )
 )
 
