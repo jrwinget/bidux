@@ -33,8 +33,7 @@ bid_report <- function(
     include_diagrams = TRUE) {
   format <- match.arg(format)
 
-  cli::cli_h1("BID Framework Report")
-
+  # Validation
   tryCatch(
     {
       if (is.null(validate_stage)) {
@@ -72,287 +71,248 @@ bid_report <- function(
     }
   )
 
-  cli::cli_alert_info("Generating {.field {toupper(format)}} report")
+  # Generate report based on format
+  if (format == "html") {
+    return(generate_html_report_direct(validate_stage, include_diagrams))
+  } else {
+    return(generate_text_report(validate_stage, format, include_diagrams))
+  }
+}
 
-  # initialize report
+# Generate text/markdown report
+generate_text_report <- function(validate_stage, format, include_diagrams) {
   report <- character(0)
 
-  # add header
-  report <- c(report, "# BID Framework Implementation Report")
+  # Header
+  if (format == "markdown") {
+    report <- c(report, "# BID Framework Implementation Report")
+  } else {
+    report <- c(report, "BID Framework Implementation Report")
+  }
   report <- c(report, paste0("Generated: ", Sys.time()))
   report <- c(report, "")
 
-  # BID overview (with diagram if requested)
+  # BID overview diagram
   if (include_diagrams) {
-    cli::cli_alert_info("Including BID framework diagram")
-    report <- c(report, "## BID Framework Overview")
-    report <- c(report, "```")
+    if (format == "markdown") {
+      report <- c(report, "## BID Framework Overview")
+      report <- c(report, "```")
+    } else {
+      report <- c(report, "BID Framework Overview")
+    }
     report <- c(report, "+-------------+  +-------------+  +-------------+  +-------------+  +-------------+")
     report <- c(report, "|    NOTICE   |  |  INTERPRET  |  |  STRUCTURE  |  |  ANTICIPATE |  |   VALIDATE  |")
     report <- c(report, "|    Stage 1  |->|    Stage 2  |->|    Stage 3  |->|    Stage 4  |->|    Stage 5  |")
     report <- c(report, "+-------------+  +-------------+  +-------------+  +-------------+  +-------------+")
-    report <- c(report, "```")
+    if (format == "markdown") {
+      report <- c(report, "```")
+    }
     report <- c(report, "")
   }
 
-  # helper function to safely extract and format data
-  safe_extract <- function(data, field, default = NA_character_, prefix = "") {
-    if (field %in% names(data) && !is.null(data[[field]][1])) {
-      if (!is.na(data[[field]][1])) {
-        return(paste0(prefix, data[[field]][1]))
+  # Helper function to safely extract data
+  safe_extract <- function(data, field, default = "Not specified") {
+    if (field %in% names(data) && length(data[[field]]) > 0) {
+      value <- data[[field]][1]
+      if (!is.null(value) && !is.na(value) && nchar(trimws(as.character(value))) > 0) {
+        return(trimws(as.character(value)))
       }
     }
-    if (is.na(default)) {
-      return(NA_character_)
-    }
-    return(paste0(prefix, default))
+    return(default)
   }
 
-  # stage 5: validate
-  cli::cli_alert_info("Adding Stage 5: Validate information")
-  report <- c(report, "## Stage 5: Validate & Empower the User")
+  # Stage 5: Validate
+  stage_header <- if (format == "markdown") "## Stage 5: Validate & Empower the User" else "Stage 5: Validate & Empower the User"
+  report <- c(report, stage_header)
 
-  # add summary panel
-  summary_panel <- safe_extract(
-    validate_stage,
-    "summary_panel",
-    "No summary panel provided"
-  )
-  report <- c(report, paste0("- **Summary Panel**: ", summary_panel))
+  # Summary Panel
+  summary_panel <- safe_extract(validate_stage, "summary_panel")
+  prefix <- if (format == "markdown") "- **Summary Panel**: " else "- Summary Panel: "
+  report <- c(report, paste0(prefix, summary_panel))
 
-  # add collaboration features
-  collaboration <- safe_extract(
-    validate_stage,
-    "collaboration",
-    "No collaboration features specified"
-  )
-  report <- c(report, paste0("- **Collaboration Features**: ", collaboration))
+  # Collaboration Features
+  collaboration <- safe_extract(validate_stage, "collaboration")
+  prefix <- if (format == "markdown") "- **Collaboration Features**: " else "- Collaboration Features: "
+  report <- c(report, paste0(prefix, collaboration))
 
-  # add next steps
-  if (
-    "next_steps" %in% names(validate_stage) &&
-      !is.na(validate_stage$next_steps[1])
-  ) {
-    cli::cli_alert_success("Found {.field next_steps} information")
-    next_steps <- tryCatch(
-      {
+  # Next Steps
+  if ("next_steps" %in% names(validate_stage) && !is.na(validate_stage$next_steps[1])) {
+    next_steps <- tryCatch({
+      if (is.character(validate_stage$next_steps[1]) && grepl(";", validate_stage$next_steps[1])) {
         unlist(strsplit(validate_stage$next_steps[1], ";"))
-      },
-      error = function(e) {
-        cli::cli_warn("Could not parse next_steps: {e$message}")
-        return(c("No next steps available or could not be parsed"))
+      } else {
+        validate_stage$next_steps[1]
       }
-    )
+    }, error = function(e) {
+      "Error parsing next steps"
+    })
 
-    report <- c(report, "- **Next Steps**:")
-    for (step in next_steps) {
-      step_text <- trimws(step)
-      if (nchar(step_text) > 0) {
-        report <- c(report, paste0("  - ", step_text))
+    prefix <- if (format == "markdown") "- **Next Steps**:" else "- Next Steps:"
+    report <- c(report, prefix)
+    
+    if (length(next_steps) > 1) {
+      for (step in next_steps) {
+        step_text <- trimws(step)
+        if (nchar(step_text) > 0) {
+          report <- c(report, paste0("  - ", step_text))
+        }
       }
+    } else {
+      report <- c(report, paste0("  - ", trimws(next_steps)))
     }
   } else {
-    cli::cli_alert_warning("No next steps found in validate_stage")
-    report <- c(report, "- **Next Steps**: None specified")
+    prefix <- if (format == "markdown") "- **Next Steps**: " else "- Next Steps: "
+    report <- c(report, paste0(prefix, "Not specified"))
   }
 
-  # add suggestions
-  suggestions <- safe_extract(
-    validate_stage,
-    "suggestions",
-    "No suggestions available"
-  )
-  report <- c(report, paste0("- **Suggestions**: ", suggestions))
+  # Suggestions
+  suggestions <- safe_extract(validate_stage, "suggestions")
+  prefix <- if (format == "markdown") "- **Suggestions**: " else "- Suggestions: "
+  report <- c(report, paste0(prefix, suggestions))
   report <- c(report, "")
 
-  # stage 4: anticipate
+  # Stage 4: Anticipate
   if ("previous_bias" %in% names(validate_stage)) {
-    cli::cli_alert_info("Adding Stage 4: Anticipate information")
-    report <- c(report, "## Stage 4: Anticipate User Behavior")
+    stage_header <- if (format == "markdown") "## Stage 4: Anticipate User Behavior" else "Stage 4: Anticipate User Behavior"
+    report <- c(report, stage_header)
 
-    bias_mitigations <- safe_extract(
-      validate_stage,
-      "previous_bias",
-      "No bias mitigations specified"
-    )
-    report <- c(report, paste0("- **Bias Mitigations**: ", bias_mitigations))
+    bias_mitigations <- safe_extract(validate_stage, "previous_bias")
+    prefix <- if (format == "markdown") "- **Bias Mitigations**: " else "- Bias Mitigations: "
+    report <- c(report, paste0(prefix, bias_mitigations))
 
-    interaction_principles <- safe_extract(
-      validate_stage,
-      "previous_interaction",
-      "No interaction principles specified"
-    )
-    if (!is.na(interaction_principles)) {
-      report <- c(
-        report,
-        paste0("- **Interaction Principles**: ", interaction_principles)
-      )
-    }
-
+    interaction_principles <- safe_extract(validate_stage, "previous_interaction")
+    prefix <- if (format == "markdown") "- **Interaction Principles**: " else "- Interaction Principles: "
+    report <- c(report, paste0(prefix, interaction_principles))
     report <- c(report, "")
-  } else {
-    cli::cli_alert_warning("No Anticipate stage information found")
   }
 
-  # stage 3: structure
+  # Stage 3: Structure
   if ("previous_layout" %in% names(validate_stage)) {
-    cli::cli_alert_info("Adding Stage 3: Structure information")
-    report <- c(report, "## Stage 3: Structure the Dashboard")
+    stage_header <- if (format == "markdown") "## Stage 3: Structure the Dashboard" else "Stage 3: Structure the Dashboard"
+    report <- c(report, stage_header)
 
-    layout <- safe_extract(
-      validate_stage,
-      "previous_layout",
-      "No layout specified"
-    )
-    report <- c(report, paste0("- **Layout**: ", layout))
+    layout <- safe_extract(validate_stage, "previous_layout")
+    prefix <- if (format == "markdown") "- **Layout**: " else "- Layout: "
+    report <- c(report, paste0(prefix, layout))
 
-    concepts <- safe_extract(
-      validate_stage,
-      "previous_concepts",
-      "No concepts specified"
-    )
-    if (!is.na(concepts)) {
-      report <- c(report, paste0("- **Applied Concepts**: ", concepts))
-    }
+    concepts <- safe_extract(validate_stage, "previous_concepts")
+    prefix <- if (format == "markdown") "- **Applied Concepts**: " else "- Applied Concepts: "
+    report <- c(report, paste0(prefix, concepts))
 
-    accessibility <- safe_extract(
-      validate_stage,
-      "previous_accessibility",
-      "No accessibility considerations specified"
-    )
-    if (!is.na(accessibility)) {
-      report <- c(
-        report,
-        paste0("- **Accessibility Considerations**: ", accessibility)
-      )
-    }
-
+    accessibility <- safe_extract(validate_stage, "previous_accessibility")
+    prefix <- if (format == "markdown") "- **Accessibility Considerations**: " else "- Accessibility Considerations: "
+    report <- c(report, paste0(prefix, accessibility))
     report <- c(report, "")
-  } else {
-    cli::cli_alert_warning("No Structure stage information found")
   }
 
-  # recommendations
-  cli::cli_alert_info("Adding implementation recommendations")
-  report <- c(report, "## Implementation Recommendations")
-  report <- c(
-    report,
-    paste(
-      "Based on your application of the BID framework, consider these",
-      "implementation tips:"
-    )
-  )
+  # Implementation Recommendations
+  impl_header <- if (format == "markdown") "## Implementation Recommendations" else "Implementation Recommendations"
+  report <- c(report, impl_header)
+  report <- c(report, "Based on your application of the BID framework, consider these implementation tips:")
   report <- c(report, "")
 
-  # UI suggestions
-  report <- c(report, "### Recommended UI Components")
+  # UI Components
+  ui_header <- if (format == "markdown") "### Recommended UI Components" else "Recommended UI Components"
+  report <- c(report, ui_header)
 
-  # helper function to safely add component suggestions
-  add_component_suggestions <- function(report, validate_stage, package_name, title) {
-    tryCatch(
-      {
-        if (!requireNamespace("dplyr", quietly = TRUE)) {
-          cli::cli_alert_warning(
-            "Package {.pkg dplyr} not available, skipping {package_name} suggestions"
-          )
-          return(report)
-        }
-
-        suggestions <- bid_suggest_components(
-          validate_stage,
-          package = package_name
-        )
-
-        if (nrow(suggestions) == 0) {
-          cli::cli_alert_warning("No {package_name} suggestions available")
-          return(report)
-        }
-
-        top_suggestions <- head(suggestions, 3)
-
-        cli::cli_alert_success(
-          "Found {nrow(top_suggestions)} {package_name} components to recommend"
-        )
-
-        report <- c(report, paste0("**", title, "**"))
-        for (i in 1:nrow(top_suggestions)) {
-          report <- c(
-            report,
-            paste0(
-              "- ", top_suggestions$component[i], ": ",
-              top_suggestions$description[i]
-            )
-          )
-        }
-        report <- c(report, "")
-      },
-      error = function(e) {
-        cli::cli_alert_danger(
-          "Error getting {package_name} suggestions: {e$message}"
-        )
-        report <- c(report, paste0("**", title, "**"))
-        report <- c(
-          report,
-          paste0("- Could not generate suggestions: ", e$message)
-        )
-        report <- c(report, "")
+  # Try to get component suggestions
+  tryCatch({
+    bslib_suggestions <- bid_suggest_components(validate_stage, package = "bslib")
+    if (nrow(bslib_suggestions) > 0) {
+      prefix <- if (format == "markdown") "**bslib Components:**" else "bslib Components:"
+      report <- c(report, prefix)
+      for (i in 1:min(3, nrow(bslib_suggestions))) {
+        report <- c(report, paste0("- ", bslib_suggestions$component[i], ": ", bslib_suggestions$description[i]))
       }
-    )
-    return(report)
-  }
+      report <- c(report, "")
+    }
+  }, error = function(e) {
+    report <- c(report, "bslib Components: Error generating suggestions")
+    report <- c(report, "")
+  })
 
-  report <- add_component_suggestions(
-    report,
-    validate_stage,
-    "bslib",
-    "bslib Components:"
-  )
+  tryCatch({
+    shiny_suggestions <- bid_suggest_components(validate_stage, package = "shiny")
+    if (nrow(shiny_suggestions) > 0) {
+      prefix <- if (format == "markdown") "**Shiny Components:**" else "Shiny Components:"
+      report <- c(report, prefix)
+      for (i in 1:min(3, nrow(shiny_suggestions))) {
+        report <- c(report, paste0("- ", shiny_suggestions$component[i], ": ", shiny_suggestions$description[i]))
+      }
+      report <- c(report, "")
+    }
+  }, error = function(e) {
+    report <- c(report, "Shiny Components: Error generating suggestions")
+    report <- c(report, "")
+  })
 
-  report <- add_component_suggestions(
-    report,
-    validate_stage,
-    "shiny",
-    "Shiny Components:"
-  )
-
-  # sext steps suggestions
-  cli::cli_alert_info("Adding next steps guidance")
-  report <- c(report, "## Next Steps")
+  # Next Steps
+  next_header <- if (format == "markdown") "## Next Steps" else "Next Steps"
+  report <- c(report, next_header)
   report <- c(report, "1. Implement key BID principles identified in this analysis")
   report <- c(report, "2. Conduct user testing to validate improvements")
   report <- c(report, "3. Iterate based on feedback")
   report <- c(report, "4. Document successful patterns for future projects")
   report <- c(report, "")
 
-  # learning resources
-  cli::cli_alert_info("Adding learning resources")
-  report <- c(report, "## Learning Resources")
+  # Learning Resources
+  learn_header <- if (format == "markdown") "## Learning Resources" else "Learning Resources"
+  report <- c(report, learn_header)
   report <- c(report, "To learn more about the BID framework concepts used in this report:")
   report <- c(report, "- Review the {bidux} vignettes with `vignette('introduction-to-bid')`")
   report <- c(report, "- Explore the concept dictionary with `bid_concepts()`")
   report <- c(report, "- Check the package documentation at https://github.com/jrwinget/bidux")
-  report <- c(report, "")
 
-  # format report
-  if (format == "html") {
-    cli::cli_alert_info("Formatting as HTML")
-    html_report <- generate_html_report(report)
-    cli::cli_alert_success("HTML report generated successfully")
-    return(html_report)
-  } else if (format == "markdown") {
-    cli::cli_alert_success("Markdown report generated successfully")
-    return(paste(report, collapse = "\n"))
-  } else {
-    cli::cli_alert_info("Formatting as plain text")
-    text_report <- gsub("^#+ ", "", report)
-    text_report <- gsub("\\*\\*", "", text_report)
-    cli::cli_alert_success("Text report generated successfully")
+  # Format output
+  if (format == "text") {
+    # Remove markdown formatting for plain text
+    text_report <- gsub("^#+\\s*", "", report)
+    text_report <- gsub("\\*\\*([^*]+)\\*\\*", "\\1", text_report)
     return(paste(text_report, collapse = "\n"))
+  } else {
+    return(paste(report, collapse = "\n"))
   }
 }
 
-# helper function to generate HTML report
-generate_html_report <- function(report) {
+# Generate HTML report directly (no markdown conversion)
+generate_html_report_direct <- function(validate_stage, include_diagrams) {
+  # Helper function to safely extract data
+  safe_extract <- function(data, field, default = "Not specified") {
+    if (field %in% names(data) && length(data[[field]]) > 0) {
+      value <- data[[field]][1]
+      if (!is.null(value) && !is.na(value) && nchar(trimws(as.character(value))) > 0) {
+        return(trimws(as.character(value)))
+      }
+    }
+    return(default)
+  }
+
+  # Helper function to generate HTML lists
+  generate_html_list <- function(items, default_text = "None specified") {
+    if (is.null(items) || length(items) == 0) {
+      return(paste0("<ul><li>", default_text, "</li></ul>"))
+    }
+    
+    if (is.character(items) && length(items) > 0) {
+      # Handle semicolon-separated strings
+      if (length(items) == 1 && grepl(";", items)) {
+        items <- unlist(strsplit(items, ";"))
+      }
+      # Filter out empty strings
+      items <- trimws(items)
+      items <- items[items != "" & !is.na(items)]
+      if (length(items) == 0) {
+        return(paste0("<ul><li>", default_text, "</li></ul>"))
+      }
+      list_items <- paste0("<li>", items, "</li>", collapse = "\n    ")
+    } else {
+      return(paste0("<ul><li>", default_text, "</li></ul>"))
+    }
+    
+    return(paste0("<ul>\n    ", list_items, "\n  </ul>"))
+  }
+
+  # CSS
   css <- '
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -481,110 +441,155 @@ generate_html_report <- function(report) {
   }
   '
 
-  convert_to_html <- function(md_lines) {
-    html_lines <- character(length(md_lines))
+  # Build HTML content directly
+  html_body <- paste0(
+    '<h1>BID Framework Implementation Report</h1>',
+    '<p>Generated: ', Sys.time(), '</p>'
+  )
 
-    for (i in seq_along(md_lines)) {
-      line <- md_lines[i]
-
-      # headers
-      if (grepl("^# ", line)) {
-        html_lines[i] <- gsub("^# (.*?)$", "<h1>\\1</h1>", line)
-      } else if (grepl("^## ", line)) {
-        html_lines[i] <- gsub("^## (.*?)$", "<h2>\\1</h2>", line)
-      } else if (grepl("^### ", line)) {
-        html_lines[i] <- gsub("^### (.*?)$", "<h3>\\1</h3>", line)
-      }
-      # list items with strong elements
-      else if (grepl("^- \\*\\*(.*?)\\*\\*: (.*?)$", line)) {
-        html_lines[i] <- gsub(
-          "^- \\*\\*(.*?)\\*\\*: (.*?)$",
-          "<li><strong>\\1:</strong> \\2</li>",
-          line
-        )
-      }
-      # regular list items
-      else if (grepl("^- (.*?)$", line)) {
-        html_lines[i] <- gsub("^- (.*?)$", "<li>\\1</li>", line)
-      }
-      # numbered list items
-      else if (grepl("^\\d+\\. (.*?)$", line)) {
-        html_lines[i] <- gsub("^\\d+\\. (.*?)$", "<li>\\1</li>", line)
-      }
-      # code blocks
-      else if (line == "```") {
-        # start or end of code block
-        if (exists("in_code_block") && in_code_block) {
-          html_lines[i] <- "</pre>"
-          in_code_block <- FALSE
-        } else {
-          html_lines[i] <- "<pre class=\"diagram\">"
-          in_code_block <- TRUE
-        }
-      }
-      # empty lines to paragraph breaks
-      else if (line == "") {
-        html_lines[i] <- ""
-      }
-      # regular text becomes paragraphs
-      else {
-        if (exists("in_code_block") && in_code_block) {
-          # inside code block, preserve as is
-          html_lines[i] <- line
-        } else {
-          # wrap other lines in paragraph tags if not empty
-          if (nchar(trimws(line)) > 0) {
-            html_lines[i] <- paste0("<p>", line, "</p>")
-          } else {
-            html_lines[i] <- ""
-          }
-        }
-      }
-    }
-
-    # clean up any remaining code block state
-    if (exists("in_code_block") && in_code_block) {
-      html_lines <- c(html_lines, "</pre>")
-    }
-
-    return(html_lines)
+  # BID Framework Overview with diagram
+  if (include_diagrams) {
+    html_body <- paste0(html_body, '
+<div class="section"><h2>BID Framework Overview</h2>
+<pre class="diagram">
++-------------+  +-------------+  +-------------+  +-------------+  +-------------+
+|    NOTICE   |  |  INTERPRET  |  |  STRUCTURE  |  |  ANTICIPATE |  |   VALIDATE  |
+|    Stage 1  |->|    Stage 2  |->|    Stage 3  |->|    Stage 4  |->|    Stage 5  |
++-------------+  +-------------+  +-------------+  +-------------+  +-------------+
+</pre>
+</div>')
   }
 
-  html_content <- convert_to_html(report)
+  # Stage 5: Validate
+  html_body <- paste0(html_body, '
+<div class="section"><h2>Stage 5: Validate & Empower the User</h2>
+  <p><strong>Summary Panel:</strong> ', safe_extract(validate_stage, "summary_panel"), '</p>
+  <p><strong>Collaboration Features:</strong> ', safe_extract(validate_stage, "collaboration"), '</p>')
 
-  # group consecutive list items
-  html_content <- gsub(
-    "(<li>.*?</li>)\\s*(<li>.*?</li>)",
-    "\\1\\2",
-    paste(html_content, collapse = "\n"),
-    perl = TRUE
-  )
+  # Next Steps
+  if ("next_steps" %in% names(validate_stage) && !is.na(validate_stage$next_steps[1])) {
+    next_steps <- tryCatch({
+      steps <- validate_stage$next_steps[1]
+      if (is.character(steps) && grepl(";", steps)) {
+        unlist(strsplit(steps, ";"))
+      } else {
+        steps
+      }
+    }, error = function(e) {
+      "Error parsing next steps"
+    })
+    
+    html_body <- paste0(html_body, '
+  <h3>Next Steps</h3>
+  ', generate_html_list(next_steps))
+  } else {
+    html_body <- paste0(html_body, '
+  <p><strong>Next Steps:</strong> Not specified</p>')
+  }
 
-  html_content <- gsub(
-    "(<li>.*?</li>)+",
-    "<ul>\\0</ul>",
-    html_content,
-    perl = TRUE
-  )
+  html_body <- paste0(html_body, '
+  <p><strong>Suggestions:</strong> ', safe_extract(validate_stage, "suggestions"), '</p>
+</div>')
 
-  html_content <- gsub(
-    "<h2>(.*?)</h2>",
-    '<div class="section"><h2>\\1</h2>',
-    html_content
-  )
-  html_content <- gsub(
-    "<h2>(.*?)</h2>(.+?)(?=<div class=\"section\">|$)",
-    '<div class="section"><h2>\\1</h2>\\2</div>',
-    html_content,
-    perl = TRUE
-  )
+  # Stage 4: Anticipate
+  if ("previous_bias" %in% names(validate_stage)) {
+    html_body <- paste0(html_body, '
+<div class="section"><h2>Stage 4: Anticipate User Behavior</h2>
+  <p><strong>Bias Mitigations:</strong> ', safe_extract(validate_stage, "previous_bias"), '</p>
+  <p><strong>Interaction Principles:</strong> ', safe_extract(validate_stage, "previous_interaction"), '</p>
+</div>')
+  }
 
-  # final HTML
+  # Stage 3: Structure
+  if ("previous_layout" %in% names(validate_stage)) {
+    html_body <- paste0(html_body, '
+<div class="section"><h2>Stage 3: Structure the Dashboard</h2>
+  <p><strong>Layout:</strong> ', safe_extract(validate_stage, "previous_layout"), '</p>
+  <p><strong>Applied Concepts:</strong> ', safe_extract(validate_stage, "previous_concepts"), '</p>
+  <p><strong>Accessibility Considerations:</strong> ', safe_extract(validate_stage, "previous_accessibility"), '</p>
+</div>')
+  }
+
+  # Implementation Recommendations
+  html_body <- paste0(html_body, '
+<div class="section"><h2>Implementation Recommendations</h2>
+<p>Based on your application of the BID framework, consider these implementation tips:</p>
+
+<h3>Recommended UI Components</h3>')
+
+  # bslib Components
+  tryCatch({
+    bslib_suggestions <- bid_suggest_components(validate_stage, package = "bslib")
+    if (nrow(bslib_suggestions) > 0) {
+      html_body <- paste0(html_body, '
+<p><strong>bslib Components:</strong></p>')
+      bslib_items <- paste0(bslib_suggestions$component[1:min(3, nrow(bslib_suggestions))], 
+                           ": ", 
+                           bslib_suggestions$description[1:min(3, nrow(bslib_suggestions))])
+      html_body <- paste0(html_body, generate_html_list(bslib_items))
+    }
+  }, error = function(e) {
+    html_body <- paste0(html_body, '
+<p><strong>bslib Components:</strong></p>
+<ul><li>Error generating suggestions</li></ul>')
+  })
+
+  # Shiny Components
+  tryCatch({
+    shiny_suggestions <- bid_suggest_components(validate_stage, package = "shiny")
+    if (nrow(shiny_suggestions) > 0) {
+      html_body <- paste0(html_body, '
+<p><strong>Shiny Components:</strong></p>')
+      shiny_items <- paste0(shiny_suggestions$component[1:min(3, nrow(shiny_suggestions))], 
+                           ": ", 
+                           shiny_suggestions$description[1:min(3, nrow(shiny_suggestions))])
+      html_body <- paste0(html_body, generate_html_list(shiny_items))
+    }
+  }, error = function(e) {
+    html_body <- paste0(html_body, '
+<p><strong>Shiny Components:</strong></p>
+<ul><li>Error generating suggestions</li></ul>')
+  })
+
+  html_body <- paste0(html_body, '
+</div>')
+
+  # Next Steps
+  html_body <- paste0(html_body, '
+<div class="section"><h2>Next Steps</h2>')
+  
+  next_steps_items <- c(
+    "Implement key BID principles identified in this analysis",
+    "Conduct user testing to validate improvements", 
+    "Iterate based on feedback",
+    "Document successful patterns for future projects"
+  )
+  html_body <- paste0(html_body, generate_html_list(next_steps_items))
+
+  html_body <- paste0(html_body, '
+</div>')
+
+  # Learning Resources
+  html_body <- paste0(html_body, '
+<div class="section"><h2>Learning Resources</h2>
+<p>To learn more about the BID framework concepts used in this report:</p>')
+  
+  learning_items <- c(
+    "Review the {bidux} vignettes with `vignette('introduction-to-bid')`",
+    "Explore the concept dictionary with `bid_concepts()`",
+    "Check the package documentation at https://github.com/jrwinget/bidux"
+  )
+  html_body <- paste0(html_body, generate_html_list(learning_items))
+
+  html_body <- paste0(html_body, '
+</div>')
+
+  # Complete HTML document
   html_report <- paste(
     "<!DOCTYPE html>",
     "<html lang=\"en\">",
     "<head>",
-    "  <meta charset=\"UTF-8\">",
+    "  <meta charset=\"UTF-8\">", 
     "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">",
     "  <title>BID Framework Implementation Report</title>",
     "  <style>",
@@ -592,7 +597,7 @@ generate_html_report <- function(report) {
     "  </style>",
     "</head>",
     "<body>",
-    html_content,
+    html_body,
     "</body>",
     "</html>",
     sep = "\n"

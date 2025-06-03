@@ -1,452 +1,687 @@
-#' Generate UI Component Suggestions Based on BID Application
+#' Suggest UI Components Based on BID Framework Analysis
 #'
 #' @description
-#' This function provides concrete UI component suggestions based on your BID
-#' framework application. It generates code examples and component
-#' recommendations for various UI packages.
+#' This function analyzes the results from BID framework stages and suggests
+#' appropriate UI components from popular R packages like shiny, bslib, DT, etc.
+#' The suggestions are based on the design principles and user needs identified
+#' in the BID process.
 #'
-#' @param bid_result A tibble from any BID stage function.
-#' @param package The UI package to generate suggestions for: "shiny", "bslib",
-#'        "reactable", "echarts4r", or "all" for suggestions from all packages.
+#' @param bid_stage A tibble output from any BID framework stage function
+#' @param package Optional character string specifying which package to focus
+#'   suggestions on. Options include "shiny", "bslib", "DT", "plotly",
+#'   "reactable", "htmlwidgets". If NULL, suggestions from all packages
+#'   are provided.
 #'
-#' @return A tibble with component suggestions.
+#' @return A tibble containing component suggestions with relevance scores
 #'
 #' @examples
 #' \dontrun{
-#' # Get suggestions from a specific stage
+#' # After completing BID stages
 #' notice_result <- bid_notice(
-#'   problem = "Too many filter options",
-#'   evidence = "Users take 30+ seconds to configure dashboard"
+#'   problem = "Users struggle with complex data",
+#'   theory = "Cognitive Load Theory"
 #' )
 #'
-#' bid_suggest_components(notice_result, package = "shiny")
+#' # Get all component suggestions
+#' bid_suggest_components(notice_result)
 #'
-#' # Get suggestions for all packages
-#' final_result <- bid_validate(...)
-#' all_suggestions <- bid_suggest_components(final_result, package = "all")
+#' # Get only bslib suggestions
+#' bid_suggest_components(notice_result, package = "bslib")
+#'
+#' # Get shiny-specific suggestions
+#' bid_suggest_components(notice_result, package = "shiny")
 #' }
 #'
 #' @export
-bid_suggest_components <- function(
-    bid_result,
-    package = c("shiny", "bslib", "reactable", "echarts4r", "all")) {
-  validate_required_params(bid_result = bid_result)
-  package <- match.arg(package)
-
-  cli::cli_alert_info("Generating suggestions for {.pkg {package}} package")
-
-  stage <- if ("stage" %in% names(bid_result)) {
-    bid_result$stage[1]
-  } else {
-    "Unknown"
+bid_suggest_components <- function(bid_stage, package = NULL) {
+  # Validation
+  if (is.null(bid_stage)) {
+    cli::cli_abort("bid_stage cannot be NULL")
   }
 
-  if (stage != "Unknown") {
-    cli::cli_alert_info("Tailoring suggestions for {.strong {stage}} stage")
+  if (!tibble::is_tibble(bid_stage)) {
+    cli::cli_abort(c(
+      "bid_stage must be a tibble",
+      "i" = "Received: {.cls {class(bid_stage)[1]}}"
+    ))
   }
 
-  layout <- extract_field(bid_result, "layout", "previous_layout")
-  concepts <- extract_field(bid_result, "concepts", "previous_concepts")
-  accessibility <- extract_field(
-    bid_result,
-    "accessibility",
-    "previous_accessibility"
+  if (!("stage" %in% names(bid_stage))) {
+    cli::cli_abort(c(
+      "bid_stage must contain a 'stage' column",
+      "i" = "Available columns: {.field {names(bid_stage)}}"
+    ))
+  }
+
+  # Validate package parameter
+  valid_packages <- c(
+    "shiny",
+    "bslib",
+    "DT",
+    "plotly",
+    "reactable",
+    "htmlwidgets"
   )
-
-  component_suggestions <- get_suggestions(
-    package,
-    stage,
-    layout,
-    accessibility
-  )
-
-  result <- filter_suggestions(component_suggestions, stage, package)
-
-  if ("relevance" %in% names(result) && nrow(result) > 0) {
-    result <- dplyr::arrange(result, dplyr::desc(relevance))
-    result <- dplyr::select(result, -relevance)
+  if (!is.null(package) && !(package %in% valid_packages)) {
+    cli::cli_abort(c(
+      "Invalid package specified",
+      "i" = "Valid options: {.val {valid_packages}}",
+      "x" = "You provided: {.val {package}}"
+    ))
   }
 
-  if (nrow(result) > 0) {
-    cli::cli_alert_success("Generated {nrow(result)} component suggestions")
-  } else {
-    cli::cli_alert_warning("No suggestions available for the given criteria")
-  }
+  # Get component database
+  components_db <- get_components_database()
 
-  return(result)
-}
-
-# helper function to extract fields with fallbacks
-extract_field <- function(data, primary_field, fallback_field = NULL) {
-  result <- NA_character_
-
-  if (
-    primary_field %in% names(data) &&
-      !is.null(data[[primary_field]][1]) &&
-      !is.na(data[[primary_field]][1])
-  ) {
-    result <- data[[primary_field]][1]
-  } else if (
-    !is.null(fallback_field) &&
-      fallback_field %in% names(data) &&
-      !is.null(data[[fallback_field]][1]) &&
-      !is.na(data[[fallback_field]][1])
-  ) {
-    result <- data[[fallback_field]][1]
-  }
-
-  return(result)
-}
-
-# helper function to filter suggestions based on stage
-filter_suggestions <- function(suggestions, stage, package) {
-  if (stage != "Unknown" && package != "all") {
-    stage_matches <- dplyr::filter(suggestions, stage == !!stage)
-
-    if (nrow(stage_matches) > 0) {
-      cli::cli_alert_success(
-        "Found {nrow(stage_matches)} suggestions for {.val {stage}} stage"
-      )
-      return(stage_matches)
-    } else {
-      cli::cli_alert_warning(
-        "No suggestions specifically for {.val {stage}} stage, using all available suggestions"
-      )
-      return(suggestions)
+  # Filter by package if specified
+  if (!is.null(package)) {
+    components_db <- components_db[components_db$package == package, ]
+    if (nrow(components_db) == 0) {
+      cli::cli_warn("No components found for package: {package}")
+      return(create_empty_components_result())
     }
-  } else {
-    return(suggestions)
   }
+
+  # Calculate relevance scores based on BID stage analysis
+  components_with_scores <- calculate_relevance_scores(bid_stage, components_db)
+
+  # Sort by relevance (descending) and return top suggestions
+  components_with_scores <- components_with_scores[
+    order(components_with_scores$relevance, decreasing = TRUE),
+  ]
+
+  # Reset row names for clean output
+  rownames(components_with_scores) <- NULL
+
+  # Provide user feedback
+  stage_name <- bid_stage$stage[1]
+  total_suggestions <- nrow(components_with_scores)
+
+  if (!is.null(package)) {
+    cli::cli_alert_success(
+      "Found {total_suggestions} {package} component suggestion{?s} for BID {stage_name} stage"
+    )
+  } else {
+    cli::cli_alert_success(
+      "Found {total_suggestions} component suggestion{?s} for BID {stage_name} stage"
+    )
+  }
+
+  if (total_suggestions > 10) {
+    cli::cli_alert_info(
+      "Showing components ordered by relevance to your BID analysis"
+    )
+  }
+
+  return(components_with_scores)
 }
 
-# helper function to create a suggestion
-create_suggestion <- function(
-    stage,
-    package,
-    component,
-    description,
-    code_example,
-    relevance = 1.0) {
+get_components_database <- function() {
   tibble::tibble(
-    stage = stage,
-    package = package,
-    component = component,
-    description = description,
-    code_example = code_example,
-    relevance = relevance
+    package = c(
+      # bslib components
+      rep("bslib", 12),
+      # shiny components
+      rep("shiny", 15),
+      # DT components
+      rep("DT", 4),
+      # plotly components
+      rep("plotly", 6),
+      # reactable components
+      rep("reactable", 5),
+      # htmlwidgets components
+      rep("htmlwidgets", 3)
+    ),
+    component = c(
+      # bslib components
+      "value_box",
+      "card",
+      "layout_column_wrap",
+      "page_sidebar",
+      "nav_panel",
+      "accordion",
+      "tooltip",
+      "popover",
+      "input_dark_mode",
+      "layout_columns",
+      "card_header",
+      "card_body",
+
+      # shiny components
+      "tabsetPanel",
+      "conditionalPanel",
+      "wellPanel",
+      "fluidRow",
+      "column",
+      "actionButton",
+      "downloadButton",
+      "modalDialog",
+      "showModal",
+      "updateSelectInput",
+      "renderUI",
+      "uiOutput",
+      "observeEvent",
+      "reactive",
+      "isolate",
+
+      # DT components
+      "datatable",
+      "renderDT",
+      "DTOutput",
+      "formatStyle",
+
+      # plotly components
+      "plot_ly",
+      "ggplotly",
+      "renderPlotly",
+      "plotlyOutput",
+      "event_data",
+      "plotlyProxy",
+
+      # reactable components
+      "reactable",
+      "colDef",
+      "reactableOutput",
+      "renderReactable",
+      "getReactableState",
+
+      # htmlwidgets components
+      "createWidget",
+      "saveWidget",
+      "onRender"
+    ),
+    description = c(
+      # bslib descriptions
+      "Display key metrics prominently with customizable styling",
+      "Organize content in visually distinct containers with headers/footers",
+      "Create responsive grid layouts that adapt to screen size",
+      "Build dashboard layout with collapsible sidebar navigation",
+      "Create tabbed interfaces for organizing related content",
+      "Implement collapsible content sections to reduce cognitive load",
+      "Provide contextual help without cluttering the interface",
+      "Show detailed information on demand without navigation",
+      "Allow users to toggle between light and dark themes",
+      "Create flexible column-based layouts with fine control",
+      "Add headers to cards for clear content organization",
+      "Control card content padding and spacing",
+
+      # shiny descriptions
+      "Organize related content in tabs to reduce visual complexity",
+      "Show/hide UI elements based on user selections",
+      "Group related inputs in a visually distinct panel",
+      "Create responsive layouts that work across devices",
+      "Control precise positioning of elements in grid system",
+      "Trigger actions with clear, accessible button interactions",
+      "Enable users to export data and results for further analysis",
+      "Present focused information overlays without losing context",
+      "Display modal dialogs for important communications",
+      "Dynamically update input choices based on user selections",
+      "Generate UI elements dynamically based on data or user input",
+      "Display dynamically generated UI in the interface",
+      "React to user actions and input changes efficiently",
+      "Create reactive expressions for efficient data processing",
+      "Control reactive dependencies to optimize performance",
+
+      # DT descriptions
+      "Display data tables with sorting, filtering, and pagination",
+      "Render interactive data tables in Shiny applications",
+      "Create output containers for DT tables in UI",
+      "Apply conditional formatting to highlight important data patterns",
+
+      # plotly descriptions
+      "Create interactive visualizations with zoom, pan, and hover",
+      "Convert ggplot objects to interactive plotly visualizations",
+      "Render interactive plots in Shiny applications",
+      "Display interactive plots in Shiny UI",
+      "Capture user interactions with plots for further analysis",
+      "Modify existing plots without full re-rendering",
+
+      # reactable descriptions
+      "Build feature-rich data tables with sorting, filtering, grouping",
+      "Define column properties including formatting and styling",
+      "Create output containers for reactable tables",
+      "Render reactable tables in Shiny applications",
+      "Access table state for integration with other components",
+
+      # htmlwidgets descriptions
+      "Build custom interactive widgets using JavaScript libraries",
+      "Save interactive widgets as standalone HTML files",
+      "Add custom JavaScript behavior to widgets"
+    ),
+    bid_stage_relevance = c(
+      # bslib relevance
+      "Stage 2,Stage 3,Stage 5",
+      "Stage 3,Stage 5",
+      "Stage 3",
+      "Stage 3",
+      "Stage 1,Stage 3",
+      "Stage 1,Stage 3",
+      "Stage 2,Stage 4",
+      "Stage 2,Stage 4",
+      "Stage 3,Stage 5",
+      "Stage 3",
+      "Stage 3",
+      "Stage 3",
+
+      # shiny relevance
+      "Stage 1,Stage 3",
+      "Stage 1,Stage 4",
+      "Stage 3",
+      "Stage 3",
+      "Stage 3",
+      "Stage 4,Stage 5",
+      "Stage 5",
+      "Stage 2,Stage 4",
+      "Stage 2,Stage 4",
+      "Stage 4",
+      "Stage 1,Stage 4",
+      "Stage 1,Stage 4",
+      "Stage 4,Stage 5",
+      "Stage 1,Stage 4",
+      "Stage 1,Stage 4",
+
+      # DT relevance
+      "Stage 2,Stage 3,Stage 5",
+      "Stage 2,Stage 3,Stage 5",
+      "Stage 2,Stage 3,Stage 5",
+      "Stage 2,Stage 4",
+
+      # plotly relevance
+      "Stage 2,Stage 4,Stage 5",
+      "Stage 2,Stage 4,Stage 5",
+      "Stage 2,Stage 4,Stage 5",
+      "Stage 2,Stage 4,Stage 5",
+      "Stage 4,Stage 5",
+      "Stage 4,Stage 5",
+
+      # reactable relevance
+      "Stage 2,Stage 3,Stage 5",
+      "Stage 2,Stage 3",
+      "Stage 2,Stage 3,Stage 5",
+      "Stage 2,Stage 3,Stage 5",
+      "Stage 4,Stage 5",
+
+      # htmlwidgets relevance
+      "Stage 3,Stage 4,Stage 5",
+      "Stage 5",
+      "Stage 4,Stage 5"
+    ),
+    cognitive_concepts = c(
+      # bslib concepts
+      "Visual Hierarchy,Aesthetic-Usability",
+      "Principle of Proximity,Visual Hierarchy",
+      "Cognitive Load Theory,Visual Hierarchy",
+      "Information Hierarchy,Progressive Disclosure",
+      "Cognitive Load Theory,Information Hierarchy",
+      "Progressive Disclosure,Cognitive Load Theory",
+      "Processing Fluency,Information Scent",
+      "Progressive Disclosure,Processing Fluency",
+      "Aesthetic-Usability,User-Centric Design",
+      "Visual Hierarchy,Principle of Proximity",
+      "Information Hierarchy,Visual Hierarchy",
+      "Breathable Layouts,Visual Hierarchy",
+
+      # shiny concepts
+      "Information Hierarchy,Progressive Disclosure",
+      "Cognitive Load Theory,Progressive Disclosure",
+      "Principle of Proximity,Visual Hierarchy",
+      "Visual Hierarchy,Breathable Layouts",
+      "Visual Hierarchy,Information Hierarchy",
+      "Fitts's Law,Affordance",
+      "Cooperation & Coordination,Peak-End Rule",
+      "Cognitive Load Theory,Processing Fluency",
+      "Processing Fluency,Cognitive Load Theory",
+      "Default Effect,Cognitive Load Theory",
+      "Progressive Disclosure,Cognitive Load Theory",
+      "Progressive Disclosure,Cognitive Load Theory",
+      "Norman's Stages of Action,Fitts's Law",
+      "Processing Fluency,Cognitive Load Theory",
+      "Processing Fluency,Cognitive Load Theory",
+
+      # DT concepts
+      "Information Hierarchy,Visual Hierarchy",
+      "Information Hierarchy,Visual Hierarchy",
+      "Information Hierarchy,Visual Hierarchy",
+      "Pre-attentive Processing,Visual Hierarchy",
+
+      # plotly concepts
+      "Data Storytelling Framework,Processing Fluency",
+      "Data Storytelling Framework,Processing Fluency",
+      "Data Storytelling Framework,Processing Fluency",
+      "Data Storytelling Framework,Processing Fluency",
+      "Norman's Stages of Action,Cooperation & Coordination",
+      "Processing Fluency,Norman's Stages of Action",
+
+      # reactable concepts
+      "Information Hierarchy,Pre-attentive Processing",
+      "Visual Hierarchy,Pre-attentive Processing",
+      "Information Hierarchy,Pre-attentive Processing",
+      "Information Hierarchy,Pre-attentive Processing",
+      "Norman's Stages of Action,Cooperation & Coordination",
+
+      # htmlwidgets concepts
+      "Affordance,Norman's Stages of Action",
+      "Peak-End Rule,Cooperation & Coordination",
+      "Norman's Stages of Action,Interaction Hints"
+    ),
+    use_cases = c(
+      # bslib use cases
+      "KPI displays,metric summaries,status indicators",
+      "Content organization,feature grouping,progressive disclosure",
+      "responsive dashboards,multi-column layouts,adaptive grids",
+      "navigation-heavy apps,filter panels,sidebar controls",
+      "content categorization,workflow organization,multi-view interfaces",
+      "FAQ sections,help documentation,optional details",
+      "contextual help,feature explanations,guidance text",
+      "detailed information,specifications,expanded content",
+      "accessibility,user preference,visual comfort",
+      "precise layouts,custom grids,flexible positioning",
+      "section titles,content labeling,organization",
+      "content spacing,visual breathing room,padding control",
+
+      # shiny use cases
+      "multi-step workflows,content organization,feature separation",
+      "dynamic interfaces,personalized views,conditional features",
+      "form organization,input grouping,visual structure",
+      "dashboard layouts,responsive design,grid systems",
+      "precise positioning,custom layouts,element alignment",
+      "user actions,form submission,workflow triggers",
+      "data export,report generation,file downloads",
+      "alerts,confirmations,detailed forms,focused interactions",
+      "important messages,confirmations,alerts,focused content",
+      "dependent dropdowns,dynamic filtering,cascading selections",
+      "conditional content,dynamic interfaces,personalized views",
+      "dynamic content display,conditional rendering,flexible interfaces",
+      "user interaction handling,real-time updates,responsive behavior",
+      "data processing,computed values,efficient updates",
+      "performance optimization,controlled updates,dependency management",
+
+      # DT use cases
+      "data exploration,reporting,administrative interfaces",
+      "interactive data display,filtering,sorting",
+      "data table containers,structured layouts",
+      "pattern highlighting,status indication,conditional formatting",
+
+      # plotly use cases
+      "exploratory data analysis,interactive reporting,data storytelling",
+      "enhanced ggplot visualizations,interactive scientific plots",
+      "dashboard visualizations,interactive analytics,data exploration",
+      "plot containers,visualization layouts,interactive displays",
+      "click analysis,selection tracking,user interaction capture",
+      "real-time updates,efficient plot modifications,performance optimization",
+
+      # reactable use cases
+      "advanced data tables,business intelligence,reporting dashboards",
+      "custom table styling,data presentation,formatted displays",
+      "table containers,data display layouts,structured interfaces",
+      "interactive tables,business applications,data management",
+      "table interaction tracking,selection management,state synchronization",
+
+      # htmlwidgets use cases
+      "custom visualizations,specialized interfaces,unique interactions",
+      "standalone reports,offline viewing,portable visualizations",
+      "enhanced interactivity,custom behaviors,specialized functionality"
+    )
   )
 }
 
-# helper function to get suggestions based on requested package
-get_suggestions <- function(package, stage, layout, accessibility) {
-  suggestions <- switch(package,
-    "shiny" = get_shiny_suggestions(stage, layout, accessibility),
-    "bslib" = get_bslib_suggestions(stage, layout, accessibility),
-    "reactable" = get_reactable_suggestions(stage, layout, accessibility),
-    "echarts4r" = get_echarts_suggestions(stage, layout, accessibility),
-    "all" = dplyr::bind_rows(
-      get_shiny_suggestions(stage, layout, accessibility),
-      get_bslib_suggestions(stage, layout, accessibility),
-      get_reactable_suggestions(stage, layout, accessibility),
-      get_echarts_suggestions(stage, layout, accessibility)
+calculate_relevance_scores <- function(bid_stage, components_db) {
+  stage_name <- bid_stage$stage[1]
+
+  # Initialize relevance scores
+  components_db$relevance <- 0
+
+  # Stage-based scoring (highest weight) - need to handle different stage name formats
+  stage_pattern <- paste0(
+    "Stage ",
+    switch(
+      stage_name,
+      "Notice" = "1",
+      "Interpret" = "2",
+      "Structure" = "3",
+      "Anticipate" = "4",
+      "Deploy" = "5",
+      "1" # fallback
     )
   )
 
-  return(suggestions)
+  stage_matches <- grepl(
+    stage_pattern,
+    components_db$bid_stage_relevance,
+    fixed = TRUE
+  )
+  components_db$relevance[stage_matches] <- components_db$relevance[
+    stage_matches
+  ] +
+    50
+
+  # Extract information from bid_stage for concept matching
+  concepts_to_match <- extract_relevant_concepts(bid_stage)
+
+  # Concept-based scoring with more flexible matching
+  for (concept in concepts_to_match) {
+    # Try exact match first
+    concept_matches <- grepl(
+      concept,
+      components_db$cognitive_concepts,
+      fixed = TRUE
+    )
+    if (!any(concept_matches)) {
+      # Try partial matching for common concepts
+      concept_lower <- tolower(concept)
+      if (grepl("visual", concept_lower)) {
+        concept_matches <- grepl(
+          "Visual",
+          components_db$cognitive_concepts,
+          fixed = TRUE
+        )
+      } else if (grepl("cognitive", concept_lower)) {
+        concept_matches <- grepl(
+          "Cognitive",
+          components_db$cognitive_concepts,
+          fixed = TRUE
+        )
+      } else if (grepl("hierarchy", concept_lower)) {
+        concept_matches <- grepl(
+          "Hierarchy",
+          components_db$cognitive_concepts,
+          fixed = TRUE
+        )
+      } else if (grepl("proximity", concept_lower)) {
+        concept_matches <- grepl(
+          "Proximity",
+          components_db$cognitive_concepts,
+          fixed = TRUE
+        )
+      }
+    }
+    components_db$relevance[concept_matches] <- components_db$relevance[
+      concept_matches
+    ] +
+      25
+  }
+
+  # Problem/theory-based scoring for additional context
+  additional_context <- extract_additional_context(bid_stage)
+  for (context_term in additional_context) {
+    context_matches <- grepl(
+      context_term,
+      components_db$description,
+      ignore.case = TRUE
+    ) |
+      grepl(context_term, components_db$use_cases, ignore.case = TRUE)
+    components_db$relevance[context_matches] <- components_db$relevance[
+      context_matches
+    ] +
+      10
+  }
+
+  # Layout-specific scoring for Structure stage
+  if (stage_name == "Structure" && "layout" %in% names(bid_stage)) {
+    layout_value <- bid_stage$layout[1]
+    if (!is.na(layout_value)) {
+      layout_keywords <- extract_layout_keywords(layout_value)
+      for (keyword in layout_keywords) {
+        layout_matches <- grepl(
+          keyword,
+          components_db$description,
+          ignore.case = TRUE
+        ) |
+          grepl(keyword, components_db$use_cases, ignore.case = TRUE)
+        components_db$relevance[layout_matches] <- components_db$relevance[
+          layout_matches
+        ] +
+          15
+      }
+    }
+  }
+
+  # Ensure we always return some components, even if relevance is low
+  if (all(components_db$relevance == 0)) {
+    # Give small scores to some general components for any stage
+    general_components <- c(
+      "card",
+      "value_box",
+      "layout",
+      "tabset",
+      "datatable"
+    )
+    for (comp in general_components) {
+      comp_matches <- grepl(comp, components_db$component, ignore.case = TRUE)
+      components_db$relevance[comp_matches] <- components_db$relevance[
+        comp_matches
+      ] +
+        5
+    }
+  }
+
+  # Remove components with zero relevance for cleaner output
+  components_db <- components_db[components_db$relevance > 0, ]
+
+  return(components_db)
 }
 
-# helper function to get Shiny suggestions
-get_shiny_suggestions <- function(stage, layout, accessibility) {
-  suggestions <- tibble::tibble(
-    stage = character(),
-    package = character(),
-    component = character(),
-    description = character(),
-    code_example = character(),
-    relevance = numeric()
-  )
+extract_relevant_concepts <- function(bid_stage) {
+  concepts <- character(0)
 
-  # notice stage
-  suggestions <- rbind(suggestions, create_suggestion(
-    "Notice",
-    "shiny",
-    "radioButtons",
-    "Use radio buttons instead of dropdown for small option sets",
-    'radioButtons("selection", "Choose option:", choices = c("Option 1", "Option 2"), inline = TRUE)',
-    1.0
-  ))
+  # Extract from theory field (Notice stage)
+  if ("theory" %in% names(bid_stage) && !is.na(bid_stage$theory[1])) {
+    theory <- bid_stage$theory[1]
+    concepts <- c(concepts, theory)
+  }
 
-  # interpret stage
-  suggestions <- rbind(suggestions, create_suggestion(
-    "Interpret",
-    "shiny",
-    "valueBox",
-    "Highlight key metrics for instant comprehension",
-    'valueBox(value = "65%", subtitle = "Completion Rate", color = "info")',
-    1.0
-  ))
+  # Extract from concepts field (Structure stage)
+  if ("concepts" %in% names(bid_stage) && !is.na(bid_stage$concepts[1])) {
+    stage_concepts <- bid_stage$concepts[1]
+    # Handle both comma-separated and individual concepts
+    if (grepl(",", stage_concepts)) {
+      concepts <- c(concepts, trimws(unlist(strsplit(stage_concepts, ","))))
+    } else {
+      concepts <- c(concepts, stage_concepts)
+    }
+  }
 
-  # structure stage
-  suggestions <- rbind(suggestions, create_suggestion(
-    "Structure",
-    "shiny",
-    "tabsetPanel",
-    "Group related content to reduce cognitive load",
-    'tabsetPanel(tabPanel("Overview", plotOutput("main_plot")), tabPanel("Details", dataTableOutput("details_table")))',
-    1.0
-  ))
+  # Extract from previous stage information
+  previous_fields <- c("previous_theory", "previous_concepts")
+  for (field in previous_fields) {
+    if (field %in% names(bid_stage) && !is.na(bid_stage[[field]][1])) {
+      concepts <- c(concepts, bid_stage[[field]][1])
+    }
+  }
 
-  # anticipate stage
-  suggestions <- rbind(suggestions, create_suggestion(
-    "Anticipate",
-    "shiny",
-    "conditionalPanel",
-    "Show context-appropriate insights based on user selection",
-    'conditionalPanel("input.view == \'comparison\'", plotOutput("comparison_chart"))',
-    1.0
-  ))
-
-  # validate stage
-  suggestions <- rbind(suggestions, create_suggestion(
-    "Validate",
-    "shiny",
-    "actionButton",
-    "Add export or sharing functionality",
-    'actionButton("share", "Share Insights", icon = icon("share-alt"))',
-    1.0
-  ))
-
-  # accessibility suggestion
-  suggestions <- rbind(suggestions, create_suggestion(
-    "Structure",
-    "shiny",
-    "tags$div with ARIA attributes",
-    "Add accessibility attributes to improve screen reader support",
-    'tags$div(id = "chart-container", role = "img", `aria-label` = "Chart showing sales trends over time", plotOutput("sales_chart"))',
-    0.9
-  ))
-
-  return(suggestions)
+  return(unique(concepts))
 }
 
-# helper function to get bslib suggestions
-get_bslib_suggestions <- function(stage, layout, accessibility) {
-  suggestions <- tibble::tibble(
-    stage = character(),
-    package = character(),
-    component = character(),
-    description = character(),
-    code_example = character(),
-    relevance = numeric()
-  )
+extract_additional_context <- function(bid_stage) {
+  context_terms <- character(0)
 
-  # notice stage
-  suggestions <- rbind(suggestions, create_suggestion(
-    "Notice",
-    "bslib",
-    "layout_columns",
-    "Create responsive layouts that adapt to screen size",
-    'layout_columns(col_widths = c(4, 8), plotOutput("overview"), plotOutput("details"))',
-    1.0
-  ))
+  # Extract problem keywords
+  if ("problem" %in% names(bid_stage) && !is.na(bid_stage$problem[1])) {
+    problem <- tolower(bid_stage$problem[1])
+    # Extract key terms that might relate to UI components
+    if (grepl("complex|overwhelm|too many", problem)) {
+      context_terms <- c(context_terms, "progressive", "accordion", "tab")
+    }
+    if (grepl("find|search|locate", problem)) {
+      context_terms <- c(context_terms, "filter", "search", "navigation")
+    }
+    if (grepl("slow|performance|delay", problem)) {
+      context_terms <- c(context_terms, "reactive", "efficient", "optimize")
+    }
+    if (grepl("mobile|phone|tablet", problem)) {
+      context_terms <- c(context_terms, "responsive", "layout", "grid")
+    }
+  }
 
-  # interpret stage
-  suggestions <- rbind(suggestions, create_suggestion(
-    "Interpret",
-    "bslib",
-    "card",
-    "Visually group related information",
-    'card(card_header("Key Metrics"), plotOutput("main_chart"), card_footer(actionLink("details", "View details")))',
-    1.0
-  ))
+  # Extract from central question (Interpret stage)
+  if (
+    "central_question" %in%
+      names(bid_stage) &&
+      !is.na(bid_stage$central_question[1])
+  ) {
+    question <- tolower(bid_stage$central_question[1])
+    if (grepl("simplify|reduce|minimize", question)) {
+      context_terms <- c(context_terms, "card", "accordion", "modal")
+    }
+    if (grepl("organize|structure|arrange", question)) {
+      context_terms <- c(context_terms, "layout", "grid", "column")
+    }
+    if (grepl("collaborate|share|team", question)) {
+      context_terms <- c(context_terms, "download", "export", "modal")
+    }
+  }
 
-  # structure stage
-  suggestions <- rbind(suggestions, create_suggestion(
-    "Structure",
-    "bslib",
-    "navset_card_tab",
-    "Create tabbed interfaces within a card",
-    'navset_card_tab(nav_panel("Overview", plotOutput("main_plot")), nav_panel("Details", dataTableOutput("data_table")))',
-    1.0
-  ))
+  # Extract from audience information
+  audience_fields <- c("audience", "target_audience", "previous_audience")
+  for (field in audience_fields) {
+    if (field %in% names(bid_stage) && !is.na(bid_stage[[field]][1])) {
+      audience <- tolower(bid_stage[[field]][1])
+      if (grepl("executive|manager|leadership", audience)) {
+        context_terms <- c(context_terms, "value_box", "card", "summary")
+      }
+      if (grepl("analyst|technical|developer", audience)) {
+        context_terms <- c(context_terms, "datatable", "plotly", "interactive")
+      }
+      if (grepl("mobile|field", audience)) {
+        context_terms <- c(context_terms, "responsive", "touch", "mobile")
+      }
+    }
+  }
 
-  # anticipate stage
-  suggestions <- rbind(suggestions, create_suggestion(
-    "Anticipate",
-    "bslib",
-    "nav_panel",
-    "Toggle between different framing perspectives",
-    'navset_pill(nav_panel("Progress View", progressOutput), nav_panel("Gap View", gapOutput))',
-    1.0
-  ))
-
-  # validate stage
-  suggestions <- rbind(suggestions, create_suggestion(
-    "Validate",
-    "bslib",
-    "accordion",
-    "Progressive disclosure of detailed information",
-    'accordion(accordion_panel("Key Finding 1", "Details about finding 1"), accordion_panel("Key Finding 2", "Details about finding 2"))',
-    1.0
-  ))
-
-  # accessibility suggestion
-  suggestions <- rbind(suggestions, create_suggestion(
-    "Structure",
-    "bslib",
-    "layout_column_wrap with variable gap",
-    "Create breathable layouts with appropriate spacing",
-    'layout_column_wrap(width = 1/2, gap = "2rem", ...)',
-    0.9
-  ))
-
-  return(suggestions)
+  return(unique(context_terms))
 }
 
-# hepper function to get reactable suggestions
-get_reactable_suggestions <- function(stage, layout, accessibility) {
-  suggestions <- tibble::tibble(
-    stage = character(),
-    package = character(),
-    component = character(),
-    description = character(),
-    code_example = character(),
-    relevance = numeric()
-  )
+extract_layout_keywords <- function(layout_value) {
+  layout_lower <- tolower(layout_value)
+  keywords <- character(0)
 
-  # notice stage
-  suggestions <- rbind(suggestions, create_suggestion(
-    "Notice",
-    "reactable",
-    "defaultColDef",
-    "Simplify table appearance to reduce cognitive load",
-    'reactable(data, defaultColDef = colDef(headerStyle = list(background = "#f7f7f7"), align = "center"))',
-    1.0
-  ))
+  if (grepl("dual|two|split", layout_lower)) {
+    keywords <- c(keywords, "column", "grid", "layout")
+  }
+  if (grepl("sidebar|side", layout_lower)) {
+    keywords <- c(keywords, "sidebar", "nav", "panel")
+  }
+  if (grepl("card|dashboard", layout_lower)) {
+    keywords <- c(keywords, "card", "value_box", "grid")
+  }
+  if (grepl("tab|navigation", layout_lower)) {
+    keywords <- c(keywords, "tab", "nav", "panel")
+  }
+  if (grepl("accordion|collaps", layout_lower)) {
+    keywords <- c(keywords, "accordion", "conditional", "progressive")
+  }
 
-  # interpret stage
-  suggestions <- rbind(suggestions, create_suggestion(
-    "Interpret",
-    "reactable",
-    "conditional style",
-    "Use color coding to enhance processing fluency",
-    'colDef(style = function(value) { if(value > 50) { list(color = "green") } else { list(color = "red") } })',
-    1.0
-  ))
-
-  # structure stage
-  suggestions <- rbind(suggestions, create_suggestion(
-    "Structure",
-    "reactable",
-    "groupBy",
-    "Group related data to implement Principle of Proximity",
-    'reactable(data, groupBy = "category")',
-    1.0
-  ))
-
-  # anticipate stage
-  suggestions <- rbind(suggestions, create_suggestion(
-    "Anticipate",
-    "reactable",
-    "columns with reference indicators",
-    "Add benchmark indicators to address Anchoring Effect",
-    'colDef(cell = function(value) { div(value, div(style = list(width = "80%", height = "4px", background = ifelse(value > 50, "green", "red"))) })',
-    1.0
-  ))
-
-  # validate stage
-  suggestions <- rbind(suggestions, create_suggestion(
-    "Validate",
-    "reactable",
-    "details",
-    "Progressive disclosure for detailed information",
-    'reactable(data, details = function(index) { div(style = list(padding = "1rem"), "Additional details for row ", index) })',
-    1.0
-  ))
-
-  # accessibility suggestion
-  suggestions <- rbind(suggestions, create_suggestion(
-    "Interpret",
-    "reactable",
-    "themed table with accessibility attributes",
-    "Create visually clean tables with proper accessibility markup",
-    'reactable(data, theme = reactableTheme(borderColor = "#dfe2e5", stripedColor = "#f6f8fa"), defaultColDef = colDef(headerStyle = list(fontWeight = "bold")))',
-    0.9
-  ))
-
-  return(suggestions)
+  return(keywords)
 }
 
-# helper function to get echarts4r suggestions
-get_echarts_suggestions <- function(stage, layout, accessibility) {
-  suggestions <- tibble::tibble(
-    stage = character(),
-    package = character(),
-    component = character(),
-    description = character(),
-    code_example = character(),
-    relevance = numeric()
+create_empty_components_result <- function() {
+  tibble::tibble(
+    package = character(0),
+    component = character(0),
+    description = character(0),
+    bid_stage_relevance = character(0),
+    cognitive_concepts = character(0),
+    use_cases = character(0),
+    relevance = numeric(0)
   )
-
-  # notice stage
-  suggestions <- rbind(suggestions, create_suggestion(
-    "Notice",
-    "echarts4r",
-    "e_title",
-    "Clear titles help establish visual hierarchy",
-    'e_charts(data) |> e_line(x) |> e_title("Main Metric Trend", "Supporting context")',
-    1.0
-  ))
-
-  # interpret stage
-  suggestions <- rbind(suggestions, create_suggestion(
-    "Interpret",
-    "echarts4r",
-    "e_tooltip",
-    "Tooltips provide additional context without cluttering interface",
-    'e_charts(data) |> e_bar(y) |> e_tooltip(trigger = "item", formatter = "{b}: {c}")',
-    1.0
-  ))
-
-  # structure stage
-  suggestions <- rbind(suggestions, create_suggestion(
-    "Structure",
-    "echarts4r",
-    "e_grid",
-    "Control chart layout precisely",
-    'e_charts(data) |> e_line(x) |> e_grid(height = "50%", top = "10%")',
-    1.0
-  ))
-
-  # anticipate stage
-  suggestions <- rbind(suggestions, create_suggestion(
-    "Anticipate",
-    "echarts4r",
-    "e_mark_line",
-    "Add reference lines to address Anchoring Effect",
-    "e_charts(data) |> e_bar(y) |> e_mark_line(data = list(yAxis = 50))",
-    1.0
-  ))
-
-  # validate stage
-  suggestions <- rbind(suggestions, create_suggestion(
-    "Validate",
-    "echarts4r",
-    "e_toolbox",
-    "Add export options for sharing insights",
-    'e_charts(data) |> e_line(x) |> e_toolbox_feature(feature = "saveAsImage")',
-    1.0
-  ))
-
-  # accessibility suggestion
-  suggestions <- rbind(suggestions, create_suggestion(
-    "Interpret",
-    "echarts4r",
-    "e_color with accessible palette",
-    "Use a colorblind-friendly palette to enhance visual hierarchy and accessibility",
-    'e_charts(data) |> e_bar(y) |> e_color(c("#4472C4", "#ED7D31", "#A5A5A5", "#FFC000", "#5B9BD5"))',
-    0.9
-  ))
-
-  return(suggestions)
 }
