@@ -81,7 +81,7 @@ bid_concepts <- function(search = NULL) {
       "Collaborative processes that enhance group decision-making.",
       "Technique of showing only necessary information to reduce cognitive load.",
       "Law predicting that interaction time is based on distance and target size.",
-      "Principle that humans can hold 7±2 items in working memory.",
+      "Principle that humans can hold 7 (plus or minus 2) items in working memory.",
       "Signals that guide users toward relevant information.",
       "Quality of an object that suggests how it should be used.",
       "Visual perception principles governing how we group similar elements.",
