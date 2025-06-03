@@ -62,10 +62,15 @@
 #'
 #' @export
 bid_anticipate <- function(
-    previous_stage,
-    bias_mitigations = NULL,
-    interaction_principles = NULL) {
-  validate_required_params(previous_stage = previous_stage)
+  previous_stage,
+  bias_mitigations = NULL,
+  interaction_principles = NULL
+) {
+  # Validate required parameters
+  if (missing(previous_stage) || is.null(previous_stage)) {
+    stop("Required parameter 'previous_stage' must be provided", call. = FALSE)
+  }
+  
   validate_previous_stage(previous_stage, "Anticipate")
 
   if (!is.null(bias_mitigations)) {
@@ -78,6 +83,7 @@ bid_anticipate <- function(
       )
     }
 
+    # Check for list structure issues
     if (
       length(bias_mitigations) == 0 ||
         is.null(names(bias_mitigations)) ||
@@ -90,11 +96,27 @@ bid_anticipate <- function(
         )
       )
       bias_mitigations <- NULL
-    }
-
-    for (i in seq_along(bias_mitigations)) {
-      if (!is.character(bias_mitigations[[i]])) {
-        bias_mitigations[[i]] <- as.character(bias_mitigations[[i]])
+    } else {
+      # Check for empty or NA values within the list
+      empty_values <- sapply(bias_mitigations, function(x) {
+        is.null(x) || is.na(x) || (is.character(x) && nchar(trimws(x)) == 0)
+      })
+      
+      if (any(empty_values)) {
+        cli::cli_warn(
+          c(
+            "!" = "bias_mitigations must be a non-empty named list.",
+            "i" = "Using automatically generated bias mitigations instead."
+          )
+        )
+        bias_mitigations <- NULL
+      } else {
+        # Convert non-character values to character
+        for (i in seq_along(bias_mitigations)) {
+          if (!is.character(bias_mitigations[[i]])) {
+            bias_mitigations[[i]] <- as.character(bias_mitigations[[i]])
+          }
+        }
       }
     }
   }
@@ -130,13 +152,13 @@ bid_anticipate <- function(
 
   layout <- NA_character_
   if (
-    "previous_layout" %in% names(previous_stage) &&
+    "previous_layout" %in%
+      names(previous_stage) &&
       !is.na(previous_stage$previous_layout[1])
   ) {
     layout <- previous_stage$previous_layout[1]
   } else if (
-    "layout" %in% names(previous_stage) &&
-      !is.na(previous_stage$layout[1])
+    "layout" %in% names(previous_stage) && !is.na(previous_stage$layout[1])
   ) {
     layout <- previous_stage$layout[1]
   }
@@ -147,7 +169,10 @@ bid_anticipate <- function(
       cli::cli_warn(
         c(
           "!" = "Layout '{layout}' is not recognized as a standard layout type.",
-          "i" = paste0("Recommended layouts: ", paste(valid_layouts, collapse = ", ")),
+          "i" = paste0(
+            "Recommended layouts: ",
+            paste(valid_layouts, collapse = ", ")
+          ),
           "i" = "Some automatic suggestions may not be optimized for your custom layout."
         )
       )
@@ -156,13 +181,13 @@ bid_anticipate <- function(
 
   concepts <- character(0)
   if (
-    "previous_concepts" %in% names(previous_stage) &&
+    "previous_concepts" %in%
+      names(previous_stage) &&
       !is.na(previous_stage$previous_concepts[1])
   ) {
     concepts <- strsplit(previous_stage$previous_concepts[1], ", ")[[1]]
   } else if (
-    "concepts" %in% names(previous_stage) &&
-      !is.na(previous_stage$concepts[1])
+    "concepts" %in% names(previous_stage) && !is.na(previous_stage$concepts[1])
   ) {
     concepts <- strsplit(previous_stage$concepts[1], ", ")[[1]]
   }
@@ -171,12 +196,14 @@ bid_anticipate <- function(
 
   accessibility <- NA_character_
   if (
-    "previous_accessibility" %in% names(previous_stage) &&
+    "previous_accessibility" %in%
+      names(previous_stage) &&
       !is.na(previous_stage$previous_accessibility[1])
   ) {
     accessibility <- previous_stage$previous_accessibility[1]
   } else if (
-    "accessibility" %in% names(previous_stage) &&
+    "accessibility" %in%
+      names(previous_stage) &&
       !is.na(previous_stage$accessibility[1])
   ) {
     accessibility <- previous_stage$accessibility[1]
@@ -193,7 +220,10 @@ bid_anticipate <- function(
         "Visual Hierarchy" = c("attention bias", "belief perseverance"),
         "Principle of Proximity" = c("association bias", "clustering illusion"),
         "Default Effect" = c("status quo bias", "choice architecture"),
-        "Aesthetic-Usability" = c("beautiful-is-good stereotype", "halo effect"),
+        "Aesthetic-Usability" = c(
+          "beautiful-is-good stereotype",
+          "halo effect"
+        ),
         "Information Hierarchy" = c("availability bias", "prominence effect")
       )
 
@@ -204,7 +234,7 @@ bid_anticipate <- function(
             biases <- concept_bias_map[[known_concept]]
             for (bias in biases) {
               suggested_biases[[bias]] <- paste(
-                "Consider", bias, "in relation to", concept
+                "Consider how this bias affects user decisions."
               )
             }
           }
@@ -231,13 +261,17 @@ bid_anticipate <- function(
 
       if (!is.na(layout) && layout %in% names(layout_bias_map)) {
         for (bias_name in names(layout_bias_map[[layout]])) {
-          suggested_biases[[bias_name]] <- layout_bias_map[[layout]][[bias_name]]
+          suggested_biases[[bias_name]] <- layout_bias_map[[layout]][[
+            bias_name
+          ]]
         }
       }
     } else if (previous_stage$stage[1] == "Interpret") {
       story_elements <- list()
       for (field in c("central_question", "hook", "tension", "resolution")) {
-        if (field %in% names(previous_stage) && !is.na(previous_stage[[field]][1])) {
+        if (
+          field %in% names(previous_stage) && !is.na(previous_stage[[field]][1])
+        ) {
           story_elements[[field]] <- previous_stage[[field]][1]
         } else {
           story_elements[[field]] <- NA_character_
@@ -246,13 +280,34 @@ bid_anticipate <- function(
 
       valid_elements <- !sapply(story_elements, is.na)
       if (any(valid_elements)) {
-        combined_text <- tolower(paste(unlist(story_elements[valid_elements]), collapse = " "))
+        combined_text <- tolower(paste(
+          unlist(story_elements[valid_elements]),
+          collapse = " "
+        ))
 
         bias_keywords <- list(
-          "anchoring" = c("compar", "reference", "previous", "baseline", "target"),
+          "anchoring" = c(
+            "compar",
+            "reference",
+            "previous",
+            "baseline",
+            "target"
+          ),
           "framing" = c("positiv", "negativ", "gain", "loss", "perspective"),
-          "confirmation bias" = c("belief", "assumption", "expect", "hypothesis", "valid"),
-          "availability bias" = c("recent", "memorable", "example", "recall", "top of mind"),
+          "confirmation bias" = c(
+            "belief",
+            "assumption",
+            "expect",
+            "hypothesis",
+            "valid"
+          ),
+          "availability bias" = c(
+            "recent",
+            "memorable",
+            "example",
+            "recall",
+            "top of mind"
+          ),
           "loss aversion" = c("risk", "loss", "gain", "averse", "avoid"),
           "recency bias" = c("recent", "latest", "new", "trend", "last")
         )
@@ -260,9 +315,13 @@ bid_anticipate <- function(
         for (bias_name in names(bias_keywords)) {
           keywords <- bias_keywords[[bias_name]]
           if (any(sapply(keywords, function(k) grepl(k, combined_text)))) {
-            tension_field <- if (!is.na(story_elements$tension)) "tension" else "data story"
+            tension_field <- if (!is.na(story_elements$tension)) "tension" else
+              "data story"
             suggested_biases[[bias_name]] <- paste(
-              "Address", bias_name, "based on", tension_field
+              "Address",
+              bias_name,
+              "based on",
+              tension_field
             )
           }
         }
@@ -274,7 +333,9 @@ bid_anticipate <- function(
       for (bias in common_biases) {
         if (!(bias %in% names(suggested_biases))) {
           suggested_biases[[bias]] <- paste(
-            "Consider how", bias, "might affect user interpretation"
+            "Consider how",
+            bias,
+            "might affect user interpretation"
           )
         }
       }
@@ -293,7 +354,8 @@ bid_anticipate <- function(
     message(
       paste0(
         "Automatically suggested bias mitigations: ",
-        paste(names(bias_mitigations), collapse = ", "), "."
+        paste(names(bias_mitigations), collapse = ", "),
+        "."
       )
     )
   }
@@ -327,7 +389,9 @@ bid_anticipate <- function(
 
       if (!is.na(layout) && layout %in% names(layout_interaction_map)) {
         for (principle_name in names(layout_interaction_map[[layout]])) {
-          suggested_principles[[principle_name]] <- layout_interaction_map[[layout]][[principle_name]]
+          suggested_principles[[principle_name]] <- layout_interaction_map[[
+            layout
+          ]][[principle_name]]
         }
       }
 
@@ -355,7 +419,9 @@ bid_anticipate <- function(
             if (grepl(tolower(known_concept), tolower(concept))) {
               principles <- concept_interaction_map[[known_concept]]
               for (principle_name in names(principles)) {
-                suggested_principles[[principle_name]] <- principles[[principle_name]]
+                suggested_principles[[principle_name]] <- principles[[
+                  principle_name
+                ]]
               }
             }
           }
@@ -368,7 +434,8 @@ bid_anticipate <- function(
 
       message(paste0(
         "Automatically suggested interaction principles: ",
-        paste(names(interaction_principles), collapse = ", "), "."
+        paste(names(interaction_principles), collapse = ", "),
+        "."
       ))
     }
   }
@@ -439,7 +506,7 @@ bid_anticipate <- function(
   ) {
     tryCatch(
       {
-        jsonlite::toJSON(interaction_principles)
+        jsonlite::toJSON(interaction_principles, auto_unbox = TRUE)
       },
       error = function(e) {
         cli::cli_warn(
@@ -474,8 +541,10 @@ bid_anticipate <- function(
     ),
     interaction_principles = interaction_formatted,
     previous_layout = if (!is.na(layout)) layout else NA_character_,
-    previous_concepts = if (length(concepts) > 0) paste(concepts, collapse = ", ") else NA_character_,
-    previous_accessibility = if (!is.na(accessibility)) accessibility %||% NA_character_ else NA_character_,
+    previous_concepts = if (length(concepts) > 0)
+      paste(concepts, collapse = ", ") else NA_character_,
+    previous_accessibility = if (!is.na(accessibility))
+      accessibility %||% NA_character_ else NA_character_,
     suggestions = suggestions,
     timestamp = Sys.time()
   )
