@@ -24,11 +24,23 @@ safe_string_check(str, min_length = 1)
 
 \item{condition_func}{Optional function to apply additional conditions}
 
+\item{df}{A data frame to check (for \code{safe_df_check})}
+
 \item{min_rows}{Minimum number of rows for data frames}
 
 \item{column_name}{Name of column to access}
 
 \item{default}{Default value to return if column access fails}
+
+\item{lst}{A list or vector to check (for \code{safe_list_access})}
+
+\item{index}{Index or name of the element to access in \code{lst} (for
+\code{safe_list_access})}
+
+\item{str}{A character string to check (for \code{safe_string_check})}
+
+\item{min_length}{Minimum number of characters required in \code{str} (for
+\code{safe_string_check})}
 }
 \description{
 These functions provide safe ways to check conditions without getting

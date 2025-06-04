@@ -182,9 +182,16 @@ validate_previous_stage <- function(previous_stage, current_stage) {
 #'
 #' @param obj Object to check
 #' @param condition_func Optional function to apply additional conditions
+#' @param df A data frame to check (for `safe_df_check`)
 #' @param min_rows Minimum number of rows for data frames
 #' @param column_name Name of column to access
 #' @param default Default value to return if column access fails
+#' @param lst A list or vector to check (for `safe_list_access`)
+#' @param index Index or name of the element to access in `lst` (for
+#'        `safe_list_access`)
+#' @param str A character string to check (for `safe_string_check`)
+#' @param min_length Minimum number of characters required in `str` (for
+#'        `safe_string_check`) 
 #'
 #' @name safe-utilities
 NULL
