@@ -2,7 +2,7 @@ library(testthat)
 library(tibble)
 
 test_that("bid_structure returns a tibble with stage 'Structure'", {
-  local_mock(
+  local_mocked_bindings(
     bid_concepts = function(search = NULL) {
       tibble::tibble(
         concept = "Test Concept",
@@ -34,7 +34,7 @@ test_that("bid_structure returns a tibble with stage 'Structure'", {
 })
 
 test_that("bid_structure warns on invalid layout", {
-  local_mock(
+  local_mocked_bindings(
     bid_concepts = function(search = NULL) {
       tibble::tibble(
         concept = "Test Concept",
@@ -82,7 +82,7 @@ test_that("bid_structure errors when accessibility parameter is not a list", {
 })
 
 test_that("bid_structure auto-detects concepts when not provided", {
-  local_mock(
+  local_mocked_bindings(
     bid_concepts = function(search = NULL) {
       tibble::tibble(
         concept = "Auto Detected Concept",
@@ -216,7 +216,7 @@ test_that("bid_structure handles NA values in previous_stage", {
   previous_stage <- tibble::tibble(
     stage = "Interpret",
     central_question = NA_character_,
-    hook = "Users struggle with navigation",  # This has a value
+    hook = "Users struggle with navigation", # This has a value
     context = NA_character_,
     tension = "Complex structure confuses users",
     resolution = NA_character_,
@@ -232,8 +232,8 @@ test_that("bid_structure handles NA values in previous_stage", {
   )
 
   expect_s3_class(result, "tbl_df")
-  expect_true(is.na(result$previous_question[1]))  # central_question is NA
-  expect_false(is.na(result$previous_story_hook[1]))  # hook has a value, so should NOT be NA
+  expect_true(is.na(result$previous_question[1])) # central_question is NA
+  expect_false(is.na(result$previous_story_hook[1])) # hook has a value, so should NOT be NA
 })
 
 test_that("bid_structure handles edge cases in accessibility parameter", {
@@ -249,7 +249,7 @@ test_that("bid_structure handles edge cases in accessibility parameter", {
       previous_stage,
       layout = "dual_process",
       concepts = c("Visual Hierarchy"),
-      accessibility = list()  # Empty list should still be stored as JSON
+      accessibility = list() # Empty list should still be stored as JSON
     )
   )
 

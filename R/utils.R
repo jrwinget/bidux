@@ -42,21 +42,18 @@ bid_message <- function(title, ...) {
 #'
 #' @noRd
 is_empty <- function(x) {
-  # Use is.null first (this doesn't have length issues)
   if (is.null(x)) {
     return(TRUE)
   }
-  
-  # Then check for NA - use all() for vectors
+
   if (all(is.na(x))) {
     return(TRUE)
   }
-  
-  # Finally check for empty string if it's character
+
   if (is.character(x) && all(nchar(trimws(x)) == 0)) {
     return(TRUE)
   }
-  
+
   return(FALSE)
 }
 
@@ -194,29 +191,37 @@ NULL
 
 #' @describeIn safe-utilities Safe conditional checking
 safe_check <- function(obj, condition_func = NULL) {
-  # Handle NULL
-  if (is.null(obj)) return(FALSE)
-  
-  # Handle length 0
-  if (length(obj) == 0) return(FALSE)
-  
-  # Handle NA values - check if ALL are NA
-  if (all(is.na(obj))) return(FALSE)
-  
-  # If no condition function provided, just check if object exists and has content
+  if (is.null(obj)) {
+    return(FALSE)
+  }
+
+  if (length(obj) == 0) {
+    return(FALSE)
+  }
+
+  if (all(is.na(obj))) {
+    return(FALSE)
+  }
+
   if (is.null(condition_func)) {
     return(TRUE)
   }
-  
-  # Apply the condition function with error handling
-  tryCatch({
-    result <- condition_func(obj)
-    if (length(result) == 0) return(FALSE)
-    if (all(is.na(result))) return(FALSE)
-    return(all(result))
-  }, error = function(e) {
-    return(FALSE)
-  })
+
+  tryCatch(
+    {
+      result <- condition_func(obj)
+      if (length(result) == 0) {
+        return(FALSE)
+      }
+      if (all(is.na(result))) {
+        return(FALSE)
+      }
+      return(all(result))
+    },
+    error = function(e) {
+      return(FALSE)
+    }
+  )
 }
 
 #' @describeIn safe-utilities Safe data frame checking
@@ -231,27 +236,42 @@ safe_column_access <- function(df, column_name, default = NA) {
   if (!safe_df_check(df) || !column_name %in% names(df)) {
     return(default)
   }
-  
+
   col_value <- df[[column_name]]
-  if (length(col_value) == 0) return(default)
-  if (all(is.na(col_value))) return(default)
-  
-  return(col_value[1])  # Return first value
+  if (length(col_value) == 0) {
+    return(default)
+  }
+  if (all(is.na(col_value))) {
+    return(default)
+  }
+
+  return(col_value[1])
 }
 
 #' @describeIn safe-utilities Safe list/vector access
 safe_list_access <- function(lst, index, default = NA) {
-  if (is.null(lst) || length(lst) == 0) return(default)
-  if (is.numeric(index) && (index < 1 || index > length(lst))) return(default)
-  if (is.character(index) && !index %in% names(lst)) return(default)
-  
-  tryCatch({
-    value <- lst[[index]]
-    if (is.null(value) || (length(value) == 1 && is.na(value))) return(default)
-    return(value)
-  }, error = function(e) {
+  if (is.null(lst) || length(lst) == 0) {
     return(default)
-  })
+  }
+  if (is.numeric(index) && (index < 1 || index > length(lst))) {
+    return(default)
+  }
+  if (is.character(index) && !index %in% names(lst)) {
+    return(default)
+  }
+
+  tryCatch(
+    {
+      value <- lst[[index]]
+      if (is.null(value) || (length(value) == 1 && is.na(value))) {
+        return(default)
+      }
+      return(value)
+    },
+    error = function(e) {
+      return(default)
+    }
+  )
 }
 
 #' @describeIn safe-utilities Safe string checking
@@ -259,4 +279,20 @@ safe_string_check <- function(str, min_length = 1) {
   safe_check(str, function(x) {
     is.character(x) && all(nchar(trimws(x)) >= min_length)
   })
+}
+
+#' Function for truncating text in messages
+#'
+#' @param text Object to check
+#' @param max_length Optional function to apply additional conditions
+#'
+#' @noRd
+truncate_text <- function(text, max_length) {
+  if (is.null(text) || is.na(text)) {
+    return("Not specified")
+  }
+  if (nchar(text) > max_length) {
+    return(paste0(substring(text, 1, max_length), "..."))
+  }
+  return(text)
 }

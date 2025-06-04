@@ -10,7 +10,8 @@ bid_concept(concept_name)
 \item{concept_name}{A character string specifying the name of the concept.}
 }
 \value{
-A tibble with details for the specified concept, or empty tibble if not found.
+A tibble with details for the specified concept, or empty tibble if
+not found.
 }
 \description{
 This function retrieves detailed information about a specific concept within

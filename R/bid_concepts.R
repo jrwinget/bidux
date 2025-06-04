@@ -5,8 +5,9 @@
 #' Insight Design framework, including their descriptions, categories,
 #' references, and example applications.
 #'
-#' @param search Optional search term to filter concepts. Multiple terms can be provided
-#'        separated by commas or spaces.
+#' @param search Optional search term to filter concepts. Multiple terms can be
+#'        provided separated by commas or spaces.
+
 #' @return A tibble with concept details.
 #'
 #' @examples
@@ -18,12 +19,10 @@
 bid_concepts <- function(search = NULL) {
   concepts <- get_concepts_data()
 
-  # If no search term provided, return all concepts
   if (is.null(search) || search == "" || nchar(trimws(search)) == 0) {
     return(concepts)
   }
 
-  # Parse search terms (support both comma and space separation)
   search_terms <- unlist(strsplit(search, "[,\\s]+"))
   search_terms <- search_terms[search_terms != "" & !is.na(search_terms)]
 
@@ -31,7 +30,6 @@ bid_concepts <- function(search = NULL) {
     return(concepts)
   }
 
-  # Search with relevance scoring
   matches <- matrix(FALSE, nrow = nrow(concepts), ncol = length(search_terms))
 
   for (i in seq_along(search_terms)) {
@@ -53,11 +51,9 @@ bid_concepts <- function(search = NULL) {
     }
   }
 
-  # Filter results - any row that matches at least one term
   matches_any <- rowSums(matches) > 0
   result <- concepts[matches_any, ]
 
-  # Sort by relevance (number of matching terms) - maintaining BID framework UX principles
   if (nrow(result) > 0) {
     relevance <- rowSums(matches[matches_any, , drop = FALSE])
     result <- result[order(relevance, decreasing = TRUE), ]
@@ -94,7 +90,8 @@ bid_concepts <- function(search = NULL) {
 #'
 #' @param concept_name A character string specifying the name of the concept.
 #'
-#' @return A tibble with details for the specified concept, or empty tibble if not found.
+#' @return A tibble with details for the specified concept, or empty tibble if
+#'         not found.
 #'
 #' @examples
 #' bid_concept("Cognitive Load Theory")
@@ -116,7 +113,7 @@ bid_concept <- function(concept_name) {
   all_concepts <- get_concepts_data()
   concept_name_clean <- trimws(concept_name)
 
-  # STAGE 1: Exact match (highest priority)
+  # stage 1: exact match
   exact_match <- all_concepts[
     tolower(all_concepts$concept) == tolower(concept_name_clean),
   ]
@@ -124,7 +121,7 @@ bid_concept <- function(concept_name) {
     return(add_recommendations_and_display(exact_match[1, ], all_concepts))
   }
 
-  # STAGE 2: Partial match in concept names
+  # stage 2: partial match
   partial_match <- all_concepts[
     grepl(
       tolower(concept_name_clean),
@@ -136,9 +133,9 @@ bid_concept <- function(concept_name) {
     return(add_recommendations_and_display(partial_match[1, ], all_concepts))
   }
 
-  # STAGE 3: Multi-word intelligent matching (BID framework: cognitive load principles)
+  # stage 3: multi-word intelligent matching
   words <- unlist(strsplit(tolower(concept_name_clean), "\\s+"))
-  significant_words <- words[nchar(words) >= 3] # Filter short words
+  significant_words <- words[nchar(words) >= 3]
 
   if (length(significant_words) > 1) {
     word_matches <- rep(TRUE, nrow(all_concepts))
@@ -156,7 +153,7 @@ bid_concept <- function(concept_name) {
     }
   }
 
-  # STAGE 4: Search in related concepts (BID framework: conceptual relationships)
+  # stage 4: search related concepts
   related_matches <- rep(FALSE, nrow(all_concepts))
   for (i in seq_len(nrow(all_concepts))) {
     related <- all_concepts$related_concepts[i]
@@ -172,7 +169,7 @@ bid_concept <- function(concept_name) {
     return(add_recommendations_and_display(related_result[1, ], all_concepts))
   }
 
-  # STAGE 5: No matches found - comprehensive suggestion system
+  # stage 5: no matches - autosuggestions
   suggest_similar_concepts_advanced(concept_name_clean, all_concepts)
   return(create_empty_concept_result(
     "Concept not found - see suggestions above"
@@ -222,7 +219,7 @@ get_concepts_data <- function() {
       "Screen Reader Compatibility",
       "User Personas",
       "User-Centric Design",
-      "Nudge Theory" # Added 41st concept to meet test requirement
+      "Nudge Theory"
     ),
     description = c(
       "Theory that suggests minimizing extraneous load to improve user understanding.",
@@ -565,7 +562,7 @@ add_recommendations_and_display <- function(concept_result, all_concepts) {
     "BID Framework {concept_result$category[1]}: {
     switch(concept_result$category[1],
       'Stage 1' = 'Notice & Identify Problems',
-      'Stage 2' = 'Interpret & Process Information', 
+      'Stage 2' = 'Interpret & Process Information',
       'Stage 3' = 'Structure & Organize Elements',
       'Stage 4' = 'Anticipate & Mitigate Biases',
       'Stage 5' = 'Validate & Enable Collaboration',
@@ -599,7 +596,7 @@ suggest_similar_concepts_advanced <- function(concept_name, all_concepts) {
   )
   concept_name_lower <- tolower(concept_name)
 
-  # Stage 1: Look for partial matches in concept names
+  # stage 1: partial matches in concept names
   partial_suggestions <- character(0)
   for (i in seq_len(nrow(all_concepts))) {
     concept_lower <- tolower(all_concepts$concept[i])
@@ -611,7 +608,7 @@ suggest_similar_concepts_advanced <- function(concept_name, all_concepts) {
     }
   }
 
-  # Stage 2: Look for thematic matches using BID framework synonyms
+  # stage 2: thematic matches using synonyms
   bid_synonyms <- list(
     "cognitive" = c(
       "mental",
@@ -660,10 +657,10 @@ suggest_similar_concepts_advanced <- function(concept_name, all_concepts) {
     }
   }
 
-  # Stage 3: Combine and deduplicate suggestions
+  # stage 3: combine and deduplicate
   all_suggestions <- unique(c(partial_suggestions, thematic_suggestions))
 
-  # Stage 4: Present suggestions organized by BID framework stages
+  # stage 4: present suggestions organized by stages
   if (length(all_suggestions) > 0) {
     cli::cli_h2("Did you mean one of these concepts?")
     suggestion_data <- all_concepts[all_concepts$concept %in% all_suggestions, ]
@@ -687,8 +684,7 @@ suggest_similar_concepts_advanced <- function(concept_name, all_concepts) {
         category <- suggestion_data$category[i]
         description <- suggestion_data$description[i]
 
-        stage_indicator <- switch(
-          category,
+        stage_indicator <- switch(category,
           "Stage 1" = cli::col_blue("NOTICE"),
           "Stage 2" = cli::col_green("INTERPRET"),
           "Stage 3" = cli::col_yellow("STRUCTURE"),
@@ -709,43 +705,46 @@ suggest_similar_concepts_advanced <- function(concept_name, all_concepts) {
       )
     }
   } else {
-    # Stage 5: No suggestions found - provide general guidance
+    # stage 5: no suggestions - provide general guidance
     cli::cli_h2("General guidance for the BID framework:")
     cli::cli_li("Use {.code bid_concepts()} to see all available concepts")
     cli::cli_li("Search by category: {.code bid_concepts(\"Stage 1\")}")
     cli::cli_li("Search by topic: {.code bid_concepts(\"cognitive\")}")
-    cli::cli_li("Search with multiple terms: {.code bid_concepts(\"visual hierarchy\")}")
+    cli::cli_li(
+      "Search with multiple terms: {.code bid_concepts(\"visual hierarchy\")}"
+    )
   }
 
   invisible(NULL)
 }
 
 suggest_alternatives <- function(search_terms, concepts) {
-  # Find the closest matches using multiple strategies
   partial_matches <- character(0)
-  
+
   for (term in search_terms) {
-    # Look for partial matches in concept names
+    # partial matches in concept names
     name_matches <- concepts$concept[
       grepl(term, tolower(concepts$concept), fixed = TRUE)
     ]
-    
-    # Look for matches in descriptions
+
+    # matches in descriptions
     desc_matches <- concepts$concept[
       grepl(term, tolower(concepts$description), fixed = TRUE)
     ]
-    
+
     partial_matches <- c(partial_matches, name_matches, desc_matches)
   }
-  
+
   partial_matches <- unique(partial_matches)
-  
+
   if (length(partial_matches) > 0) {
     cli::cli_alert_info("Similar concepts you might be looking for:")
     for (match in head(partial_matches, 3)) {
       cli::cli_li("{.field {match}}")
     }
   } else {
-    cli::cli_alert_info("Try searching for broader terms like 'cognitive', 'visual', 'bias', or 'accessibility'")
+    cli::cli_alert_info(
+      "Try searching for broader terms like 'cognitive', 'visual', 'bias', or 'accessibility'"
+    )
   }
 }

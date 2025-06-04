@@ -58,7 +58,7 @@ test_that("bid_anticipate fails with missing parameters", {
     result <- bid_anticipate(previous_stage = structure_result)
   })
   expect_s3_class(result, "tbl_df")
-  
+
   # This SHOULD throw an error since previous_stage is required
   expect_error(bid_anticipate(bias_mitigations = list(anchoring = "Test")), "must be provided")
 })

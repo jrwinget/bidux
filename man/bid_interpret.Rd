@@ -12,17 +12,20 @@ bid_interpret(
 )
 }
 \arguments{
-\item{previous_stage}{A tibble or list output from an earlier BID stage function.}
+\item{previous_stage}{A tibble or list output from an earlier BID stage
+function.}
 
 \item{central_question}{A character string representing the main question to
-be answered. If NULL, will be suggested based on previous stage information.}
+be answered. If NULL, will be suggested based on previous stage
+information.}
 
 \item{data_story}{A list containing elements such as \code{hook},
 \code{context}, \code{tension}, \code{resolution}, and optionally
 \code{audience}, \code{metrics}, and \code{visual_approach}. If NULL,
 elements will be suggested based on previous stage.}
 
-\item{user_personas}{Optional list of user personas to consider in the design.}
+\item{user_personas}{Optional list of user personas to consider in the
+design.}
 }
 \value{
 A tibble containing the documented information for the "Interpret"

@@ -5,14 +5,17 @@
 #' central question and the data storytelling narrative. It represents stage 2
 #' in the BID framework.
 #'
-#' @param previous_stage A tibble or list output from an earlier BID stage function.
+#' @param previous_stage A tibble or list output from an earlier BID stage
+#'        function.
 #' @param central_question A character string representing the main question to
-#'        be answered. If NULL, will be suggested based on previous stage information.
+#'        be answered. If NULL, will be suggested based on previous stage
+#'        information.
 #' @param data_story A list containing elements such as \code{hook},
 #'        \code{context}, \code{tension}, \code{resolution}, and optionally
 #'        \code{audience}, \code{metrics}, and \code{visual_approach}. If NULL,
 #'        elements will be suggested based on previous stage.
-#' @param user_personas Optional list of user personas to consider in the design.
+#' @param user_personas Optional list of user personas to consider in the
+#'        design.
 #'
 #' @return A tibble containing the documented information for the "Interpret"
 #'         stage.
@@ -121,8 +124,9 @@ bid_interpret <- function(
             "How can we improve the speed and efficiency of user interactions?"
           )
         } else if (grepl("overwhelm|too many|excess", problem_lower)) {
-          central_question <- paste0(
-            "How can we reduce cognitive load and help users focus on what matters?"
+          central_question <- paste(
+            "How can we reduce cognitive load and",
+            "help users focus on what matters?"
           )
         } else {
           central_question <- paste0(
@@ -199,13 +203,17 @@ bid_interpret <- function(
 
       if (!is.na(problem)) {
         # hook
-        data_story$hook <- paste0("Users are experiencing problems with ", problem)
+        data_story$hook <- paste0(
+          "Users are experiencing problems with ", problem
+        )
 
         # context
         if (!is.na(evidence)) {
           data_story$context <- paste0("According to our evidence: ", evidence)
         } else {
-          data_story$context <- "Our current interface may be contributing to this issue."
+          data_story$context <- "
+            Our current interface may be contributing to this issue.
+          "
         }
 
         # tension
@@ -217,7 +225,11 @@ bid_interpret <- function(
         # resolution
         data_story$resolution <- paste0(
           "We need to redesign the interface",
-          if (!is.na(theory)) paste0(" using principles from ", theory) else "",
+          if (!is.na(theory)) {
+            paste0(" using principles from ", theory)
+          } else {
+            ""
+          },
           " to address this problem."
         )
 
@@ -231,31 +243,50 @@ bid_interpret <- function(
           theory_lower <- tolower(theory)
 
           if (grepl("cognitive load", theory_lower)) {
-            data_story$visual_approach <- "Simplified visualizations with reduced clutter"
+            data_story$visual_approach <- "
+              Simplified visualizations with reduced clutter
+            "
           } else if (grepl("hick", theory_lower)) {
-            data_story$visual_approach <- "Clear hierarchy of choices with progressive disclosure"
+            data_story$visual_approach <- "
+              Clear hierarchy of choices with progressive disclosure
+            "
           } else if (grepl("visual hierarch", theory_lower)) {
-            data_story$visual_approach <- "Strong visual hierarchy using size, color, and positioning"
+            data_story$visual_approach <- "
+              Strong visual hierarchy using size, color, and positioning
+            "
           } else {
-            data_story$visual_approach <- "Clean, focused visualizations with clear purpose"
+            data_story$visual_approach <- "
+              Clean, focused visualizations with clear purpose
+            "
           }
         }
       } else {
         data_story <- list(
           hook = "Dashboard users may not be getting maximum value",
-          context = "Current interface could be improved for better user experience",
-          tension = "Users may be missing important insights or spending too much time",
+          context = "
+            Current interface could be improved for better user experience
+          ",
+          tension = "
+            Users may be missing important insights or spending too much time
+          ",
           resolution = "Redesign interface using behavioral science principles"
         )
       }
 
-      cli::cli_alert_info("Suggested data story elements based on previous stage information")
-    } else if (previous_stage$stage[1] == "Structure" || previous_stage$stage[1] == "Anticipate") {
+      cli::cli_alert_info(
+        "Suggested data story elements based on previous stage information"
+      )
+    } else if (
+      previous_stage$stage[1] == "Structure" ||
+        previous_stage$stage[1] == "Anticipate"
+    ) {
       data_story <- list(
         hook = "We need to revisit our understanding of user needs",
         context = "The current design may need refinement",
         tension = "User needs may have evolved or been incompletely understood",
-        resolution = "Gather additional user feedback and refine our interpretation"
+        resolution = "
+          Gather additional user feedback and refine our interpretation
+        "
       )
 
       cli::cli_alert_info("Suggested generic data story for iteration cycle")
@@ -264,7 +295,7 @@ bid_interpret <- function(
 
   required_story_elements <- c("hook", "context", "tension", "resolution")
   provided_elements <- required_story_elements %in% names(data_story)
-  story_completeness <- sum(provided_elements)/length(required_story_elements)
+  story_completeness <- sum(provided_elements) / length(required_story_elements)
 
   if (story_completeness < 0.5) {
     missing_elements <- required_story_elements[!provided_elements]
@@ -285,7 +316,10 @@ bid_interpret <- function(
     story_suggestion <- "Your data story has all key elements. Focus on making each component compelling and relevant."
   }
 
-  question_suggestion <- if (is.na(central_question) || is.null(central_question)) {
+  question_suggestion <- if (
+    is.na(central_question) ||
+      is.null(central_question)
+  ) {
     "Please provide a central question to guide your dashboard design."
   } else if (stringr::str_length(central_question) > 100) {
     "Consider simplifying your central question for more focus."
@@ -299,7 +333,11 @@ bid_interpret <- function(
     audience <- NULL
 
     # try to get audience from data_story
-    if (!is.null(data_story) && "audience" %in% names(data_story) && !is.na(data_story$audience)) {
+    if (
+      !is.null(data_story) &&
+        "audience" %in% names(data_story) &&
+        !is.na(data_story$audience)
+    ) {
       audience <- data_story$audience
     }
     # try to get audience from previous_stage
@@ -315,9 +353,19 @@ bid_interpret <- function(
       audience_lower <- tolower(audience)
 
       # nuanced user type
-      user_type <- if (grepl("analyst|data scientist|technical|developer|engineer", audience_lower)) {
+      user_type <- if (
+        grepl(
+          "analyst|data scientist|technical|developer|engineer",
+          audience_lower
+        )
+      ) {
         "Data Analyst"
-      } else if (grepl("executive|manager|director|leadership|ceo|cfo|cto|vp", audience_lower)) {
+      } else if (
+        grepl(
+          "executive|manager|director|leadership|ceo|cfo|cto|vp",
+          audience_lower
+        )
+      ) {
         "Executive"
       } else if (grepl("market|advertis|campaign|brand", audience_lower)) {
         "Marketing Professional"
@@ -330,7 +378,12 @@ bid_interpret <- function(
       }
 
       # technical level
-      technical_level <- if (grepl("analyst|data scientist|technical|developer|engineer", audience_lower)) {
+      technical_level <- if (
+        grepl(
+          "analyst|data scientist|technical|developer|engineer",
+          audience_lower
+        )
+      ) {
         "Advanced"
       } else if (grepl("executive|leadership|ceo|cfo", audience_lower)) {
         "Basic"
@@ -374,11 +427,20 @@ bid_interpret <- function(
         )
       )
 
-      cli::cli_alert_info(paste0("Created user persona '", user_personas[[1]]$name, "' based on audience information"))
+      cli::cli_alert_info(
+        paste0(
+          "Created user persona '",
+          user_personas[[1]]$name,
+          "' based on audience information"
+        )
+      )
     }
   }
 
-  persona_suggestion <- if (!is.null(user_personas) && length(user_personas) > 0) {
+  persona_suggestion <- if (
+    !is.null(user_personas) &&
+      length(user_personas) > 0
+  ) {
     paste0(
       "You've defined ", length(user_personas), " persona(s). ",
       "Ensure your design addresses the specific needs of each."
@@ -387,7 +449,11 @@ bid_interpret <- function(
     "Consider defining specific user personas to better target your design."
   }
 
-  suggestions <- paste(story_suggestion, question_suggestion, persona_suggestion, sep = " ")
+  suggestions <- paste(
+    story_suggestion,
+    question_suggestion,
+    persona_suggestion
+  )
 
   audience <- if (!is.null(data_story) && "audience" %in% names(data_story)) {
     data_story$audience %||% NA_character_
@@ -395,7 +461,11 @@ bid_interpret <- function(
     NA_character_
   }
 
-  metrics <- if (!is.null(data_story) && "metrics" %in% names(data_story) && !is.null(data_story$metrics)) {
+  metrics <- if (
+    !is.null(data_story) &&
+      "metrics" %in% names(data_story) &&
+      !is.null(data_story$metrics)
+  ) {
     if (is.character(data_story$metrics)) {
       paste(data_story$metrics, collapse = ", ")
     } else if (is.numeric(data_story$metrics)) {
@@ -409,13 +479,19 @@ bid_interpret <- function(
     NA_character_
   }
 
-  visual_approach <- if (!is.null(data_story) && "visual_approach" %in% names(data_story)) {
+  visual_approach <- if (
+    !is.null(data_story) &&
+      "visual_approach" %in% names(data_story)
+  ) {
     data_story$visual_approach %||% NA_character_
   } else {
     NA_character_
   }
 
-  personas_formatted <- if (!is.null(user_personas) && length(user_personas) > 0) {
+  personas_formatted <- if (
+    !is.null(user_personas) &&
+      length(user_personas) > 0
+  ) {
     tryCatch(
       {
         jsonlite::toJSON(user_personas)

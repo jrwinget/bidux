@@ -348,12 +348,12 @@ extract_previous_stage_info <- function(previous_stage) {
     info$layout <- safe_column_access(previous_stage, "previous_layout", NA_character_)
     info$concepts <- safe_column_access(previous_stage, "previous_concepts", NA_character_)
     info$accessibility <- safe_column_access(previous_stage, "previous_accessibility", NA_character_)
-    
+
     # Get problem and theory info with multiple fallback options
     info$central_question <- safe_column_access(previous_stage, "previous_central_question", NA_character_)
     info$problem <- safe_column_access(previous_stage, "previous_problem", NA_character_)
     info$theory <- safe_column_access(previous_stage, "previous_theory", NA_character_)
-    
+
     # Try extracting from previous stages if not available
     if (is.na(info$problem)) {
       info$problem <- safe_column_access(previous_stage, "problem", NA_character_)
@@ -364,7 +364,6 @@ extract_previous_stage_info <- function(previous_stage) {
     if (is.na(info$central_question)) {
       info$central_question <- safe_column_access(previous_stage, "central_question", NA_character_)
     }
-    
   } else if (stage_name == "Structure") {
     info$layout <- safe_column_access(previous_stage, "layout", NA_character_)
     info$concepts <- safe_column_access(previous_stage, "concepts", NA_character_)
@@ -374,7 +373,7 @@ extract_previous_stage_info <- function(previous_stage) {
     info$central_question <- safe_column_access(previous_stage, "previous_central_question", NA_character_)
     info$problem <- safe_column_access(previous_stage, "previous_problem", NA_character_)
     info$theory <- safe_column_access(previous_stage, "previous_theory", NA_character_)
-    
+
     # Try fallback fields if not available
     if (is.na(info$central_question)) {
       info$central_question <- safe_column_access(previous_stage, "central_question", NA_character_)
@@ -385,14 +384,13 @@ extract_previous_stage_info <- function(previous_stage) {
     if (is.na(info$theory)) {
       info$theory <- safe_column_access(previous_stage, "theory", NA_character_)
     }
-    
   } else if (stage_name == "Interpret") {
     info$central_question <- safe_column_access(previous_stage, "central_question", NA_character_)
 
-    # Get information from previous stages  
+    # Get information from previous stages
     info$problem <- safe_column_access(previous_stage, "previous_problem", NA_character_)
     info$theory <- safe_column_access(previous_stage, "previous_theory", NA_character_)
-    
+
     # Try fallback fields if not available
     if (is.na(info$problem)) {
       info$problem <- safe_column_access(previous_stage, "problem", NA_character_)

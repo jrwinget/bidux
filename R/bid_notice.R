@@ -7,10 +7,13 @@
 #' @param problem A character string describing the observed user problem.
 #' @param theory A character string describing the behavioral theory that might
 #'        explain the problem.
-#' @param evidence A character string describing evidence supporting the problem.
-#' @param target_audience Optional character string describing the target audience.
+#' @param evidence A character string describing evidence supporting the
+#'        problem.
+#' @param target_audience Optional character string describing the target
+#'        audience.
 #'
-#' @return A tibble containing the documented information for the "Notice" stage.
+#' @return A tibble containing the documented information for the "Notice"
+#'         stage.
 #'
 #' @examples
 #' bid_notice(
@@ -21,12 +24,10 @@
 #'
 #' @export
 bid_notice <- function(
-  problem,
-  theory = NULL,
-  evidence = NULL,
-  target_audience = NULL
-) {
-  # Validate required parameters - handle empty strings by treating them as warnings, not errors
+    problem,
+    theory = NULL,
+    evidence = NULL,
+    target_audience = NULL) {
   if (missing(problem) || is.null(problem)) {
     stop("Required parameter 'problem' must be provided", call. = FALSE)
   }
@@ -35,7 +36,6 @@ bid_notice <- function(
     stop("Required parameter 'evidence' must be provided", call. = FALSE)
   }
 
-  # Validate parameter types BEFORE checking for empty strings
   if (!is.character(problem)) {
     stop("Problem must be a character string", call. = FALSE)
   }
@@ -48,25 +48,24 @@ bid_notice <- function(
     stop("Theory must be a character string", call. = FALSE)
   }
 
-  # Handle target_audience validation - single validation block
   if (!is.null(target_audience)) {
-    # Special case: handle logical NA (when user passes just NA)
-    if (is.logical(target_audience) && length(target_audience) == 1 && is.na(target_audience)) {
+    if (
+      is.logical(target_audience) &&
+        length(target_audience) == 1 &&
+        is.na(target_audience)
+    ) {
       warning("target_audience is NA", call. = FALSE)
     } else if (is.character(target_audience)) {
-      # For character strings, check for NA or empty
       if (is.na(target_audience)) {
         warning("target_audience is NA", call. = FALSE)
       } else if (nchar(trimws(target_audience)) == 0) {
         warning("target_audience is empty", call. = FALSE)
       }
     } else {
-      # For non-character types (except the logical NA case above), give error
       stop("Target audience must be a character string", call. = FALSE)
     }
   }
 
-  # Check for empty strings and warn appropriately (after type validation)
   if (is.character(problem) && nchar(trimws(problem)) == 0) {
     warning("Problem description is very short", call. = FALSE)
   } else if (nchar(trimws(problem)) < 10) {
@@ -119,13 +118,9 @@ bid_notice <- function(
   return(result)
 }
 
-# Helper functions
 suggest_theory_from_problem <- function(problem, evidence = NULL) {
-  # Combine problem and evidence for analysis
   combined_text <- tolower(paste(problem, evidence %||% "", sep = " "))
 
-  # More specific pattern matching with priority order
-  # Check for "too many options" patterns first (most specific)
   if (
     grepl(
       "too many.*option|overwhelm.*too many|dropdown.*option|too many.*choice|many.*choice|choice.*option|options.*dropdown|too many choices|dropdown.*menu",
@@ -161,11 +156,10 @@ suggest_theory_from_problem <- function(problem, evidence = NULL) {
 }
 
 generate_notice_suggestions <- function(
-  problem,
-  theory,
-  evidence,
-  target_audience
-) {
+    problem,
+    theory,
+    evidence,
+    target_audience) {
   suggestions <- character(0)
 
   if (
@@ -193,40 +187,11 @@ generate_notice_suggestions <- function(
   }
 
   if (length(suggestions) == 0) {
-    suggestions <- "Problem clearly defined. Move to Interpret stage to develop central question."
+    suggestions <- paste(
+      "Problem clearly defined.",
+      "Move to Interpret stage to develop central question."
+    )
   }
 
   return(paste(suggestions, collapse = " "))
-}
-
-# Utility function for safe column access
-safe_column_access <- function(
-  data,
-  column_name,
-  default_value = NA_character_
-) {
-  if (column_name %in% names(data) && !is.null(data[[column_name]])) {
-    value <- data[[column_name]][1]
-    if (is.na(value) || is.null(value)) {
-      return(default_value)
-    }
-    return(value)
-  }
-  return(default_value)
-}
-
-# Utility function for truncating text in messages
-truncate_text <- function(text, max_length) {
-  if (is.null(text) || is.na(text)) {
-    return("Not specified")
-  }
-  if (nchar(text) > max_length) {
-    return(paste0(substring(text, 1, max_length), "..."))
-  }
-  return(text)
-}
-
-# Infix operator for null coalescing
-`%||%` <- function(x, y) {
-  if (is.null(x)) y else x
 }

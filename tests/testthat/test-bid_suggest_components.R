@@ -152,9 +152,12 @@ test_that("bid_suggest_components handles edge cases", {
     evidence = "Test evidence"
   )
 
-  expect_warning({
-    empty_suggestions <- bid_suggest_components(notice_result, package = "DT")
-  }, NA) # Should not warn, but may return empty results
+  expect_warning(
+    {
+      empty_suggestions <- bid_suggest_components(notice_result, package = "DT")
+    },
+    NA
+  ) # Should not warn, but may return empty results
 
   expect_s3_class(empty_suggestions, "tbl_df")
 })
@@ -233,7 +236,7 @@ test_that("bid_suggest_components handles layout-specific scoring", {
   # Should include layout-relevant components with higher scores
   sidebar_components <- layout_suggestions[
     grepl("sidebar|nav|panel", layout_suggestions$description, ignore.case = TRUE) |
-    grepl("sidebar|nav|panel", layout_suggestions$component, ignore.case = TRUE),
+      grepl("sidebar|nav|panel", layout_suggestions$component, ignore.case = TRUE),
   ]
 
   if (nrow(sidebar_components) > 0) {
@@ -251,8 +254,10 @@ test_that("bid_suggest_components component database has required structure", {
     suggestions <- bid_suggest_components(notice_result)
   })
 
-  required_fields <- c("package", "component", "description", "bid_stage_relevance", 
-                      "cognitive_concepts", "use_cases", "relevance")
+  required_fields <- c(
+    "package", "component", "description", "bid_stage_relevance",
+    "cognitive_concepts", "use_cases", "relevance"
+  )
 
   expect_true(all(required_fields %in% names(suggestions)))
 
@@ -281,7 +286,7 @@ test_that("bid_suggest_components handles audience-based context", {
   # Should prioritize executive-friendly components
   exec_components <- exec_suggestions[
     grepl("summary|value|card|executive", exec_suggestions$description, ignore.case = TRUE) |
-    grepl("summary|value|card", exec_suggestions$use_cases, ignore.case = TRUE),
+      grepl("summary|value|card", exec_suggestions$use_cases, ignore.case = TRUE),
   ]
 
   if (nrow(exec_components) > 0) {

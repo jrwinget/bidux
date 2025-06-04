@@ -5,10 +5,13 @@
 #' mitigation strategies related to anchoring, framing, confirmation bias, etc.
 #' It also supports adding interaction hints and visual feedback elements.
 #'
-#' @param previous_stage A tibble or list output from an earlier BID stage function.
-#' @param bias_mitigations A named list of bias mitigation strategies. If NULL, the
-#'        function will suggest bias mitigations based on information from previous stages.
-#' @param interaction_principles A named list of interaction principles (optional).
+#' @param previous_stage A tibble or list output from an earlier BID stage
+#'        function.
+#' @param bias_mitigations A named list of bias mitigation strategies. If NULL,
+#'        the function will suggest bias mitigations based on information from
+#'        previous stages.
+#' @param interaction_principles A named list of interaction principles
+#'        (optional).
 #'
 #' @return A tibble containing the documented information for the "Anticipate"
 #'         stage.
@@ -56,21 +59,19 @@
 #'   interaction_principles = list(
 #'     hover_effects = "Show additional information on hover",
 #'     selection_feedback = "Highlight active filters with color change",
-#'     progressive_actions = "Reveal advanced options only when basic ones are used"
+#'     progressive_actions = "Show advanced options only if basic ones are used"
 #'   )
 #' )
 #'
 #' @export
 bid_anticipate <- function(
-  previous_stage,
-  bias_mitigations = NULL,
-  interaction_principles = NULL
-) {
-  # Validate required parameters
+    previous_stage,
+    bias_mitigations = NULL,
+    interaction_principles = NULL) {
   if (missing(previous_stage) || is.null(previous_stage)) {
     stop("Required parameter 'previous_stage' must be provided", call. = FALSE)
   }
-  
+
   validate_previous_stage(previous_stage, "Anticipate")
 
   if (!is.null(bias_mitigations)) {
@@ -83,7 +84,6 @@ bid_anticipate <- function(
       )
     }
 
-    # Check for list structure issues
     if (
       length(bias_mitigations) == 0 ||
         is.null(names(bias_mitigations)) ||
@@ -97,11 +97,10 @@ bid_anticipate <- function(
       )
       bias_mitigations <- NULL
     } else {
-      # Check for empty or NA values within the list
       empty_values <- sapply(bias_mitigations, function(x) {
         is.null(x) || is.na(x) || (is.character(x) && nchar(trimws(x)) == 0)
       })
-      
+
       if (any(empty_values)) {
         cli::cli_warn(
           c(
@@ -111,7 +110,6 @@ bid_anticipate <- function(
         )
         bias_mitigations <- NULL
       } else {
-        # Convert non-character values to character
         for (i in seq_along(bias_mitigations)) {
           if (!is.character(bias_mitigations[[i]])) {
             bias_mitigations[[i]] <- as.character(bias_mitigations[[i]])
@@ -168,12 +166,17 @@ bid_anticipate <- function(
     if (!layout %in% valid_layouts) {
       cli::cli_warn(
         c(
-          "!" = "Layout '{layout}' is not recognized as a standard layout type.",
+          "!" = "
+            Layout '{layout}' is not recognized as a standard layout type.
+          ",
           "i" = paste0(
             "Recommended layouts: ",
             paste(valid_layouts, collapse = ", ")
           ),
-          "i" = "Some automatic suggestions may not be optimized for your custom layout."
+          "i" = paste(
+            "Some automatic suggestions may not be optimized for",
+            "your custom layout."
+          )
         )
       )
     }
@@ -243,19 +246,27 @@ bid_anticipate <- function(
 
       layout_bias_map <- list(
         "dual_process" = c(
-          "framing" = "Toggle between high-level insights and detailed analysis views"
+          "framing" = "
+            Toggle between high-level insights and detailed analysis views
+          "
         ),
         "grid" = c(
           "anchoring" = "Provide multiple reference points across grid cells"
         ),
         "card" = c(
-          "beautiful-is-good stereotype" = "Ensure card aesthetics don't overshadow content quality"
+          "beautiful-is-good stereotype" = "
+            Ensure card aesthetics don't overshadow content quality
+          "
         ),
         "tabs" = c(
-          "availability bias" = "Make important information available in the default tab"
+          "availability bias" = "
+            Make important information available in the default tab
+          "
         ),
         "breathable" = c(
-          "cognitive load" = "Use whitespace to reduce cognitive load and improve focus"
+          "cognitive load" = "
+            Use whitespace to reduce cognitive load and improve focus
+          "
         )
       )
 
@@ -315,8 +326,11 @@ bid_anticipate <- function(
         for (bias_name in names(bias_keywords)) {
           keywords <- bias_keywords[[bias_name]]
           if (any(sapply(keywords, function(k) grepl(k, combined_text)))) {
-            tension_field <- if (!is.na(story_elements$tension)) "tension" else
+            tension_field <- if (!is.na(story_elements$tension)) {
+              "tension"
+            } else {
               "data story"
+            }
             suggested_biases[[bias_name]] <- paste(
               "Address",
               bias_name,
@@ -343,9 +357,15 @@ bid_anticipate <- function(
 
     if (length(suggested_biases) == 0) {
       suggested_biases <- list(
-        anchoring = "Provide multiple reference points to reduce anchoring effect",
-        framing = "Toggle between positive and negative framing of the same data",
-        confirmation_bias = "Include evidence that challenges common assumptions"
+        anchoring = "
+          Provide multiple reference points to reduce anchoring effect
+        ",
+        framing = "
+          Toggle between positive and negative framing of the same data
+        ",
+        confirmation_bias = "
+          Include evidence that challenges common assumptions
+        "
       )
     }
 
@@ -366,12 +386,20 @@ bid_anticipate <- function(
     if (previous_stage$stage[1] == "Structure") {
       layout_interaction_map <- list(
         "dual_process" = c(
-          "progressive_disclosure" = "Reveal detailed analysis only when users want to explore further",
-          "hover_effects" = "Show additional context on hover for quick insights"
+          "progressive_disclosure" = "
+            Reveal detailed analysis only when users want to explore further
+          ",
+          "hover_effects" = "
+            Show additional context on hover for quick insights
+          "
         ),
         "grid" = c(
-          "selection_feedback" = "Highlight selected grid cells with visual feedback",
-          "cross_filtering" = "Allow filtering one grid cell to affect related cells"
+          "selection_feedback" = "
+            Highlight selected grid cells with visual feedback
+          ",
+          "cross_filtering" = "
+            Allow filtering one grid cell to affect related cells
+          "
         ),
         "card" = c(
           "card_expansion" = "Allow cards to expand for more details on click",
@@ -382,8 +410,12 @@ bid_anticipate <- function(
           "persistent_elements" = "Keep key controls consistent across tabs"
         ),
         "breathable" = c(
-          "subtle_animations" = "Use subtle animations to guide attention without clutter",
-          "contextual_controls" = "Show controls only when relevant to reduce visual noise"
+          "subtle_animations" = "
+            Use subtle animations to guide attention without clutter
+          ",
+          "contextual_controls" = "
+            Show controls only when relevant to reduce visual noise
+          "
         )
       )
 
@@ -398,18 +430,27 @@ bid_anticipate <- function(
       if (length(concepts) > 0) {
         concept_interaction_map <- list(
           "Visual Hierarchy" = c(
-            "visual_prominence" = "Give interactive elements visual prominence proportional to importance"
+            "visual_prominence" = paste(
+              "Give interactive elements visual prominence proportional",
+              "to importance"
+            )
           ),
           "Progressive Disclosure" = c(
-            "progressive_interaction" = "Reveal more complex options only after basic ones are used"
+            "progressive_interaction" = "
+              Reveal more complex options only after basic ones are used
+            "
           ),
           "Interaction Hints" = c(
             "hover_effects" = "Use hover effects to suggest interactivity",
             "cursor_changes" = "Change cursor to indicate interactive elements"
           ),
           "Visual Feedback" = c(
-            "selection_feedback" = "Provide immediate visual feedback for user actions",
-            "state_indicators" = "Use clear visual indicators for different states"
+            "selection_feedback" = "
+              Provide immediate visual feedback for user actions
+            ",
+            "state_indicators" = "
+              Use clear visual indicators for different states
+            "
           )
         )
 
@@ -541,10 +582,16 @@ bid_anticipate <- function(
     ),
     interaction_principles = interaction_formatted,
     previous_layout = if (!is.na(layout)) layout else NA_character_,
-    previous_concepts = if (length(concepts) > 0)
-      paste(concepts, collapse = ", ") else NA_character_,
-    previous_accessibility = if (!is.na(accessibility))
-      accessibility %||% NA_character_ else NA_character_,
+    previous_concepts = if (length(concepts) > 0) {
+      paste(concepts, collapse = ", ")
+    } else {
+      NA_character_
+    },
+    previous_accessibility = if (!is.na(accessibility)) {
+      accessibility %||% NA_character_
+    } else {
+      NA_character_
+    },
     suggestions = suggestions,
     timestamp = Sys.time()
   )

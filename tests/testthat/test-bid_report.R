@@ -137,19 +137,22 @@ generate_text_report <- function(validate_stage, format, include_diagrams) {
 
   # Next Steps
   if ("next_steps" %in% names(validate_stage) && !is.na(validate_stage$next_steps[1])) {
-    next_steps <- tryCatch({
-      if (is.character(validate_stage$next_steps[1]) && grepl(";", validate_stage$next_steps[1])) {
-        unlist(strsplit(validate_stage$next_steps[1], ";"))
-      } else {
-        validate_stage$next_steps[1]
+    next_steps <- tryCatch(
+      {
+        if (is.character(validate_stage$next_steps[1]) && grepl(";", validate_stage$next_steps[1])) {
+          unlist(strsplit(validate_stage$next_steps[1], ";"))
+        } else {
+          validate_stage$next_steps[1]
+        }
+      },
+      error = function(e) {
+        "Error parsing next steps"
       }
-    }, error = function(e) {
-      "Error parsing next steps"
-    })
+    )
 
     prefix <- if (format == "markdown") "- **Next Steps**:" else "- Next Steps:"
     report <- c(report, prefix)
-    
+
     if (length(next_steps) > 1) {
       for (step in next_steps) {
         step_text <- trimws(step)
@@ -216,35 +219,41 @@ generate_text_report <- function(validate_stage, format, include_diagrams) {
   report <- c(report, ui_header)
 
   # Try to get component suggestions
-  tryCatch({
-    bslib_suggestions <- bid_suggest_components(validate_stage, package = "bslib")
-    if (nrow(bslib_suggestions) > 0) {
-      prefix <- if (format == "markdown") "**bslib Components:**" else "bslib Components:"
-      report <- c(report, prefix)
-      for (i in 1:min(3, nrow(bslib_suggestions))) {
-        report <- c(report, paste0("- ", bslib_suggestions$component[i], ": ", bslib_suggestions$description[i]))
+  tryCatch(
+    {
+      bslib_suggestions <- bid_suggest_components(validate_stage, package = "bslib")
+      if (nrow(bslib_suggestions) > 0) {
+        prefix <- if (format == "markdown") "**bslib Components:**" else "bslib Components:"
+        report <- c(report, prefix)
+        for (i in 1:min(3, nrow(bslib_suggestions))) {
+          report <- c(report, paste0("- ", bslib_suggestions$component[i], ": ", bslib_suggestions$description[i]))
+        }
+        report <- c(report, "")
       }
+    },
+    error = function(e) {
+      report <- c(report, "bslib Components: Error generating suggestions")
       report <- c(report, "")
     }
-  }, error = function(e) {
-    report <- c(report, "bslib Components: Error generating suggestions")
-    report <- c(report, "")
-  })
+  )
 
-  tryCatch({
-    shiny_suggestions <- bid_suggest_components(validate_stage, package = "shiny")
-    if (nrow(shiny_suggestions) > 0) {
-      prefix <- if (format == "markdown") "**Shiny Components:**" else "Shiny Components:"
-      report <- c(report, prefix)
-      for (i in 1:min(3, nrow(shiny_suggestions))) {
-        report <- c(report, paste0("- ", shiny_suggestions$component[i], ": ", shiny_suggestions$description[i]))
+  tryCatch(
+    {
+      shiny_suggestions <- bid_suggest_components(validate_stage, package = "shiny")
+      if (nrow(shiny_suggestions) > 0) {
+        prefix <- if (format == "markdown") "**Shiny Components:**" else "Shiny Components:"
+        report <- c(report, prefix)
+        for (i in 1:min(3, nrow(shiny_suggestions))) {
+          report <- c(report, paste0("- ", shiny_suggestions$component[i], ": ", shiny_suggestions$description[i]))
+        }
+        report <- c(report, "")
       }
+    },
+    error = function(e) {
+      report <- c(report, "Shiny Components: Error generating suggestions")
       report <- c(report, "")
     }
-  }, error = function(e) {
-    report <- c(report, "Shiny Components: Error generating suggestions")
-    report <- c(report, "")
-  })
+  )
 
   # Next Steps
   next_header <- if (format == "markdown") "## Recommended Next Steps" else "Recommended Next Steps"
@@ -292,7 +301,7 @@ generate_html_report_direct <- function(validate_stage, include_diagrams) {
     if (is.null(items) || length(items) == 0) {
       return(paste0("<ul><li>", default_text, "</li></ul>"))
     }
-    
+
     if (is.character(items) && length(items) > 0) {
       # Handle semicolon-separated strings
       if (length(items) == 1 && grepl(";", items)) {
@@ -308,7 +317,7 @@ generate_html_report_direct <- function(validate_stage, include_diagrams) {
     } else {
       return(paste0("<ul><li>", default_text, "</li></ul>"))
     }
-    
+
     return(paste0("<ul>\n    ", list_items, "\n  </ul>"))
   }
 
@@ -443,8 +452,8 @@ generate_html_report_direct <- function(validate_stage, include_diagrams) {
 
   # Build HTML content directly
   html_body <- paste0(
-    '<h1>BID Framework Implementation Report</h1>',
-    '<p>Generated: ', Sys.time(), '</p>'
+    "<h1>BID Framework Implementation Report</h1>",
+    "<p>Generated: ", Sys.time(), "</p>"
   )
 
   # BID Framework Overview with diagram
@@ -463,51 +472,54 @@ generate_html_report_direct <- function(validate_stage, include_diagrams) {
   # Stage 5: Validate
   html_body <- paste0(html_body, '
 <div class="section"><h2>Stage 5: Validate & Empower the User</h2>
-  <p><strong>Summary Panel:</strong> ', safe_extract(validate_stage, "summary_panel"), '</p>
-  <p><strong>Collaboration Features:</strong> ', safe_extract(validate_stage, "collaboration"), '</p>')
+  <p><strong>Summary Panel:</strong> ', safe_extract(validate_stage, "summary_panel"), "</p>
+  <p><strong>Collaboration Features:</strong> ", safe_extract(validate_stage, "collaboration"), "</p>")
 
   # Next Steps
   if ("next_steps" %in% names(validate_stage) && !is.na(validate_stage$next_steps[1])) {
-    next_steps <- tryCatch({
-      steps <- validate_stage$next_steps[1]
-      if (is.character(steps) && grepl(";", steps)) {
-        unlist(strsplit(steps, ";"))
-      } else {
-        steps
+    next_steps <- tryCatch(
+      {
+        steps <- validate_stage$next_steps[1]
+        if (is.character(steps) && grepl(";", steps)) {
+          unlist(strsplit(steps, ";"))
+        } else {
+          steps
+        }
+      },
+      error = function(e) {
+        "Error parsing next steps"
       }
-    }, error = function(e) {
-      "Error parsing next steps"
-    })
-    
-    html_body <- paste0(html_body, '
+    )
+
+    html_body <- paste0(html_body, "
   <h3>Next Steps</h3>
-  ', generate_html_list(next_steps))
+  ", generate_html_list(next_steps))
   } else {
-    html_body <- paste0(html_body, '
-  <p><strong>Next Steps:</strong> Not specified</p>')
+    html_body <- paste0(html_body, "
+  <p><strong>Next Steps:</strong> Not specified</p>")
   }
 
-  html_body <- paste0(html_body, '
-  <p><strong>Suggestions:</strong> ', safe_extract(validate_stage, "suggestions"), '</p>
-</div>')
+  html_body <- paste0(html_body, "
+  <p><strong>Suggestions:</strong> ", safe_extract(validate_stage, "suggestions"), "</p>
+</div>")
 
   # Stage 4: Anticipate
   if ("previous_bias" %in% names(validate_stage)) {
     html_body <- paste0(html_body, '
 <div class="section"><h2>Stage 4: Anticipate User Behavior</h2>
-  <p><strong>Bias Mitigations:</strong> ', safe_extract(validate_stage, "previous_bias"), '</p>
-  <p><strong>Interaction Principles:</strong> ', safe_extract(validate_stage, "previous_interaction"), '</p>
-</div>')
+  <p><strong>Bias Mitigations:</strong> ', safe_extract(validate_stage, "previous_bias"), "</p>
+  <p><strong>Interaction Principles:</strong> ", safe_extract(validate_stage, "previous_interaction"), "</p>
+</div>")
   }
 
   # Stage 3: Structure
   if ("previous_layout" %in% names(validate_stage)) {
     html_body <- paste0(html_body, '
 <div class="section"><h2>Stage 3: Structure the Dashboard</h2>
-  <p><strong>Layout:</strong> ', safe_extract(validate_stage, "previous_layout"), '</p>
-  <p><strong>Applied Concepts:</strong> ', safe_extract(validate_stage, "previous_concepts"), '</p>
-  <p><strong>Accessibility Considerations:</strong> ', safe_extract(validate_stage, "previous_accessibility"), '</p>
-</div>')
+  <p><strong>Layout:</strong> ', safe_extract(validate_stage, "previous_layout"), "</p>
+  <p><strong>Applied Concepts:</strong> ", safe_extract(validate_stage, "previous_concepts"), "</p>
+  <p><strong>Accessibility Considerations:</strong> ", safe_extract(validate_stage, "previous_accessibility"), "</p>
+</div>")
   }
 
   # Implementation Recommendations
@@ -518,62 +530,72 @@ generate_html_report_direct <- function(validate_stage, include_diagrams) {
 <h3>Recommended UI Components</h3>')
 
   # bslib Components
-  tryCatch({
-    bslib_suggestions <- bid_suggest_components(validate_stage, package = "bslib")
-    if (nrow(bslib_suggestions) > 0) {
-      html_body <- paste0(html_body, '
-<p><strong>bslib Components:</strong></p>')
-      bslib_items <- paste0(bslib_suggestions$component[1:min(3, nrow(bslib_suggestions))], 
-                           ": ", 
-                           bslib_suggestions$description[1:min(3, nrow(bslib_suggestions))])
-      html_body <- paste0(html_body, generate_html_list(bslib_items))
-    }
-  }, error = function(e) {
-    html_body <- paste0(html_body, '
+  tryCatch(
+    {
+      bslib_suggestions <- bid_suggest_components(validate_stage, package = "bslib")
+      if (nrow(bslib_suggestions) > 0) {
+        html_body <- paste0(html_body, "
+<p><strong>bslib Components:</strong></p>")
+        bslib_items <- paste0(
+          bslib_suggestions$component[1:min(3, nrow(bslib_suggestions))],
+          ": ",
+          bslib_suggestions$description[1:min(3, nrow(bslib_suggestions))]
+        )
+        html_body <- paste0(html_body, generate_html_list(bslib_items))
+      }
+    },
+    error = function(e) {
+      html_body <- paste0(html_body, "
 <p><strong>bslib Components:</strong></p>
-<ul><li>Error generating suggestions</li></ul>')
-  })
+<ul><li>Error generating suggestions</li></ul>")
+    }
+  )
 
   # Shiny Components
-  tryCatch({
-    shiny_suggestions <- bid_suggest_components(validate_stage, package = "shiny")
-    if (nrow(shiny_suggestions) > 0) {
-      html_body <- paste0(html_body, '
-<p><strong>Shiny Components:</strong></p>')
-      shiny_items <- paste0(shiny_suggestions$component[1:min(3, nrow(shiny_suggestions))], 
-                           ": ", 
-                           shiny_suggestions$description[1:min(3, nrow(shiny_suggestions))])
-      html_body <- paste0(html_body, generate_html_list(shiny_items))
-    }
-  }, error = function(e) {
-    html_body <- paste0(html_body, '
+  tryCatch(
+    {
+      shiny_suggestions <- bid_suggest_components(validate_stage, package = "shiny")
+      if (nrow(shiny_suggestions) > 0) {
+        html_body <- paste0(html_body, "
+<p><strong>Shiny Components:</strong></p>")
+        shiny_items <- paste0(
+          shiny_suggestions$component[1:min(3, nrow(shiny_suggestions))],
+          ": ",
+          shiny_suggestions$description[1:min(3, nrow(shiny_suggestions))]
+        )
+        html_body <- paste0(html_body, generate_html_list(shiny_items))
+      }
+    },
+    error = function(e) {
+      html_body <- paste0(html_body, "
 <p><strong>Shiny Components:</strong></p>
-<ul><li>Error generating suggestions</li></ul>')
-  })
+<ul><li>Error generating suggestions</li></ul>")
+    }
+  )
 
-  html_body <- paste0(html_body, '
-</div>')
+  html_body <- paste0(html_body, "
+</div>")
 
-  # Recommended Next Steps  
+  # Recommended Next Steps
   html_body <- paste0(html_body, '
 <div class="section"><h2>Recommended Next Steps</h2>')
-  
+
   next_steps_items <- c(
     "Implement key BID principles identified in this analysis",
-    "Conduct user testing to validate improvements", 
+    "Conduct user testing to validate improvements",
     "Iterate based on feedback",
     "Document successful patterns for future projects"
   )
   html_body <- paste0(html_body, generate_html_list(next_steps_items))
 
-  html_body <- paste0(html_body, '
-</div>')
+  html_body <- paste0(html_body, "
+</div>")
 
   # Learning Resources
   html_body <- paste0(html_body, '
 <div class="section"><h2>Learning Resources</h2>
 <p>To learn more about the BID framework concepts used in this report:</p>')
-  
+
   learning_items <- c(
     "Review the {bidux} vignettes with `vignette('introduction-to-bid')`",
     "Explore the concept dictionary with `bid_concepts()`",
@@ -581,15 +603,15 @@ generate_html_report_direct <- function(validate_stage, include_diagrams) {
   )
   html_body <- paste0(html_body, generate_html_list(learning_items))
 
-  html_body <- paste0(html_body, '
-</div>')
+  html_body <- paste0(html_body, "
+</div>")
 
   # Complete HTML document
   html_report <- paste(
     "<!DOCTYPE html>",
     "<html lang=\"en\">",
     "<head>",
-    "  <meta charset=\"UTF-8\">", 
+    "  <meta charset=\"UTF-8\">",
     "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">",
     "  <title>BID Framework Implementation Report</title>",
     "  <style>",

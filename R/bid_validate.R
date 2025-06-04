@@ -4,7 +4,8 @@
 #' This function documents the validation stage, where the user tests and
 #' refines the dashboard. It represents stage 5 in the BID framework.
 #'
-#' @param previous_stage A tibble or list output from an earlier BID stage function.
+#' @param previous_stage A tibble or list output from an earlier BID stage
+#'        function.
 #' @param summary_panel A character string describing the final summary panel
 #'        or key insight presentation.
 #' @param collaboration A character string describing how the dashboard enables
@@ -44,19 +45,16 @@ bid_validate <- function(
   validate_required_params(previous_stage = previous_stage)
   validate_previous_stage(previous_stage, "Validate")
 
-  # Auto-suggest summary_panel if not provided
   if (is.null(summary_panel)) {
     summary_panel <- generate_summary_panel_suggestion(previous_stage)
     cli::cli_alert_info(paste0("Suggested summary panel: ", summary_panel))
   }
 
-  # Auto-suggest collaboration if not provided
   if (is.null(collaboration)) {
     collaboration <- generate_collaboration_suggestion(previous_stage)
     cli::cli_alert_info(paste0("Suggested collaboration features: ", collaboration))
   }
 
-  # Auto-suggest next_steps if not provided
   if (is.null(next_steps)) {
     next_steps <- generate_next_steps_suggestion(previous_stage)
     cli::cli_alert_info("Suggested next steps:")
@@ -65,10 +63,8 @@ bid_validate <- function(
     }
   }
 
-  # Convert next_steps to standardized format
   next_steps_formatted <- format_next_steps(next_steps)
 
-  # Generate suggestions for improvement
   suggestions <- generate_validation_suggestions(
     summary_panel,
     collaboration,
@@ -76,7 +72,6 @@ bid_validate <- function(
     previous_stage
   )
 
-  # Extract information from previous stages for comprehensive documentation
   previous_info <- extract_previous_stage_info(previous_stage)
 
   result <- tibble::tibble(
@@ -100,7 +95,11 @@ bid_validate <- function(
     "Stage 5 (Validate) completed.",
     paste0("Summary panel: ", truncate_text(summary_panel, 50)),
     paste0("Collaboration: ", truncate_text(collaboration, 50)),
-    paste0("Next steps: ", length(parse_next_steps(next_steps_formatted)), " items defined"),
+    paste0(
+      "Next steps: ",
+      length(parse_next_steps(next_steps_formatted)),
+      " items defined"
+    ),
     suggestions
   )
 
@@ -110,14 +109,12 @@ bid_validate <- function(
 generate_summary_panel_suggestion <- function(previous_stage) {
   stage_name <- previous_stage$stage[1]
 
-  # Extract key information for context-aware suggestions
   central_question <- safe_column_access(previous_stage, "central_question", "")
   problem <- safe_column_access(previous_stage, "problem", "")
   theory <- safe_column_access(previous_stage, "theory", "")
 
   base_suggestion <- "Dashboard provides clear summary of key insights with actionable recommendations"
 
-  # Customize based on available information
   if (central_question != "" && !is.na(central_question)) {
     if (grepl("simplify|reduce|minimize", tolower(central_question))) {
       return("Simplified summary panel highlighting the most critical insights to reduce cognitive load")
@@ -150,7 +147,6 @@ generate_summary_panel_suggestion <- function(previous_stage) {
 }
 
 generate_collaboration_suggestion <- function(previous_stage) {
-  # Extract audience information for targeted suggestions
   audience_fields <- c("audience", "target_audience", "previous_audience")
   audience <- ""
 
@@ -178,7 +174,6 @@ generate_collaboration_suggestion <- function(previous_stage) {
     }
   }
 
-  # Check for collaboration-related concepts in previous stages
   concepts_field <- safe_column_access(previous_stage, "concepts", "")
   if (grepl("cooperation", tolower(concepts_field))) {
     return("Structured collaboration workflows that enhance group decision-making")
@@ -191,10 +186,8 @@ generate_next_steps_suggestion <- function(previous_stage) {
   stage_name <- previous_stage$stage[1]
   next_steps <- character(0)
 
-  # Always include user testing as a priority
   next_steps <- c(next_steps, "Conduct user testing with target audience to validate design decisions")
 
-  # Stage-specific suggestions
   if (stage_name == "Anticipate") {
     next_steps <- c(
       next_steps,
@@ -215,7 +208,6 @@ generate_next_steps_suggestion <- function(previous_stage) {
     )
   }
 
-  # Add context-specific suggestions based on previous stage content
   problem <- safe_column_access(previous_stage, "problem", "")
   if (problem != "" && !is.na(problem)) {
     if (grepl("mobile|phone", tolower(problem))) {
@@ -229,13 +221,11 @@ generate_next_steps_suggestion <- function(previous_stage) {
     }
   }
 
-  # Add collaboration-specific steps if collaboration features are planned
   collaboration <- safe_column_access(previous_stage, "collaboration", "")
   if (collaboration != "" && !is.na(collaboration)) {
     next_steps <- c(next_steps, "Test collaboration features with multi-user scenarios")
   }
 
-  # Always end with iteration and documentation
   next_steps <- c(
     next_steps,
     "Document successful patterns and lessons learned for future projects",
@@ -252,19 +242,16 @@ format_next_steps <- function(next_steps) {
 
   if (is.character(next_steps)) {
     if (length(next_steps) == 1) {
-      # If it's already a semicolon-separated string, return as-is
       if (grepl(";", next_steps)) {
         return(next_steps)
       } else {
         return(next_steps)
       }
     } else {
-      # Multiple character elements - join with semicolons
       return(paste(next_steps, collapse = "; "))
     }
   }
 
-  # Convert other types to character and join
   next_steps_char <- as.character(next_steps)
   return(paste(next_steps_char, collapse = "; "))
 }
@@ -281,54 +268,81 @@ parse_next_steps <- function(next_steps_formatted) {
   }
 }
 
-generate_validation_suggestions <- function(summary_panel, collaboration, next_steps, previous_stage) {
+generate_validation_suggestions <- function(
+    summary_panel,
+    collaboration,
+    next_steps,
+    previous_stage) {
   suggestions <- character(0)
 
-  # Analyze summary panel
   if (!is.null(summary_panel) && nchar(summary_panel) > 0) {
     if (nchar(summary_panel) > 150) {
-      suggestions <- c(suggestions, "Consider simplifying the summary panel description for clarity")
+      suggestions <- c(
+        suggestions,
+        "Consider simplifying the summary panel description for clarity"
+      )
     }
     if (!grepl("insight|action|recommendation", tolower(summary_panel))) {
-      suggestions <- c(suggestions, "Ensure summary panel includes actionable insights")
+      suggestions <- c(
+        suggestions,
+        "Ensure summary panel includes actionable insights"
+      )
     }
   } else {
-    suggestions <- c(suggestions, "Define a clear summary panel to help users extract key insights")
+    suggestions <- c(
+      suggestions,
+      "Define a clear summary panel to help users extract key insights"
+    )
   }
 
-  # Analyze collaboration features
   if (!is.null(collaboration) && nchar(collaboration) > 0) {
     if (!grepl("share|export|team|collaborate", tolower(collaboration))) {
-      suggestions <- c(suggestions, "Consider adding specific sharing or collaboration mechanisms")
+      suggestions <- c(
+        suggestions,
+        "Consider adding specific sharing or collaboration mechanisms"
+      )
     }
   } else {
-    suggestions <- c(suggestions, "Consider adding collaboration features to enable team decision-making")
+    suggestions <- c(
+      suggestions,
+      "Consider adding collaboration features to enable team decision-making"
+    )
   }
 
-  # Analyze next steps
   if (!is.null(next_steps)) {
     steps_list <- parse_next_steps(format_next_steps(next_steps))
     if (length(steps_list) < 3) {
-      suggestions <- c(suggestions, "Consider adding more specific next steps for implementation")
+      suggestions <- c(
+        suggestions,
+        "Consider adding more specific next steps for implementation"
+      )
     }
     if (!any(grepl("test|user|feedback", tolower(steps_list)))) {
       suggestions <- c(suggestions, "Include user testing in your next steps")
     }
   } else {
-    suggestions <- c(suggestions, "Define specific next steps for dashboard implementation and iteration")
+    suggestions <- c(
+      suggestions,
+      "Define specific next steps for dashboard implementation and iteration"
+    )
   }
 
-  # Stage-specific suggestions
   stage_name <- previous_stage$stage[1]
   if (stage_name == "Anticipate") {
     bias_field <- safe_column_access(previous_stage, "bias_mitigations", "")
     if (bias_field == "" || is.na(bias_field)) {
-      suggestions <- c(suggestions, "Ensure bias mitigation strategies from Anticipate stage are documented")
+      suggestions <- c(
+        suggestions,
+        "Ensure bias mitigation strategies from Anticipate stage are documented"
+      )
     }
   }
 
   if (length(suggestions) == 0) {
-    suggestions <- "Validation stage is well-defined. Focus on implementation and user testing."
+    suggestions <- paste(
+      "Validation stage is well-defined.",
+      "Focus on implementation and user testing."
+    )
   }
 
   return(paste(suggestions, collapse = " "))
@@ -337,14 +351,13 @@ generate_validation_suggestions <- function(summary_panel, collaboration, next_s
 extract_previous_stage_info <- function(previous_stage) {
   info <- list()
 
-  # Extract based on stage type
   stage_name <- previous_stage$stage[1]
 
   if (stage_name == "Anticipate") {
     info$bias <- safe_column_access(previous_stage, "bias_mitigations", NA_character_)
     info$interaction <- safe_column_access(previous_stage, "interaction_principles", NA_character_)
 
-    # Also get information from any previous stages
+    # get information from any previous stages
     info$layout <- safe_column_access(previous_stage, "previous_layout", NA_character_)
     info$concepts <- safe_column_access(previous_stage, "previous_concepts", NA_character_)
     info$accessibility <- safe_column_access(previous_stage, "previous_accessibility", NA_character_)
@@ -356,27 +369,17 @@ extract_previous_stage_info <- function(previous_stage) {
     info$concepts <- safe_column_access(previous_stage, "concepts", NA_character_)
     info$accessibility <- safe_column_access(previous_stage, "accessibility", NA_character_)
 
-    # Get information from previous stages
+    # get information from previous stages
     info$central_question <- safe_column_access(previous_stage, "previous_central_question", NA_character_)
     info$problem <- safe_column_access(previous_stage, "previous_problem", NA_character_)
     info$theory <- safe_column_access(previous_stage, "previous_theory", NA_character_)
   } else if (stage_name == "Interpret") {
     info$central_question <- safe_column_access(previous_stage, "central_question", NA_character_)
 
-    # Get information from previous stages  
+    # get information from previous stages
     info$problem <- safe_column_access(previous_stage, "previous_problem", NA_character_)
     info$theory <- safe_column_access(previous_stage, "previous_theory", NA_character_)
   }
 
   return(info)
-}
-
-truncate_text <- function(text, max_length) {
-  if (is.null(text) || is.na(text)) {
-    return("Not specified")
-  }
-  if (nchar(text) > max_length) {
-    return(paste0(substring(text, 1, max_length), "..."))
-  }
-  return(text)
 }

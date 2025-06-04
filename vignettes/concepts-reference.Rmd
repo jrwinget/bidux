@@ -117,7 +117,7 @@ ui <- page_fillable(
       value = "$1.24M",
       showcase = bsicons::bs_icon("graph-up-arrow"),
       theme = value_box_theme(
-        bg = "#f8f9fa", 
+        bg = "#f8f9fa",
         fg = "#333333"
       )
     ),
@@ -126,7 +126,7 @@ ui <- page_fillable(
       value = "8,490",
       showcase = bsicons::bs_icon("cart"),
       theme = value_box_theme(
-        bg = "#f8f9fa", 
+        bg = "#f8f9fa",
         fg = "#333333"
       )
     ),
@@ -135,7 +135,7 @@ ui <- page_fillable(
       value = "$146",
       showcase = bsicons::bs_icon("tag"),
       theme = value_box_theme(
-        bg = "#f8f9fa", 
+        bg = "#f8f9fa",
         fg = "#333333"
       )
     )
@@ -316,7 +316,7 @@ server <- function(input, output, session) {
       ) |>
       e_color(c("#3498db", "#2ecc71"))
   })
-  
+
   # Channel gauge chart for current quarter
   output$channel_pie <- renderEcharts4r({
     data.frame(
@@ -342,7 +342,7 @@ server <- function(input, output, session) {
       ) |>
       e_tooltip()
   })
-  
+
   # Behavior comparison for tension
   output$behavior_comparison <- renderEcharts4r({
     data.frame(
@@ -393,7 +393,7 @@ ui <- page_fillable(
         h1(
           "Customer Analytics Dashboard",
           class = "fs-3 py-2" # Add vertical padding
-          )
+        )
       )
     )
   ),
@@ -447,7 +447,8 @@ ui <- page_fillable(
     nav_panel_tabset(
       nav_panel(
         "Demographics",
-        div(class = "py-4", # Top and bottom padding
+        div(
+          class = "py-4", # Top and bottom padding
           layout_column_wrap(
             width = 1 / 2,
             gap = "2rem",
@@ -458,7 +459,8 @@ ui <- page_fillable(
       ),
       nav_panel(
         "Behavior",
-        div(class = "py-4",
+        div(
+          class = "py-4",
           layout_column_wrap(
             width = 1 / 2,
             gap = "2rem",
@@ -538,7 +540,7 @@ ui <- page_fillable(
           # Multiple reference points to reduce anchoring
           navset_pill(
             nav_panel(
-              "vs Target", 
+              "vs Target",
               div(
                 class = "text-center mt-2",
                 div(class = "text-success fw-bold", "+8%"),
@@ -546,7 +548,7 @@ ui <- page_fillable(
               )
             ),
             nav_panel(
-              "vs Last Year", 
+              "vs Last Year",
               div(
                 class = "text-center mt-2",
                 div(class = "text-success fw-bold", "+12%"),
@@ -554,7 +556,7 @@ ui <- page_fillable(
               )
             ),
             nav_panel(
-              "vs Industry", 
+              "vs Industry",
               div(
                 class = "text-center mt-2",
                 div(class = "text-success fw-bold", "+5%"),
@@ -575,7 +577,7 @@ ui <- page_fillable(
           # Multiple reference points
           navset_pill(
             nav_panel(
-              "vs Target", 
+              "vs Target",
               div(
                 class = "text-center mt-2",
                 div(class = "text-success fw-bold", "+0.2%"),
@@ -583,7 +585,7 @@ ui <- page_fillable(
               )
             ),
             nav_panel(
-              "vs Last Year", 
+              "vs Last Year",
               div(
                 class = "text-center mt-2",
                 div(class = "text-success fw-bold", "+0.5%"),
@@ -591,7 +593,7 @@ ui <- page_fillable(
               )
             ),
             nav_panel(
-              "vs Industry", 
+              "vs Industry",
               div(
                 class = "text-center mt-2",
                 div(class = "text-danger fw-bold", "-0.3%"),
@@ -612,7 +614,7 @@ ui <- page_fillable(
           # Multiple reference points
           navset_pill(
             nav_panel(
-              "vs Target", 
+              "vs Target",
               div(
                 class = "text-center mt-2",
                 div(class = "text-danger fw-bold", "-$7"),
@@ -620,7 +622,7 @@ ui <- page_fillable(
               )
             ),
             nav_panel(
-              "vs Last Year", 
+              "vs Last Year",
               div(
                 class = "text-center mt-2",
                 div(class = "text-success fw-bold", "+$10"),
@@ -628,7 +630,7 @@ ui <- page_fillable(
               )
             ),
             nav_panel(
-              "vs Industry", 
+              "vs Industry",
               div(
                 class = "text-center mt-2",
                 div(class = "text-success fw-bold", "+$8"),
@@ -681,28 +683,28 @@ server <- function(input, output, session) {
         symbolSize = 10
       ) |>
       e_line(
-        target, 
-        name = "Target", 
-        symbol = "none", 
+        target,
+        name = "Target",
+        symbol = "none",
         lineStyle = list(type = "dashed")
       ) |>
       e_line(
-        prev_year, 
-        name = "Previous Year", 
-        symbol = "none", 
+        prev_year,
+        name = "Previous Year",
+        symbol = "none",
         lineStyle = list(type = "dotted")
       ) |>
       e_line(
-        industry, 
-        name = "Industry Avg", 
-        symbol = "none", 
+        industry,
+        name = "Industry Avg",
+        symbol = "none",
         lineStyle = list(type = "dashed")
       ) |>
       e_title("Revenue Performance (Thousands)") |>
       e_tooltip(trigger = "axis") |>
       e_color(c("#3498db", "#e74c3c", "#2ecc71", "#f39c12"))
   })
-  
+
   # Table with multiple reference columns
   output$metrics_table <- renderReactable({
     data <- data.frame(
@@ -721,7 +723,7 @@ server <- function(input, output, session) {
       industry = c("$1.18M", "3.5%", "$140", "8,100", "12,000"),
       vs_industry = c("+5%", "-9%", "+6%", "+3%", "+4%")
     )
-    
+
     # Custom cell renderer for comparisons
     compare_cell <- function(value) {
       if (grepl("^\\+", value)) {
@@ -732,7 +734,7 @@ server <- function(input, output, session) {
         value
       }
     }
-    
+
     reactable(data,
       columns = list(
         metric = colDef(name = "Metric"),
@@ -771,9 +773,9 @@ ui <- page_fillable(
   theme = bs_theme(
     version = 5
   ),
-  
+
   # Dashboard content would go here...
-  
+
   # End with a strong summary and clear next steps
   layout_column_wrap(
     width = 12,
@@ -791,7 +793,7 @@ ui <- page_fillable(
               tags$ul(
                 tags$li(
                   span("Revenue is trending ", class = "fw-bold"),
-                  span("8% above target", class = "text-success fw-bold"), 
+                  span("8% above target", class = "text-success fw-bold"),
                   span(
                     paste(
                       " for the quarter, primarily driven by",
@@ -801,12 +803,12 @@ ui <- page_fillable(
                 ),
                 tags$li(
                   span("Customer acquisition cost has ", class = "fw-bold"),
-                  span("decreased by 12%", class = "text-success fw-bold"), 
+                  span("decreased by 12%", class = "text-success fw-bold"),
                   span(" following the new digital marketing strategy.")
                 ),
                 tags$li(
                   span("The West region continues to ", class = "fw-bold"),
-                  span("underperform by 5%", class = "text-danger fw-bold"), 
+                  span("underperform by 5%", class = "text-danger fw-bold"),
                   span(" compared to other regions.")
                 )
               )
@@ -829,7 +831,7 @@ ui <- page_fillable(
                       )
                     ),
                     actionButton(
-                      "action1", 
+                      "action1",
                       "Order Inventory",
                       class = "btn-primary w-100"
                     )
@@ -847,7 +849,7 @@ ui <- page_fillable(
                     ),
                     actionButton(
                       "action2",
-                      "Adjust Budget", 
+                      "Adjust Budget",
                       class = "btn-primary w-100"
                     )
                   )
@@ -863,7 +865,7 @@ ui <- page_fillable(
                       )
                     ),
                     actionButton(
-                      "action3", 
+                      "action3",
                       "Schedule Meeting",
                       class = "btn-primary w-100"
                     )
@@ -882,13 +884,13 @@ ui <- page_fillable(
           div(
             class = "text-end",
             actionButton(
-              "export_pdf", 
-              "Export as PDF", 
+              "export_pdf",
+              "Export as PDF",
               class = "btn-outline-primary me-2"
             ),
             actionButton(
-              "share_dashboard", 
-              "Share Dashboard", 
+              "share_dashboard",
+              "Share Dashboard",
               class = "btn-primary"
             )
           )
@@ -918,7 +920,7 @@ These practical implementations demonstrate how to apply key BID framework conce
 To explore more concepts and their implementation, use the `bid_concepts()` function to access the full concept dictionary:
 
 ```{r}
-bid_concepts() |> 
+bid_concepts() |>
   select(concept, category, implementation_tips) |>
   head(5)
 ```

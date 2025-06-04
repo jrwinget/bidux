@@ -12,12 +12,15 @@ bid_notice(problem, theory = NULL, evidence = NULL, target_audience = NULL)
 \item{theory}{A character string describing the behavioral theory that might
 explain the problem.}
 
-\item{evidence}{A character string describing evidence supporting the problem.}
+\item{evidence}{A character string describing evidence supporting the
+problem.}
 
-\item{target_audience}{Optional character string describing the target audience.}
+\item{target_audience}{Optional character string describing the target
+audience.}
 }
 \value{
-A tibble containing the documented information for the "Notice" stage.
+A tibble containing the documented information for the "Notice"
+stage.
 }
 \description{
 This function documents the initial observation and problem identification

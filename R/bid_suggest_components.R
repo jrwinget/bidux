@@ -119,22 +119,15 @@ bid_suggest_components <- function(bid_stage, package = NULL) {
 get_components_database <- function() {
   tibble::tibble(
     package = c(
-      # bslib components
-      rep("bslib", 12),
-      # shiny components
-      rep("shiny", 15),
-      # DT components
-      rep("DT", 4),
-      # plotly components
-      rep("plotly", 6),
-      # reactable components
-      rep("reactable", 5),
-      # htmlwidgets components
-      rep("htmlwidgets", 3)
+      rep("bslib", 12), # bslib components
+      rep("shiny", 15), # shiny components
+      rep("DT", 4), # DT components
+      rep("plotly", 6), # plotly components
+      rep("reactable", 5), # reactable components
+      rep("htmlwidgets", 3) # htmlwidgets components
     ),
     component = c(
-      # bslib components
-      "value_box",
+      "value_box", # bslib components
       "card",
       "layout_column_wrap",
       "page_sidebar",
@@ -146,9 +139,7 @@ get_components_database <- function() {
       "layout_columns",
       "card_header",
       "card_body",
-
-      # shiny components
-      "tabsetPanel",
+      "tabsetPanel", # shiny components
       "conditionalPanel",
       "wellPanel",
       "fluidRow",
@@ -163,36 +154,27 @@ get_components_database <- function() {
       "observeEvent",
       "reactive",
       "isolate",
-
-      # DT components
-      "datatable",
+      "datatable", # DT components
       "renderDT",
       "DTOutput",
       "formatStyle",
-
-      # plotly components
-      "plot_ly",
+      "plot_ly", # plotly components
       "ggplotly",
       "renderPlotly",
       "plotlyOutput",
       "event_data",
       "plotlyProxy",
-
-      # reactable components
-      "reactable",
+      "reactable", # reactable components
       "colDef",
       "reactableOutput",
       "renderReactable",
       "getReactableState",
-
-      # htmlwidgets components
-      "createWidget",
+      "createWidget", # htmlwidgets components
       "saveWidget",
       "onRender"
     ),
     description = c(
-      # bslib descriptions
-      "Display key metrics prominently with customizable styling",
+      "Display key metrics prominently with customizable styling", # bslib descriptions
       "Organize content in visually distinct containers with headers/footers",
       "Create responsive grid layouts that adapt to screen size",
       "Build dashboard layout with collapsible sidebar navigation",
@@ -204,9 +186,7 @@ get_components_database <- function() {
       "Create flexible column-based layouts with fine control",
       "Add headers to cards for clear content organization",
       "Control card content padding and spacing",
-
-      # shiny descriptions
-      "Organize related content in tabs to reduce visual complexity",
+      "Organize related content in tabs to reduce visual complexity", # shiny descriptions
       "Show/hide UI elements based on user selections",
       "Group related inputs in a visually distinct panel",
       "Create responsive layouts that work across devices",
@@ -221,36 +201,27 @@ get_components_database <- function() {
       "React to user actions and input changes efficiently",
       "Create reactive expressions for efficient data processing",
       "Control reactive dependencies to optimize performance",
-
-      # DT descriptions
-      "Display data tables with sorting, filtering, and pagination",
+      "Display data tables with sorting, filtering, and pagination", # DT descriptions
       "Render interactive data tables in Shiny applications",
       "Create output containers for DT tables in UI",
       "Apply conditional formatting to highlight important data patterns",
-
-      # plotly descriptions
-      "Create interactive visualizations with zoom, pan, and hover",
+      "Create interactive visualizations with zoom, pan, and hover", # plotly descriptions
       "Convert ggplot objects to interactive plotly visualizations",
       "Render interactive plots in Shiny applications",
       "Display interactive plots in Shiny UI",
       "Capture user interactions with plots for further analysis",
       "Modify existing plots without full re-rendering",
-
-      # reactable descriptions
-      "Build feature-rich data tables with sorting, filtering, grouping",
+      "Build feature-rich data tables with sorting, filtering, grouping", # reactable descriptions
       "Define column properties including formatting and styling",
       "Create output containers for reactable tables",
       "Render reactable tables in Shiny applications",
       "Access table state for integration with other components",
-
-      # htmlwidgets descriptions
-      "Build custom interactive widgets using JavaScript libraries",
+      "Build custom interactive widgets using JavaScript libraries", # htmlwidgets descriptions
       "Save interactive widgets as standalone HTML files",
       "Add custom JavaScript behavior to widgets"
     ),
     bid_stage_relevance = c(
-      # bslib relevance
-      "Stage 2,Stage 3,Stage 5",
+      "Stage 2,Stage 3,Stage 5", # bslib relevance
       "Stage 3,Stage 5",
       "Stage 3",
       "Stage 3",
@@ -262,9 +233,7 @@ get_components_database <- function() {
       "Stage 3",
       "Stage 3",
       "Stage 3",
-
-      # shiny relevance
-      "Stage 1,Stage 3",
+      "Stage 1,Stage 3", # shiny relevance
       "Stage 1,Stage 4",
       "Stage 3",
       "Stage 3",
@@ -279,36 +248,27 @@ get_components_database <- function() {
       "Stage 4,Stage 5",
       "Stage 1,Stage 4",
       "Stage 1,Stage 4",
-
-      # DT relevance
-      "Stage 2,Stage 3,Stage 5",
+      "Stage 2,Stage 3,Stage 5", # DT relevance
       "Stage 2,Stage 3,Stage 5",
       "Stage 2,Stage 3,Stage 5",
       "Stage 2,Stage 4",
-
-      # plotly relevance
-      "Stage 2,Stage 4,Stage 5",
+      "Stage 2,Stage 4,Stage 5", # plotly relevance
       "Stage 2,Stage 4,Stage 5",
       "Stage 2,Stage 4,Stage 5",
       "Stage 2,Stage 4,Stage 5",
       "Stage 4,Stage 5",
       "Stage 4,Stage 5",
-
-      # reactable relevance
-      "Stage 2,Stage 3,Stage 5",
+      "Stage 2,Stage 3,Stage 5", # reactable relevance
       "Stage 2,Stage 3",
       "Stage 2,Stage 3,Stage 5",
       "Stage 2,Stage 3,Stage 5",
       "Stage 4,Stage 5",
-
-      # htmlwidgets relevance
-      "Stage 3,Stage 4,Stage 5",
+      "Stage 3,Stage 4,Stage 5", # htmlwidgets relevance
       "Stage 5",
       "Stage 4,Stage 5"
     ),
     cognitive_concepts = c(
-      # bslib concepts
-      "Visual Hierarchy,Aesthetic-Usability",
+      "Visual Hierarchy,Aesthetic-Usability", # bslib concepts
       "Principle of Proximity,Visual Hierarchy",
       "Cognitive Load Theory,Visual Hierarchy",
       "Information Hierarchy,Progressive Disclosure",
@@ -320,9 +280,7 @@ get_components_database <- function() {
       "Visual Hierarchy,Principle of Proximity",
       "Information Hierarchy,Visual Hierarchy",
       "Breathable Layouts,Visual Hierarchy",
-
-      # shiny concepts
-      "Information Hierarchy,Progressive Disclosure",
+      "Information Hierarchy,Progressive Disclosure", # shiny concepts
       "Cognitive Load Theory,Progressive Disclosure",
       "Principle of Proximity,Visual Hierarchy",
       "Visual Hierarchy,Breathable Layouts",
@@ -337,36 +295,27 @@ get_components_database <- function() {
       "Norman's Stages of Action,Fitts's Law",
       "Processing Fluency,Cognitive Load Theory",
       "Processing Fluency,Cognitive Load Theory",
-
-      # DT concepts
-      "Information Hierarchy,Visual Hierarchy",
+      "Information Hierarchy,Visual Hierarchy", # DT concepts
       "Information Hierarchy,Visual Hierarchy",
       "Information Hierarchy,Visual Hierarchy",
       "Pre-attentive Processing,Visual Hierarchy",
-
-      # plotly concepts
-      "Data Storytelling Framework,Processing Fluency",
+      "Data Storytelling Framework,Processing Fluency", # plotly concepts
       "Data Storytelling Framework,Processing Fluency",
       "Data Storytelling Framework,Processing Fluency",
       "Data Storytelling Framework,Processing Fluency",
       "Norman's Stages of Action,Cooperation & Coordination",
       "Processing Fluency,Norman's Stages of Action",
-
-      # reactable concepts
-      "Information Hierarchy,Pre-attentive Processing",
+      "Information Hierarchy,Pre-attentive Processing", # reactable concepts
       "Visual Hierarchy,Pre-attentive Processing",
       "Information Hierarchy,Pre-attentive Processing",
       "Information Hierarchy,Pre-attentive Processing",
       "Norman's Stages of Action,Cooperation & Coordination",
-
-      # htmlwidgets concepts
-      "Affordance,Norman's Stages of Action",
+      "Affordance,Norman's Stages of Action", # htmlwidgets concepts
       "Peak-End Rule,Cooperation & Coordination",
       "Norman's Stages of Action,Interaction Hints"
     ),
     use_cases = c(
-      # bslib use cases
-      "KPI displays,metric summaries,status indicators",
+      "KPI displays,metric summaries,status indicators", # bslib use cases
       "Content organization,feature grouping,progressive disclosure",
       "responsive dashboards,multi-column layouts,adaptive grids",
       "navigation-heavy apps,filter panels,sidebar controls",
@@ -378,9 +327,7 @@ get_components_database <- function() {
       "precise layouts,custom grids,flexible positioning",
       "section titles,content labeling,organization",
       "content spacing,visual breathing room,padding control",
-
-      # shiny use cases
-      "multi-step workflows,content organization,feature separation",
+      "multi-step workflows,content organization,feature separation", # shiny use cases
       "dynamic interfaces,personalized views,conditional features",
       "form organization,input grouping,visual structure",
       "dashboard layouts,responsive design,grid systems",
@@ -395,30 +342,22 @@ get_components_database <- function() {
       "user interaction handling,real-time updates,responsive behavior",
       "data processing,computed values,efficient updates",
       "performance optimization,controlled updates,dependency management",
-
-      # DT use cases
-      "data exploration,reporting,administrative interfaces",
+      "data exploration,reporting,administrative interfaces", # DT use cases
       "interactive data display,filtering,sorting",
       "data table containers,structured layouts",
       "pattern highlighting,status indication,conditional formatting",
-
-      # plotly use cases
-      "exploratory data analysis,interactive reporting,data storytelling",
+      "exploratory data analysis,interactive reporting,data storytelling", # plotly use cases
       "enhanced ggplot visualizations,interactive scientific plots",
       "dashboard visualizations,interactive analytics,data exploration",
       "plot containers,visualization layouts,interactive displays",
       "click analysis,selection tracking,user interaction capture",
       "real-time updates,efficient plot modifications,performance optimization",
-
-      # reactable use cases
-      "advanced data tables,business intelligence,reporting dashboards",
+      "advanced data tables,business intelligence,reporting dashboards", # reactable use cases
       "custom table styling,data presentation,formatted displays",
       "table containers,data display layouts,structured interfaces",
       "interactive tables,business applications,data management",
       "table interaction tracking,selection management,state synchronization",
-
-      # htmlwidgets use cases
-      "custom visualizations,specialized interfaces,unique interactions",
+      "custom visualizations,specialized interfaces,unique interactions", # htmlwidgets use cases
       "standalone reports,offline viewing,portable visualizations",
       "enhanced interactivity,custom behaviors,specialized functionality"
     )
@@ -434,8 +373,7 @@ calculate_relevance_scores <- function(bid_stage, components_db) {
   # Stage-based scoring (highest weight) - need to handle different stage name formats
   stage_pattern <- paste0(
     "Stage ",
-    switch(
-      stage_name,
+    switch(stage_name,
       "Notice" = "1",
       "Interpret" = "2",
       "Structure" = "3",

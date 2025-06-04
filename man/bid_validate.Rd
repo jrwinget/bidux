@@ -12,7 +12,8 @@ bid_validate(
 )
 }
 \arguments{
-\item{previous_stage}{A tibble or list output from an earlier BID stage function.}
+\item{previous_stage}{A tibble or list output from an earlier BID stage
+function.}
 
 \item{summary_panel}{A character string describing the final summary panel
 or key insight presentation.}
