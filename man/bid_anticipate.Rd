@@ -11,12 +11,15 @@ bid_anticipate(
 )
 }
 \arguments{
-\item{previous_stage}{A tibble or list output from an earlier BID stage function.}
+\item{previous_stage}{A tibble or list output from an earlier BID stage
+function.}
 
-\item{bias_mitigations}{A named list of bias mitigation strategies. If NULL, the
-function will suggest bias mitigations based on information from previous stages.}
+\item{bias_mitigations}{A named list of bias mitigation strategies. If NULL,
+the function will suggest bias mitigations based on information from
+previous stages.}
 
-\item{interaction_principles}{A named list of interaction principles (optional).}
+\item{interaction_principles}{A named list of interaction principles
+(optional).}
 }
 \value{
 A tibble containing the documented information for the "Anticipate"
@@ -70,7 +73,7 @@ bid_anticipate(
   interaction_principles = list(
     hover_effects = "Show additional information on hover",
     selection_feedback = "Highlight active filters with color change",
-    progressive_actions = "Reveal advanced options only when basic ones are used"
+    progressive_actions = "Show advanced options only if basic ones are used"
   )
 )
 

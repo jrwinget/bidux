@@ -2,7 +2,7 @@ library(testthat)
 library(tibble)
 
 test_that("bid_interpret returns a tibble with stage 'Interpret'", {
-  local_mock(
+  local_mocked_bindings(
     validate_user_personas = function(user_personas) invisible(NULL),
     bid_concepts = function(search = NULL) {
       tibble::tibble(
@@ -31,7 +31,7 @@ test_that("bid_interpret returns a tibble with stage 'Interpret'", {
 })
 
 test_that("bid_interpret uses provided central_question", {
-  local_mock(
+  local_mocked_bindings(
     validate_user_personas = function(user_personas) invisible(NULL),
     bid_concepts = function(search = NULL) {
       tibble::tibble(
@@ -58,7 +58,7 @@ test_that("bid_interpret uses provided central_question", {
 })
 
 test_that("bid_interpret errors when data_story is not a list", {
-  local_mock(
+  local_mocked_bindings(
     validate_user_personas = function(user_personas) invisible(NULL)
   )
 
@@ -76,7 +76,7 @@ test_that("bid_interpret errors when data_story is not a list", {
 })
 
 test_that("bid_interpret errors when user_personas is invalid", {
-  local_mock(
+  local_mocked_bindings(
     validate_user_personas = function(user_personas) {
       cli::cli_abort("Invalid user_personas provided")
     }

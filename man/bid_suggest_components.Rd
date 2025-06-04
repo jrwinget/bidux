@@ -2,40 +2,43 @@
 % Please edit documentation in R/bid_suggest_components.R
 \name{bid_suggest_components}
 \alias{bid_suggest_components}
-\title{Generate UI Component Suggestions Based on BID Application}
+\title{Suggest UI Components Based on BID Framework Analysis}
 \usage{
-bid_suggest_components(
-  bid_result,
-  package = c("shiny", "bslib", "reactable", "echarts4r", "all")
-)
+bid_suggest_components(bid_stage, package = NULL)
 }
 \arguments{
-\item{bid_result}{A tibble from any BID stage function.}
+\item{bid_stage}{A tibble output from any BID framework stage function}
 
-\item{package}{The UI package to generate suggestions for: "shiny", "bslib",
-"reactable", "echarts4r", or "all" for suggestions from all packages.}
+\item{package}{Optional character string specifying which package to focus
+suggestions on. Options include "shiny", "bslib", "DT", "plotly",
+"reactable", "htmlwidgets". If NULL, suggestions from all packages
+are provided.}
 }
 \value{
-A tibble with component suggestions.
+A tibble containing component suggestions with relevance scores
 }
 \description{
-This function provides concrete UI component suggestions based on your BID
-framework application. It generates code examples and component
-recommendations for various UI packages.
+This function analyzes the results from BID framework stages and suggests
+appropriate UI components from popular R packages like shiny, bslib, DT, etc.
+The suggestions are based on the design principles and user needs identified
+in the BID process.
 }
 \examples{
 \dontrun{
-# Get suggestions from a specific stage
+# After completing BID stages
 notice_result <- bid_notice(
-  problem = "Too many filter options",
-  evidence = "Users take 30+ seconds to configure dashboard"
+  problem = "Users struggle with complex data",
+  theory = "Cognitive Load Theory"
 )
 
-bid_suggest_components(notice_result, package = "shiny")
+# Get all component suggestions
+bid_suggest_components(notice_result)
 
-# Get suggestions for all packages
-final_result <- bid_validate(...)
-all_suggestions <- bid_suggest_components(final_result, package = "all")
+# Get only bslib suggestions
+bid_suggest_components(notice_result, package = "bslib")
+
+# Get shiny-specific suggestions
+bid_suggest_components(notice_result, package = "shiny")
 }
 
 }

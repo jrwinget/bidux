@@ -46,7 +46,7 @@ all_concepts <- bid_concepts()
 head(dplyr::select(all_concepts, concept, category, description), 3)
 
 # Search for specific concepts
-bid_concepts("cognitive") |> 
+bid_concepts("cognitive") |>
   dplyr::select(concept, description, implementation_tips)
 ```
 
@@ -62,11 +62,11 @@ The `bid_concept()` function supports case-insensitive and partial matching:
 
 ```{r concept_matching}
 # Case-insensitive matching
-bid_concept("hick's law") |> 
+bid_concept("hick's law") |>
   dplyr::select(concept, description)
 
 # Partial matching
-bid_concept("proximity") |> 
+bid_concept("proximity") |>
   dplyr::select(concept, description)
 ```
 
@@ -75,7 +75,7 @@ You can also explore concepts that are new to the BID framework:
 ```{r new_concepts}
 # Explore new concepts from user-centric design
 bid_concepts("visual hierarchy|breathable|gherkin") |>
-  dplyr::select(concept, description) 
+  dplyr::select(concept, description)
 ```
 
 ## Documenting a Dashboard Project with BID
@@ -94,7 +94,7 @@ notice_result <- bid_notice(
   target_audience = "Marketing team members with varying technical skills"
 )
 
-notice_result |> 
+notice_result |>
   dplyr::select(problem, theory, evidence, target_audience)
 ```
 
@@ -134,7 +134,7 @@ interpret_result <- bid_interpret(
   )
 )
 
-interpret_result |> 
+interpret_result |>
   dplyr::select(central_question, hook, tension, resolution)
 ```
 
@@ -162,7 +162,7 @@ structure_result <- bid_structure(
   )
 )
 
-structure_result |> 
+structure_result |>
   dplyr::select(layout, concepts, accessibility)
 ```
 
@@ -188,7 +188,7 @@ anticipate_result <- bid_anticipate(
   )
 )
 
-anticipate_result |> 
+anticipate_result |>
   dplyr::select(bias_mitigations, interaction_principles)
 ```
 
@@ -212,7 +212,7 @@ validate_result <- bid_validate(
   )
 )
 
-validate_result |> 
+validate_result |>
   dplyr::select(summary_panel, collaboration, next_steps)
 ```
 
@@ -251,7 +251,7 @@ cat(report)
 html_report <- bid_report(
   validate_result,
   format = "html"
-  )
+)
 
 # Generate a markdown report
 md_report <- bid_report(validate_result, format = "markdown")

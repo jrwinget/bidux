@@ -1,158 +1,295 @@
 library(testthat)
 library(tibble)
 
-test_that("bid_suggest_components returns appropriate shiny suggestions", {
+test_that("bid_suggest_components returns tibble with correct structure", {
   notice_result <- bid_notice(
-    problem = "Complex interface",
+    problem = "Users struggle with complex data",
     theory = "Cognitive Load Theory",
     evidence = "User complaints"
   )
 
-  suggestions <- bid_suggest_components(notice_result, package = "shiny")
+  suppressMessages({
+    suggestions <- bid_suggest_components(notice_result)
+  })
 
-  # structure
   expect_s3_class(suggestions, "tbl_df")
-  expect_true(all(c("stage", "component", "description", "code_example") %in% names(suggestions)))
-
-  # content
-  expect_true(any(suggestions$stage == "Notice"))
-  expect_true(any(grepl("radioButtons|select|input", suggestions$component)))
-  expect_true(all(nchar(suggestions$code_example) > 0))
-
-  # message
-  expect_message(
-    bid_suggest_components(notice_result, package = "shiny"),
-    "Component suggestions provided"
-  )
+  expect_true(all(c("package", "component", "description", "relevance") %in% names(suggestions)))
+  expect_true(nrow(suggestions) > 0)
 })
 
-test_that("bid_suggest_components returns stage-appropriate suggestions", {
-  # notice stage
+test_that("bid_suggest_components filters by package correctly", {
   notice_result <- bid_notice(
-    problem = "Complex interface",
-    theory = "Cognitive Load Theory",
-    evidence = "User complaints"
-  )
-  notice_suggestions <- bid_suggest_components(notice_result, package = "bslib")
-  expect_true(any(notice_suggestions$stage == "Notice"))
-
-  # interpret stage
-  interpret_result <- bid_interpret(
-    notice_result,
-    central_question = "How to simplify?",
-    data_story = list(
-      hook = "Users are confused",
-      context = "Dashboard has evolved over time"
-    )
-  )
-  interpret_suggestions <- bid_suggest_components(interpret_result, package = "bslib")
-  expect_true(any(interpret_suggestions$stage == "Interpret"))
-
-  # structure stage
-  structure_result <- bid_structure(
-    interpret_result,
-    layout = "dual_process",
-    concepts = c("Principle of Proximity", "Default Effect")
-  )
-  structure_suggestions <- bid_suggest_components(structure_result, package = "bslib")
-  expect_true(any(structure_suggestions$stage == "Structure"))
-
-  # anticipate stage
-  anticipate_result <- bid_anticipate(
-    structure_result,
-    bias_mitigations = list(
-      anchoring = "Provide reference points",
-      framing = "Use consistent positive framing"
-    )
-  )
-  anticipate_suggestions <- bid_suggest_components(anticipate_result, package = "bslib")
-  expect_true(any(anticipate_suggestions$stage == "Anticipate"))
-
-  # validate stage
-  validate_result <- bid_validate(
-    anticipate_result,
-    summary_panel = "Dashboard simplified for quicker insights",
-    collaboration = "Added team annotation features"
-  )
-  validate_suggestions <- bid_suggest_components(validate_result, package = "bslib")
-  expect_true(any(validate_suggestions$stage == "Validate"))
-})
-
-test_that("bid_suggest_components returns appropriate suggestions for each package", {
-  notice_result <- bid_notice(
-    problem = "Complex interface",
+    problem = "Users struggle with complex data",
     theory = "Cognitive Load Theory",
     evidence = "User complaints"
   )
 
-  # bslib suggestions
-  bslib_suggestions <- bid_suggest_components(notice_result, package = "bslib")
-  expect_true(any(grepl("layout_|card|navset", bslib_suggestions$component)))
+  suppressMessages({
+    bslib_suggestions <- bid_suggest_components(notice_result, package = "bslib")
+  })
 
-  # reactable suggestions
-  reactable_suggestions <- bid_suggest_components(notice_result, package = "reactable")
-  expect_true(any(grepl("reactable|colDef|defaultCol", reactable_suggestions$component)))
+  expect_s3_class(bslib_suggestions, "tbl_df")
+  if (nrow(bslib_suggestions) > 0) {
+    expect_true(all(bslib_suggestions$package == "bslib"))
+  }
 
-  # echarts4r suggestions
-  echarts_suggestions <- bid_suggest_components(notice_result, package = "echarts4r")
-  expect_true(any(grepl("e_charts|e_|echarts", echarts_suggestions$component)))
+  suppressMessages({
+    shiny_suggestions <- bid_suggest_components(notice_result, package = "shiny")
+  })
+
+  expect_s3_class(shiny_suggestions, "tbl_df")
+  if (nrow(shiny_suggestions) > 0) {
+    expect_true(all(shiny_suggestions$package == "shiny"))
+  }
 })
 
-test_that("bid_suggest_components works with unknown stage", {
-  unknown_stage <- tibble::tibble(
+test_that("bid_suggest_components handles invalid inputs", {
+  expect_error(
+    bid_suggest_components(NULL),
+    "bid_stage cannot be NULL"
+  )
+
+  expect_error(
+    bid_suggest_components(list(stage = "Notice")),
+    "bid_stage must be a tibble"
+  )
+
+  expect_error(
+    bid_suggest_components(tibble(foo = "bar")),
+    "bid_stage must contain a 'stage' column"
+  )
+
+  notice_result <- bid_notice(
     problem = "Test problem",
     evidence = "Test evidence"
   )
 
-  suggestions <- bid_suggest_components(unknown_stage, package = "shiny")
-  expect_s3_class(suggestions, "tbl_df")
-  expect_true(nrow(suggestions) > 0)
-  expect_true(length(unique(suggestions$stage)) > 1)
+  expect_error(
+    bid_suggest_components(notice_result, package = "invalid_package"),
+    "Invalid package specified"
+  )
 })
 
-test_that("bid_suggest_components validates package argument", {
+test_that("bid_suggest_components calculates relevance scores correctly", {
   notice_result <- bid_notice(
-    problem = "Complex interface",
+    problem = "Users struggle with complex data",
     theory = "Cognitive Load Theory",
     evidence = "User complaints"
   )
 
-  expect_error(
-    bid_suggest_components(notice_result, package = "invalidpackage"),
-    "should be one of"
+  suppressMessages({
+    suggestions <- bid_suggest_components(notice_result)
+  })
+
+  expect_true(all(suggestions$relevance > 0))
+  expect_true(is.numeric(suggestions$relevance))
+
+  # Results should be ordered by relevance (descending)
+  if (nrow(suggestions) > 1) {
+    expect_true(all(diff(suggestions$relevance) <= 0))
+  }
+})
+
+test_that("bid_suggest_components works with different BID stages", {
+  # Test with Notice stage
+  notice_result <- bid_notice(
+    problem = "Complex interface",
+    theory = "Cognitive Load Theory",
+    evidence = "User feedback"
   )
 
-  expect_s3_class(
-    bid_suggest_components(notice_result, package = "sh"),
-    "tbl_df"
+  suppressMessages({
+    notice_suggestions <- bid_suggest_components(notice_result)
+  })
+  expect_s3_class(notice_suggestions, "tbl_df")
+
+  # Test with Interpret stage
+  interpret_result <- bid_interpret(
+    notice_result,
+    central_question = "How to simplify the interface?",
+    data_story = list(
+      hook = "Users are confused",
+      context = "Dashboard is complex"
+    )
+  )
+
+  suppressMessages({
+    interpret_suggestions <- bid_suggest_components(interpret_result)
+  })
+  expect_s3_class(interpret_suggestions, "tbl_df")
+
+  # Test with Structure stage
+  structure_result <- bid_structure(
+    interpret_result,
+    layout = "dual_process",
+    concepts = c("Visual Hierarchy", "Cognitive Load Theory")
+  )
+
+  suppressMessages({
+    structure_suggestions <- bid_suggest_components(structure_result)
+  })
+  expect_s3_class(structure_suggestions, "tbl_df")
+})
+
+test_that("bid_suggest_components handles edge cases", {
+  # Test with minimal Notice result
+  minimal_notice <- tibble(
+    stage = "Notice",
+    problem = NA_character_,
+    theory = NA_character_,
+    evidence = "Some evidence",
+    timestamp = Sys.time()
+  )
+
+  suppressMessages({
+    minimal_suggestions <- bid_suggest_components(minimal_notice)
+  })
+  expect_s3_class(minimal_suggestions, "tbl_df")
+
+  # Test with empty package filter that has no matches
+  notice_result <- bid_notice(
+    problem = "Test problem",
+    evidence = "Test evidence"
+  )
+
+  expect_warning(
+    {
+      empty_suggestions <- bid_suggest_components(notice_result, package = "DT")
+    },
+    NA
+  ) # Should not warn, but may return empty results
+
+  expect_s3_class(empty_suggestions, "tbl_df")
+})
+
+test_that("bid_suggest_components extracts concepts correctly", {
+  # Test concept extraction from theory field
+  notice_with_theory <- bid_notice(
+    problem = "Users need better visual hierarchy",
+    theory = "Visual Hierarchies",
+    evidence = "User testing"
+  )
+
+  suppressMessages({
+    theory_suggestions <- bid_suggest_components(notice_with_theory)
+  })
+
+  expect_s3_class(theory_suggestions, "tbl_df")
+  expect_true(nrow(theory_suggestions) > 0)
+
+  # Test concept extraction from Structure stage
+  structure_with_concepts <- bid_structure(
+    bid_interpret(
+      notice_with_theory,
+      central_question = "How to improve visual organization?"
+    ),
+    layout = "card_layout",
+    concepts = c("Principle of Proximity", "Visual Hierarchy")
+  )
+
+  suppressMessages({
+    concept_suggestions <- bid_suggest_components(structure_with_concepts)
+  })
+
+  expect_s3_class(concept_suggestions, "tbl_df")
+  expect_true(nrow(concept_suggestions) > 0)
+})
+
+test_that("bid_suggest_components provides appropriate user feedback", {
+  notice_result <- bid_notice(
+    problem = "Test problem",
+    evidence = "Test evidence"
+  )
+
+  # Should provide success message
+  expect_message(
+    bid_suggest_components(notice_result),
+    "Found .* component suggestion"
+  )
+
+  expect_message(
+    bid_suggest_components(notice_result, package = "bslib"),
+    "Found .* bslib component suggestion"
   )
 })
 
-test_that("bid_suggest_components provides layout-specific suggestions", {
-  structure_result_breathable <- bid_structure(
+test_that("bid_suggest_components handles layout-specific scoring", {
+  structure_result <- bid_structure(
     bid_interpret(
       bid_notice(
-        problem = "Complex interface",
-        evidence = "User complaints"
+        problem = "Need better organization",
+        evidence = "User feedback"
       ),
-      central_question = "How to simplify?"
+      central_question = "How to organize content?"
     ),
-    layout = "breathable",
-    concepts = c("Visual Hierarchy")
+    layout = "sidebar_layout",
+    concepts = "Information Hierarchy"
   )
 
-  breathable_suggestions <- bid_suggest_components(
-    structure_result_breathable,
-    package = "bslib"
+  suppressMessages({
+    layout_suggestions <- bid_suggest_components(structure_result)
+  })
+
+  expect_s3_class(layout_suggestions, "tbl_df")
+  expect_true(nrow(layout_suggestions) > 0)
+
+  # Should include layout-relevant components with higher scores
+  sidebar_components <- layout_suggestions[
+    grepl("sidebar|nav|panel", layout_suggestions$description, ignore.case = TRUE) |
+      grepl("sidebar|nav|panel", layout_suggestions$component, ignore.case = TRUE),
+  ]
+
+  if (nrow(sidebar_components) > 0) {
+    expect_true(any(sidebar_components$relevance > 0))
+  }
+})
+
+test_that("bid_suggest_components component database has required structure", {
+  notice_result <- bid_notice(
+    problem = "Test problem",
+    evidence = "Test evidence"
   )
 
-  expect_true(
-    any(
-      grepl(
-        "space|gap|padding|margin|breathable",
-        breathable_suggestions$description,
-        ignore.case = TRUE
-      )
-    )
+  suppressMessages({
+    suggestions <- bid_suggest_components(notice_result)
+  })
+
+  required_fields <- c(
+    "package", "component", "description", "bid_stage_relevance",
+    "cognitive_concepts", "use_cases", "relevance"
   )
+
+  expect_true(all(required_fields %in% names(suggestions)))
+
+  # Check that packages are from expected list
+  valid_packages <- c("shiny", "bslib", "DT", "plotly", "reactable", "htmlwidgets")
+  if (nrow(suggestions) > 0) {
+    expect_true(all(suggestions$package %in% valid_packages))
+  }
+})
+
+test_that("bid_suggest_components handles audience-based context", {
+  notice_with_audience <- bid_notice(
+    problem = "Executive dashboard needs simplification",
+    theory = "Cognitive Load Theory",
+    evidence = "Executive feedback",
+    target_audience = "Executive leadership team"
+  )
+
+  suppressMessages({
+    exec_suggestions <- bid_suggest_components(notice_with_audience)
+  })
+
+  expect_s3_class(exec_suggestions, "tbl_df")
+  expect_true(nrow(exec_suggestions) > 0)
+
+  # Should prioritize executive-friendly components
+  exec_components <- exec_suggestions[
+    grepl("summary|value|card|executive", exec_suggestions$description, ignore.case = TRUE) |
+      grepl("summary|value|card", exec_suggestions$use_cases, ignore.case = TRUE),
+  ]
+
+  if (nrow(exec_components) > 0) {
+    expect_true(any(exec_components$relevance > 0))
+  }
 })

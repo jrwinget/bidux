@@ -7,8 +7,8 @@
 bid_concepts(search = NULL)
 }
 \arguments{
-\item{search}{Optional search term to filter concepts. Multiple terms can be provided
-separated by commas or spaces.}
+\item{search}{Optional search term to filter concepts. Multiple terms can be
+provided separated by commas or spaces.}
 }
 \value{
 A tibble with concept details.

@@ -42,21 +42,18 @@ bid_message <- function(title, ...) {
 #'
 #' @noRd
 is_empty <- function(x) {
-  # Use is.null first (this doesn't have length issues)
   if (is.null(x)) {
     return(TRUE)
   }
-  
-  # Then check for NA - use all() for vectors
+
   if (all(is.na(x))) {
     return(TRUE)
   }
-  
-  # Finally check for empty string if it's character
+
   if (is.character(x) && all(nchar(trimws(x)) == 0)) {
     return(TRUE)
   }
-  
+
   return(FALSE)
 }
 
@@ -176,4 +173,133 @@ validate_previous_stage <- function(previous_stage, current_stage) {
   }
 
   invisible(NULL)
+}
+
+#' Safe conditional checking utilities
+#'
+#' These functions provide safe ways to check conditions without getting
+#' "missing value where TRUE/FALSE needed" errors.
+#'
+#' @param obj Object to check
+#' @param condition_func Optional function to apply additional conditions
+#' @param df A data frame to check (for `safe_df_check`)
+#' @param min_rows Minimum number of rows for data frames
+#' @param column_name Name of column to access
+#' @param default Default value to return if column access fails
+#' @param lst A list or vector to check (for `safe_list_access`)
+#' @param index Index or name of the element to access in `lst` (for
+#'        `safe_list_access`)
+#' @param str A character string to check (for `safe_string_check`)
+#' @param min_length Minimum number of characters required in `str` (for
+#'        `safe_string_check`) 
+#'
+#' @name safe-utilities
+NULL
+
+#' @describeIn safe-utilities Safe conditional checking
+safe_check <- function(obj, condition_func = NULL) {
+  if (is.null(obj)) {
+    return(FALSE)
+  }
+
+  if (length(obj) == 0) {
+    return(FALSE)
+  }
+
+  if (all(is.na(obj))) {
+    return(FALSE)
+  }
+
+  if (is.null(condition_func)) {
+    return(TRUE)
+  }
+
+  tryCatch(
+    {
+      result <- condition_func(obj)
+      if (length(result) == 0) {
+        return(FALSE)
+      }
+      if (all(is.na(result))) {
+        return(FALSE)
+      }
+      return(all(result))
+    },
+    error = function(e) {
+      return(FALSE)
+    }
+  )
+}
+
+#' @describeIn safe-utilities Safe data frame checking
+safe_df_check <- function(df, min_rows = 1) {
+  safe_check(df, function(x) {
+    is.data.frame(x) && nrow(x) >= min_rows
+  })
+}
+
+#' @describeIn safe-utilities Safe column access
+safe_column_access <- function(df, column_name, default = NA) {
+  if (!safe_df_check(df) || !column_name %in% names(df)) {
+    return(default)
+  }
+
+  col_value <- df[[column_name]]
+  if (length(col_value) == 0) {
+    return(default)
+  }
+  if (all(is.na(col_value))) {
+    return(default)
+  }
+
+  return(col_value[1])
+}
+
+#' @describeIn safe-utilities Safe list/vector access
+safe_list_access <- function(lst, index, default = NA) {
+  if (is.null(lst) || length(lst) == 0) {
+    return(default)
+  }
+  if (is.numeric(index) && (index < 1 || index > length(lst))) {
+    return(default)
+  }
+  if (is.character(index) && !index %in% names(lst)) {
+    return(default)
+  }
+
+  tryCatch(
+    {
+      value <- lst[[index]]
+      if (is.null(value) || (length(value) == 1 && is.na(value))) {
+        return(default)
+      }
+      return(value)
+    },
+    error = function(e) {
+      return(default)
+    }
+  )
+}
+
+#' @describeIn safe-utilities Safe string checking
+safe_string_check <- function(str, min_length = 1) {
+  safe_check(str, function(x) {
+    is.character(x) && all(nchar(trimws(x)) >= min_length)
+  })
+}
+
+#' Function for truncating text in messages
+#'
+#' @param text Object to check
+#' @param max_length Optional function to apply additional conditions
+#'
+#' @noRd
+truncate_text <- function(text, max_length) {
+  if (is.null(text) || is.na(text)) {
+    return("Not specified")
+  }
+  if (nchar(text) > max_length) {
+    return(paste0(substring(text, 1, max_length), "..."))
+  }
+  return(text)
 }
