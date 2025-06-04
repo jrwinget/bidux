@@ -377,7 +377,11 @@ bid_anticipate <- function(
   for (bias_name in names(bias_mitigations)) {
     bias_info <- bid_concept(bias_name)
 
-    if (!is.null(bias_info) && nrow(bias_info) > 0) {
+    if (
+      !is.null(bias_info) &&
+        is.data.frame(bias_info) &&
+        nrow(bias_info) > 0
+    ) {
       implementation <- paste(
         bias_name,
         "mitigation:",

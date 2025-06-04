@@ -81,7 +81,7 @@ bid_concepts <- function(search = NULL) {
       "Collaborative processes that enhance group decision-making.",
       "Technique of showing only necessary information to reduce cognitive load.",
       "Law predicting that interaction time is based on distance and target size.",
-      "Principle that humans can hold 7±2 items in working memory.",
+      "Principle that humans can hold 7 (plus or minus 2) items in working memory.",
       "Signals that guide users toward relevant information.",
       "Quality of an object that suggests how it should be used.",
       "Visual perception principles governing how we group similar elements.",
@@ -317,7 +317,7 @@ bid_concepts <- function(search = NULL) {
       "Accessibility Contrast, Screen Reader Compatibility, Fitts's Law", # Keyboard Navigation
       "Accessibility Contrast, Keyboard Navigation, User-Centric Design", # Screen Reader Compatibility
       "User-Centric Design, Gherkin Method, Data Storytelling Framework", # User Personas
-      "User Personas, Gherkin Method, Cooperation & Coordination" # User-Centric Design
+      "User-Centric Design, Gherkin Method, Cooperation & Coordination" # User-Centric Design
     )
   )
 
@@ -383,30 +383,59 @@ bid_concepts <- function(search = NULL) {
         }
       } else {
         cli::cli_alert_warning("No concepts found matching '{search_str}'")
-        all_concepts <- data.frame(concept = unique(tolower(unlist(strsplit(
-          paste(concepts$concept, concepts$related_concepts, sep = ", "),
-          "[,\\s]+"
-        )))))
-        all_concepts <- all_concepts[all_concepts$concept != "", ]
+        
+        tryCatch({
+          # Get the original full concepts list for fuzzy matching
+          full_concepts <- bid_concepts()  # Call without search to get all concepts
+          
+          if (nrow(full_concepts) > 0) {
+            # Safely create concept names for fuzzy matching
+            concept_text <- paste(
+              full_concepts$concept,
+              ifelse(
+                is.na(full_concepts$related_concepts), "", full_concepts$related_concepts
+              ),
+              sep = ", "
+            )
 
-        similar_concepts <- character(0)
-        for (term in search_terms) {
-          distances <- stringdist::stringdistmatrix(
-            tolower(term),
-            all_concepts$concept,
-            method = "jw"
-          )
-          best_matches <- head(order(distances), 3)
-          similar_concepts <- c(similar_concepts, all_concepts$concept[best_matches])
-        }
+            all_concept_names <- unique(
+              tolower(unlist(strsplit(concept_text, "[,\\s]+")))
+            )
 
-        if (length(similar_concepts) > 0) {
-          similar_concepts <- unique(similar_concepts)
-          cli::cli_alert_info("Try searching for similar concepts:")
-          for (concept in similar_concepts) {
-            cli::cli_li("{.field {concept}}")
+            all_concept_names <- all_concept_names[
+              all_concept_names != "" & !is.na(all_concept_names)
+            ]
+
+            if (length(all_concept_names) > 0) {
+              all_concepts <- tibble::tibble(concept = all_concept_names)
+            } else {
+              all_concepts <- tibble::tibble(concept = character(0))
+            }
+
+            similar_concepts <- character(0)
+            if (nrow(all_concepts) > 0 && "concept" %in% names(all_concepts)) {
+              for (term in search_terms) {
+                distances <- stringdist::stringdistmatrix(
+                  tolower(term),
+                  all_concepts$concept,
+                  method = "jw"
+                )
+                best_matches <- head(order(distances), 3)
+                similar_concepts <- c(similar_concepts, all_concepts$concept[best_matches])
+              }
+            }
+
+            if (length(similar_concepts) > 0) {
+              similar_concepts <- unique(similar_concepts)
+              cli::cli_alert_info("Try searching for similar concepts:")
+              for (concept in similar_concepts) {
+                cli::cli_li("{.field {concept}}")
+              }
+            }
           }
-        }
+        }, error = function(e) {
+          cli::cli_alert_info("Fuzzy matching unavailable")
+        })
 
         cli::cli_alert_info(
           "Or use {.code bid_concepts()} without a search term to see all concepts"
@@ -436,6 +465,11 @@ bid_concepts <- function(search = NULL) {
 #'
 #' @export
 bid_concept <- function(concept_name) {
+  if (is.null(concept_name) || is.na(concept_name) || trimws(concept_name) == "") {
+    cli::cli_alert_warning("Please provide a valid concept name")
+    return(structure(list(), suggestions = "Please provide a valid concept name"))
+  }
+  
   all_concepts <- bid_concepts()
 
   result <- dplyr::filter(
@@ -471,12 +505,18 @@ bid_concept <- function(concept_name) {
   # try matching by related concepts
   if (nrow(result) == 0) {
     related_matches <- sapply(all_concepts$related_concepts, function(related) {
+      if (is.na(related) || trimws(related) == "") {
+        return(FALSE)
+      }
       grepl(tolower(concept_name), tolower(related))
     })
 
     if (any(related_matches)) {
       result <- all_concepts[related_matches, ]
       similarities <- sapply(result$related_concepts, function(related) {
+        if (is.na(related) || trimws(related) == "") {
+          return(0)
+        }
         match_words <- sum(sapply(strsplit(tolower(concept_name), "\\s+")[[1]], function(word) {
           grepl(word, tolower(related))
         }))
@@ -486,155 +526,166 @@ bid_concept <- function(concept_name) {
     }
   }
 
-  # fuzzy matching suggestions
+  # fuzzy matching suggestions - FIXED with proper error handling
   if (nrow(result) == 0) {
-    # calculate string distances
-    distances <- stringdist::stringdistmatrix(
-      tolower(concept_name),
-      tolower(all_concepts$concept),
-      method = "jw"
-    )
-
-    closest_indices <- order(distances)[1:min(5, length(distances))]
-    closest_matches <- all_concepts$concept[closest_indices]
-    match_scores <- 1 - distances[closest_indices]
-    match_categories <- all_concepts$category[closest_indices]
-
-    synonyms <- list(
-      "hierarchy" = c("structure", "organization", "layout"),
-      "cognitive" = c("mental", "thinking", "brain"),
-      "bias" = c("preference", "tendency", "inclination"),
-      "visual" = c("display", "graphic", "interface"),
-      "proximity" = c("nearness", "closeness", "grouping"),
-      "choice" = c("option", "selection", "decision"),
-      "information" = c("data", "content", "details"),
-      "feedback" = c("response", "reaction", "output"),
-      "user" = c("person", "visitor", "customer")
-    )
-
-    query_words <- strsplit(tolower(concept_name), "\\s+")[[1]]
-    synonym_matches <- integer(0)
-
-    for (i in seq_along(query_words)) {
-      word <- query_words[i]
-      for (syn_key in names(synonyms)) {
-        if (word %in% synonyms[[syn_key]] || grepl(word, syn_key)) {
-          matches <- grepl(syn_key, tolower(all_concepts$concept))
-          if (any(matches)) {
-            synonym_matches <- c(synonym_matches, which(matches))
-          }
-        }
-      }
-    }
-
-    if (length(synonym_matches) > 0) {
-      synonym_concepts <- all_concepts$concept[unique(synonym_matches)]
-      synonym_concepts <- setdiff(synonym_concepts, closest_matches)
-      if (length(synonym_concepts) > 0) {
-        closest_matches <- c(closest_matches, head(synonym_concepts, 2))
-      }
-    }
-
-    cli::cli_h1("Concept Not Found")
-    cli::cli_alert_warning(
-      "Concept '{concept_name}' not found in the BID framework dictionary."
-    )
-
-    cli::cli_h2("Did you mean one of these?")
-    for (i in seq_along(closest_matches)) {
-      if (i <= length(match_scores)) {
-        score_pct <- round(match_scores[i] * 100)
-        category <- if (i <= length(match_categories)) match_categories[i] else ""
-
-        if (score_pct >= 75) {
-          match_indicator <- cli::col_green("\u2713 High match")
-        } else if (score_pct >= 50) {
-          match_indicator <- cli::col_yellow("\u26A0 Possible match")
-        } else {
-          match_indicator <- cli::col_red("\u2022 Related concept")
-        }
-
-        cli::cli_li("{.strong {closest_matches[i]}} {match_indicator} ({category})")
-
-        if (i <= 2) {
-          concept_idx <- which(all_concepts$concept == closest_matches[i])[1]
-          if (!is.na(concept_idx)) {
-            desc <- all_concepts$description[concept_idx]
-            cli::cli_alert_info("  {desc}")
-          }
-        }
-      }
-    }
-
-    cli::cli_alert_success(
-      "Try using {.code bid_concept(\"{closest_matches[1]}\")} to get more information."
-    )
-
-    cli::cli_alert_info(
-      "Or use {.code bid_concepts()} to browse all available concepts."
-    )
-
-    suggestions <- tibble::tibble(suggested_concept = closest_matches)
-    return(structure(NULL, suggestions = suggestions))
-  }
-
-  result <- result |>
-    dplyr::mutate(
-      recommendations = dplyr::case_when(
-        category == "Stage 1" ~
-          paste(
-            "Consider how this concept can help identify friction points in",
-            "your UI. Focus on reducing cognitive barriers for users."
-          ),
-        category == "Stage 2" ~
-          paste(
-            "Apply this concept to improve how users interpret data.",
-            "Enhance information processing and meaning extraction."
-          ),
-        category == "Stage 3" ~
-          paste(
-            "Use this concept to better structure dashboard elements.",
-            "Create intuitive layouts that match users' mental models."
-          ),
-        category == "Stage 4" ~
-          paste(
-            "Consider how this concept influences user decision-making.",
-            "Mitigate cognitive biases to improve information interpretation."
-          ),
-        category == "Stage 5" ~
-          paste(
-            "Apply this concept to create a more memorable final impression.",
-            "Help users extract actionable insights and collaborate effectively."
-          ),
-        category == "All Stages" ~
-          paste(
-            "This concept is relevant throughout the entire BID process.",
-            "Incorporate it at each stage of your dashboard development."
-          ),
-        TRUE ~ "Consider how this concept can improve your dashboard."
+    tryCatch({
+      # calculate string distances safely
+      distances <- stringdist::stringdistmatrix(
+        tolower(concept_name),
+        tolower(all_concepts$concept),
+        method = "jw"
       )
-    )
 
-  if (nrow(result) > 0 && "related_concepts" %in% names(result)) {
-    related <- result$related_concepts[1]
-    if (!is.na(related) && related != "") {
-      cli::cli_h2("Related concepts you might find useful:")
-      related_list <- unlist(strsplit(related, ",\\s*"))
-      for (rel in related_list) {
-        rel_info <- dplyr::filter(all_concepts, concept == rel)
-        if (nrow(rel_info) > 0) {
-          cli::cli_li("{.field {rel}}: {rel_info$description[1]}")
-        } else {
-          cli::cli_li("{.field {rel}}")
+      closest_indices <- order(distances)[1:min(5, length(distances))]
+      closest_matches <- all_concepts$concept[closest_indices]
+      match_scores <- 1 - distances[closest_indices]
+      match_categories <- all_concepts$category[closest_indices]
+
+      synonyms <- list(
+        "hierarchy" = c("structure", "organization", "layout"),
+        "cognitive" = c("mental", "thinking", "brain"),
+        "bias" = c("preference", "tendency", "inclination"),
+        "visual" = c("display", "graphic", "interface"),
+        "proximity" = c("nearness", "closeness", "grouping"),
+        "choice" = c("option", "selection", "decision"),
+        "information" = c("data", "content", "details"),
+        "feedback" = c("response", "reaction", "output"),
+        "user" = c("person", "visitor", "customer")
+      )
+
+      query_words <- strsplit(tolower(concept_name), "\\s+")[[1]]
+      synonym_matches <- integer(0)
+
+      for (i in seq_along(query_words)) {
+        word <- query_words[i]
+        for (syn_key in names(synonyms)) {
+          if (word %in% synonyms[[syn_key]] || grepl(word, syn_key)) {
+            matches <- grepl(syn_key, tolower(all_concepts$concept))
+            if (any(matches)) {
+              synonym_matches <- c(synonym_matches, which(matches))
+            }
+          }
         }
       }
+
+      if (length(synonym_matches) > 0) {
+        synonym_concepts <- all_concepts$concept[unique(synonym_matches)]
+        synonym_concepts <- setdiff(synonym_concepts, closest_matches)
+        if (length(synonym_concepts) > 0) {
+          closest_matches <- c(closest_matches, head(synonym_concepts, 2))
+        }
+      }
+
+      cli::cli_h1("Concept Not Found")
+      cli::cli_alert_warning(
+        "Concept '{concept_name}' not found in the BID framework dictionary."
+      )
+
+      cli::cli_h2("Did you mean one of these?")
+      for (i in seq_along(closest_matches)) {
+        if (i <= length(match_scores)) {
+          score_pct <- round(match_scores[i] * 100)
+          category <- if (i <= length(match_categories)) match_categories[i] else ""
+
+          if (score_pct >= 75) {
+            match_indicator <- cli::col_green("\u2713 High match")
+          } else if (score_pct >= 50) {
+            match_indicator <- cli::col_yellow("\u26A0 Possible match")
+          } else {
+            match_indicator <- cli::col_red("\u2022 Related concept")
+          }
+
+          cli::cli_li("{.strong {closest_matches[i]}} {match_indicator} ({category})")
+
+          if (i <= 2) {
+            concept_idx <- which(all_concepts$concept == closest_matches[i])[1]
+            if (!is.na(concept_idx)) {
+              desc <- all_concepts$description[concept_idx]
+              cli::cli_alert_info("  {desc}")
+            }
+          }
+        }
+      }
+
+      cli::cli_alert_success(
+        "Try using {.code bid_concept(\"{closest_matches[1]}\")} to get more information."
+      )
+
       cli::cli_alert_info(
-        "To explore these concepts further, use {.code bid_concept(\"concept name\")}"
+        "Or use {.code bid_concepts()} to browse all available concepts."
       )
-    }
+
+      suggestions <- tibble::tibble(suggested_concept = closest_matches)
+      return(structure(list(), suggestions = suggestions))
+      
+    }, error = function(e) {
+      cli::cli_alert_warning("Concept '{concept_name}' not found")
+      cli::cli_alert_info("Use {.code bid_concepts()} to see all available concepts")
+      return(structure(list(), suggestions = "Concept matching unavailable"))
+    })
   }
 
+  # Add recommendations safely
   if (nrow(result) > 0) {
+    result <- result |>
+      dplyr::mutate(
+        recommendations = dplyr::case_when(
+          category == "Stage 1" ~
+            paste(
+              "Consider how this concept can help identify friction points in",
+              "your UI. Focus on reducing cognitive barriers for users."
+            ),
+          category == "Stage 2" ~
+            paste(
+              "Apply this concept to improve how users interpret data.",
+              "Enhance information processing and meaning extraction."
+            ),
+          category == "Stage 3" ~
+            paste(
+              "Use this concept to better structure dashboard elements.",
+              "Create intuitive layouts that match users' mental models."
+            ),
+          category == "Stage 4" ~
+            paste(
+              "Consider how this concept influences user decision-making.",
+              "Mitigate cognitive biases to improve information interpretation."
+            ),
+          category == "Stage 5" ~
+            paste(
+              "Apply this concept to create a more memorable final impression.",
+              "Help users extract actionable insights and collaborate effectively."
+            ),
+          category == "All Stages" ~
+            paste(
+              "This concept is relevant throughout the entire BID process.",
+              "Incorporate it at each stage of your dashboard development."
+            ),
+          TRUE ~ "Consider how this concept can improve your dashboard."
+        )
+      )
+
+    if ("related_concepts" %in% names(result) && nrow(result) > 0) {
+      related <- result$related_concepts[1]
+      if (!is.na(related) && related != "" && trimws(related) != "") {
+        cli::cli_h2("Related concepts you might find useful:")
+        related_list <- unlist(strsplit(related, ",\\s*"))
+        for (rel in related_list) {
+          rel_trimmed <- trimws(rel)
+          if (rel_trimmed != "") {
+            rel_info <- dplyr::filter(all_concepts, concept == rel_trimmed)
+            if (nrow(rel_info) > 0) {
+              cli::cli_li("{.field {rel_trimmed}}: {rel_info$description[1]}")
+            } else {
+              cli::cli_li("{.field {rel_trimmed}}")
+            }
+          }
+        }
+        cli::cli_alert_info(
+          "To explore these concepts further, use {.code bid_concept(\"concept name\")}"
+        )
+      }
+    }
+
     cli::cli_alert_success("Found information for {.strong {result$concept[1]}}")
     cli::cli_alert_info("Category: {result$category[1]}")
   }
