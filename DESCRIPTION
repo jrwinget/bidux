@@ -22,6 +22,7 @@ Imports:
     cli,
     dplyr,
     jsonlite,
+    readr,
     stringdist,
     stringr,
     tibble,

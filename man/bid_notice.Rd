@@ -10,27 +10,45 @@ bid_notice(problem, theory = NULL, evidence = NULL, target_audience = NULL)
 \item{problem}{A character string describing the observed user problem.}
 
 \item{theory}{A character string describing the behavioral theory that might
-explain the problem.}
+explain the problem. If NULL, will be auto-suggested using external
+theory mappings.}
 
-\item{evidence}{A character string describing evidence supporting the
-problem.}
+\item{evidence}{A character string describing evidence supporting the problem.}
 
-\item{target_audience}{Optional character string describing the target
-audience.}
+\item{target_audience}{Optional character string describing the target audience.}
 }
 \value{
-A tibble containing the documented information for the "Notice"
-stage.
+A bid_stage object containing the documented information for the
+"Notice" stage with enhanced metadata and validation.
 }
 \description{
 This function documents the initial observation and problem identification
-stage. It represents stage 1 in the BID framework.
+stage. It represents stage 1 in the BID framework and now returns a
+structured bid_stage object with enhanced metadata and external mapping support.
 }
 \examples{
-bid_notice(
-  problem = "Users struggle with complex data",
-  theory = "Cognitive Load Theory",
-  evidence = "User testing shows confusion with current interface"
+# Basic usage with auto-suggested theory
+notice_result <- bid_notice(
+  problem = "Users struggle with complex dropdown menus containing too many options",
+  evidence = "User testing shows 65\% abandonment rate on filter selection"
+)
+
+# Print shows human-friendly summary
+print(notice_result)
+
+# Access underlying data
+summary(notice_result)
+
+# Check stage and metadata
+get_stage(notice_result)
+get_metadata(notice_result)
+
+# With explicit theory
+notice_explicit <- bid_notice(
+  problem = "Mobile interface is difficult to navigate",
+  theory = "Fitts's Law",
+  evidence = "Mobile users report frustration with small touch targets",
+  target_audience = "Mobile users with varying technical expertise"
 )
 
 }

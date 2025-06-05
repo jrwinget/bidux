@@ -1,0 +1,11 @@
+keywords,theory,confidence,description,stage_relevance
+"too many.*option|overwhelm.*too many|dropdown.*option|too many.*choice|many.*choice|choice.*option|options.*dropdown|too many choices|dropdown.*menu",Hick's Law,0.9,"Decision time increases with number of choices",Stage 1
+"find.*information|search|locate|discover|navigation",Information Scent,0.8,"Users follow cues to find relevant information",Stage 1
+"visual.*layout|hierarchy|organization|attention|cluttered.*layout|disorganized|layout.*cluttered|cluttered.*disorganized",Visual Hierarchies,0.85,"Organization of visual elements by importance",Stage 1
+"complex|overwhelm|too much|confus|mental load|difficult",Cognitive Load Theory,0.9,"Mental effort required to process information",Stage 1
+"mobile|touch|responsive|screen",Fitts's Law,0.8,"Interaction time based on distance and target size",Stage 1
+"aesthetic|beautiful|appearance|design",Aesthetic-Usability,0.7,"Attractive designs perceived as more usable",Stage 1
+"remember|recall|memory|forget",Miller's Law,0.75,"Humans can hold 7±2 items in working memory",Stage 1
+"group|cluster|organize|categoriz",Gestalt Principles,0.8,"Visual perception principles for grouping elements",Stage 1
+"speed|fast|slow|performance|delay",Processing Fluency,0.7,"Ease of processing affects comprehension and trust",Stage 2
+"story|narrative|explain|meaning",Data Storytelling Framework,0.85,"Framework for crafting narratives with data",Stage 2

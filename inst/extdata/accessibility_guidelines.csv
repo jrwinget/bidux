@@ -1,0 +1,11 @@
+guideline,requirement,wcag_level,implementation,testing_method,bid_relevance
+color_contrast,"4.5:1 ratio for normal text, 3:1 for large text",AA,"Use WebAIM contrast checker, test with color blindness simulators","Automated tools like axe-core or manual testing","Essential for Visual Hierarchy and Cognitive Load Theory"
+keyboard_navigation,"All interactive elements accessible via keyboard",AA,"Implement proper tab order, focus indicators, keyboard shortcuts","Tab through interface, test with screen reader","Supports Fitts's Law and Norman's Stages of Action"
+screen_reader,"Descriptive alt text, ARIA labels, semantic markup",AA,"Use proper heading structure, describe chart content, label form elements","Test with NVDA, JAWS, or VoiceOver","Critical for Information Scent and Data Storytelling"
+text_size,"Minimum 16px for body text, 20px for headings",AA,"Use relative units (rem/em), test at 200% zoom","Browser zoom testing, mobile device testing","Supports Processing Fluency and Cognitive Load Theory"
+focus_indicators,"Visible focus outline for keyboard users",AA,"Custom focus styles, minimum 2px outline","Keyboard navigation testing","Essential for Affordance and Interaction Hints"
+semantic_markup,"Proper HTML5 elements for structure",A,"Use header, nav, main, section, article appropriately","Automated accessibility scanners","Supports Information Hierarchy and Screen Reader compatibility"
+aria_labels,"Descriptive labels for complex UI components",AA,"Label charts, interactive widgets, dynamic content","Screen reader testing, automated tools","Critical for complex visualizations and interactions"
+motion_preferences,"Respect prefers-reduced-motion setting",AAA,"Disable animations for users who prefer reduced motion","CSS media query testing","Supports inclusive design and reduces cognitive load"
+error_handling,"Clear error messages and recovery paths",AA,"Descriptive error text, inline validation, clear instructions","User testing with people with disabilities","Essential for Norman's Stages of Action and error recovery"
+timing_adjustments,"Allow users to extend time limits",AAA,"Provide timing controls or warnings before timeouts","Test with assistive technology users","Supports users with cognitive disabilities"

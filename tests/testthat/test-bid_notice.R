@@ -3,46 +3,56 @@ library(tibble)
 library(cli)
 library(stringr)
 
-validate_required_params <- function(...) {}
-bid_message <- function(...) {}
-
-bid_concept <- function(theory) {
-  known_theories <- c(
-    "Cognitive Load Theory", "Visual Hierarchies", "Hick's Law",
-    "Information Scent", "Pre-attentive Processing", "Fitts's Law",
-    "Miller's Law", "Gestalt Principles", "Principle of Proximity"
-  )
-  if (theory %in% known_theories) {
-    return(tibble(implementation_tips = paste("Tip for", theory)))
-  } else {
-    return(tibble())
-  }
-}
-
-test_that("bid_notice returns a tibble with correct columns and stage", {
+test_that("bid_notice returns a bid_stage object with correct structure", {
   result <- bid_notice(
     problem = "Users struggle to navigate cluttered dashboards",
     evidence = "User testing showed increased time to locate key metrics."
   )
+  
+  # Check S3 class
+  expect_s3_class(result, "bid_stage")
   expect_s3_class(result, "tbl_df")
-
+  
+  # Check required columns
   expected_cols <- c(
     "stage", "problem", "theory", "evidence",
     "target_audience", "suggestions", "timestamp"
   )
-
   expect_equal(sort(names(result)), sort(expected_cols))
-
   expect_equal(result$stage, "Notice")
+  
+  # Check S3 methods work
+  expect_equal(get_stage(result), "Notice")
+  expect_type(get_metadata(result), "list")
 })
 
-test_that("bid_notice respects provided theory", {
+test_that("bid_notice respects provided theory and doesn't auto-suggest", {
   result <- bid_notice(
     problem = "Simple dashboard issue",
     evidence = "Users are confused by the interface layout",
     theory = "Custom Theory"
   )
   expect_equal(result$theory, "Custom Theory")
+  
+  # Check metadata reflects manual theory selection
+  metadata <- get_metadata(result)
+  expect_false(metadata$auto_suggested_theory)
+})
+
+test_that("bid_notice auto-suggests theory when not provided", {
+  result <- bid_notice(
+    problem = "Users are overwhelmed with too many options in the dropdown",
+    evidence = "User testing shows confusion"
+  )
+  
+  # Should suggest a theory
+  expect_false(is.na(result$theory))
+  
+  # Check metadata reflects auto-suggestion
+  metadata <- get_metadata(result)
+  expect_true(metadata$auto_suggested_theory)
+  expect_type(metadata$theory_confidence, "double")
+  expect_true(metadata$theory_confidence > 0 && metadata$theory_confidence <= 1)
 })
 
 test_that("bid_notice records provided target audience correctly", {
@@ -55,6 +65,10 @@ test_that("bid_notice records provided target audience correctly", {
     result$target_audience,
     "Sales representatives with varying technical skills"
   )
+  
+  # Check metadata
+  metadata <- get_metadata(result)
+  expect_true(metadata$has_target_audience)
 })
 
 test_that("bid_notice returns NA for target audience when not provided", {
@@ -63,6 +77,10 @@ test_that("bid_notice returns NA for target audience when not provided", {
     evidence = "Feedback indicates users are disoriented."
   )
   expect_true(is.na(result$target_audience))
+  
+  # Check metadata
+  metadata <- get_metadata(result)
+  expect_false(metadata$has_target_audience)
 })
 
 test_that("bid_notice warns for short problem description", {
@@ -82,44 +100,35 @@ test_that("bid_notice warns for short evidence description", {
   )
 })
 
-test_that("bid_notice errors if problem is not a character", {
+test_that("bid_notice errors with proper validation messages", {
   expect_error(
     bid_notice(problem = 123, evidence = "Valid evidence"),
-    "Problem must be a character string"
+    "'problem' must be a single character string"
   )
-})
-
-test_that("bid_notice errors if evidence is not a character", {
+  
   expect_error(
     bid_notice(problem = "Valid problem", evidence = 456),
-    "Evidence must be a character string"
+    "'evidence' must be a single character string"
   )
-})
-
-test_that("bid_notice errors if theory is provided and is not a character", {
+  
   expect_error(
     bid_notice(
       problem = "Valid problem",
       evidence = "Valid evidence",
       theory = 789
     ),
-    "Theory must be a character string"
+    "'theory' must be a single character string or NULL"
+  )
+  
+  expect_error(
+    bid_notice(
+      problem = "Valid problem",
+      evidence = "Valid evidence",
+      target_audience = 101112
+    ),
+    "'target_audience' must be a single character string or NULL"
   )
 })
-
-test_that(
-  "bid_notice errors if target_audience is provided and is not a character",
-  {
-    expect_error(
-      bid_notice(
-        problem = "Valid problem",
-        evidence = "Valid evidence",
-        target_audience = 101112
-      ),
-      "Target audience must be a character string"
-    )
-  }
-)
 
 test_that("bid_notice returns timestamp as a POSIXct object", {
   result <- bid_notice(
@@ -148,20 +157,20 @@ test_that("bid_notice suggests appropriate theory based on problem description",
   )
 })
 
-test_that("bid_notice handles NA, NULL, and empty string correctly", {
-  expect_warning(
+test_that("bid_notice handles empty strings and validates properly", {
+  expect_error(
     bid_notice(problem = "", evidence = "Valid evidence"),
-    "Problem description is very short"
+    "Problem cannot be empty or whitespace only"
   )
 
-  expect_warning(
+  expect_error(
     bid_notice(problem = "   ", evidence = "Valid evidence"),
-    "Problem description is very short"
+    "Problem cannot be empty or whitespace only"
   )
 
-  expect_warning(
+  expect_error(
     bid_notice(problem = "Valid problem", evidence = ""),
-    "Evidence description is very short"
+    "Evidence cannot be empty or whitespace only"
   )
 
   expect_error(
@@ -176,24 +185,6 @@ test_that("bid_notice handles NA, NULL, and empty string correctly", {
 })
 
 test_that("bid_notice handles edge cases in optional parameters", {
-  expect_warning(
-    result <- bid_notice(
-      problem = "Users struggle with complex filters",
-      evidence = "User feedback indicates confusion",
-      target_audience = ""
-    ),
-    "target_audience is empty"
-  )
-
-  expect_warning(
-    result <- bid_notice(
-      problem = "Users struggle with complex filters",
-      evidence = "User feedback indicates confusion",
-      target_audience = NA
-    ),
-    "target_audience is NA"
-  )
-
   long_problem <- paste(
     rep("This is a very long problem description. ", 20),
     collapse = ""
@@ -209,7 +200,7 @@ test_that("bid_notice handles edge cases in optional parameters", {
     evidence = long_evidence
   )
 
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
   expect_equal(result$problem, long_problem)
   expect_equal(result$evidence, long_evidence)
 
@@ -222,20 +213,112 @@ test_that("bid_notice handles edge cases in optional parameters", {
   expect_equal(result$theory, "My Custom Theory Framework")
 })
 
-test_that("bid_notice suggests appropriate theories based on combined text", {
+test_that("bid_notice metadata contains expected information", {
+  result <- bid_notice(
+    problem = "Complex dashboard with many options",
+    evidence = "User feedback indicates confusion and task abandonment"
+  )
+  
+  metadata <- get_metadata(result)
+  
+  # Check required metadata fields
+  expect_true("auto_suggested_theory" %in% names(metadata))
+  expect_true("theory_confidence" %in% names(metadata))
+  expect_true("problem_length" %in% names(metadata))
+  expect_true("evidence_length" %in% names(metadata))
+  expect_true("has_target_audience" %in% names(metadata))
+  expect_true("validation_status" %in% names(metadata))
+  expect_true("stage_number" %in% names(metadata))
+  expect_true("total_stages" %in% names(metadata))
+  expect_true("custom_mappings_used" %in% names(metadata))
+  
+  # Check values
+  expect_equal(metadata$stage_number, 1)
+  expect_equal(metadata$total_stages, 5)
+  expect_equal(metadata$validation_status, "completed")
+  expect_false(metadata$custom_mappings_used)
+})
+
+test_that("bid_notice print method works correctly", {
+  result <- bid_notice(
+    problem = "Users struggle with complex data visualization",
+    evidence = "User testing revealed high task completion times",
+    target_audience = "Data analysts"
+  )
+  
+  # Test that print method executes without error
+  expect_output(print(result), "BID Framework")
+  expect_output(print(result), "Notice Stage")
+  expect_output(print(result), "Problem:")
+  expect_output(print(result), "Theory:")
+  expect_output(print(result), "Evidence:")
+  expect_output(print(result), "Target Audience:")
+})
+
+test_that("bid_notice summary method works correctly", {
+  result <- bid_notice(
+    problem = "Complex interface overwhelms users",
+    evidence = "Analytics show high bounce rates"
+  )
+  
+  # Test that summary method executes without error
+  expect_output(summary(result), "BID Framework:")
+  expect_output(summary(result), "Notice Stage Summary")
+  expect_output(summary(result), "Metadata:")
+})
+
+test_that("bid_notice as_tibble method works correctly", {
+  result <- bid_notice(
+    problem = "Interface complexity issue",
+    evidence = "User research indicates problems"
+  )
+  
+  # Convert to tibble
+  tibble_result <- as_tibble(result)
+  
+  # Should be a regular tibble without bid_stage class
+  expect_s3_class(tibble_result, "tbl_df")
+  expect_false(inherits(tibble_result, "bid_stage"))
+  
+  # Should have same data
+  expect_equal(names(tibble_result), names(result))
+  expect_equal(nrow(tibble_result), nrow(result))
+})
+
+test_that("bid_notice theory confidence scoring works", {
+  # Test high-confidence match
   result1 <- bid_notice(
-    problem = "Users struggle with finding information",
-    evidence = "Complex interface with too many options"
+    problem = "Too many dropdown options overwhelm users",
+    evidence = "Users abandon tasks when faced with many choices"
   )
-
+  
+  metadata1 <- get_metadata(result1)
+  expect_true(metadata1$theory_confidence >= 0.8)  # Should be high confidence
+  
+  # Test lower confidence scenario
   result2 <- bid_notice(
-    problem = "Users face difficulties",
-    evidence = "Too many choices in the dropdown menus"
+    problem = "General usability issues",
+    evidence = "Some user complaints"
   )
+  
+  metadata2 <- get_metadata(result2)
+  expect_true(metadata2$theory_confidence > 0)  # Should have some confidence
+})
 
-  expect_match(
-    paste(result1$theory, result2$theory),
-    "Hick|Cognitive Load|Visual Hierarchy",
-    ignore.case = TRUE
+test_that("bid_notice generates appropriate suggestions", {
+  result <- bid_notice(
+    problem = "Mobile interface is difficult to use",
+    evidence = "Touch targets are too small"
   )
+  
+  # Should include mobile-specific suggestions
+  expect_match(result$suggestions, "mobile|touch", ignore.case = TRUE)
+  
+  result2 <- bid_notice(
+    problem = "Users struggle with too many choices",
+    evidence = "Decision time is very long"
+  )
+  
+  # Should include choice-related suggestions
+  expect_match(result2$suggestions, "choice|decision|disclosure", ignore.case = TRUE)
 })

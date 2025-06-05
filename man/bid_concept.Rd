@@ -2,25 +2,19 @@
 % Please edit documentation in R/bid_concepts.R
 \name{bid_concept}
 \alias{bid_concept}
-\title{Get Detailed Information for a BID Concept}
+\title{Get detailed information about a specific concept}
 \usage{
-bid_concept(concept_name)
+bid_concept(concept_name, add_recommendations = TRUE)
 }
 \arguments{
-\item{concept_name}{A character string specifying the name of the concept.}
+\item{concept_name}{A character string with the exact or partial concept name}
+
+\item{add_recommendations}{Logical indicating whether to add stage-specific recommendations}
 }
 \value{
-A tibble with details for the specified concept, or empty tibble if
-not found.
+A tibble with detailed concept information
 }
 \description{
-This function retrieves detailed information about a specific concept within
-the BID framework. If the concept is not found, it suggests similar concepts
-using both fuzzy matching and conceptual relationships.
-}
-\examples{
-bid_concept("Cognitive Load Theory")
-bid_concept("cognitive load") # Case insensitive, partial matching
-bid_concept("proximity") # Works with partial concept names
-
+Returns detailed information about a specific BID framework concept,
+including implementation recommendations based on the concept's stage.
 }

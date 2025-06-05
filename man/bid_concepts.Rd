@@ -2,25 +2,22 @@
 % Please edit documentation in R/bid_concepts.R
 \name{bid_concepts}
 \alias{bid_concepts}
-\title{List all BID Framework Concepts}
+\title{Search BID Framework Concepts}
 \usage{
-bid_concepts(search = NULL)
+bid_concepts(search = NULL, fuzzy_match = TRUE, max_distance = 2)
 }
 \arguments{
-\item{search}{Optional search term to filter concepts. Multiple terms can be
-provided separated by commas or spaces.}
+\item{search}{A character string to search for. If NULL or empty, returns all concepts.}
+
+\item{fuzzy_match}{Logical indicating whether to use fuzzy string matching (default: TRUE)}
+
+\item{max_distance}{Maximum string distance for fuzzy matching (default: 2)}
 }
 \value{
-A tibble with concept details.
+A tibble containing matching concepts with their details
 }
 \description{
-This function returns a tibble listing all the key concepts in the Behavior
-Insight Design framework, including their descriptions, categories,
-references, and example applications.
-}
-\examples{
-bid_concepts()
-bid_concepts("cognitive")
-bid_concepts("visual, hierarchy") # Multiple search terms
-
+Search for behavioral science and UX concepts used in the BID framework.
+Returns concepts matching the search term along with their descriptions,
+categories, and implementation guidance.
 }
