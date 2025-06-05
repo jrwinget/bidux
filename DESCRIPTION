@@ -16,16 +16,19 @@ Description: Provides a framework and toolkit to guide Shiny developers in
     dictionary.
 License: MIT + file LICENSE
 Encoding: UTF-8
+LazyData: true
+Depends: 
+    R (>= 4.1.0)
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports: 
-    cli,
-    dplyr,
-    jsonlite,
-    readr,
-    stringdist,
-    stringr,
-    tibble,
+    cli (>= 3.6.5),
+    dplyr (>= 1.1.4),
+    jsonlite (>= 2.0.0),
+    readr (>= 2.1.5),
+    stringdist (>= 0.9.15),
+    stringr (>= 1.5.1),
+    tibble (>= 3.2.1),
     utils
 Suggests: 
     DiagrammeR,
