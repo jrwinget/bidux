@@ -251,17 +251,15 @@ validate_previous_stage <- function(previous_stage = NULL, current_stage) {
   invisible(NULL)
 }
 
-#' Safe conditional checking utilities
+#' Safe conditional checking
 #'
-#' These functions provide safe ways to check conditions without getting
-#' "missing value where TRUE/FALSE needed" errors.
+#' @param obj The object to check
+#' @param condition_func Optional function to apply for checking
 #'
-#' @name safe-utilities
+#' @return TRUE if object passes checks, FALSE otherwise
+#'
 #' @keywords internal
 #' @noRd
-NULL
-
-#' @describeIn safe-utilities Safe conditional checking
 safe_check <- function(obj, condition_func = NULL) {
   if (is.null(obj)) {
     return(FALSE)
@@ -292,14 +290,31 @@ safe_check <- function(obj, condition_func = NULL) {
   )
 }
 
-#' @describeIn safe-utilities Safe data frame checking
+#' Safe data frame checking
+#'
+#' @param df Data frame to check
+#' @param min_rows Minimum number of rows required
+#'
+#' @return TRUE if data frame meets criteria, FALSE otherwise
+#'
+#' @keywords internal
+#' @noRd
 safe_df_check <- function(df, min_rows = 1) {
   safe_check(df, function(x) {
     is.data.frame(x) && nrow(x) >= min_rows
   })
 }
 
-#' @describeIn safe-utilities Safe column access
+#' Safe column access from data frame
+#'
+#' @param df Data frame to access
+#' @param column_name Name of column to access
+#' @param default Default value to return if column doesn't exist or is empty
+#'
+#' @return First value from column or default
+#'
+#' @keywords internal
+#' @noRd
 safe_column_access <- function(df, column_name, default = NA) {
   if (!safe_df_check(df) || !column_name %in% names(df)) {
     return(default)
@@ -314,7 +329,16 @@ safe_column_access <- function(df, column_name, default = NA) {
   col_value[1]
 }
 
-#' @describeIn safe-utilities Safe list/vector access
+#' Safe list or vector access
+#'
+#' @param lst List or vector to access
+#' @param index Index (numeric or character) to access
+#' @param default Default value to return if index doesn't exist
+#'
+#' @return Value at index or default
+#'
+#' @keywords internal
+#' @noRd
 safe_list_access <- function(lst, index, default = NA) {
   if (is.null(lst) || length(lst) == 0) {
     return(default)
@@ -339,7 +363,15 @@ safe_list_access <- function(lst, index, default = NA) {
   )
 }
 
-#' @describeIn safe-utilities Safe string checking
+#' Safe string checking
+#'
+#' @param str String or vector to check
+#' @param min_length Minimum length required for strings
+#'
+#' @return TRUE if strings meet length criteria, FALSE otherwise
+#'
+#' @keywords internal
+#' @noRd
 safe_string_check <- function(str, min_length = 1) {
   safe_check(str, function(x) {
     is.character(x) && all(nchar(trimws(x)) >= min_length)
