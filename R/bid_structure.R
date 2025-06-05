@@ -21,8 +21,8 @@
 #'        screen_reader, text_size, alternative_text, focus_indicators,
 #'        semantic_markup, and aria_labels.
 #'
-#' @return A tibble containing the documented information for the "Structure"
-#'         stage.
+#' @return A bid_stage object containing the documented information for the 
+#'         "Structure" stage.
 #'
 #' @examples
 #' interpret <- bid_notice(
@@ -46,39 +46,6 @@
 #'   concepts = c("Principle of Proximity", "Default Effect")
 #' )
 #'
-#' # Let the function detect relevant concepts from previous stages
-#' bid_structure(
-#'   previous_stage = interpret,
-#'   layout = "dual_process"
-#' )
-#'
-#' # With breathable layout and modern concepts
-#' bid_structure(
-#'   previous_stage = interpret,
-#'   layout = "breathable",
-#'   concepts = c(
-#'     "Visual Hierarchy",
-#'     "Breathable Layouts",
-#'     "Progressive Disclosure"
-#'   )
-#' )
-#'
-#' # With comprehensive accessibility considerations
-#' bid_structure(
-#'   previous_stage = interpret,
-#'   layout = "dual_process",
-#'   concepts = c("Proximity", "Default Effect", "Visual Hierarchy"),
-#'   accessibility = list(
-#'     color_contrast = "Using WCAG AA-compliant color contrasts (minimum 4.5:1 ratio)",
-#'     text_size = "Minimum 16px for body text, 20px for headings",
-#'     keyboard_navigation = "All interactive elements are keyboard accessible and follow logical tab order",
-#'     screen_reader = "Charts include descriptive alt text and ARIA landmarks for navigation",
-#'     focus_indicators = "Visible focus indicators for keyboard users",
-#'     semantic_markup = "Using proper HTML5 semantic elements for structure",
-#'     aria_labels = "ARIA labels for complex interactive components"
-#'   )
-#' )
-#'
 #' @export
 bid_structure <- function(
     previous_stage,
@@ -86,93 +53,57 @@ bid_structure <- function(
     concepts = NULL,
     accessibility = NULL) {
   # Validate required parameters
-  if (missing(previous_stage) || is.null(previous_stage)) {
-    stop("Required parameter 'previous_stage' must be provided", call. = FALSE)
-  }
-
-  if (missing(layout) || is.null(layout)) {
-    stop("Required parameter 'layout' must be provided", call. = FALSE)
-  }
+  validate_required_params(
+    previous_stage = previous_stage,
+    layout = layout
+  )
 
   validate_previous_stage(previous_stage, "Structure")
 
-  layout <- tolower(layout)
+  layout <- tolower(trimws(layout))
   valid_layouts <- c("dual_process", "grid", "card", "tabs", "breathable")
 
   if (!layout %in% valid_layouts) {
     cli::cli_warn(c(
       "!" = "Layout '{layout}' is not recognized as a standard layout type.",
-      "i" = paste0("Recommended layouts: ", paste(valid_layouts, collapse = ", ")),
+      "i" = paste0(
+        "Recommended layouts: ",
+        paste(valid_layouts, collapse = ", ")
+      ),
       "i" = "Proceeding with custom layout, but standard layouts have built-in suggestions."
     ))
   }
 
-  all_concepts <- bid_concepts()
-
-  if (!is.null(accessibility)) {
-    if (!is.list(accessibility)) {
-      cli::cli_abort(c(
-        "x" = "The accessibility parameter must be a list.",
-        "i" = paste0("You provided a ", class(accessibility)[1], "."),
-        "i" = "Example: accessibility = list(color_contrast = \"WCAG AA compliant\")"
-      ))
-    }
-
-    # check for common accessibility parameters
-    common_params <- c(
-      "color_contrast", "keyboard_navigation", "screen_reader",
-      "text_size", "alternative_text", "focus_indicators",
-      "semantic_markup", "aria_labels"
+  # Get all concepts data
+  d_all_concepts <- tryCatch({
+    bid_concepts()
+  }, error = function(e) {
+    cli::cli_warn("Could not load concepts data: {e$message}")
+    tibble::tibble(
+      concept = character(0),
+      description = character(0),
+      category = character(0),
+      reference = character(0),
+      example = character(0)
     )
+  })
 
-    provided_params <- names(accessibility)
-    missing_common <- common_params[!common_params %in% tolower(provided_params)]
-
-    if (length(missing_common) > 0) {
-      cli::cli_alert_info(c(
-        "Consider adding these common accessibility parameters:",
-        paste0("- ", missing_common)
-      ))
-    }
-
-    # check for invalid parameter values - only check non-nested values
-    for (param in names(accessibility)) {
-      value <- accessibility[[param]]
-      if (is.character(value) && (is.na(value) || nchar(value) < 5)) {
-        cli::cli_warn(c(
-          "!" = paste0(
-            "The accessibility parameter '",
-            param,
-            "' has an invalid or too brief value."
-          ),
-          "i" = "Accessibility parameters should have descriptive text values."
-        ))
-      } else if (is.list(value)) {
-        cli::cli_warn(c(
-          "!" = paste0(
-            "The accessibility parameter '",
-            param,
-            "' contains nested structure which may not be fully supported."
-          ),
-          "i" = "Consider flattening nested accessibility parameters for better compatibility."
-        ))
-      }
-    }
+  # Validate accessibility parameter
+  if (!is.null(accessibility)) {
+    validate_accessibility_parameter(accessibility)
   }
 
-  # concept detection
+  # Concept detection and matching
   if (is.null(concepts)) {
     detected_concepts <- detect_concepts_from_previous(previous_stage, layout)
     concepts <- detected_concepts
   }
 
-  # concept fuzzy matching
-  matched_concepts <- match_concepts_to_framework(concepts, all_concepts)
+  matched_concepts <- match_concepts_to_framework(concepts, d_all_concepts)
 
+  # Generate suggestions
   layout_suggestions <- get_layout_suggestions(layout)
-
   concept_tips <- get_concept_implementation_tips(matched_concepts$matched)
-
   accessibility_suggestion <- get_accessibility_suggestions(accessibility)
 
   suggestions <- build_structure_suggestions(
@@ -181,13 +112,12 @@ bid_structure <- function(
     accessibility_suggestion
   )
 
-  accessibility_formatted <- format_accessibility_for_storage(accessibility)
-
-  result <- tibble::tibble(
+  # Prepare result data
+  result_data <- tibble::tibble(
     stage = "Structure",
     layout = layout,
     concepts = paste(matched_concepts$matched, collapse = ", "),
-    accessibility = accessibility_formatted,
+    accessibility = format_accessibility_for_storage(accessibility),
     previous_question = safe_column_access(previous_stage, "central_question"),
     previous_story_hook = safe_column_access(previous_stage, "hook"),
     previous_audience = get_audience_from_previous(previous_stage),
@@ -195,6 +125,19 @@ bid_structure <- function(
     suggestions = suggestions,
     timestamp = Sys.time()
   )
+
+  metadata <- list(
+    layout_type = layout,
+    concepts_count = length(matched_concepts$matched),
+    accessibility_defined = !is.null(accessibility),
+    auto_detected_concepts = is.null(concepts),
+    stage_number = 3,
+    total_stages = 5,
+    matched_concepts = matched_concepts$matched,
+    unmatched_concepts = matched_concepts$unmatched
+  )
+
+  result <- bid_stage("Structure", result_data, metadata)
 
   bid_message(
     "Stage 3 (Structure) completed.",
@@ -207,20 +150,79 @@ bid_structure <- function(
       )
     } else {
       "No accessibility considerations specified"
-    },
-    accessibility_suggestion
+    }
   )
 
   return(result)
 }
 
+# Helper function for accessibility validation
+validate_accessibility_parameter <- function(accessibility) {
+  if (!is.list(accessibility)) {
+    cli::cli_abort(c(
+      "x" = "The accessibility parameter must be a list.",
+      "i" = paste0("You provided a ", class(accessibility)[1], "."),
+      "i" = "Example: accessibility = list(color_contrast = \"WCAG AA compliant\")"
+    ))
+  }
+
+  # Check for common accessibility parameters
+  common_params <- c(
+    "color_contrast",
+    "keyboard_navigation",
+    "screen_reader",
+    "text_size",
+    "alternative_text",
+    "focus_indicators",
+    "semantic_markup",
+    "aria_labels"
+  )
+
+  provided_params <- names(accessibility)
+  missing_common <- common_params[!common_params %in% tolower(provided_params)]
+
+  if (length(missing_common) > 0) {
+    cli::cli_alert_info(c(
+      "Consider adding these common accessibility parameters:",
+      paste0("- ", missing_common)
+    ))
+  }
+
+  # Check for invalid parameter values
+  for (param in names(accessibility)) {
+    value <- accessibility[[param]]
+    if (is.character(value) && (is.na(value) || nchar(trimws(value)) < 5)) {
+      cli::cli_warn(c(
+        "!" = paste0(
+          "The accessibility parameter '",
+          param,
+          "' has an invalid or too brief value."
+        ),
+        "i" = "Accessibility parameters should have descriptive text values."
+      ))
+    } else if (is.list(value)) {
+      cli::cli_warn(c(
+        "!" = paste0(
+          "The accessibility parameter '",
+          param,
+          "' contains nested structure which may not be fully supported."
+        ),
+        "i" = "Consider flattening nested accessibility parameters for better compatibility."
+      ))
+    }
+  }
+}
+
 detect_concepts_from_previous <- function(previous_stage, layout) {
   detected_concepts <- character(0)
 
-  if (previous_stage$stage[1] == "Notice") {
-    detected_concepts <- detect_concepts_from_notice(previous_stage)
-  } else if (previous_stage$stage[1] == "Interpret") {
-    detected_concepts <- detect_concepts_from_interpret(previous_stage)
+  stage_name <- safe_column_access(previous_stage, "stage")
+  if (!is.na(stage_name)) {
+    if (stage_name == "Notice") {
+      detected_concepts <- detect_concepts_from_notice(previous_stage)
+    } else if (stage_name == "Interpret") {
+      detected_concepts <- detect_concepts_from_interpret(previous_stage)
+    }
   }
 
   if (length(detected_concepts) == 0) {
@@ -231,7 +233,8 @@ detect_concepts_from_previous <- function(previous_stage, layout) {
   if (length(detected_concepts) > 4) {
     cli::cli_alert_info(paste0(
       "Limiting to 4 most relevant concepts from ",
-      length(detected_concepts), " detected concepts."
+      length(detected_concepts),
+      " detected concepts."
     ))
     detected_concepts <- detected_concepts[1:4]
   }
@@ -244,29 +247,32 @@ detect_concepts_from_notice <- function(previous_stage) {
 
   # theory-based concepts
   theory <- safe_column_access(previous_stage, "theory")
-  if (!is.na(theory) && theory != "") {
+  if (!is.na(theory) && nchar(trimws(theory)) > 0) {
     theory_info <- bid_concept(theory)
     if (!is.null(theory_info) && nrow(theory_info) > 0) {
       detected_concepts <- c(detected_concepts, theory_info$concept[1])
-      cli::cli_alert_info(paste0("Detected concept from theory: ", theory_info$concept[1]))
+      cli::cli_alert_info(paste0(
+        "Detected concept from theory: ",
+        theory_info$concept[1]
+      ))
     }
   }
 
   # problem-based concepts
   problem <- safe_column_access(previous_stage, "problem")
-  if (!is.na(problem) && problem != "") {
+  if (!is.na(problem) && nchar(trimws(problem)) > 0) {
     problem_concepts <- detect_concepts_from_text(problem, "problem")
     detected_concepts <- c(detected_concepts, problem_concepts)
   }
 
   # accessibility needs
   target_audience <- safe_column_access(previous_stage, "target_audience")
-  if (!is.na(target_audience) && target_audience != "") {
+  if (!is.na(target_audience) && nchar(trimws(target_audience)) > 0) {
     accessibility_concepts <- detect_accessibility_concepts(target_audience)
     detected_concepts <- c(detected_concepts, accessibility_concepts)
   }
 
-  return(detected_concepts)
+  return(unique(detected_concepts))
 }
 
 detect_concepts_from_interpret <- function(previous_stage) {
@@ -280,42 +286,97 @@ detect_concepts_from_interpret <- function(previous_stage) {
     resolution = safe_column_access(previous_stage, "resolution")
   )
 
-  valid_elements <- elements[!is.na(elements) & elements != ""]
+  valid_elements <- elements[!is.na(elements) & nchar(trimws(elements)) > 0]
   if (length(valid_elements) > 0) {
     combined_text <- paste(unlist(valid_elements), collapse = " ")
-    structure_concepts <- detect_concepts_from_text(combined_text, "interpretation")
+    structure_concepts <- detect_concepts_from_text(
+      combined_text,
+      "interpretation"
+    )
     detected_concepts <- c(detected_concepts, structure_concepts)
   }
 
   # check personas for accessibility needs
   user_personas <- safe_column_access(previous_stage, "user_personas")
-  if (!is.na(user_personas) && user_personas != "") {
+  if (!is.na(user_personas) && nchar(trimws(user_personas)) > 0) {
     accessibility_concepts <- detect_accessibility_concepts(user_personas)
     detected_concepts <- c(detected_concepts, accessibility_concepts)
   }
 
   # get audience
   audience <- get_audience_from_previous(previous_stage)
-  if (!is.na(audience) && audience != "") {
+  if (!is.na(audience) && nchar(trimws(audience)) > 0) {
     accessibility_concepts <- detect_accessibility_concepts(audience)
     detected_concepts <- c(detected_concepts, accessibility_concepts)
   }
 
-  return(detected_concepts)
+  return(unique(detected_concepts))
 }
 
 detect_concepts_from_text <- function(text, source_type = "general") {
-  text_lower <- tolower(text)
+  if (is.na(text) || nchar(trimws(text)) == 0) {
+    return(character(0))
+  }
+
+  text_lower <- tolower(trimws(text))
   detected_concepts <- character(0)
 
   concept_keywords <- list(
-    "Visual Hierarchy" = c("focus", "attention", "important", "priority", "hierarchy", "prominence"),
-    "Principle of Proximity" = c("group", "related", "together", "proximity", "association", "arrange"),
-    "Dual-Processing Theory" = c("overview", "detail", "quick", "depth", "glance", "dig"),
-    "Breathable Layouts" = c("space", "clean", "clear", "simple", "uncluttered", "whitespace"),
-    "Progressive Disclosure" = c("gradually", "reveal", "step", "complexity", "details", "level"),
-    "Default Effect" = c("default", "preset", "initial", "automatic", "standard", "starting"),
-    "Information Hierarchy" = c("organize", "structure", "arrange", "categorize", "classify")
+    "Visual Hierarchy" = c(
+      "focus",
+      "attention",
+      "important",
+      "priority",
+      "hierarchy",
+      "prominence"
+    ),
+    "Principle of Proximity" = c(
+      "group",
+      "related",
+      "together",
+      "proximity",
+      "association",
+      "arrange"
+    ),
+    "Dual-Processing Theory" = c(
+      "overview",
+      "detail",
+      "quick",
+      "depth",
+      "glance",
+      "dig"
+    ),
+    "Breathable Layouts" = c(
+      "space",
+      "clean",
+      "clear",
+      "simple",
+      "uncluttered",
+      "whitespace"
+    ),
+    "Progressive Disclosure" = c(
+      "gradually",
+      "reveal",
+      "step",
+      "complexity",
+      "details",
+      "level"
+    ),
+    "Default Effect" = c(
+      "default",
+      "preset",
+      "initial",
+      "automatic",
+      "standard",
+      "starting"
+    ),
+    "Information Hierarchy" = c(
+      "organize",
+      "structure",
+      "arrange",
+      "categorize",
+      "classify"
+    )
   )
 
   for (concept_name in names(concept_keywords)) {
@@ -327,20 +388,32 @@ detect_concepts_from_text <- function(text, source_type = "general") {
 
   if (length(detected_concepts) > 0) {
     cli::cli_alert_info(paste0(
-      "Detected ", length(detected_concepts),
-      " concepts from ", source_type, " description: ",
+      "Detected ",
+      length(detected_concepts),
+      " concepts from ",
+      source_type,
+      " description: ",
       paste(detected_concepts, collapse = ", ")
     ))
   }
 
-  return(detected_concepts)
+  return(unique(detected_concepts))
 }
 
 detect_accessibility_concepts <- function(text) {
-  text_lower <- tolower(text)
+  if (is.na(text) || nchar(trimws(text)) == 0) {
+    return(character(0))
+  }
+
+  text_lower <- tolower(trimws(text))
   accessibility_concepts <- character(0)
 
-  if (grepl("accessibility|disability|impair|screen reader|keyboard|contrast|vision", text_lower)) {
+  if (
+    grepl(
+      "accessibility|disability|impair|screen reader|keyboard|contrast|vision",
+      text_lower
+    )
+  ) {
     accessibility_concepts <- c(
       "Accessibility Contrast",
       "Keyboard Navigation",
@@ -352,18 +425,25 @@ detect_accessibility_concepts <- function(text) {
     ))
   }
 
-  return(accessibility_concepts)
+  return(unique(accessibility_concepts))
 }
 
 get_layout_based_concepts <- function(layout) {
-  layout_concepts <- switch(layout,
-    "dual_process" = c("Dual-Processing Theory", "Visual Hierarchy"),
-    "grid" = c("Principle of Proximity", "Information Hierarchy"),
-    "card" = c("Aesthetic-Usability", "Principle of Proximity"),
-    "tabs" = c("Progressive Disclosure", "Cognitive Load Theory"),
-    "breathable" = c("Breathable Layouts", "Visual Hierarchy"),
-    c("Visual Hierarchy", "Principle of Proximity")
-  )
+  # Use the layout mappings system for consistency
+  layout_concepts <- get_layout_concepts(layout)
+
+  if (length(layout_concepts) == 0 || all(is.na(layout_concepts))) {
+    # Fallback to switch statement for backwards compatibility
+    layout_concepts <- switch(
+      layout,
+      "dual_process" = c("Dual-Processing Theory", "Visual Hierarchy"),
+      "grid" = c("Principle of Proximity", "Information Hierarchy"),
+      "card" = c("Aesthetic-Usability", "Principle of Proximity"),
+      "tabs" = c("Progressive Disclosure", "Cognitive Load Theory"),
+      "breathable" = c("Breathable Layouts", "Visual Hierarchy"),
+      c("Visual Hierarchy", "Principle of Proximity")
+    )
+  }
 
   cli::cli_alert_info(paste0(
     "Suggesting layout-appropriate concepts: ",
@@ -373,13 +453,21 @@ get_layout_based_concepts <- function(layout) {
   return(layout_concepts)
 }
 
-match_concepts_to_framework <- function(concepts, all_concepts) {
+match_concepts_to_framework <- function(concepts, d_all_concepts) {
   matched_concepts <- character(0)
   unmatched_concepts <- character(0)
-
+  
+  if (length(concepts) == 0 || nrow(d_all_concepts) == 0) {
+    return(list(matched = character(0), unmatched = concepts))
+  }
+  
   for (concept in concepts) {
-    matched_concept <- find_best_concept_match(concept, all_concepts)
-
+    if (is.na(concept) || nchar(trimws(concept)) == 0) {
+      next
+    }
+    
+    matched_concept <- find_best_concept_match(concept, d_all_concepts)
+    
     if (!is.null(matched_concept)) {
       matched_concepts <- c(matched_concepts, matched_concept)
     } else {
@@ -396,15 +484,24 @@ match_concepts_to_framework <- function(concepts, all_concepts) {
     ))
   }
 
-  return(list(matched = matched_concepts, unmatched = unmatched_concepts))
+  return(list(
+    matched = unique(matched_concepts),
+    unmatched = unique(unmatched_concepts)
+  ))
 }
 
-find_best_concept_match <- function(concept, all_concepts) {
-  normalized_concept <- tolower(gsub("[_-]", " ", concept))
-  normalized_concept <- gsub("\\s+", " ", trimws(normalized_concept))
+find_best_concept_match <- function(concept, d_all_concepts) {
+  if (is.na(concept) || nchar(trimws(concept)) == 0) {
+    return(NULL)
+  }
+
+  normalized_concept <- tolower(gsub("[_-]", " ", trimws(concept)))
+  normalized_concept <- gsub("\\s+", " ", normalized_concept)
 
   # exact match
-  exact_matches <- all_concepts[tolower(all_concepts$concept) == normalized_concept, ]
+  exact_matches <- d_all_concepts[
+    tolower(d_all_concepts$concept) == normalized_concept,
+  ]
   if (nrow(exact_matches) > 0) {
     return(exact_matches$concept[1])
   }
@@ -418,22 +515,28 @@ find_best_concept_match <- function(concept, all_concepts) {
   }
 
   # exact match again after corrections
-  exact_matches <- all_concepts[tolower(all_concepts$concept) == normalized_concept, ]
+  exact_matches <- d_all_concepts[
+    tolower(d_all_concepts$concept) == normalized_concept,
+  ]
   if (nrow(exact_matches) > 0) {
     return(exact_matches$concept[1])
   }
 
   # contains match (both ways)
-  contains_matches <- all_concepts[grepl(normalized_concept, tolower(all_concepts$concept)), ]
+  contains_matches <- d_all_concepts[
+    grepl(normalized_concept, tolower(d_all_concepts$concept)),
+  ]
   if (nrow(contains_matches) > 0) {
     return(contains_matches$concept[1])
   }
 
   # reverse contains for partial matches
-  reverse_contains <- all_concepts[grepl(
-    paste(strsplit(normalized_concept, " ")[[1]], collapse = ".*"),
-    tolower(all_concepts$concept)
-  ), ]
+  reverse_contains <- d_all_concepts[
+    grepl(
+      paste(strsplit(normalized_concept, " ")[[1]], collapse = ".*"),
+      tolower(d_all_concepts$concept)
+    ),
+  ]
   if (nrow(reverse_contains) > 0) {
     return(reverse_contains$concept[1])
   }
@@ -449,8 +552,8 @@ find_best_concept_match <- function(concept, all_concepts) {
     for (word in ordered_words) {
       if (nchar(word) >= 3) {
         word_pattern <- paste0("\\b", word, "\\b")
-        word_matches <- all_concepts[
-          grepl(word_pattern, tolower(all_concepts$concept)),
+        word_matches <- d_all_concepts[
+          grepl(word_pattern, tolower(d_all_concepts$concept)),
         ]
         if (nrow(word_matches) > 0) {
           return(word_matches$concept[1])
@@ -463,7 +566,7 @@ find_best_concept_match <- function(concept, all_concepts) {
   if (requireNamespace("stringdist", quietly = TRUE)) {
     distances <- stringdist::stringdistmatrix(
       normalized_concept,
-      tolower(all_concepts$concept),
+      tolower(d_all_concepts$concept),
       method = "jw"
     )
 
@@ -471,11 +574,15 @@ find_best_concept_match <- function(concept, all_concepts) {
     best_score <- 1 - distances[best_match_idx]
 
     if (best_score > 0.6) {
-      matched_concept <- all_concepts$concept[best_match_idx]
+      matched_concept <- d_all_concepts$concept[best_match_idx]
       cli::cli_alert_info(paste0(
-        "Fuzzy matched '", concept, "' to '",
-        matched_concept, "' (similarity: ",
-        round(best_score * 100), "%)"
+        "Fuzzy matched '",
+        concept,
+        "' to '",
+        matched_concept,
+        "' (similarity: ",
+        round(best_score * 100),
+        "%)"
       ))
       return(matched_concept)
     }
@@ -485,7 +592,8 @@ find_best_concept_match <- function(concept, all_concepts) {
 }
 
 get_layout_suggestions <- function(layout) {
-  suggestion <- switch(layout,
+  suggestion <- switch(
+    layout,
     "dual_process" = paste(
       "For dual_process layout: Consider separating quick insights (System 1) from detailed analysis",
       "(System 2). Place summary metrics and KPIs at the top, with detailed",
@@ -528,11 +636,17 @@ get_concept_implementation_tips <- function(matched_concepts) {
     cli::cli_h3("Implementation tips for selected concepts:")
 
     for (concept in matched_concepts) {
+      if (is.na(concept) || nchar(trimws(concept)) == 0) {
+        next
+      }
+
       concept_info <- bid_concept(concept)
       if (!is.null(concept_info) && nrow(concept_info) > 0) {
         concept_tips <- c(concept_tips, concept_info$implementation_tips)
         cli::cli_li(paste0(
-          "{.strong ", concept, "}: ",
+          "{.strong ",
+          concept,
+          "}: ",
           concept_info$implementation_tips
         ))
       }
@@ -544,9 +658,18 @@ get_concept_implementation_tips <- function(matched_concepts) {
 
 get_accessibility_suggestions <- function(accessibility) {
   if (!is.null(accessibility) && length(accessibility) > 0) {
-    has_contrast <- any(grepl("contrast|color|wcag", tolower(names(accessibility))))
-    has_keyboard <- any(grepl("keyboard|navigation|tab", tolower(names(accessibility))))
-    has_screen_reader <- any(grepl("screen reader|aria|alt", tolower(names(accessibility))))
+    has_contrast <- any(grepl(
+      "contrast|color|wcag",
+      tolower(names(accessibility))
+    ))
+    has_keyboard <- any(grepl(
+      "keyboard|navigation|tab",
+      tolower(names(accessibility))
+    ))
+    has_screen_reader <- any(grepl(
+      "screen reader|aria|alt",
+      tolower(names(accessibility))
+    ))
     has_text_size <- any(grepl("text|font|size", tolower(names(accessibility))))
 
     suggestions <- c()
@@ -604,9 +727,10 @@ get_accessibility_suggestions <- function(accessibility) {
 }
 
 build_structure_suggestions <- function(
-    layout_suggestions,
-    concept_tips,
-    accessibility_suggestion) {
+  layout_suggestions,
+  concept_tips,
+  accessibility_suggestion
+) {
   suggestions_parts <- c(layout_suggestions)
 
   if (length(concept_tips) > 0) {
@@ -637,7 +761,7 @@ get_audience_from_previous <- function(previous_stage) {
   audience_fields <- c("audience", "target_audience", "previous_audience")
   for (field in audience_fields) {
     value <- safe_column_access(previous_stage, field)
-    if (!is.na(value) && value != "") {
+    if (!is.na(value) && nchar(trimws(value)) > 0) {
       return(value)
     }
   }
@@ -648,50 +772,9 @@ get_personas_from_previous <- function(previous_stage) {
   persona_fields <- c("user_personas", "previous_personas")
   for (field in persona_fields) {
     value <- safe_column_access(previous_stage, field)
-    if (!is.na(value) && value != "") {
+    if (!is.na(value) && nchar(trimws(value)) > 0) {
       return(value)
     }
   }
   return(NA_character_)
-}
-
-validate_previous_stage <- function(previous_stage, current_stage) {
-  if (!is.data.frame(previous_stage) && !is.list(previous_stage)) {
-    stop(
-      paste("previous_stage must be a tibble or list from a previous BID stage"),
-      call. = FALSE
-    )
-  }
-
-  if (!"stage" %in% names(previous_stage)) {
-    stop("previous_stage must contain a 'stage' column", call. = FALSE)
-  }
-
-  invisible(TRUE)
-}
-
-safe_column_access <- function(data, column_name) {
-  if (!column_name %in% names(data)) {
-    return(NA_character_)
-  }
-
-  value <- data[[column_name]]
-  if (is.null(value) || length(value) == 0) {
-    return(NA_character_)
-  }
-
-  if (is.data.frame(data) && nrow(data) > 0) {
-    value <- value[1]
-  }
-
-  if (is.na(value) || is.null(value)) {
-    return(NA_character_)
-  }
-
-  value_char <- as.character(value)
-  if (value_char == "") {
-    return(NA_character_)
-  }
-
-  return(value_char)
 }

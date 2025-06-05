@@ -1,183 +1,176 @@
-#' List all BID Framework Concepts
+#' Search BID Framework Concepts
 #'
 #' @description
-#' This function returns a tibble listing all the key concepts in the Behavior
-#' Insight Design framework, including their descriptions, categories,
-#' references, and example applications.
+#' Search for behavioral science and UX concepts used in the BID framework.
+#' Returns concepts matching the search term along with their descriptions,
+#' categories, and implementation guidance.
 #'
-#' @param search Optional search term to filter concepts. Multiple terms can be
-#'        provided separated by commas or spaces.
-
-#' @return A tibble with concept details.
+#' @param search A character string to search for. If NULL or empty, returns all concepts.
+#' @param fuzzy_match Logical indicating whether to use fuzzy string matching (default: TRUE)
+#' @param max_distance Maximum string distance for fuzzy matching (default: 2)
 #'
-#' @examples
-#' bid_concepts()
-#' bid_concepts("cognitive")
-#' bid_concepts("visual, hierarchy") # Multiple search terms
-#'
+#' @return A tibble containing matching concepts with their details
 #' @export
-bid_concepts <- function(search = NULL) {
-  concepts <- get_concepts_data()
+bid_concepts <- function(search = NULL, fuzzy_match = TRUE, max_distance = 2) {
+  concepts_data <- get_concepts_data()
 
-  if (is.null(search) || search == "" || nchar(trimws(search)) == 0) {
-    return(concepts)
+  if (is.null(search) || nchar(trimws(search)) == 0) {
+    message("Returning all ", nrow(concepts_data), " concepts")
+    return(concepts_data)
   }
 
-  search_terms <- unlist(strsplit(search, "[,\\s]+"))
-  search_terms <- search_terms[search_terms != "" & !is.na(search_terms)]
+  # Direct search in concept names and descriptions
+  search_terms <- tolower(trimws(unlist(strsplit(search, ","))))
 
-  if (length(search_terms) == 0) {
-    return(concepts)
-  }
+  matches <- c()
+  for (term in search_terms) {
+    term <- trimws(term)
+    if (nchar(term) > 0) {
+      # Exact matches in concept names or descriptions
+      exact_matches <- which(
+        grepl(term, tolower(concepts_data$concept)) |
+          grepl(term, tolower(concepts_data$description))
+      )
+      matches <- c(matches, exact_matches)
 
-  matches <- matrix(FALSE, nrow = nrow(concepts), ncol = length(search_terms))
-
-  for (i in seq_along(search_terms)) {
-    term <- tolower(trimws(search_terms[i]))
-
-    for (col in c(
-      "concept",
-      "description",
-      "category",
-      "implementation_tips",
-      "example",
-      "related_concepts"
-    )) {
-      if (col %in% names(concepts)) {
-        col_values <- ifelse(is.na(concepts[[col]]), "", concepts[[col]])
-        matches[, i] <- matches[, i] |
-          grepl(term, tolower(col_values), fixed = TRUE)
+      # Fuzzy matching if enabled and no exact matches
+      if (fuzzy_match && length(exact_matches) == 0) {
+        distances <- stringdist::stringdistmatrix(
+          term,
+          tolower(concepts_data$concept),
+          method = "jw"
+        )
+        fuzzy_matches <- which(distances <= max_distance / 10)
+        matches <- c(matches, fuzzy_matches)
       }
     }
   }
 
-  matches_any <- rowSums(matches) > 0
-  result <- concepts[matches_any, ]
+  matches <- unique(matches)
 
-  if (nrow(result) > 0) {
-    relevance <- rowSums(matches[matches_any, , drop = FALSE])
-    result <- result[order(relevance, decreasing = TRUE), ]
-    rownames(result) <- NULL
+  if (length(matches) == 0) {
+    message("No concepts found matching '", search, "'")
+    return(concepts_data[0, ])
   }
 
-  search_str <- paste(search_terms, collapse = ", ")
-  if (nrow(result) > 0) {
-    cli::cli_alert_success(
-      "Found {nrow(result)} concept{?s} matching '{search_str}'"
-    )
-    if (nrow(result) > 5) {
-      cli::cli_alert_info("Showing results ordered by relevance")
-    }
+  result <- concepts_data[matches, ]
+  message("Found ", nrow(result), " concept(s) matching '", search, "'")
+  return(result)
+}
+
+#' Get detailed information about a specific concept
+#'
+#' @description
+#' Returns detailed information about a specific BID framework concept,
+#' including implementation recommendations based on the concept's stage.
+#'
+#' @param concept_name A character string with the exact or partial concept name
+#' @param add_recommendations Logical indicating whether to add stage-specific recommendations
+#'
+#' @return A tibble with detailed concept information
+#' @export
+bid_concept <- function(concept_name, add_recommendations = TRUE) {
+  if (is.null(concept_name) || nchar(trimws(concept_name)) == 0) {
+    message("Please provide a concept name")
+    return(get_concepts_data()[0, ])
+  }
+
+  concepts_data <- get_concepts_data()
+  concept_clean <- trimws(concept_name)
+
+  # Try exact match first
+  exact_match <- which(tolower(concepts_data$concept) == tolower(concept_clean))
+
+  if (length(exact_match) > 0) {
+    result <- concepts_data[exact_match[1], ]
   } else {
-    cli::cli_alert_warning("No concepts found matching '{search_str}'")
+    # Try partial match
+    partial_matches <- which(grepl(
+      tolower(concept_clean),
+      tolower(concepts_data$concept)
+    ))
 
-    suggest_alternatives(search_terms, concepts)
+    if (length(partial_matches) > 0) {
+      result <- concepts_data[partial_matches[1], ]
+      message("Found partial match: ", result$concept[1])
+    } else {
+      message("Concept '", concept_name, "' not found")
+      return(concepts_data[0, ])
+    }
+  }
 
-    cli::cli_alert_info(
-      "Or use {.code bid_concepts()} without a search term to see all concepts"
+  # Add recommendations based on stage
+  if (add_recommendations) {
+    stage_recs <- switch(
+      result$category[1],
+      "Stage 1" = "NOTICE: Use this concept when identifying user problems and cognitive barriers",
+      "Stage 2" = "INTERPRET: Apply this concept when developing data stories and central questions",
+      "Stage 3" = "STRUCTURE: Implement this concept in dashboard layout and information organization",
+      "Stage 4" = "ANTICIPATE: Consider this concept when designing interactions and mitigating biases",
+      "Stage 5" = "VALIDATE: Use this concept in user empowerment and collaboration features",
+      "All Stages" = "UNIVERSAL: This concept applies throughout the entire BID framework",
+      "General guidance for concept application"
     )
+
+    result$recommendations <- stage_recs
   }
 
   return(result)
 }
 
-#' Get Detailed Information for a BID Concept
-#'
-#' @description
-#' This function retrieves detailed information about a specific concept within
-#' the BID framework. If the concept is not found, it suggests similar concepts
-#' using both fuzzy matching and conceptual relationships.
-#'
-#' @param concept_name A character string specifying the name of the concept.
-#'
-#' @return A tibble with details for the specified concept, or empty tibble if
-#'         not found.
-#'
-#' @examples
-#' bid_concept("Cognitive Load Theory")
-#' bid_concept("cognitive load") # Case insensitive, partial matching
-#' bid_concept("proximity") # Works with partial concept names
-#'
-#' @export
-bid_concept <- function(concept_name) {
-  if (
-    is.null(concept_name) ||
-      is.na(concept_name) ||
-      trimws(concept_name) == "" ||
-      length(concept_name) == 0
-  ) {
-    cli::cli_alert_warning("Please provide a valid concept name")
-    return(create_empty_concept_result("Please provide a valid concept name"))
-  }
+#' Internal function to get concepts data from external files
+#' @return A tibble with all BID framework concepts
+#' @keywords internal
+get_concepts_data <- function() {
+  # Try to load from external data file first
+  concepts_file <- system.file(
+    "extdata",
+    "bid_concepts_data.csv",
+    package = "bidux"
+  )
 
-  all_concepts <- get_concepts_data()
-  concept_name_clean <- trimws(concept_name)
-
-  # stage 1: exact match
-  exact_match <- all_concepts[
-    tolower(all_concepts$concept) == tolower(concept_name_clean),
-  ]
-  if (nrow(exact_match) > 0) {
-    return(add_recommendations_and_display(exact_match[1, ], all_concepts))
-  }
-
-  # stage 2: partial match
-  partial_match <- all_concepts[
-    grepl(
-      tolower(concept_name_clean),
-      tolower(all_concepts$concept),
-      fixed = TRUE
-    ),
-  ]
-  if (nrow(partial_match) > 0) {
-    return(add_recommendations_and_display(partial_match[1, ], all_concepts))
-  }
-
-  # stage 3: multi-word intelligent matching
-  words <- unlist(strsplit(tolower(concept_name_clean), "\\s+"))
-  significant_words <- words[nchar(words) >= 3]
-
-  if (length(significant_words) > 1) {
-    word_matches <- rep(TRUE, nrow(all_concepts))
-    for (word in significant_words) {
-      word_matches <- word_matches &
-        grepl(word, tolower(all_concepts$concept), fixed = TRUE)
-    }
-
-    if (any(word_matches)) {
-      multiword_result <- all_concepts[word_matches, ]
-      return(add_recommendations_and_display(
-        multiword_result[1, ],
-        all_concepts
-      ))
-    }
-  }
-
-  # stage 4: search related concepts
-  related_matches <- rep(FALSE, nrow(all_concepts))
-  for (i in seq_len(nrow(all_concepts))) {
-    related <- all_concepts$related_concepts[i]
-    if (!is.na(related) && related != "") {
-      if (grepl(tolower(concept_name_clean), tolower(related), fixed = TRUE)) {
-        related_matches[i] <- TRUE
+  if (file.exists(concepts_file)) {
+    tryCatch(
+      {
+        concepts <- readr::read_csv(concepts_file)
+        # Ensure required columns exist
+        required_cols <- c(
+          "concept",
+          "description",
+          "category",
+          "reference",
+          "example",
+          "implementation_tips",
+          "related_concepts"
+        )
+        if (all(required_cols %in% names(concepts))) {
+          return(tibble::as_tibble(concepts))
+        } else {
+          warning(
+            "External concepts file missing required columns, using defaults",
+            call. = FALSE
+          )
+        }
+      },
+      error = function(e) {
+        warning(
+          "Could not load external concepts file: ",
+          e$message,
+          call. = FALSE
+        )
       }
-    }
+    )
   }
 
-  if (any(related_matches)) {
-    related_result <- all_concepts[related_matches, ]
-    return(add_recommendations_and_display(related_result[1, ], all_concepts))
-  }
-
-  # stage 5: no matches - autosuggestions
-  suggest_similar_concepts_advanced(concept_name_clean, all_concepts)
-  return(create_empty_concept_result(
-    "Concept not found - see suggestions above"
-  ))
+  # Fallback to hardcoded data if external file not available or invalid
+  return(get_default_concepts_data())
 }
 
-get_concepts_data <- function() {
-  concepts <- tibble::tibble(
+#' Get default concepts data (fallback when external file unavailable)
+#' @return A tibble with default BID framework concepts
+#' @keywords internal
+get_default_concepts_data <- function() {
+  tibble::tibble(
     concept = c(
       "Cognitive Load Theory",
       "Hick's Law",
@@ -242,7 +235,6 @@ get_concepts_data <- function() {
       "Collaborative processes that enhance group decision-making.",
       "Technique of showing only necessary information to reduce cognitive load.",
       "Law predicting that interaction time is based on distance and target size.",
-      "Principle that humans can hold 7 (plus or minus 2) items in working memory.",
       "Principle that humans can hold 7 (plus or minus 2) items in working memory.",
       "Signals that guide users toward relevant information.",
       "Quality of an object that suggests how it should be used.",
@@ -382,17 +374,17 @@ get_concepts_data <- function() {
       "Making primary metrics visually dominant over secondary ones",
       "Evaluating dashboard complexity across multiple dimensions",
       "Using animation to highlight data changes between states",
-      "Creating a clear hierarchy with primary KPIs at top (large font), secondary metrics below (medium font), and detailed data at bottom; using bslib::value_box() components with varying sizes for different metrics; applying color saturation to distinguish between critical alerts (bright colors) and normal metrics (muted colors).",
-      "Using bslib::layout_column_wrap(width = 1/3, gap = '2rem') to create well-spaced card layouts; implementing whitespace between sections with consistent margins (12-24px); applying content 'breathing room' within cards using card_body(padding = 4); creating focused UIs that limit information density to prevent cognitive overload.",
-      "Structuring user stories for dashboard features like: 'GIVEN I am a marketing analyst, WHEN I select multiple channels in the filter, THEN I should see a comparison chart of all selected channels'; defining acceptance criteria as 'GIVEN no filters are selected, THEN all data should be shown'; documenting edge cases with 'GIVEN all filters are applied AND no data exists, THEN show a helpful empty state message'.",
-      "Adding subtle hover effects to cards that can be clicked for details; using cursor changes (cursor: pointer) for interactive elements; adding tooltip hints such as 'Click to expand' or 'Drag to rearrange'; implementing skeleton loading states to indicate content is coming; providing visual affordances like slight elevation or borders for clickable elements.",
-      "Highlighting the active tab with a clear indicator; showing loading states when data is refreshing; providing success/error notifications after user actions; implementing animated transitions when states change; adding subtle animations for filtering actions; using progress bars for ongoing processes; highlighting selected data points in linked visualizations.",
-      "Ensuring text has a 4.5:1 contrast ratio against its background",
-      "Making all interactive elements focusable with the Tab key",
+      "Creating clear visual hierarchy with primary KPIs at top",
+      "Using whitespace between sections with consistent margins",
+      "Structuring user stories with Given-When-Then syntax",
+      "Adding hover effects and cursor changes for interactive elements",
+      "Highlighting active states and providing loading feedback",
+      "Ensuring text has 4.5:1 contrast ratio against background",
+      "Making all interactive elements focusable with Tab key",
       "Adding descriptive alt text to charts and visuals",
       "Creating design personas representing different user types",
-      "Conducting user interviews before and during the design process",
-      "Setting beneficial defaults like opt-in organ donation or automatic retirement savings"
+      "Conducting user interviews before and during design process",
+      "Setting beneficial defaults like automatic savings enrollment"
     ),
     implementation_tips = c(
       "Use tabs or collapsible sections to organize complex information.",
@@ -400,7 +392,7 @@ get_concepts_data <- function() {
       "Use size, color, and position to indicate importance of elements.",
       "Start with a clear headline insight before showing supporting details.",
       "Use clean, consistent typography and simple chart types.",
-      "Consider subtle color cues that match the message (red/green appropriately).",
+      "Consider subtle color cues that match the message appropriately.",
       "Place related controls and visualizations in proximity to each other.",
       "Provide both KPI summary cards and detailed data tables.",
       "Pre-select the most useful timeframe or metrics for initial view.",
@@ -481,76 +473,4 @@ get_concepts_data <- function() {
       "Default Effect, Anchoring Effect, Framing & Loss Aversion"
     )
   )
-
-  return(concepts)
-}
-
-add_recommendations_and_display <- function(concept_result, all_concepts) {
-  if (nrow(concept_result) == 0) {
-    return(concept_result)
-  }
-
-  concept_result <- concept_result |>
-    dplyr::mutate(
-      recommendations = dplyr::case_when(
-        category == "Stage 1" ~
-          paste(
-            "NOTICE: Use this concept to identify friction points and cognitive barriers.",
-            "Focus on reducing complexity and improving initial user comprehension."
-          ),
-        category == "Stage 2" ~
-          paste(
-            "INTERPRET: Apply this concept to improve how users process and understand data.",
-            "Enhance information clarity and meaning extraction from your dashboard."
-          ),
-        category == "Stage 3" ~
-          paste(
-            "STRUCTURE: Use this concept to organize dashboard elements effectively.",
-            "Create intuitive layouts that match users' mental models and expectations."
-          ),
-        category == "Stage 4" ~
-          paste(
-            "ANTICIPATE: Consider how this concept influences user decision-making.",
-            "Proactively mitigate cognitive biases that could lead to misinterpretation."
-          ),
-        category == "Stage 5" ~
-          paste(
-            "VALIDATE: Apply this concept to create memorable final impressions.",
-            "Help users extract actionable insights and enable effective collaboration."
-          ),
-        category == "All Stages" ~
-          paste(
-            "UNIVERSAL: This concept applies throughout the entire BID framework.",
-            "Incorporate it consistently across all stages of your dashboard development."
-          ),
-        TRUE ~
-          "Consider how this concept can improve your dashboard experience."
-      )
-    )
-
-  if (nrow(result) > 0 && "related_concepts" %in% names(result)) {
-    related <- result$related_concepts[1]
-    if (!is.na(related) && related != "") {
-      cli::cli_h2("Related concepts you might find useful:")
-      related_list <- unlist(strsplit(related, ",\\s*"))
-      for (rel in related_list) {
-        rel_info <- dplyr::filter(all_concepts, concept == rel)
-        if (nrow(rel_info) > 0) {
-          cli::cli_li("{.field {rel}}: {rel_info$description[1]}")
-        } else {
-          cli::cli_li("{.field {rel}}")
-        }
-      }
-      cli::cli_alert_info(
-        "To explore these concepts further, use {.code bid_concept(\"concept name\")}"
-      )
-    }
-  }
-
-  if (nrow(result) > 0) {
-    cli::cli_alert_success("Found information for {.strong {result$concept[1]}}")
-    cli::cli_alert_info("Category: {result$category[1]}")
-  }
-
-  return(result)
 }

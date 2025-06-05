@@ -1,0 +1,16 @@
+concept,bias_type,mitigation_strategy,stage_relevance,implementation_priority
+"Dual-Processing Theory","framing,anchoring","Provide both quick insights and detailed analysis views",Structure,high
+"Visual Hierarchy","attention bias,belief perseverance","Use size and color to guide attention to important elements",Structure,high
+"Principle of Proximity","association bias,clustering illusion","Group related elements together to show relationships",Structure,medium
+"Default Effect","status quo bias,choice architecture","Pre-select beneficial options while allowing user control",Structure,high
+"Aesthetic-Usability","beautiful-is-good stereotype,halo effect","Ensure visual appeal doesn't overshadow content quality",Structure,medium
+"Information Hierarchy","availability bias,prominence effect","Make important information easily accessible",Structure,high
+"Progressive Disclosure","cognitive overload,choice paralysis","Reveal complexity gradually to reduce overwhelm",Structure,high
+"Cognitive Load Theory","mental fatigue,decision fatigue","Minimize unnecessary cognitive burden",Notice,high
+"Processing Fluency","ease of processing bias","Make information easy to read and understand",Interpret,medium
+"Data Storytelling Framework","narrative bias,confirmation bias","Structure data to tell compelling but honest stories",Interpret,high
+"Anchoring Effect","first impression bias","Provide multiple reference points for comparison",Anticipate,high
+"Framing & Loss Aversion","loss/gain framing bias","Present information in both positive and negative frames",Anticipate,high
+"Confirmation Bias","selective attention,motivated reasoning","Include disconfirming evidence and alternative views",Anticipate,high
+"Peak-End Rule","recency bias,memory bias","End with strong positive impression and clear next steps",Validate,medium
+"Cooperation & Coordination","groupthink,social proof","Enable collaborative decision-making with diverse input",Validate,low
