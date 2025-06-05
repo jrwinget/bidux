@@ -1,33 +1,44 @@
 library(testthat)
 library(tibble)
 
-test_that("bid_structure returns a tibble with stage 'Structure'", {
+test_that("bid_structure returns a bid_stage object with stage 'Structure'", {
   local_mocked_bindings(
     bid_concepts = function(search = NULL) {
       tibble::tibble(
-        concept = "Test Concept",
-        description = "Dummy description",
+        concept = c("Test Concept", "Visual Hierarchy", "Cognitive Load Theory"),
+        description = c("Test description", "Visual description", "Cognitive description"),
+        category = c("Stage 1", "Stage 2", "Stage 3"),
+        reference = rep(NA_character_, 3),
+        example = rep(NA_character_, 3),
+        implementation_tips = c("Test tip", "Visual tip", "Cognitive tip")
+      )
+    },
+    bid_concept = function(concept_name) {
+      tibble::tibble(
+        concept = concept_name,
+        description = "Mocked description",
         category = "Stage 1",
         reference = NA_character_,
-        example = NA_character_
+        example = NA_character_,
+        implementation_tips = paste("Implementation tip for", concept_name)
       )
     }
   )
-
+  
   previous_stage <- tibble::tibble(
     stage = "Interpret",
     problem = "The dashboard layout is cluttered.",
     theory = "Visual Hierarchies",
     evidence = "User feedback indicates confusion."
   )
-
+  
   result <- bid_structure(
     previous_stage,
     layout = "dual_process",
     concepts = c("Test Concept")
   )
-
-  expect_s3_class(result, "tbl_df")
+  
+  expect_s3_class(result, "bid_stage")
   expect_equal(result$stage[1], "Structure")
   expect_equal(result$layout[1], "dual_process")
   expect_true("concepts" %in% names(result))

@@ -25,8 +25,8 @@ screen_reader, text_size, alternative_text, focus_indicators,
 semantic_markup, and aria_labels.}
 }
 \value{
-A tibble containing the documented information for the "Structure"
-stage.
+A bid_stage object containing the documented information for the
+"Structure" stage.
 }
 \description{
 This function documents the structure of the dashboard, including layout and
@@ -55,39 +55,6 @@ bid_structure(
   previous_stage = interpret,
   layout = "dual_process",
   concepts = c("Principle of Proximity", "Default Effect")
-)
-
-# Let the function detect relevant concepts from previous stages
-bid_structure(
-  previous_stage = interpret,
-  layout = "dual_process"
-)
-
-# With breathable layout and modern concepts
-bid_structure(
-  previous_stage = interpret,
-  layout = "breathable",
-  concepts = c(
-    "Visual Hierarchy",
-    "Breathable Layouts",
-    "Progressive Disclosure"
-  )
-)
-
-# With comprehensive accessibility considerations
-bid_structure(
-  previous_stage = interpret,
-  layout = "dual_process",
-  concepts = c("Proximity", "Default Effect", "Visual Hierarchy"),
-  accessibility = list(
-    color_contrast = "Using WCAG AA-compliant color contrasts (minimum 4.5:1 ratio)",
-    text_size = "Minimum 16px for body text, 20px for headings",
-    keyboard_navigation = "All interactive elements are keyboard accessible and follow logical tab order",
-    screen_reader = "Charts include descriptive alt text and ARIA landmarks for navigation",
-    focus_indicators = "Visible focus indicators for keyboard users",
-    semantic_markup = "Using proper HTML5 semantic elements for structure",
-    aria_labels = "ARIA labels for complex interactive components"
-  )
 )
 
 }

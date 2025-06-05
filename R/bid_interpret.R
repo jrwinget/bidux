@@ -97,17 +97,8 @@ bid_interpret <- function(
 
   if (is.null(central_question)) {
     if (previous_stage$stage[1] == "Notice") {
-      problem <- if ("problem" %in% names(previous_stage)) {
-        previous_stage$problem[1]
-      } else {
-        NA_character_
-      }
-
-      theory <- if ("theory" %in% names(previous_stage)) {
-        previous_stage$theory[1]
-      } else {
-        NA_character_
-      }
+      problem <- safe_column_access(previous_stage, "problem")
+      theory <- safe_column_access(previous_stage, "theory")
 
       if (!is.na(problem)) {
         problem_lower <- tolower(problem)
@@ -188,29 +179,10 @@ bid_interpret <- function(
     data_story <- list()
 
     if (previous_stage$stage[1] == "Notice") {
-      problem <- if ("problem" %in% names(previous_stage)) {
-        previous_stage$problem[1]
-      } else {
-        NA_character_
-      }
-
-      theory <- if ("theory" %in% names(previous_stage)) {
-        previous_stage$theory[1]
-      } else {
-        NA_character_
-      }
-
-      evidence <- if ("evidence" %in% names(previous_stage)) {
-        previous_stage$evidence[1]
-      } else {
-        NA_character_
-      }
-
-      target_audience <- if ("target_audience" %in% names(previous_stage)) {
-        previous_stage$target_audience[1]
-      } else {
-        NA_character_
-      }
+      problem <- safe_column_access(previous_stage, "problem")
+      theory <- safe_column_access(previous_stage, "theory")
+      evidence <- safe_column_access(previous_stage, "evidence")
+      target_audience <- safe_column_access(previous_stage, "target_audience")
 
       if (!is.na(problem)) {
         # hook
@@ -522,49 +494,35 @@ bid_interpret <- function(
     NA_character_
   }
 
-  result <- tibble::tibble(
+  result_data <- tibble::tibble(
     stage = "Interpret",
     central_question = central_question,
-    hook = if (!is.null(data_story) && "hook" %in% names(data_story))
-      data_story$hook %||% NA_character_ else NA_character_,
-    context = if (!is.null(data_story) && "context" %in% names(data_story))
-      data_story$context %||% NA_character_ else NA_character_,
-    tension = if (!is.null(data_story) && "tension" %in% names(data_story))
-      data_story$tension %||% NA_character_ else NA_character_,
-    resolution = if (
-      !is.null(data_story) && "resolution" %in% names(data_story)
-    )
-      data_story$resolution %||% NA_character_ else NA_character_,
+    hook = safe_data_story_access(data_story, "hook"),
+    context = safe_data_story_access(data_story, "context"),
+    tension = safe_data_story_access(data_story, "tension"),
+    resolution = safe_data_story_access(data_story, "resolution"),
     audience = audience,
     metrics = metrics,
     visual_approach = visual_approach,
     user_personas = personas_formatted,
-    previous_problem = if (
-      previous_stage$stage[1] == "Notice" &&
-        "problem" %in% names(previous_stage)
-    ) {
-      previous_stage$problem[1] %||% NA_character_
-    } else {
-      NA_character_
-    },
-    previous_theory = if (
-      previous_stage$stage[1] == "Notice" && "theory" %in% names(previous_stage)
-    ) {
-      previous_stage$theory[1] %||% NA_character_
-    } else {
-      NA_character_
-    },
-    previous_audience = if (
-      previous_stage$stage[1] == "Notice" &&
-        "target_audience" %in% names(previous_stage)
-    ) {
-      previous_stage$target_audience[1] %||% NA_character_
-    } else {
-      NA_character_
-    },
+    previous_problem = safe_column_access(previous_stage, "problem"),
+    previous_theory = safe_column_access(previous_stage, "theory"),
+    previous_audience = safe_column_access(previous_stage, "target_audience"),
     suggestions = suggestions,
     timestamp = Sys.time()
   )
+
+  metadata <- list(
+    stage_number = 2,
+    total_stages = 5,
+    has_central_question = !is.null(central_question),
+    story_completeness = story_completeness,
+    personas_count = if (!is.null(user_personas)) length(user_personas) else 0,
+    auto_generated_question = is.null(central_question),
+    auto_generated_story = is.null(data_story)
+  )
+
+  result <- bid_stage("Interpret", result_data, metadata)
 
   bid_message(
     "Stage 2 (Interpret) completed.",
@@ -586,6 +544,16 @@ bid_interpret <- function(
   )
 
   return(result)
+}
+
+safe_data_story_access <- function(data_story, element) {
+  if (!is.null(data_story) && element %in% names(data_story)) {
+    value <- data_story[[element]]
+    if (!is.null(value) && !is.na(value) && nchar(trimws(as.character(value))) > 0) {
+      return(as.character(value))
+    }
+  }
+  return(NA_character_)
 }
 
 # helper function to validate user_personas structure

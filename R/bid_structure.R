@@ -48,11 +48,10 @@
 #'
 #' @export
 bid_structure <- function(
-  previous_stage,
-  layout,
-  concepts = NULL,
-  accessibility = NULL
-) {
+    previous_stage,
+    layout,
+    concepts = NULL,
+    accessibility = NULL) {
   # Validate required parameters
   validate_required_params(
     previous_stage = previous_stage,
@@ -76,7 +75,18 @@ bid_structure <- function(
   }
 
   # Get all concepts data
-  d_all_concepts <- bid_concepts()
+  d_all_concepts <- tryCatch({
+    bid_concepts()
+  }, error = function(e) {
+    cli::cli_warn("Could not load concepts data: {e$message}")
+    tibble::tibble(
+      concept = character(0),
+      description = character(0),
+      category = character(0),
+      reference = character(0),
+      example = character(0)
+    )
+  })
 
   # Validate accessibility parameter
   if (!is.null(accessibility)) {
@@ -116,7 +126,6 @@ bid_structure <- function(
     timestamp = Sys.time()
   )
 
-  # Create metadata
   metadata <- list(
     layout_type = layout,
     concepts_count = length(matched_concepts$matched),
@@ -128,10 +137,8 @@ bid_structure <- function(
     unmatched_concepts = matched_concepts$unmatched
   )
 
-  # Create bid_stage object
   result <- bid_stage("Structure", result_data, metadata)
 
-  # User feedback
   bid_message(
     "Stage 3 (Structure) completed.",
     paste0("Layout: ", layout),
@@ -449,18 +456,18 @@ get_layout_based_concepts <- function(layout) {
 match_concepts_to_framework <- function(concepts, d_all_concepts) {
   matched_concepts <- character(0)
   unmatched_concepts <- character(0)
-
-  if (length(concepts) == 0) {
-    return(list(matched = character(0), unmatched = character(0)))
+  
+  if (length(concepts) == 0 || nrow(d_all_concepts) == 0) {
+    return(list(matched = character(0), unmatched = concepts))
   }
-
+  
   for (concept in concepts) {
     if (is.na(concept) || nchar(trimws(concept)) == 0) {
       next
     }
-
+    
     matched_concept <- find_best_concept_match(concept, d_all_concepts)
-
+    
     if (!is.null(matched_concept)) {
       matched_concepts <- c(matched_concepts, matched_concept)
     } else {

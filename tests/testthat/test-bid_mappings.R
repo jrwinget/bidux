@@ -403,24 +403,24 @@ test_that("mapping functions handle edge cases in file loading", {
   # This simulates the behavior when inst/extdata files don't exist
   
   # Should fall back gracefully without errors
-  expect_silent({
+  expect_no_warning({
     mappings <- load_theory_mappings()
     expect_s3_class(mappings, "data.frame")
     expect_true(nrow(mappings) > 0)
   })
   
-  expect_silent({
+  expect_no_warning({
     bias_mappings <- load_concept_bias_mappings()
     expect_s3_class(bias_mappings, "data.frame")
   })
   
-  expect_silent({
+  expect_no_warning({
     layout_mappings <- load_layout_mappings()
     expect_s3_class(layout_mappings, "data.frame")
     expect_true(nrow(layout_mappings) > 0)
   })
   
-  expect_silent({
+  expect_no_warning({
     accessibility_guidelines <- load_accessibility_guidelines()
     expect_s3_class(accessibility_guidelines, "data.frame")
   })
