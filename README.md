@@ -1,13 +1,14 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# bidux
+# bidux <a href="https://github.com/jrwinget/bid-framework"><img src="man/figures/logo.png" align="right" height="138" /></a>
 
 <!-- badges: start -->
 
 [![CRAN
-status](https://www.r-pkg.org/badges/version/bidux)](https://CRAN.r-status.org/package=bidux)
+status](https://www.r-pkg.org/badges/version/bidux)](https://github.com/jrwinget/bidux/releases)
 [![R-CMD-check](https://github.com/jrwinget/bidux/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jrwinget/bidux/actions/workflows/R-CMD-check.yaml)
+[![code-size](https://img.shields.io/github/languages/code-size/jrwinget/bidux)](https://github.com/jrwinget/bidux)
 [![Codecov test
 coverage](https://codecov.io/gh/jrwinget/bidux/graph/badge.svg)](https://app.codecov.io/gh/jrwinget/bidux)
 <!-- badges: end -->
