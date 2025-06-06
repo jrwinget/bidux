@@ -34,7 +34,6 @@
 #'
 #' @export
 bid_suggest_components <- function(bid_stage, package = NULL) {
-  # Validation
   if (is.null(bid_stage)) {
     cli::cli_abort("bid_stage cannot be NULL")
   }
@@ -53,15 +52,16 @@ bid_suggest_components <- function(bid_stage, package = NULL) {
     ))
   }
 
-  # Validate package parameter
   valid_packages <- c(
     "shiny",
     "bslib",
     "DT",
     "plotly",
     "reactable",
-    "htmlwidgets"
+    "htmlwidgets",
+    "echarts4r"
   )
+
   if (!is.null(package) && !(package %in% valid_packages)) {
     cli::cli_abort(c(
       "Invalid package specified",
@@ -70,30 +70,43 @@ bid_suggest_components <- function(bid_stage, package = NULL) {
     ))
   }
 
-  # Get component database
   components_db <- get_components_database()
 
-  # Filter by package if specified
   if (!is.null(package)) {
     components_db <- components_db[components_db$package == package, ]
     if (nrow(components_db) == 0) {
       cli::cli_warn("No components found for package: {package}")
       return(create_empty_components_result())
     }
+
+    components_with_scores <- calculate_relevance_scores(bid_stage, components_db)
+  } else {
+    suggestions_list <- lapply(valid_packages, function(pkg) {
+      pkg_db <- components_db[components_db$package == pkg, ]
+      scored_pkg <- calculate_relevance_scores(bid_stage, pkg_db)
+
+      if (nrow(scored_pkg) == 0) {
+        return(NULL)
+      }
+      scored_pkg
+    })
+
+    suggestions_list <- suggestions_list[!vapply(suggestions_list, is.null, logical(1))]
+    if (length(suggestions_list) == 0) {
+      cli::cli_warn("No component suggestions found across any supported package")
+      return(create_empty_components_result())
+    }
+
+    components_with_scores <- do.call(rbind, suggestions_list)
   }
 
-  # Calculate relevance scores based on BID stage analysis
-  components_with_scores <- calculate_relevance_scores(bid_stage, components_db)
-
-  # Sort by relevance (descending) and return top suggestions
+  # sort by relevance (descending) and return top suggestions
   components_with_scores <- components_with_scores[
     order(components_with_scores$relevance, decreasing = TRUE),
   ]
 
-  # Reset row names for clean output
   rownames(components_with_scores) <- NULL
 
-  # Provide user feedback
   stage_name <- bid_stage$stage[1]
   total_suggestions <- nrow(components_with_scores)
 
@@ -103,7 +116,7 @@ bid_suggest_components <- function(bid_stage, package = NULL) {
     )
   } else {
     cli::cli_alert_success(
-      "Found {total_suggestions} component suggestion{?s} for BID {stage_name} stage"
+      "Found {total_suggestions} component suggestion{?s} across all packages for BID {stage_name} stage"
     )
   }
 

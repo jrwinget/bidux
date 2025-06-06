@@ -9,8 +9,11 @@
 ## R CMD check results
 0 errors ✔ | 0 warnings ✔ | 0 notes ✔
 
-This is a new package submission. The package provides the BID
-(Behavior Insight Design) framework for integrating behavioral science concepts
-into Shiny UI/UX design.
+## Resubmission
+This is a resubmission. In this version I have:
 
-I have read and agree to the CRAN repository policies.
+* Revised the CRAN status badge hyperlink to the official CRAN package page
+* Added UI/UX to spell check wordlist (these are standard industry abbreviations for "User Interface" and "User Experience")
+
+## Comments
+This is a new package submission. The package provides the BID (Behavior Insight Design) framework for integrating behavioral science concepts into Shiny UI/UX design.
