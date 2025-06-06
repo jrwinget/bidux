@@ -6,7 +6,7 @@
 <!-- badges: start -->
 
 [![CRAN
-status](https://www.r-pkg.org/badges/version/bidux)](https://github.com/jrwinget/bidux/releases)
+status](https://www.r-pkg.org/badges/version/bidux)](https://cran.r-project.org/package=bidux)
 [![R-CMD-check](https://github.com/jrwinget/bidux/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jrwinget/bidux/actions/workflows/R-CMD-check.yaml)
 [![code-size](https://img.shields.io/github/languages/code-size/jrwinget/bidux)](https://github.com/jrwinget/bidux)
 [![Codecov test
