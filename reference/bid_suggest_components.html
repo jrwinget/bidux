@@ -91,22 +91,22 @@ are provided.</p></dd>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="co"># After completing BID stages</span></span></span>
-<span class="r-in"><span><span class="va">notice_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="bid_notice.html">bid_notice</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  problem <span class="op">=</span> <span class="st">"Users struggle with complex data"</span>,</span></span>
-<span class="r-in"><span>  theory <span class="op">=</span> <span class="st">"Cognitive Load Theory"</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="co"># After completing BID stages</span></span></span>
+<span class="r-in"><span>  <span class="va">notice_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="bid_notice.html">bid_notice</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    problem <span class="op">=</span> <span class="st">"Users struggle with complex data"</span>,</span></span>
+<span class="r-in"><span>    theory <span class="op">=</span> <span class="st">"Cognitive Load Theory"</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Get all component suggestions</span></span></span>
-<span class="r-in"><span><span class="fu">bid_suggest_components</span><span class="op">(</span><span class="va">notice_result</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="co"># Get all component suggestions</span></span></span>
+<span class="r-in"><span>  <span class="fu">bid_suggest_components</span><span class="op">(</span><span class="va">notice_result</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Get only bslib suggestions</span></span></span>
-<span class="r-in"><span><span class="fu">bid_suggest_components</span><span class="op">(</span><span class="va">notice_result</span>, package <span class="op">=</span> <span class="st">"bslib"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="co"># Get only bslib suggestions</span></span></span>
+<span class="r-in"><span>  <span class="fu">bid_suggest_components</span><span class="op">(</span><span class="va">notice_result</span>, package <span class="op">=</span> <span class="st">"bslib"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Get shiny-specific suggestions</span></span></span>
-<span class="r-in"><span><span class="fu">bid_suggest_components</span><span class="op">(</span><span class="va">notice_result</span>, package <span class="op">=</span> <span class="st">"shiny"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-in"><span>  <span class="co"># Get shiny-specific suggestions</span></span></span>
+<span class="r-in"><span>  <span class="fu">bid_suggest_components</span><span class="op">(</span><span class="va">notice_result</span>, package <span class="op">=</span> <span class="st">"shiny"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
