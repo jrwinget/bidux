@@ -1,7 +1,5 @@
 library(testthat)
 library(tibble)
-library(cli)
-library(stringr)
 
 test_that("bid_notice returns a bid_stage object with correct structure", {
   result <- bid_notice(

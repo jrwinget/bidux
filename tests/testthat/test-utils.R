@@ -1,9 +1,4 @@
-library(testthat)
-library(tibble)
-
-#
-# 1) %||% operator tests
-#
+# %||% operator tests
 test_that("%||% operator works correctly", {
   expect_equal(5 %||% "default", 5)
   expect_equal("hello" %||% "default", "hello")
@@ -11,9 +6,7 @@ test_that("%||% operator works correctly", {
   expect_equal(NA %||% "default", NA) # NA is not NULL
 })
 
-#
-# 2) truncate_text tests
-#
+# truncate_text tests
 test_that("truncate_text works correctly", {
   expect_equal(truncate_text("short", 10), "short")
   expect_equal(
@@ -27,9 +20,7 @@ test_that("truncate_text works correctly", {
   expect_equal(truncate_text("exactly11!!", 10), "exactly...")
 })
 
-#
-# 3) validate_required_params tests
-#
+# validate_required_params tests
 test_that("validate_required_params works correctly", {
   # Should pass for valid parameters
   expect_silent(validate_required_params(
@@ -63,9 +54,7 @@ test_that("validate_required_params works correctly", {
   )
 })
 
-#
-# 4) validate_previous_stage tests
-#
+# validate_previous_stage tests
 test_that("validate_previous_stage works correctly", {
   # Fresh start: only allowed if current_stage == "Notice"
   expect_silent(validate_previous_stage(NULL, "Notice"))
@@ -105,9 +94,7 @@ test_that("validate_previous_stage works correctly", {
   )
 })
 
-#
-# 5) bid_message tests
-#
+# bid_message tests
 test_that("bid_message works correctly", {
   # Should print title + bullet lines
   expect_output(
@@ -138,9 +125,7 @@ test_that("bid_message works correctly", {
   expect_silent(bid_message("Something", NULL, NA, ""))
 })
 
-#
-# 6) Utility edge case tests
-#
+# Utility edge case tests
 test_that("utility functions handle edge cases", {
   # truncate_text edge cases
   expect_equal(truncate_text("abc", 3), "abc") # Exactly at limit
@@ -159,9 +144,7 @@ test_that("utility functions handle edge cases", {
   )
 })
 
-#
-# 7) Integration with bid_stage objects
-#
+# Integration with bid_stage objects
 test_that("utility functions integrate with bid_stage system", {
   # Make a dummy bid_stage tibble
   test_data <- tibble(
@@ -180,9 +163,7 @@ test_that("utility functions integrate with bid_stage system", {
   expect_silent(validate_previous_stage(get_stage(stage_obj), "Interpret"))
 })
 
-#
-# 8) Utility error messages are helpful
-#
+# Utility error messages are helpful
 test_that("utility error messages are helpful", {
   # validate_required_params message
   tryCatch(
@@ -205,9 +186,7 @@ test_that("utility error messages are helpful", {
   )
 })
 
-#
-# 9) Package style conventions
-#
+# Package style conventions
 test_that("utility functions are consistent with package style", {
   # truncate_text returns a single character string
   expect_type(truncate_text("test", 10), "character")
@@ -218,9 +197,7 @@ test_that("utility functions are consistent with package style", {
   expect_silent(bid_message(NULL, "valid"))
 })
 
-#
-# 10) Internationalization / encoding tests
-#
+# Internationalization / encoding tests
 test_that("utilities support internationalization considerations", {
   # Unicode characters
   unicode_text <- "Test with émojis 🎉 and àccénts"
@@ -233,9 +210,7 @@ test_that("utilities support internationalization considerations", {
   expect_match(truncated, "\\.\\.\\.$") # Should end with "..."
 })
 
-#
-# 11) Utility functions support debugging and testing
-#
+# Utility functions support debugging and testing
 test_that("utility functions support debugging and testing", {
   test_problem <- "Test problem for unit testing purposes"
   test_evidence <- "Test evidence for validation"

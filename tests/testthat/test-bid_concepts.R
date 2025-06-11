@@ -1,6 +1,3 @@
-library(testthat)
-library(tibble)
-
 test_that("bid_concepts returns at least 40 concepts", {
   concepts <- bid_concepts()
 
