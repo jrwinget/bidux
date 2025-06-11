@@ -1,6 +1,3 @@
-library(testthat)
-library(tibble)
-
 test_that("bid_interpret returns a tibble with stage 'Interpret'", {
   local_mocked_bindings(
     validate_required_params = function(...) invisible(TRUE),
@@ -17,7 +14,7 @@ test_that("bid_interpret returns a tibble with stage 'Interpret'", {
     }
   )
   
-  previous_stage <- tibble::tibble(
+  previous_stage <- tibble(
     stage = "Notice",
     problem = "Users struggle with complex data",
     theory = "Cognitive Load Theory",

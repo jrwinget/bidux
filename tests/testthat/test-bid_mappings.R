@@ -1,6 +1,3 @@
-library(testthat)
-library(tibble)
-
 test_that("load_theory_mappings works with default data", {
   mappings <- load_theory_mappings()
   

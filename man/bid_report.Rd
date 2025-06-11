@@ -26,18 +26,22 @@ Creates a comprehensive report from a completed BID framework process. This
 report summarizes all stages and provides recommendations for implementation.
 }
 \examples{
-\dontrun{
-# After completing all 5 stages
-validation_result <- bid_validate(...)
+if(interactive()){
+  # After completing all 5 stages
+  validation_result <- bid_validate(...)
 
-# Generate a text report
-bid_report(validation_result)
+  # Generate a text report
+  bid_report(validation_result)
 
-# Generate an HTML report
-bid_report(validation_result, format = "html")
+  # Generate an HTML report
+  bid_report(validation_result, format = "html")
 
-# Generate a markdown report without diagrams
-bid_report(validation_result, format = "markdown", include_diagrams = FALSE)
+  # Generate a markdown report without diagrams
+  bid_report(
+    validation_result,
+    format = "markdown",
+    include_diagrams = FALSE
+  )
 }
 
 }

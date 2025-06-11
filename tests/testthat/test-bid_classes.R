@@ -1,6 +1,3 @@
-library(testthat)
-library(tibble)
-
 test_that("bid_stage constructor creates valid objects", {
   test_data <- tibble(
     stage = "Notice",
