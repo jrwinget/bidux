@@ -8,7 +8,7 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Provides a framework and toolkit to guide Shiny developers in implementing the Behavior Insight Design (BID) framework. The package offers functions for documenting each of the five stages—Notice, Interpret, Structure, Anticipate, and Validate—along with a comprehensive concept dictionary.
+Provides a framework and toolkit to guide 'shiny' developers in implementing the Behavior Insight Design (BID) framework. The package offers functions for documenting each of the five stages (Notice, Interpret, Structure, Anticipate, and Validate), along with a comprehensive concept dictionary.
 }
 \author{
 \strong{Maintainer}: Jeremy Winget \email{contact@jrwinget.com} (\href{https://orcid.org/0000-0002-3783-4354}{ORCID})
