@@ -102,7 +102,14 @@ get_metadata <- function(x) {
 
 #' Print method for BID stage objects
 #' @param x A bid_stage object
-#' @param ... Additional arguments (unused)
+#' @param ... Additional arguments
+#' @return Returns the input \code{bid_stage} object invisibly (class:
+#'         \code{c("bid_stage", "tbl_df", "tbl", "data.frame")}). The method is
+#'         called for its side effects: printing a formatted summary of the BID
+#'         stage to the console, including stage progress, key stage-specific
+#'         information, and usage suggestions. The invisible return allows for
+#'         method chaining while maintaining the primary purpose of console
+#'         output.
 #' @export
 print.bid_stage <- function(x, ...) {
   stage <- attr(x, "stage")
@@ -236,7 +243,13 @@ print.bid_stage <- function(x, ...) {
 
 #' Summary method for BID stage objects
 #' @param object A bid_stage object
-#' @param ... Additional arguments (unused)
+#' @param ... Additional arguments
+#' @return Returns the input \code{bid_stage} object invisibly (class:
+#'         \code{c("bid_stage", "tbl_df", "tbl", "data.frame")}). The method is
+#'         called for its side effects: printing a comprehensive summary to the
+#'         console including stage metadata, all non-empty data columns, and
+#'         timestamp information. The invisible return enables method chaining
+#'         while prioritizing the detailed console output display.
 #' @export
 summary.bid_stage <- function(object, ...) {
   stage <- attr(object, "stage")
@@ -387,7 +400,13 @@ is_complete <- function(x) {
 
 #' Print method for BID result objects
 #' @param x A bid_result object
-#' @param ... Additional arguments (unused)
+#' @param ... Additional arguments
+#' @return Returns the input \code{bid_result} object invisibly (class:
+#'         \code{c("bid_result", "list")}). The method is called for its side
+#'         effects: printing a workflow overview to the console showing
+#'         completion status, stage progression, and key information from each
+#'         completed BID stage. The invisible return supports method chaining
+#'         while emphasizing the console summary output.
 #' @export
 print.bid_result <- function(x, ...) {
   created <- attr(x, "created")
@@ -446,7 +465,14 @@ print.bid_result <- function(x, ...) {
 
 #' Summary method for BID result objects
 #' @param object A bid_result object
-#' @param ... Additional arguments (unused)
+#' @param ... Additional arguments
+#' @return Returns the input \code{bid_result} object invisibly (class:
+#'         \code{c("bid_result", "list")}). The method is called for its side
+#'         effects: printing a detailed workflow analysis to the console
+#'         including completion statistics, duration metrics, and comprehensive
+#'         stage-by-stage breakdowns with key data from each BID framework
+#'         stage. The invisible return facilitates method chaining while
+#'         focusing on comprehensive console reporting.
 #' @export
 summary.bid_result <- function(object, ...) {
   cat(cli::style_bold(cli::col_blue(
