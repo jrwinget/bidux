@@ -34,7 +34,13 @@ psychology concepts to their design process.
 
 ## Installation
 
-You can install the development version of {bidux} from GitHub:
+You can install bidux from CRAN:
+
+``` r
+install.packages("bidux")
+```
+
+Or install the development version from GitHub:
 
 ``` r
 # install.packages("pak")
@@ -459,3 +465,6 @@ Check out the vignettes for more information:
   examples
 - `vignette("concepts-reference")` - Detailed guide to implementing key
   concepts
+
+Visit the [package website](https://jrwinget.github.io/bidux/) for
+complete documentation and examples.
