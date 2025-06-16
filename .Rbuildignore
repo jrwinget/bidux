@@ -16,3 +16,5 @@
 ^CRAN-SUBMISSION$
 ^\.cache$
 ^\.vscode$
+^_pkgdown\.yml$
+^pkgdown$
