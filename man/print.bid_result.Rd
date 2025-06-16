@@ -9,7 +9,15 @@
 \arguments{
 \item{x}{A bid_result object}
 
-\item{...}{Additional arguments (unused)}
+\item{...}{Additional arguments}
+}
+\value{
+Returns the input \code{bid_result} object invisibly (class:
+\code{c("bid_result", "list")}). The method is called for its side
+effects: printing a workflow overview to the console showing
+completion status, stage progression, and key information from each
+completed BID stage. The invisible return supports method chaining
+while emphasizing the console summary output.
 }
 \description{
 Print method for BID result objects

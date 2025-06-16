@@ -1,6 +1,3 @@
-library(testthat)
-library(tibble)
-
 test_that("bid_suggest_components returns tibble with correct structure", {
   notice_result <- bid_notice(
     problem = "Users struggle with complex data",

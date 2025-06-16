@@ -9,7 +9,16 @@
 \arguments{
 \item{x}{A bid_stage object}
 
-\item{...}{Additional arguments (unused)}
+\item{...}{Additional arguments}
+}
+\value{
+Returns the input \code{bid_stage} object invisibly (class:
+\code{c("bid_stage", "tbl_df", "tbl", "data.frame")}). The method is
+called for its side effects: printing a formatted summary of the BID
+stage to the console, including stage progress, key stage-specific
+information, and usage suggestions. The invisible return allows for
+method chaining while maintaining the primary purpose of console
+output.
 }
 \description{
 Print method for BID stage objects

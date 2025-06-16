@@ -1,6 +1,3 @@
-library(testthat)
-library(tibble)
-
 test_that("bid_anticipate works with valid inputs", {
   structure_result <- bid_structure(
     bid_interpret(
@@ -169,7 +166,7 @@ test_that("bid_anticipate handles different layout types appropriately", {
   layouts <- c("dual_process", "grid", "card", "tabs", "breathable")
 
   for (layout in layouts) {
-    structure_result <- tibble::tibble(
+    structure_result <- tibble(
       stage = "Structure",
       layout = layout,
       concepts = "Visual Hierarchy",
@@ -192,7 +189,7 @@ test_that("bid_anticipate handles different layout types appropriately", {
 })
 
 test_that("bid_anticipate handles NA values in previous_stage fields", {
-  structure_result <- tibble::tibble(
+  structure_result <- tibble(
     stage = "Structure",
     layout = NA_character_,
     concepts = NA_character_,
@@ -221,7 +218,7 @@ test_that("bid_anticipate handles NA values in previous_stage fields", {
 })
 
 test_that("bid_anticipate handles edge cases in bias_mitigations parameter", {
-  structure_result <- tibble::tibble(
+  structure_result <- tibble(
     stage = "Structure",
     layout = "dual_process",
     concepts = "Visual Hierarchy",
@@ -266,7 +263,7 @@ test_that("bid_anticipate handles edge cases in bias_mitigations parameter", {
 })
 
 test_that("bid_anticipate handles edge cases in interaction_principles param", {
-  structure_result <- tibble::tibble(
+  structure_result <- tibble(
     stage = "Structure",
     layout = "dual_process",
     concepts = "Visual Hierarchy",
@@ -304,7 +301,7 @@ test_that("bid_anticipate handles edge cases in interaction_principles param", {
 })
 
 test_that("bid_anticipate correctly parses JSON in interaction_principles", {
-  structure_result <- tibble::tibble(
+  structure_result <- tibble(
     stage = "Structure",
     layout = "dual_process",
     concepts = "Visual Hierarchy",

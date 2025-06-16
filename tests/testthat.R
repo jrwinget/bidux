@@ -8,5 +8,8 @@
 
 library(testthat)
 library(bidux)
+library(tibble)
+library(cli)
+library(stringr)
 
 test_check("bidux")

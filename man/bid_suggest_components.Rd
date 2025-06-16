@@ -24,21 +24,21 @@ The suggestions are based on the design principles and user needs identified
 in the BID process.
 }
 \examples{
-\dontrun{
-# After completing BID stages
-notice_result <- bid_notice(
-  problem = "Users struggle with complex data",
-  theory = "Cognitive Load Theory"
-)
+if(interactive()){
+  # After completing BID stages
+  notice_result <- bid_notice(
+    problem = "Users struggle with complex data",
+    theory = "Cognitive Load Theory"
+  )
 
-# Get all component suggestions
-bid_suggest_components(notice_result)
+  # Get all component suggestions
+  bid_suggest_components(notice_result)
 
-# Get only bslib suggestions
-bid_suggest_components(notice_result, package = "bslib")
+  # Get only bslib suggestions
+  bid_suggest_components(notice_result, package = "bslib")
 
-# Get shiny-specific suggestions
-bid_suggest_components(notice_result, package = "shiny")
+  # Get shiny-specific suggestions
+  bid_suggest_components(notice_result, package = "shiny")
 }
 
 }

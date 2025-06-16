@@ -1,10 +1,7 @@
-library(testthat)
-library(tibble)
-
 test_that("bid_structure returns a bid_stage object with stage 'Structure'", {
   local_mocked_bindings(
     bid_concepts = function(search = NULL) {
-      tibble::tibble(
+      tibble(
         concept = c("Test Concept", "Visual Hierarchy", "Cognitive Load Theory"),
         description = c("Test description", "Visual description", "Cognitive description"),
         category = c("Stage 1", "Stage 2", "Stage 3"),
@@ -14,7 +11,7 @@ test_that("bid_structure returns a bid_stage object with stage 'Structure'", {
       )
     },
     bid_concept = function(concept_name) {
-      tibble::tibble(
+      tibble(
         concept = concept_name,
         description = "Mocked description",
         category = "Stage 1",
@@ -25,7 +22,7 @@ test_that("bid_structure returns a bid_stage object with stage 'Structure'", {
     }
   )
   
-  previous_stage <- tibble::tibble(
+  previous_stage <- tibble(
     stage = "Interpret",
     problem = "The dashboard layout is cluttered.",
     theory = "Visual Hierarchies",
@@ -47,7 +44,7 @@ test_that("bid_structure returns a bid_stage object with stage 'Structure'", {
 test_that("bid_structure warns on invalid layout", {
   local_mocked_bindings(
     bid_concepts = function(search = NULL) {
-      tibble::tibble(
+      tibble(
         concept = "Test Concept",
         description = "Dummy description",
         category = "Stage 1",
@@ -57,7 +54,7 @@ test_that("bid_structure warns on invalid layout", {
     }
   )
 
-  previous_stage <- tibble::tibble(
+  previous_stage <- tibble(
     stage = "Notice",
     problem = "Dashboard elements are not arranged clearly.",
     theory = "Cognitive Load Theory",
@@ -75,7 +72,7 @@ test_that("bid_structure warns on invalid layout", {
 })
 
 test_that("bid_structure errors when accessibility parameter is not a list", {
-  previous_stage <- tibble::tibble(
+  previous_stage <- tibble(
     stage = "Interpret",
     problem = "Layout organization is suboptimal.",
     theory = "Dual-Processing Theory",
@@ -95,7 +92,7 @@ test_that("bid_structure errors when accessibility parameter is not a list", {
 test_that("bid_structure auto-detects concepts when not provided", {
   local_mocked_bindings(
     bid_concepts = function(search = NULL) {
-      tibble::tibble(
+      tibble(
         concept = "Auto Detected Concept",
         description = "Automatically detected based on problem statement.",
         category = "Stage 1",
@@ -105,7 +102,7 @@ test_that("bid_structure auto-detects concepts when not provided", {
     }
   )
 
-  previous_stage <- tibble::tibble(
+  previous_stage <- tibble(
     stage = "Notice",
     problem = "Dashboard elements are scattered across the screen.",
     theory = "Principle of Proximity",
@@ -120,7 +117,7 @@ test_that("bid_structure auto-detects concepts when not provided", {
 })
 
 test_that("bid_structure fuzzy matches concept names", {
-  previous_stage <- tibble::tibble(
+  previous_stage <- tibble(
     stage = "Interpret",
     central_question = "How can we improve dashboard usability?",
     hook = "Users struggle with navigation",
@@ -177,7 +174,7 @@ test_that("bid_structure fuzzy matches concept names", {
 })
 
 test_that("bid_structure handles NULL concepts with automatic detection", {
-  previous_stage <- tibble::tibble(
+  previous_stage <- tibble(
     stage = "Interpret",
     central_question = "How can we make data easier to find?",
     hook = "Users struggle with information overload",
@@ -200,7 +197,7 @@ test_that("bid_structure handles NULL concepts with automatic detection", {
   expect_true(nchar(result$concepts[1]) > 0)
   expect_match(result$concepts, "Visual|Hierarchy|Cognitive|Load", perl = TRUE)
 
-  minimal_previous_stage <- tibble::tibble(
+  minimal_previous_stage <- tibble(
     stage = "Interpret",
     central_question = "How to improve?",
     hook = "Issue found",
@@ -224,7 +221,7 @@ test_that("bid_structure handles NULL concepts with automatic detection", {
 })
 
 test_that("bid_structure handles NA values in previous_stage", {
-  previous_stage <- tibble::tibble(
+  previous_stage <- tibble(
     stage = "Interpret",
     central_question = NA_character_,
     hook = "Users struggle with navigation", # This has a value
@@ -248,7 +245,7 @@ test_that("bid_structure handles NA values in previous_stage", {
 })
 
 test_that("bid_structure handles edge cases in accessibility parameter", {
-  previous_stage <- tibble::tibble(
+  previous_stage <- tibble(
     stage = "Interpret",
     central_question = "Test question",
     hook = "Test hook",
@@ -303,7 +300,7 @@ test_that("bid_structure handles edge cases in accessibility parameter", {
 })
 
 test_that("bid_structure handles various layout values", {
-  previous_stage <- tibble::tibble(
+  previous_stage <- tibble(
     stage = "Interpret",
     central_question = "Test question",
     hook = "Test hook",
@@ -339,7 +336,7 @@ test_that("bid_structure handles various layout values", {
 })
 
 test_that("bid_structure handles complex accessibility parameter structures", {
-  previous_stage <- tibble::tibble(
+  previous_stage <- tibble(
     stage = "Interpret",
     central_question = "Test question",
     timestamp = Sys.time()
