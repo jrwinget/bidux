@@ -9,7 +9,9 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  out.width = "100%",
+  warning = FALSE,
+  message = FALSE
 )
 ```
 
@@ -133,13 +135,18 @@ The package includes a comprehensive dictionary of behavioral psychology concept
 ```{r concept_dict}
 # List all concepts
 all_concepts <- bid_concepts()
+all_concepts
 
 # Search for specific concepts
 cognitive_concepts <- bid_concepts("cognitive")
+cognitive_concepts
+
 visual_concepts <- bid_concepts("visual, hierarchy") # Multiple search terms
+visual_concepts
 
 # Get detailed information about a specific concept
 anchoring_info <- bid_concept("anchoring effect")
+anchoring_info
 ```
 
 ## UI Component Suggestions
@@ -148,19 +155,19 @@ Get concrete implementation ideas for various UI packages:
 
 ```{r ui_suggestions}
 # Get bslib component suggestions
-bslib_components <- bid_suggest_components(structure_result, package = "bslib")
+bid_suggest_components(structure_result, package = "bslib")
 
 # Get shiny component suggestions
-shiny_components <- bid_suggest_components(notice_result, package = "shiny")
+bid_suggest_components(notice_result, package = "shiny")
 
 # Get reactable component suggestions
-reactable_components <- bid_suggest_components(anticipate_result, package = "reactable")
+bid_suggest_components(anticipate_result, package = "reactable")
 
 # Get echarts4r component suggestions
-echarts_components <- bid_suggest_components(validate_result, package = "echarts4r")
+bid_suggest_components(validate_result, package = "echarts4r")
 
 # Get suggestions from all supported packages
-all_suggestions <- bid_suggest_components(validate_result)
+bid_suggest_components(validate_result)
 ```
 
 ## Comprehensive Reporting
@@ -208,9 +215,10 @@ bid_process <- bid_notice(
     summary_panel = "Key insights summary",
     collaboration = "Team annotation features"
   )
+bid_process
 
 # Generate implementation suggestions
-ui_suggestions <- bid_suggest_components(bid_process, "bslib")
+bid_suggest_components(bid_process, "bslib")
 
 # Create a report
 report <- bid_report(bid_process, format = "html")

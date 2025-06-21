@@ -109,50 +109,6 @@ structure_result <- bid_structure(
     screen_reader = "Charts include descriptive alt text"
   )
 )
-#> Rows: 41 Columns: 7
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: ","
-#> chr (7): concept, description, category, reference, example, implementation_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Returning all 41 concepts
-#> 
-#> ℹ Consider adding these common accessibility parameters:- text_size- alternative_text- focus_indicators- semantic_markup- aria_labels
-#> 
-#> 
-#> 
-#> ── Implementation tips for selected concepts: 
-#> 
-#> Rows: 41 Columns: 7
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: ","
-#> chr (7): concept, description, category, reference, example, implementation_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> • Principle of Proximity: Place related controls and visualizations in
-#> proximity to each other.
-#> 
-#> Rows: 41 Columns: 7
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: ","
-#> chr (7): concept, description, category, reference, example, implementation_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> • Default Effect: Pre-select the most useful timeframe or metrics for initial
-#> view.
-#> 
-#> Rows: 41 Columns: 7
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: ","
-#> chr (7): concept, description, category, reference, example, implementation_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> • Breathable Layouts: Use bslib::card_body(padding = 4) to add consistent
-#> padding and whitespace.
 #> Stage 3 (Structure) completed.
 #>   - Layout: dual_process
 #>   - Concepts: Principle of Proximity, Default Effect, Breathable Layouts
@@ -172,41 +128,6 @@ anticipate_result <- bid_anticipate(
     progressive_disclosure = "Reveal advanced options progressively"
   )
 )
-#> Rows: 41 Columns: 7
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: ","
-#> chr (7): concept, description, category, reference, example, implementation_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Found 7 concept(s) matching 'bias|anchor|fram|confirm'
-#> 
-#> Rows: 41 Columns: 7
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: ","
-#> chr (7): concept, description, category, reference, example, implementation_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Found partial match: Anchoring Effect
-#> 
-#> Rows: 41 Columns: 7
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: ","
-#> chr (7): concept, description, category, reference, example, implementation_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Found partial match: Framing & Loss Aversion
-#> 
-#> Rows: 41 Columns: 7
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: ","
-#> chr (7): concept, description, category, reference, example, implementation_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Concept 'confirmation_bias' not found
 #> Stage 4 (Anticipate) completed.
 #>   - Bias mitigations: 3 defined
 #>   - Interaction principles: 3 defined
@@ -238,44 +159,61 @@ concepts:
 ``` r
 # List all concepts
 all_concepts <- bid_concepts()
-#> Rows: 41 Columns: 7
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: ","
-#> chr (7): concept, description, category, reference, example, implementation_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Returning all 41 concepts
+all_concepts
+#> # A tibble: 41 × 7
+#>    concept            description category reference example implementation_tips
+#>    <chr>              <chr>       <chr>    <chr>     <chr>   <chr>              
+#>  1 Cognitive Load Th… Theory tha… Stage 1  Sweller … Reduci… Use tabs or collap…
+#>  2 Hick's Law         Principle … Stage 1  Hick (19… Simpli… Reduce dropdown op…
+#>  3 Visual Hierarchies Design pri… Stage 1  Tufte (1… Emphas… Use size, color, a…
+#>  4 Data Storytelling… Framework … Stage 2  Matei & … Highli… Start with a clear…
+#>  5 Processing Fluency The ease w… Stage 2  Alter & … Using … Use clean, consist…
+#>  6 Emotion & Fluency… How emotio… Stage 2  Song & S… Applyi… Consider subtle co…
+#>  7 Principle of Prox… Grouping r… Stage 3  Gestalt … Groupi… Place related cont…
+#>  8 Dual-Processing T… Model dist… Stage 3  Tversky … Provid… Provide both KPI s…
+#>  9 Default Effect     How defaul… Stage 3  Johnson … Pre-se… Pre-select the mos…
+#> 10 Aesthetic-Usabili… The effect… Stage 3  Norman (… Creati… Ensure visual cohe…
+#> # ℹ 31 more rows
+#> # ℹ 1 more variable: related_concepts <chr>
 
 # Search for specific concepts
 cognitive_concepts <- bid_concepts("cognitive")
-#> Rows: 41 Columns: 7
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: ","
-#> chr (7): concept, description, category, reference, example, implementation_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Found 4 concept(s) matching 'cognitive'
+cognitive_concepts
+#> # A tibble: 4 × 7
+#>   concept             description category reference example implementation_tips
+#>   <chr>               <chr>       <chr>    <chr>     <chr>   <chr>              
+#> 1 Cognitive Load The… Theory tha… Stage 1  Sweller … Reduci… Use tabs or collap…
+#> 2 Progressive Disclo… Technique … Stage 1  Krug (20… Expand… Use shiny::actionB…
+#> 3 Cognitive Dimensio… Framework … Stage 1  Green & … Evalua… Evaluate your UI a…
+#> 4 Breathable Layouts  Using whit… Stage 3  White (2… Using … Use bslib::card_bo…
+#> # ℹ 1 more variable: related_concepts <chr>
+
 visual_concepts <- bid_concepts("visual, hierarchy") # Multiple search terms
-#> Rows: 41 Columns: 7
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: ","
-#> chr (7): concept, description, category, reference, example, implementation_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Found 11 concept(s) matching 'visual, hierarchy'
+visual_concepts
+#> # A tibble: 11 × 7
+#>    concept            description category reference example implementation_tips
+#>    <chr>              <chr>       <chr>    <chr>     <chr>   <chr>              
+#>  1 Visual Hierarchies Design pri… Stage 1  Tufte (1… Emphas… Use size, color, a…
+#>  2 Principle of Prox… Grouping r… Stage 3  Gestalt … Groupi… Place related cont…
+#>  3 Gestalt Principles Visual per… Stage 3  Wertheim… Arrang… Use layout_column_…
+#>  4 Pre-attentive Pro… Visual pro… Stage 2  Healey (… Using … Leverage reactable…
+#>  5 Change Blindness   Failure to… Stage 4  Rensink … Using … Use transitions or…
+#>  6 Visual Hierarchy   Organizing… Stage 1  Djamasbi… Creati… Apply different fo…
+#>  7 Breathable Layouts Using whit… Stage 3  White (2… Using … Use bslib::card_bo…
+#>  8 Interaction Hints  Visual cue… Stage 4  Norman (… Adding… Add CSS hover stat…
+#>  9 Visual Feedback    Immediate … Stage 4  Shneider… Highli… Use shinyFeedback …
+#> 10 Accessibility Con… Ensuring s… Stage 3  WCAG 2.1  Ensuri… Test color combina…
+#> 11 Information Hiera… Organizati… Stage 3  Djamasbi… Making… Use font size, wei…
+#> # ℹ 1 more variable: related_concepts <chr>
 
 # Get detailed information about a specific concept
 anchoring_info <- bid_concept("anchoring effect")
-#> Rows: 41 Columns: 7
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: ","
-#> chr (7): concept, description, category, reference, example, implementation_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+anchoring_info
+#> # A tibble: 1 × 8
+#>   concept          description    category reference example implementation_tips
+#>   <chr>            <chr>          <chr>    <chr>     <chr>   <chr>              
+#> 1 Anchoring Effect Bias where in… Stage 4  Tversky … Using … Always show refere…
+#> # ℹ 2 more variables: related_concepts <chr>, recommendations <chr>
 ```
 
 ## UI Component Suggestions
@@ -284,25 +222,72 @@ Get concrete implementation ideas for various UI packages:
 
 ``` r
 # Get bslib component suggestions
-bslib_components <- bid_suggest_components(structure_result, package = "bslib")
-#> ✔ Found 10 bslib component suggestion for BID Structure stage
+bid_suggest_components(structure_result, package = "bslib")
+#> # A tibble: 10 × 7
+#>    package component          description bid_stage_relevance cognitive_concepts
+#>    <chr>   <chr>              <chr>       <chr>               <chr>             
+#>  1 bslib   layout_columns     Create fle… Stage 3             Visual Hierarchy,…
+#>  2 bslib   layout_column_wrap Create res… Stage 3             Cognitive Load Th…
+#>  3 bslib   card               Organize c… Stage 3,Stage 5     Principle of Prox…
+#>  4 bslib   card_body          Control ca… Stage 3             Breathable Layout…
+#>  5 bslib   page_sidebar       Build dash… Stage 3             Information Hiera…
+#>  6 bslib   value_box          Display ke… Stage 2,Stage 3,St… Visual Hierarchy,…
+#>  7 bslib   nav_panel          Create tab… Stage 1,Stage 3     Cognitive Load Th…
+#>  8 bslib   accordion          Implement … Stage 1,Stage 3     Progressive Discl…
+#>  9 bslib   input_dark_mode    Allow user… Stage 3,Stage 5     Aesthetic-Usabili…
+#> 10 bslib   card_header        Add header… Stage 3             Information Hiera…
+#> # ℹ 2 more variables: use_cases <chr>, relevance <dbl>
 
 # Get shiny component suggestions
-shiny_components <- bid_suggest_components(notice_result, package = "shiny")
-#> ✔ Found 10 shiny component suggestion for BID Notice stage
+bid_suggest_components(notice_result, package = "shiny")
+#> # A tibble: 10 × 7
+#>    package component         description  bid_stage_relevance cognitive_concepts
+#>    <chr>   <chr>             <chr>        <chr>               <chr>             
+#>  1 shiny   tabsetPanel       Organize re… Stage 1,Stage 3     Information Hiera…
+#>  2 shiny   conditionalPanel  Show/hide U… Stage 1,Stage 4     Cognitive Load Th…
+#>  3 shiny   renderUI          Generate UI… Stage 1,Stage 4     Progressive Discl…
+#>  4 shiny   uiOutput          Display dyn… Stage 1,Stage 4     Progressive Discl…
+#>  5 shiny   reactive          Create reac… Stage 1,Stage 4     Processing Fluenc…
+#>  6 shiny   isolate           Control rea… Stage 1,Stage 4     Processing Fluenc…
+#>  7 shiny   wellPanel         Group relat… Stage 3             Principle of Prox…
+#>  8 shiny   fluidRow          Create resp… Stage 3             Visual Hierarchy,…
+#>  9 shiny   column            Control pre… Stage 3             Visual Hierarchy,…
+#> 10 shiny   updateSelectInput Dynamically… Stage 4             Default Effect,Co…
+#> # ℹ 2 more variables: use_cases <chr>, relevance <dbl>
 
 # Get reactable component suggestions
-reactable_components <- bid_suggest_components(anticipate_result, package = "reactable")
-#> ✔ Found 1 reactable component suggestion for BID Anticipate stage
+bid_suggest_components(anticipate_result, package = "reactable")
+#> # A tibble: 1 × 7
+#>   package component description bid_stage_relevance cognitive_concepts use_cases
+#>   <chr>   <chr>     <chr>       <chr>               <chr>              <chr>    
+#> 1 reacta… getReact… Access tab… Stage 4,Stage 5     Norman's Stages o… table in…
+#> # ℹ 1 more variable: relevance <dbl>
 
 # Get echarts4r component suggestions
-echarts_components <- bid_suggest_components(validate_result, package = "echarts4r")
-#> Warning: No components found for package: echarts4r
+bid_suggest_components(validate_result, package = "echarts4r")
+#> # A tibble: 0 × 7
+#> # ℹ 7 variables: package <chr>, component <chr>, description <chr>,
+#> #   bid_stage_relevance <chr>, cognitive_concepts <chr>, use_cases <chr>,
+#> #   relevance <dbl>
 
 # Get suggestions from all supported packages
-all_suggestions <- bid_suggest_components(validate_result)
-#> ✔ Found 12 component suggestions across all packages for BID Validate stage
-#> ℹ Showing components ordered by relevance to your BID analysis
+bid_suggest_components(validate_result)
+#> # A tibble: 12 × 7
+#>    package component        description   bid_stage_relevance cognitive_concepts
+#>    <chr>   <chr>            <chr>         <chr>               <chr>             
+#>  1 shiny   tabsetPanel      Organize rel… Stage 1,Stage 3     Information Hiera…
+#>  2 shiny   conditionalPanel Show/hide UI… Stage 1,Stage 4     Cognitive Load Th…
+#>  3 shiny   renderUI         Generate UI … Stage 1,Stage 4     Progressive Discl…
+#>  4 shiny   uiOutput         Display dyna… Stage 1,Stage 4     Progressive Discl…
+#>  5 shiny   reactive         Create react… Stage 1,Stage 4     Processing Fluenc…
+#>  6 shiny   isolate          Control reac… Stage 1,Stage 4     Processing Fluenc…
+#>  7 bslib   nav_panel        Create tabbe… Stage 1,Stage 3     Cognitive Load Th…
+#>  8 bslib   accordion        Implement co… Stage 1,Stage 3     Progressive Discl…
+#>  9 shiny   wellPanel        Group relate… Stage 3             Principle of Prox…
+#> 10 bslib   card             Organize con… Stage 3,Stage 5     Principle of Prox…
+#> 11 bslib   layout_columns   Create flexi… Stage 3             Visual Hierarchy,…
+#> 12 DT      datatable        Display data… Stage 2,Stage 3,St… Information Hiera…
+#> # ℹ 2 more variables: use_cases <chr>, relevance <dbl>
 ```
 
 ## Comprehensive Reporting
@@ -312,14 +297,8 @@ Generate documentation for your BID implementation:
 ``` r
 # Generate a report in various formats
 text_report <- bid_report(validate_result)
-#> ✔ Found 4 bslib component suggestion for BID Validate stage
-#> ✔ Found 7 shiny component suggestion for BID Validate stage
 html_report <- bid_report(validate_result, format = "html")
-#> ✔ Found 4 bslib component suggestion for BID Validate stage
-#> ✔ Found 7 shiny component suggestion for BID Validate stage
 md_report <- bid_report(validate_result, format = "markdown", include_diagrams = TRUE)
-#> ✔ Found 4 bslib component suggestion for BID Validate stage
-#> ✔ Found 7 shiny component suggestion for BID Validate stage
 ```
 
 ## Example Workflow
@@ -368,94 +347,42 @@ bid_process <- bid_notice(
 #>   - Your data story has all key elements. Focus on making each component compelling and relevant.
 #>   - Your central question is appropriately scoped.
 #>   - No user personas defined
-#> Rows: 41 Columns: 7
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: ","
-#> chr (7): concept, description, category, reference, example, implementation_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Returning all 41 concepts
-#> 
-#> 
-#> 
-#> ── Implementation tips for selected concepts: 
-#> 
-#> Rows: 41 Columns: 7
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: ","
-#> chr (7): concept, description, category, reference, example, implementation_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> • Principle of Proximity: Place related controls and visualizations in
-#> proximity to each other.
-#> 
-#> Rows: 41 Columns: 7
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: ","
-#> chr (7): concept, description, category, reference, example, implementation_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> • Default Effect: Pre-select the most useful timeframe or metrics for initial
-#> view.
 #> Stage 3 (Structure) completed.
 #>   - Layout: dual_process
 #>   - Concepts: Principle of Proximity, Default Effect
 #>   - No accessibility considerations specified
-#> Rows: 41 Columns: 7
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: ","
-#> chr (7): concept, description, category, reference, example, implementation_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Found 7 concept(s) matching 'bias|anchor|fram|confirm'
-#> 
-#> Automatically suggested interaction principles: progressive_disclosure, hover_effects.
-#> 
-#> Rows: 41 Columns: 7
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: ","
-#> chr (7): concept, description, category, reference, example, implementation_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Found partial match: Anchoring Effect
-#> 
-#> Rows: 41 Columns: 7
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: ","
-#> chr (7): concept, description, category, reference, example, implementation_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Found partial match: Framing & Loss Aversion
 #> Stage 4 (Anticipate) completed.
 #>   - Bias mitigations: 2 defined
 #>   - Interaction principles: 2 defined
 #>   - Key suggestions: anchoring mitigation: Always show reference points like previous period, budget, or industry average., framing mitigation: Toggle between progress (65% complete) and gap (35% remaining) framing., Consider also addressing these common biases: confirmation
-#> ℹ Suggested next steps:
-#> • Conduct user testing with target audience to validate design decisions
-#> • Implement bias mitigation strategies identified in the Anticipate stage
-#> • Monitor user behavior patterns to validate bias assumptions
-#> • Document successful patterns and lessons learned for future projects
-#> • Plan iterative improvements based on user feedback and analytics
 #> Stage 5 (Validate) completed.
 #>   - Summary panel: Key insights summary
 #>   - Collaboration: Team annotation features
 #>   - Next steps: 5 items defined
 #>   - Validation stage is well-defined. Focus on implementation and user testing.
+bid_process
+#> # A tibble: 1 × 14
+#>   stage    summary_panel        collaboration           next_steps previous_bias
+#>   <chr>    <chr>                <chr>                   <chr>      <chr>        
+#> 1 Validate Key insights summary Team annotation featur… Conduct u… anchoring: U…
+#> # ℹ 9 more variables: previous_interaction <json>, previous_layout <chr>,
+#> #   previous_concepts <chr>, previous_accessibility <chr>,
+#> #   previous_central_question <chr>, previous_problem <chr>,
+#> #   previous_theory <chr>, suggestions <chr>, timestamp <dttm>
 
 # Generate implementation suggestions
-ui_suggestions <- bid_suggest_components(bid_process, "bslib")
-#> ✔ Found 4 bslib component suggestion for BID Validate stage
+bid_suggest_components(bid_process, "bslib")
+#> # A tibble: 4 × 7
+#>   package component description bid_stage_relevance cognitive_concepts use_cases
+#>   <chr>   <chr>     <chr>       <chr>               <chr>              <chr>    
+#> 1 bslib   nav_panel Create tab… Stage 1,Stage 3     Cognitive Load Th… content …
+#> 2 bslib   accordion Implement … Stage 1,Stage 3     Progressive Discl… FAQ sect…
+#> 3 bslib   card      Organize c… Stage 3,Stage 5     Principle of Prox… Content …
+#> 4 bslib   layout_c… Create fle… Stage 3             Visual Hierarchy,… precise …
+#> # ℹ 1 more variable: relevance <dbl>
 
 # Create a report
 report <- bid_report(bid_process, format = "html")
-#> ✔ Found 4 bslib component suggestion for BID Validate stage
-#> ✔ Found 7 shiny component suggestion for BID Validate stage
 ```
 
 ## Learn More
