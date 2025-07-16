@@ -36,7 +36,7 @@ psychology concepts to their design process.
 
 ## Installation
 
-You can install bidux from CRAN:
+You can install `{bidux}` from CRAN:
 
 ``` r
 install.packages("bidux")
@@ -397,3 +397,135 @@ Check out the vignettes for more information:
 
 Visit the [package website](https://jrwinget.github.io/bidux/) for
 complete documentation and examples.
+
+## Contributing
+
+We welcome contributions to the `{bidux}` package! Whether you’re
+reporting bugs, suggesting new features, or contributing code, your
+involvement helps make `{bidux}` better for everyone.
+
+### Quick Start for Contributors
+
+1.  **Check existing issues** - Browse [open
+    issues](https://github.com/jrwinget/bidux/issues) to see if your
+    idea or bug has already been reported
+2.  **Use issue templates** - When creating new issues, please use our
+    structured templates to provide complete information
+3.  **Join discussions** - Participate in [GitHub
+    Discussions](https://github.com/jrwinget/bidux/discussions) for
+    questions and ideas
+4.  **Review the documentation** - Check the [package
+    website](https://jrwinget.github.io/bidux/) and [BID framework
+    resources](https://github.com/jrwinget/bid-framework)
+
+### Types of Contributions
+
+We have specific issue templates for different types of contributions:
+
+- **🐛 Bug Reports** - Report issues with existing functionality
+- **✨ Feature Requests** - Suggest new features or enhancements
+- **🧠 BID Framework Enhancements** - Improve the theoretical foundation
+- **📚 Documentation Improvements** - Help improve docs and examples
+- **♿ Accessibility Issues** - Report or fix accessibility barriers
+- **🧠 Psychological Theory Suggestions** - Propose new psychological
+  concepts
+- **✨ Shiny Integration Requests** - Improve integration with Shiny
+  packages
+
+### Submitting Code Contributions
+
+Ready to contribute code? Here’s how to submit your changes:
+
+1.  **Fork the repository** and create a feature branch from `main`
+
+2.  **Install development dependencies**: \`\`\`r \# Install development
+    version pak::pak(“jrwinget/bidux”)
+
+    \# Install development tools pak::pak(c(“devtools”, “testthat”,
+    “roxygen2”)) \`\`\`
+
+3.  **Make your changes** following our guidelines:
+
+    - Write clear, documented code
+    - Add tests for new functionality
+    - Update documentation as needed
+    - Ensure changes align with BID framework principles
+
+4.  **Test your changes**: \`\`\`r \# Run tests devtools::test()
+
+    \# Check package devtools::check()
+
+    \# Update documentation devtools::document() \`\`\`
+
+5.  **Submit your pull request**:
+
+    - Create a clear PR title and description
+    - Reference any related issues
+    - Our PR bot will help format your contribution
+    - Describe how your changes affect the BID framework
+    - Include any relevant psychological principles or theories
+
+### Code Style Guidelines
+
+- Follow the existing code style in the package
+- Use descriptive function and variable names
+- Include roxygen2 documentation for all functions
+- Write clear commit messages
+- Consider psychological principles in your implementations
+
+### BID Framework Considerations
+
+When contributing, please consider:
+
+- **Psychological Accuracy** - Ensure psychological concepts are
+  accurately represented
+- **Accessibility** - All contributions should maintain or improve
+  accessibility
+- **User Experience** - Consider how changes affect the user workflow
+- **Evidence-Based** - Provide references for psychological theories
+  when applicable
+
+### Development Setup
+
+For more detailed development instructions:
+
+1.  **Clone the repository**:
+    `bash     git clone https://github.com/jrwinget/bidux.git     cd bidux`
+
+2.  **Set up your development environment**: \`\`\`r \# Install package
+    dependencies pak::pak(desc::desc_get_deps()\$package)
+
+    \# Install development tools pak::pak(c(“devtools”, “testthat”,
+    “roxygen2”, “pkgdown”)) \`\`\`
+
+3.  **Run development workflow**: \`\`\`r \# Load package for
+    development devtools::load_all()
+
+    \# Run tests devtools::test()
+
+    \# Build documentation devtools::document()
+
+    \# Check package devtools::check() \`\`\`
+
+### Questions?
+
+- **General questions** - Use [GitHub
+  Discussions](https://github.com/jrwinget/bidux/discussions)
+- **Bug reports** - Use the bug report issue template
+- **Feature ideas** - Use the feature request template
+- **Direct contact** - Email the maintainer at <contact@jrwinget.com>
+
+Thank you for helping improve `{bidux}` and making behavioral psychology
+more accessible to R developers!
+
+## Code of Conduct
+
+Please note that this project is released with a [Contributor Code of
+Conduct](https://contributor-covenant.org/version/2/1/CODE_OF_CONDUCT.html).
+By contributing to this project, you agree to abide by its terms. See
+the [CODE_OF_CONDUCT](.github/CODE_OF_CONDUCT.md) file for details.
+
+## License
+
+This project is licensed under the MIT License - see the
+[LICENSE](LICENSE) file for details.
