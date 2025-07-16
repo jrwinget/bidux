@@ -1,0 +1,197 @@
+name: ♿ Accessibility Issue
+description: Report accessibility problems or suggest improvements
+title: "[Accessibility]: "
+labels: ["accessibility", "triage"]
+assignees:
+  - jrwinget
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping make bidux more accessible! Accessibility is a core principle of the BID framework, and we appreciate your help in identifying and addressing accessibility issues.
+  
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Details
+      description: How can we get in touch with you if we need more info?
+      placeholder: ex. email@example.com
+    validations:
+      required: false
+  
+  - type: dropdown
+    id: accessibility_type
+    attributes:
+      label: Accessibility Category
+      description: What type of accessibility issue is this?
+      options:
+        - "Visual - Color contrast, text size, visual hierarchy"
+        - "Motor - Keyboard navigation, mouse interactions"
+        - "Cognitive - Information processing, complexity"
+        - "Hearing - Audio cues, alternative formats"
+        - "Screen reader compatibility"
+        - "Documentation accessibility"
+        - "Code example accessibility"
+        - "Other (specify in description)"
+    validations:
+      required: true
+  
+  - type: textarea
+    id: accessibility_issue
+    attributes:
+      label: Accessibility Issue Description
+      description: Describe the accessibility problem you've encountered
+      placeholder: |
+        Provide a clear description:
+        
+        - What accessibility barrier did you encounter?
+        - Which users would be affected?
+        - How does this impact usability?
+    validations:
+      required: true
+  
+  - type: dropdown
+    id: bid_stage_affected
+    attributes:
+      label: BID Stage Affected
+      description: Which BID stage is affected by this accessibility issue?
+      options:
+        - "Stage 1: Notice"
+        - "Stage 2: Interpret"
+        - "Stage 3: Structure"
+        - "Stage 4: Anticipate"
+        - "Stage 5: Validate"
+        - "Cross-stage functionality"
+        - "Package documentation"
+        - "Generated output/reports"
+    validations:
+      required: true
+  
+  - type: textarea
+    id: current_behavior
+    attributes:
+      label: Current Behavior
+      description: What currently happens that creates an accessibility barrier?
+      placeholder: |
+        Describe the current behavior:
+        
+        - What is the current user experience?
+        - Where does the accessibility barrier occur?
+        - How does it prevent or hinder access?
+    validations:
+      required: true
+  
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected Accessible Behavior
+      description: What should happen to make this accessible?
+      placeholder: |
+        Describe the expected accessible behavior:
+        
+        - How should this work to be accessible?
+        - What would an inclusive experience look like?
+        - What standards or guidelines should be followed?
+    validations:
+      required: true
+  
+  - type: checkboxes
+    id: wcag_guidelines
+    attributes:
+      label: WCAG Guidelines
+      description: Which WCAG 2.1 principles does this relate to? (Check all that apply)
+      options:
+        - label: "Perceivable - Information must be presentable in ways users can perceive"
+        - label: "Operable - User interface components must be operable"
+        - label: "Understandable - Information and UI operation must be understandable"
+        - label: "Robust - Content must be robust enough for various assistive technologies"
+        - label: "Not sure/Not applicable"
+  
+  - type: textarea
+    id: assistive_technology
+    attributes:
+      label: Assistive Technology
+      description: What assistive technologies have you tested or would be affected?
+      placeholder: |
+        Specify assistive technologies:
+        
+        - Screen readers (JAWS, NVDA, VoiceOver, etc.)
+        - Keyboard navigation
+        - Voice control software
+        - Magnification software
+        - Other assistive tools
+        - Not applicable
+    validations:
+      required: false
+  
+  - type: textarea
+    id: reproduction_steps
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this accessibility issue?
+      placeholder: |
+        Provide reproduction steps:
+        
+        1. Step 1
+        2. Step 2
+        3. Step 3
+        
+        Expected: [accessible behavior]
+        Actual: [barrier encountered]
+    validations:
+      required: true
+  
+  - type: textarea
+    id: suggested_solution
+    attributes:
+      label: Suggested Solution
+      description: Do you have suggestions for how to fix this accessibility issue?
+      placeholder: |
+        Provide suggestions:
+        
+        - Specific changes to make
+        - Alternative approaches
+        - Resources or standards to reference
+        - Examples from other accessible implementations
+    validations:
+      required: false
+  
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity Level
+      description: How severe is this accessibility barrier?
+      options:
+        - "Critical - Completely blocks access for affected users"
+        - "High - Significantly impairs usability"
+        - "Medium - Creates difficulty but workarounds exist"
+        - "Low - Minor accessibility improvement"
+    validations:
+      required: true
+  
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: Any other context about this accessibility issue
+      placeholder: |
+        - Screenshots or screen recordings
+        - Assistive technology output
+        - References to accessibility standards
+        - User feedback from accessibility testing
+    validations:
+      required: false
+  
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have described the accessibility barrier clearly
+          required: true
+        - label: I have provided steps to reproduce the issue
+          required: true
+        - label: I have considered which users would be affected
+          required: true
+        - label: I have identified the relevant WCAG principles (if applicable)
+          required: false
