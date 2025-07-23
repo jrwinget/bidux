@@ -422,48 +422,24 @@ involvement helps make `{bidux}` better for everyone.
 
 We have specific issue templates for different types of contributions:
 
-- **🐛 Bug Reports** - Report issues with existing functionality
-- **✨ Feature Requests** - Suggest new features or enhancements
-- **🧠 BID Framework Enhancements** - Improve the theoretical foundation
-- **📚 Documentation Improvements** - Help improve docs and examples
-- **♿ Accessibility Issues** - Report or fix accessibility barriers
-- **🧠 Psychological Theory Suggestions** - Propose new psychological
-  concepts
-- **✨ Shiny Integration Requests** - Improve integration with Shiny
-  packages
-
-### Submitting Code Contributions
-
-Ready to contribute code? Here’s how to submit your changes:
-
-1.  **Fork the repository** and create a feature branch from `main`
-
-2.  **Install development dependencies**: \`\`\`r \# Install development
-    version pak::pak(“jrwinget/bidux”)
-
-    \# Install development tools pak::pak(c(“devtools”, “testthat”,
-    “roxygen2”)) \`\`\`
-
-3.  **Make your changes** following our guidelines:
-
-    - Write clear, documented code
-    - Add tests for new functionality
-    - Update documentation as needed
-    - Ensure changes align with BID framework principles
-
-4.  **Test your changes**: \`\`\`r \# Run tests devtools::test()
-
-    \# Check package devtools::check()
-
-    \# Update documentation devtools::document() \`\`\`
-
-5.  **Submit your pull request**:
-
-    - Create a clear PR title and description
-    - Reference any related issues
-    - Our PR bot will help format your contribution
-    - Describe how your changes affect the BID framework
-    - Include any relevant psychological principles or theories
+- **[🐛 Bug
+  Report](https://github.com/jrwinget/bidux/issues/new?template=01_bug-report.yml)** -
+  Report issues with existing functionality
+- **[✨ Feature
+  Request](https://github.com/jrwinget/bidux/issues/new?template=02_feature-request.yml)** -
+  Suggest new features or enhancements
+- **[📖
+  Documentation](https://github.com/jrwinget/bidux/issues/new?template=03_documentation-improvement.yml)** -
+  Help improve docs and examples
+- **[♿ Accessibility
+  Issue](https://github.com/jrwinget/bidux/issues/new?template=04_accessibility-issue.yml)** -
+  Report or fix accessibility barriers
+- **[🧠 Theory
+  Suggestions](https://github.com/jrwinget/bidux/issues/new?template=05_theory-suggestion.yml)** -
+  Propose new concepts or theories
+- **[✨ Shiny Integration
+  Requests](https://github.com/jrwinget/bidux/issues/new?template=06_shiny-integration-request.yml)** -
+  Improve integration with Shiny packages
 
 ### Code Style Guidelines
 

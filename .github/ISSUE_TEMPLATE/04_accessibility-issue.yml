@@ -1,4 +1,4 @@
-name: ♿ Accessibility Issue
+name: Accessibility Issue
 description: Report accessibility problems or suggest improvements
 title: "[Accessibility]: "
 labels: ["accessibility", "triage"]
@@ -8,7 +8,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you for helping make bidux more accessible! Accessibility is a core principle of the BID framework, and we appreciate your help in identifying and addressing accessibility issues.
+        Thank you for helping make {bidux} more accessible! Accessibility is a core principle of the BID framework, and we appreciate your help in identifying and addressing accessibility issues.
   
   - type: input
     id: contact

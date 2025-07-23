@@ -3,12 +3,6 @@ contact_links:
   - name: 📚 Package Documentation
     url: https://jrwinget.github.io/bidux/
     about: Browse the complete package documentation and vignettes
-  - name: 💬 Discussion Forum
-    url: https://github.com/jrwinget/bidux/discussions
-    about: Ask questions, share examples, and discuss BID framework implementation
   - name: 🧠 BID Framework Resources
     url: https://github.com/jrwinget/bid-framework
     about: Learn more about the Behavior Insight Design framework
-  - name: 📧 Contact Maintainer
-    url: mailto:contact@jrwinget.com
-    about: Direct contact for urgent issues or private concerns

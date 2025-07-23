@@ -1,4 +1,4 @@
-name: ✨ Shiny Integration Request
+name: Shiny Integration Request
 description: Request new Shiny package integrations or improvements
 title: "[Shiny]: "
 labels: ["shiny", "enhancement", "triage"]
@@ -8,7 +8,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you for suggesting Shiny integration improvements! The bidux package aims to work seamlessly with the Shiny ecosystem to help developers create better UX experiences.
+        Thank you for suggesting Shiny integration improvements! The {bidux} package aims to work seamlessly with the Shiny ecosystem to help developers create better UX experiences.
   
   - type: input
     id: contact

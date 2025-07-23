@@ -1,5 +1,5 @@
-name: 🧠 Theory Suggestion
-description: Suggest new theories or concepts to integrate into bidux
+name: Theory Suggestion
+description: Suggest new theories or concepts to integrate into {bidux}
 title: "[Psychology]: "
 labels: ["psychology", "enhancement", "triage"]
 assignees:
@@ -39,7 +39,7 @@ body:
         - Core principles and mechanisms
         - Key researchers and foundational work
         - Main findings and applications
-        - Relationship to existing theories in bidux
+        - Relationship to existing theories in {bidux}
     validations:
       required: true
   
@@ -90,8 +90,8 @@ body:
   - type: textarea
     id: bidux_integration
     attributes:
-      label: bidux Integration Proposal
-      description: How would you integrate this theory into the bidux package?
+      label: Integration Proposal
+      description: How would you integrate this theory into the {bidux} package?
       placeholder: |
         Propose specific integration:
         
@@ -206,7 +206,7 @@ body:
           required: true
         - label: I have described specific UX/UI applications
           required: true
-        - label: I have provided concrete examples of bidux integration
+        - label: I have provided concrete examples of {bidux} integration
           required: true
         - label: I have considered the empirical evidence base
           required: true

@@ -1,5 +1,5 @@
-name: ✨ Feature Request
-description: Suggest a new feature for the bidux package
+name: Feature Request
+description: Suggest a new feature for the {bidux} package
 title: "[Feature]: "
 labels: ["enhancement", "triage"]
 assignees:
@@ -8,7 +8,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you for suggesting a new feature! Your ideas help make bidux better for everyone.
+        Thank you for suggesting a new feature! Your ideas help make {bidux} better for everyone.
         
         **Before submitting:** Please check the [roadmap](#roadmap) and existing issues to see if this feature is already planned or requested.
   

@@ -1,4 +1,4 @@
-name: 📚 Documentation Improvement
+name: Documentation Improvement
 description: Suggest improvements to documentation, vignettes, or examples
 title: "[Docs]: "
 labels: ["documentation", "triage"]
@@ -8,7 +8,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you for helping improve the bidux documentation! Clear documentation is essential for helping users understand and apply the BID framework effectively.
+        Thank you for helping improve the {bidux} documentation! Clear documentation is essential for helping users understand and apply the BID framework effectively.
   
   - type: input
     id: contact

@@ -1,5 +1,5 @@
-name: 🐛 Bug Report
-description: Report a bug in the bidux package
+name: Bug Report
+description: Report a bug in the {bidux} package
 title: "[Bug]: "
 labels: ["bug", "triage"]
 assignees:
@@ -8,7 +8,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you for taking the time to report a bug! This helps us improve the bidux package for everyone.
+        Thank you for taking the time to report a bug! This helps us improve the {bidux} package for everyone.
         
         **Before submitting:** Please search existing issues to see if this bug has already been reported.
   
