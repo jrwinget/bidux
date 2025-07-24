@@ -37,7 +37,7 @@ This structured approach helps developers create more intuitive, user-friendly d
 
 ## Installation
 
-You can install bidux from CRAN:
+You can install `{bidux}` from CRAN:
 
 ``` r
 install.packages("bidux")
@@ -233,3 +233,93 @@ Check out the vignettes for more information:
 * `vignette("concepts-reference")` - Detailed guide to implementing key concepts
 
 Visit the [package website](https://jrwinget.github.io/bidux/) for complete documentation and examples.
+
+## Contributing
+
+We welcome contributions to the `{bidux}` package! Whether you're reporting bugs, suggesting new features, or contributing code, your involvement helps make `{bidux}` better for everyone.
+
+### Quick Start for Contributors
+
+1. **Check existing issues** - Browse [open issues](https://github.com/jrwinget/bidux/issues) to see if your idea or bug has already been reported
+2. **Use issue templates** - When creating new issues, please use our structured templates to provide complete information
+3. **Join discussions** - Participate in [GitHub Discussions](https://github.com/jrwinget/bidux/discussions) for questions and ideas
+4. **Review the documentation** - Check the [package website](https://jrwinget.github.io/bidux/) and [BID framework resources](https://github.com/jrwinget/bid-framework)
+
+### Types of Contributions
+
+We have specific issue templates for different types of contributions:
+
+- **[🐛 Bug Report](https://github.com/jrwinget/bidux/issues/new?template=01_bug-report.yml)** - Report issues with existing functionality
+- **[✨ Feature Request](https://github.com/jrwinget/bidux/issues/new?template=02_feature-request.yml)** - Suggest new features or enhancements
+- **[📖 Documentation](https://github.com/jrwinget/bidux/issues/new?template=03_documentation-improvement.yml)** - Help improve docs and examples
+- **[♿ Accessibility Issue](https://github.com/jrwinget/bidux/issues/new?template=04_accessibility-issue.yml)** - Report or fix accessibility barriers
+- **[🧠 Theory Suggestions](https://github.com/jrwinget/bidux/issues/new?template=05_theory-suggestion.yml)** - Propose new concepts or theories
+- **[✨ Shiny Integration Requests](https://github.com/jrwinget/bidux/issues/new?template=06_shiny-integration-request.yml)** - Improve integration with Shiny packages
+
+### Code Style Guidelines
+
+- Follow the existing code style in the package
+- Use descriptive function and variable names
+- Include roxygen2 documentation for all functions
+- Write clear commit messages
+- Consider psychological principles in your implementations
+
+### BID Framework Considerations
+
+When contributing, please consider:
+
+- **Psychological Accuracy** - Ensure psychological concepts are accurately represented
+- **Accessibility** - All contributions should maintain or improve accessibility
+- **User Experience** - Consider how changes affect the user workflow
+- **Evidence-Based** - Provide references for psychological theories when applicable
+
+### Development Setup
+
+For more detailed development instructions:
+
+1. **Clone the repository**:
+    ```bash
+    git clone https://github.com/jrwinget/bidux.git
+    cd bidux
+    ```
+
+2. **Set up your development environment**:
+    ```r
+    # Install package dependencies
+    pak::pak(desc::desc_get_deps()$package)
+    
+    # Install development tools
+    pak::pak(c("devtools", "testthat", "roxygen2", "pkgdown"))
+    ```
+
+3. **Run development workflow**:
+    ```r
+    # Load package for development
+    devtools::load_all()
+    
+    # Run tests
+    devtools::test()
+    
+    # Build documentation
+    devtools::document()
+    
+    # Check package
+    devtools::check()
+    ```
+
+### Questions?
+
+- **General questions** - Use [GitHub Discussions](https://github.com/jrwinget/bidux/discussions)
+- **Bug reports** - Use the bug report issue template
+- **Feature ideas** - Use the feature request template
+- **Direct contact** - Email the maintainer at contact@jrwinget.com
+
+Thank you for helping improve `{bidux}` and making behavioral psychology more accessible to R developers!
+
+## Code of Conduct
+
+Please note that this project is released with a [Contributor Code of Conduct](https://contributor-covenant.org/version/2/1/CODE_OF_CONDUCT.html). By contributing to this project, you agree to abide by its terms. See the [CODE_OF_CONDUCT](.github/CODE_OF_CONDUCT.md) file for details.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

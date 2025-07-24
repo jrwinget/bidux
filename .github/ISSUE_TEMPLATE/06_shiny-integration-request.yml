@@ -1,0 +1,239 @@
+name: Shiny Integration Request
+description: Request new Shiny package integrations or improvements
+title: "[Shiny]: "
+labels: ["shiny", "enhancement", "triage"]
+assignees:
+  - jrwinget
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting Shiny integration improvements! The {bidux} package aims to work seamlessly with the Shiny ecosystem to help developers create better UX experiences.
+  
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Details
+      description: How can we get in touch with you if we need more info?
+      placeholder: ex. email@example.com
+    validations:
+      required: false
+  
+  - type: dropdown
+    id: shiny_package
+    attributes:
+      label: Target Shiny Package
+      description: Which Shiny package would you like better integration with?
+      options:
+        - "shiny (base)"
+        - "bslib"
+        - "DT"
+        - "plotly"
+        - "reactable"
+        - "htmlwidgets"
+        - "shiny.fluent"
+        - "rhino"
+        - "shinyWidgets"
+        - "shinydashboard"
+        - "flexdashboard"
+        - "golem"
+        - "brochure"
+        - "Other (specify in description)"
+    validations:
+      required: true
+  
+  - type: textarea
+    id: integration_summary
+    attributes:
+      label: Integration Summary
+      description: Brief description of the requested integration
+      placeholder: Summarize what integration you're requesting
+    validations:
+      required: true
+  
+  - type: dropdown
+    id: integration_type
+    attributes:
+      label: Integration Type
+      description: What type of integration are you requesting?
+      options:
+        - "New bid_suggest_components() support"
+        - "Enhanced component suggestions"
+        - "BID-compliant component wrappers"
+        - "Accessibility improvements"
+        - "Behavioral psychology integration"
+        - "Automated BID validation"
+        - "Documentation/examples"
+        - "Other"
+    validations:
+      required: true
+  
+  - type: checkboxes
+    id: bid_stage_support
+    attributes:
+      label: BID Stage Support
+      description: Which BID stages would this integration support? (Check all that apply)
+      options:
+        - label: "Stage 1: Notice - Problem identification"
+        - label: "Stage 2: Interpret - User needs analysis"
+        - label: "Stage 3: Structure - Layout and accessibility"
+        - label: "Stage 4: Anticipate - Behavioral predictions"
+        - label: "Stage 5: Validate - User empowerment"
+        - label: "Cross-stage functionality"
+  
+  - type: textarea
+    id: current_limitation
+    attributes:
+      label: Current Limitation
+      description: What limitation does this integration address?
+      placeholder: |
+        Describe the current limitation:
+        
+        - What can't you currently do?
+        - What workflow is inefficient?
+        - What BID principles are missing?
+        - How does this affect user experience?
+    validations:
+      required: true
+  
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Proposed Solution
+      description: How would you like this integration to work?
+      placeholder: |
+        Describe your proposed solution:
+        
+        - What functions would be added/modified?
+        - How would users interact with this?
+        - What would the API look like?
+        
+        ```r
+        # Example usage
+        bid_suggest_components(stage_result, package = "your_package")
+        ```
+    validations:
+      required: true
+  
+  - type: textarea
+    id: psychological_benefits
+    attributes:
+      label: Psychological/UX Benefits
+      description: What psychological or UX benefits would this integration provide?
+      placeholder: |
+        Describe the benefits:
+        
+        - Which cognitive principles would be better supported?
+        - How would user experience improve?
+        - What accessibility gains would result?
+        - Which biases would be better addressed?
+    validations:
+      required: true
+  
+  - type: textarea
+    id: use_cases
+    attributes:
+      label: Use Cases
+      description: Provide specific use cases for this integration
+      placeholder: |
+        Describe specific scenarios:
+        
+        **Use Case 1:** [Description]
+        - Current approach: [how it works now]
+        - With integration: [how it would work]
+        
+        **Use Case 2:** [Description]
+        - Current approach: [how it works now]
+        - With integration: [how it would work]
+    validations:
+      required: true
+  
+  - type: textarea
+    id: example_implementation
+    attributes:
+      label: Example Implementation
+      description: Provide a concrete example of how this would work
+      placeholder: |
+        ```r
+        library(bidux)
+        library(your_target_package)
+        
+        # Example workflow
+        stage_result <- bid_notice(
+          problem = "Example problem",
+          evidence = "Example evidence"
+        )
+        
+        # Your proposed integration
+        suggestions <- bid_suggest_components(stage_result, package = "your_package")
+        
+        # Expected output or behavior
+        ```
+    validations:
+      required: true
+  
+  - type: textarea
+    id: technical_considerations
+    attributes:
+      label: Technical Considerations
+      description: What technical aspects should be considered?
+      placeholder: |
+        Consider technical aspects:
+        
+        - Package dependencies
+        - Version compatibility
+        - Performance implications
+        - Maintenance requirements
+        - Testing needs
+    validations:
+      required: false
+  
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority Level
+      description: How important is this integration to you?
+      options:
+        - "Critical - Blocking my work"
+        - "High - Would significantly improve my workflow"
+        - "Medium - Would be nice to have"
+        - "Low - Minor improvement"
+    validations:
+      required: true
+  
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I would be willing to help implement this integration
+        - label: I would be willing to test this integration
+        - label: I would be willing to provide examples/documentation
+        - label: I have experience with the target Shiny package
+  
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: Any other context about this integration request
+      placeholder: |
+        - Links to relevant documentation
+        - Examples from other packages
+        - Screenshots or mockups
+        - Community discussions
+    validations:
+      required: false
+  
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have provided specific use cases for this integration
+          required: true
+        - label: I have described the psychological/UX benefits
+          required: true
+        - label: I have provided example implementation code
+          required: true
+        - label: I have considered technical implications
+          required: true

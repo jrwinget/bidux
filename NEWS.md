@@ -1,3 +1,5 @@
+# bidux 0.2.0
+
 # bidux 0.1.0
 
 * Initial CRAN submission.

@@ -1,0 +1,162 @@
+name: Documentation Improvement
+description: Suggest improvements to documentation, vignettes, or examples
+title: "[Docs]: "
+labels: ["documentation", "triage"]
+assignees:
+  - jrwinget
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping improve the {bidux} documentation! Clear documentation is essential for helping users understand and apply the BID framework effectively.
+  
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Details
+      description: How can we get in touch with you if we need more info?
+      placeholder: ex. email@example.com
+    validations:
+      required: false
+  
+  - type: dropdown
+    id: doc_type
+    attributes:
+      label: Documentation Type
+      description: What type of documentation needs improvement?
+      options:
+        - "Function documentation (roxygen2)"
+        - "README file"
+        - "Package vignettes"
+        - "Website (pkgdown)"
+        - "Code examples"
+        - "Error messages"
+        - "Getting started guide"
+        - "API reference"
+        - "Other"
+    validations:
+      required: true
+  
+  - type: textarea
+    id: location
+    attributes:
+      label: Location
+      description: Where is the documentation that needs improvement?
+      placeholder: |
+        Specify the exact location:
+        
+        - Function name: `function_name()`
+        - File path: `path/to/file.R`
+        - Vignette title: "Getting Started with bidux"
+        - Website URL: https://example.com/page
+        - Other: [description]
+    validations:
+      required: true
+  
+  - type: textarea
+    id: current_issue
+    attributes:
+      label: Current Issue
+      description: What's wrong with the current documentation?
+      placeholder: |
+        Describe the problem:
+        
+        - What is unclear or confusing?
+        - What information is missing?
+        - What examples don't work?
+        - What could be explained better?
+    validations:
+      required: true
+  
+  - type: textarea
+    id: improvement_suggestion
+    attributes:
+      label: Improvement Suggestion
+      description: How should the documentation be improved?
+      placeholder: |
+        Provide specific suggestions:
+        
+        - New content to add
+        - Existing content to clarify
+        - Examples to include
+        - Structure improvements
+        - Visual aids needed
+    validations:
+      required: true
+  
+  - type: dropdown
+    id: user_level
+    attributes:
+      label: Target User Level
+      description: What user level would benefit most from this improvement?
+      options:
+        - "Beginner - New to R or bidux"
+        - "Intermediate - Familiar with R, new to BID"
+        - "Advanced - Experienced with both R and BID"
+        - "Expert - Package developers/contributors"
+        - "All levels"
+    validations:
+      required: true
+  
+  - type: textarea
+    id: bid_context
+    attributes:
+      label: BID Framework Context
+      description: How does this documentation relate to the BID framework?
+      placeholder: |
+        Explain the BID context:
+        
+        - Which BID stage(s) does this affect?
+        - What psychological principles are involved?
+        - How does this help users apply BID effectively?
+    validations:
+      required: false
+  
+  - type: textarea
+    id: proposed_content
+    attributes:
+      label: Proposed Content
+      description: If you have specific content suggestions, provide them here
+      placeholder: |
+        Provide draft content if you have it:
+        
+        ```r
+        # Example code
+        ```
+        
+        Or suggested text improvements...
+    validations:
+      required: false
+  
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I would be willing to help write this documentation
+        - label: I would be willing to review improved documentation
+        - label: I can provide additional examples or use cases
+  
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: Any other context about this documentation improvement
+      placeholder: |
+        - Screenshots of current documentation
+        - References to good examples from other packages
+        - Links to related issues or discussions
+    validations:
+      required: false
+  
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have identified the specific location of the documentation issue
+          required: true
+        - label: I have provided constructive suggestions for improvement
+          required: true
+        - label: I have considered the target user level for this improvement
+          required: true

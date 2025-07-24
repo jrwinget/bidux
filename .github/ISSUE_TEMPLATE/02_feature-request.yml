@@ -1,0 +1,203 @@
+name: Feature Request
+description: Suggest a new feature for the {bidux} package
+title: "[Feature]: "
+labels: ["enhancement", "triage"]
+assignees:
+  - jrwinget
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a new feature! Your ideas help make {bidux} better for everyone.
+        
+        **Before submitting:** Please check the [roadmap](#roadmap) and existing issues to see if this feature is already planned or requested.
+  
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Details
+      description: How can we get in touch with you if we need more info?
+      placeholder: ex. email@example.com
+    validations:
+      required: false
+  
+  - type: textarea
+    id: feature_summary
+    attributes:
+      label: Feature Summary
+      description: A brief, clear description of the feature you're requesting
+      placeholder: Summarize your feature request in 1-2 sentences
+    validations:
+      required: true
+  
+  - type: dropdown
+    id: feature_category
+    attributes:
+      label: Feature Category
+      description: What type of feature is this?
+      options:
+        - "New BID stage function"
+        - "Enhancement to existing function"
+        - "New psychological theory integration"
+        - "Shiny integration improvement"
+        - "Accessibility feature"
+        - "Reporting/documentation enhancement"
+        - "Performance improvement"
+        - "Developer tools/utilities"
+        - "Other"
+    validations:
+      required: true
+  
+  - type: dropdown
+    id: bid_stage_target
+    attributes:
+      label: Target BID Stage
+      description: Which stage of the BID framework would this feature enhance?
+      options:
+        - "Stage 1: Notice"
+        - "Stage 2: Interpret"
+        - "Stage 3: Structure"
+        - "Stage 4: Anticipate"
+        - "Stage 5: Validate"
+        - "Cross-stage functionality"
+        - "Package infrastructure"
+        - "Not applicable"
+    validations:
+      required: true
+  
+  - type: textarea
+    id: problem_statement
+    attributes:
+      label: Problem Statement
+      description: What problem does this feature solve?
+      placeholder: |
+        Describe the current limitation or problem that this feature would address:
+        
+        - What are users currently unable to do?
+        - What workflow is currently difficult or inefficient?
+        - What psychological principles are missing from the current implementation?
+    validations:
+      required: true
+  
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Proposed Solution
+      description: Describe your proposed solution in detail
+      placeholder: |
+        Provide a detailed description of your proposed solution:
+        
+        - How would this feature work?
+        - What would the API look like?
+        - How would users interact with this feature?
+        
+        ```r
+        # Example usage (if applicable)
+        proposed_function(...)
+        ```
+    validations:
+      required: true
+  
+  - type: textarea
+    id: psychological_rationale
+    attributes:
+      label: Psychological/UX Rationale
+      description: What behavioral psychology principles support this feature?
+      placeholder: |
+        Explain the psychological or UX principles that justify this feature:
+        
+        - Which cognitive biases does this address?
+        - How does this improve user experience?
+        - What psychological theories support this approach?
+        - References to relevant research (if applicable)
+    validations:
+      required: false
+  
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: What alternative solutions have you considered?
+      placeholder: |
+        Describe any alternative approaches you've considered:
+        
+        - Other potential solutions
+        - Workarounds you've tried
+        - Why the proposed solution is preferable
+    validations:
+      required: false
+  
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority Level
+      description: How important is this feature to you?
+      options:
+        - "Critical - Blocking my work"
+        - "High - Would significantly improve my workflow"
+        - "Medium - Would be nice to have"
+        - "Low - Minor improvement"
+    validations:
+      required: true
+  
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Estimated Complexity
+      description: How complex do you think this feature would be to implement?
+      options:
+        - "Small - Simple addition or modification"
+        - "Medium - Moderate development effort"
+        - "Large - Significant development effort"
+        - "Extra Large - Major architectural changes"
+        - "Unknown - Hard to estimate"
+    validations:
+      required: true
+  
+  - type: textarea
+    id: use_cases
+    attributes:
+      label: Use Cases
+      description: Provide specific examples of how this feature would be used
+      placeholder: |
+        Describe specific scenarios where this feature would be valuable:
+        
+        1. Use case 1: [Description]
+        2. Use case 2: [Description]
+        3. Use case 3: [Description]
+    validations:
+      required: true
+  
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: Any other context or information about the feature request
+      placeholder: |
+        - Screenshots or mockups
+        - Links to related discussions
+        - References to similar features in other packages
+        - Any other relevant information
+    validations:
+      required: false
+  
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I would be willing to contribute to implementing this feature
+        - label: I would be willing to help with testing this feature
+        - label: I would be willing to help with documentation for this feature
+  
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have searched existing issues and the roadmap for this feature
+          required: true
+        - label: I have provided clear use cases for this feature
+          required: true
+        - label: I have considered the psychological/UX rationale for this feature
+          required: true
