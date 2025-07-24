@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="index.html">bidux</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,7 +84,7 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install bidux from CRAN:</p>
+<p>You can install <a href="https://jrwinget.github.io/bidux/">bidux</a> from CRAN:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"bidux"</span><span class="op">)</span></span></code></pre></div>
 <p>Or install the development version from GitHub:</p>
@@ -436,6 +436,116 @@
 </ul>
 <p>Visit the <a href="https://jrwinget.github.io/bidux/">package website</a> for complete documentation and examples.</p>
 </div>
+<div class="section level2">
+<h2 id="contributing">Contributing<a class="anchor" aria-label="anchor" href="#contributing"></a>
+</h2>
+<p>We welcome contributions to the <a href="https://jrwinget.github.io/bidux/">bidux</a> package! Whether you’re reporting bugs, suggesting new features, or contributing code, your involvement helps make <a href="https://jrwinget.github.io/bidux/">bidux</a> better for everyone.</p>
+<div class="section level3">
+<h3 id="quick-start-for-contributors">Quick Start for Contributors<a class="anchor" aria-label="anchor" href="#quick-start-for-contributors"></a>
+</h3>
+<ol style="list-style-type: decimal">
+<li>
+<strong>Check existing issues</strong> - Browse <a href="https://github.com/jrwinget/bidux/issues" class="external-link">open issues</a> to see if your idea or bug has already been reported</li>
+<li>
+<strong>Use issue templates</strong> - When creating new issues, please use our structured templates to provide complete information</li>
+<li>
+<strong>Join discussions</strong> - Participate in <a href="https://github.com/jrwinget/bidux/discussions" class="external-link">GitHub Discussions</a> for questions and ideas</li>
+<li>
+<strong>Review the documentation</strong> - Check the <a href="https://jrwinget.github.io/bidux/">package website</a> and <a href="https://github.com/jrwinget/bid-framework" class="external-link">BID framework resources</a>
+</li>
+</ol>
+</div>
+<div class="section level3">
+<h3 id="types-of-contributions">Types of Contributions<a class="anchor" aria-label="anchor" href="#types-of-contributions"></a>
+</h3>
+<p>We have specific issue templates for different types of contributions:</p>
+<ul>
+<li>
+<strong><a href="https://github.com/jrwinget/bidux/issues/new?template=01_bug-report.yml" class="external-link">🐛 Bug Report</a></strong> - Report issues with existing functionality</li>
+<li>
+<strong><a href="https://github.com/jrwinget/bidux/issues/new?template=02_feature-request.yml" class="external-link">✨ Feature Request</a></strong> - Suggest new features or enhancements</li>
+<li>
+<strong><a href="https://github.com/jrwinget/bidux/issues/new?template=03_documentation-improvement.yml" class="external-link">📖 Documentation</a></strong> - Help improve docs and examples</li>
+<li>
+<strong><a href="https://github.com/jrwinget/bidux/issues/new?template=04_accessibility-issue.yml" class="external-link">♿ Accessibility Issue</a></strong> - Report or fix accessibility barriers</li>
+<li>
+<strong><a href="https://github.com/jrwinget/bidux/issues/new?template=05_theory-suggestion.yml" class="external-link">🧠 Theory Suggestions</a></strong> - Propose new concepts or theories</li>
+<li>
+<strong><a href="https://github.com/jrwinget/bidux/issues/new?template=06_shiny-integration-request.yml" class="external-link">✨ Shiny Integration Requests</a></strong> - Improve integration with Shiny packages</li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="code-style-guidelines">Code Style Guidelines<a class="anchor" aria-label="anchor" href="#code-style-guidelines"></a>
+</h3>
+<ul>
+<li>Follow the existing code style in the package</li>
+<li>Use descriptive function and variable names</li>
+<li>Include roxygen2 documentation for all functions</li>
+<li>Write clear commit messages</li>
+<li>Consider psychological principles in your implementations</li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="bid-framework-considerations">BID Framework Considerations<a class="anchor" aria-label="anchor" href="#bid-framework-considerations"></a>
+</h3>
+<p>When contributing, please consider:</p>
+<ul>
+<li>
+<strong>Psychological Accuracy</strong> - Ensure psychological concepts are accurately represented</li>
+<li>
+<strong>Accessibility</strong> - All contributions should maintain or improve accessibility</li>
+<li>
+<strong>User Experience</strong> - Consider how changes affect the user workflow</li>
+<li>
+<strong>Evidence-Based</strong> - Provide references for psychological theories when applicable</li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="development-setup">Development Setup<a class="anchor" aria-label="anchor" href="#development-setup"></a>
+</h3>
+<p>For more detailed development instructions:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Clone the repository</strong>: <code>bash     git clone https://github.com/jrwinget/bidux.git     cd bidux</code></p></li>
+<li>
+<p><strong>Set up your development environment</strong>: ```r # Install package dependencies pak::pak(desc::desc_get_deps()$package)</p>
+<p># Install development tools pak::pak(c(“devtools”, “testthat”, “roxygen2”, “pkgdown”)) ```</p>
+</li>
+<li>
+<p><strong>Run development workflow</strong>: ```r # Load package for development devtools::load_all()</p>
+<p># Run tests devtools::test()</p>
+<p># Build documentation devtools::document()</p>
+<p># Check package devtools::check() ```</p>
+</li>
+</ol>
+</div>
+<div class="section level3">
+<h3 id="questions">Questions?<a class="anchor" aria-label="anchor" href="#questions"></a>
+</h3>
+<ul>
+<li>
+<strong>General questions</strong> - Use <a href="https://github.com/jrwinget/bidux/discussions" class="external-link">GitHub Discussions</a>
+</li>
+<li>
+<strong>Bug reports</strong> - Use the bug report issue template</li>
+<li>
+<strong>Feature ideas</strong> - Use the feature request template</li>
+<li>
+<strong>Direct contact</strong> - Email the maintainer at <a href="mailto:contact@jrwinget.com" class="email">contact@jrwinget.com</a>
+</li>
+</ul>
+<p>Thank you for helping improve <a href="https://jrwinget.github.io/bidux/">bidux</a> and making behavioral psychology more accessible to R developers!</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="code-of-conduct">Code of Conduct<a class="anchor" aria-label="anchor" href="#code-of-conduct"></a>
+</h2>
+<p>Please note that this project is released with a <a href="https://contributor-covenant.org/version/2/1/CODE_OF_CONDUCT.html" class="external-link">Contributor Code of Conduct</a>. By contributing to this project, you agree to abide by its terms. See the <a href="CODE_OF_CONDUCT.html">CODE_OF_CONDUCT</a> file for details.</p>
+</div>
+<div class="section level2">
+<h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
+</h2>
+<p>This project is licensed under the MIT License - see the <a href="LICENSE">LICENSE</a> file for details.</p>
+</div>
 </div>
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
@@ -452,6 +562,12 @@
 </ul>
 </div>
 
+<div class="community">
+<h2 data-toc-skip>Community</h2>
+<ul class="list-unstyled">
+<li><a href="CODE_OF_CONDUCT.html">Code of conduct</a></li>
+</ul>
+</div>
 
 <div class="citation">
 <h2 data-toc-skip>Citation</h2>
