@@ -1,0 +1,315 @@
+---
+title: "Integrating shiny.telemetry with BIDUX"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Integrating shiny.telemetry with BIDUX}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Overview
+
+The `bid_ingest_telemetry()` function enables you to analyze real user behavior data from `{shiny.telemetry}` and automatically identify UX friction points. This creates a powerful feedback loop where actual usage patterns drive design improvements through the BID framework.
+
+## Prerequisites
+
+First, ensure you have `{shiny.telemetry}` set up in your Shiny application:
+
+```{r setup, eval=FALSE}
+library(shiny)
+library(shiny.telemetry)
+
+# Initialize telemetry
+telemetry <- Telemetry$new()
+
+ui <- fluidPage(
+  use_telemetry(), # Add telemetry JavaScript
+
+  titlePanel("Sales Dashboard"),
+  sidebarLayout(
+    sidebarPanel(
+      selectInput(
+        "region",
+        "Region:",
+        choices = c("North", "South", "East", "West")
+      ),
+      dateRangeInput("date_range", "Date Range:"),
+      selectInput(
+        "product_category",
+        "Product Category:",
+        choices = c("All", "Electronics", "Clothing", "Food")
+      ),
+      actionButton("refresh", "Refresh Data")
+    ),
+    mainPanel(
+      tabsetPanel(
+        tabPanel("Overview", plotOutput("overview_plot")),
+        tabPanel("Details", dataTableOutput("details_table")),
+        tabPanel("Settings", uiOutput("settings_ui"))
+      )
+    )
+  )
+)
+
+server <- function(input, output, session) {
+  # Start telemetry tracking
+  telemetry$start_session()
+
+  # Your app logic here...
+}
+
+shinyApp(ui, server)
+```
+
+## Analyzing Telemetry Data
+
+After collecting telemetry data from your users, use `bid_ingest_telemetry()` to identify UX issues:
+
+```{r basic_usage, eval=FALSE}
+library(bidux)
+
+# Analyze telemetry from SQLite database (default)
+issues <- bid_ingest_telemetry("telemetry.sqlite")
+
+# Or from JSON log file
+issues <- bid_ingest_telemetry("telemetry.log", format = "json")
+
+# Review identified issues
+length(issues)
+names(issues)
+```
+
+## Understanding the Analysis
+
+The function analyzes five key friction indicators:
+
+### 1. Unused or Under-used Inputs
+
+Identifies UI controls that users rarely or never interact with:
+
+```{r unused_inputs, eval=FALSE}
+# Example: Region filter is never used
+issues$unused_input_region
+#> BID Framework - Notice Stage
+#> Problem: Users are not interacting with the 'region' input control
+#> Theory: Hick's Law (auto-suggested)
+#> Evidence: Telemetry shows 0 out of 847 sessions where 'region' was changed
+```
+
+This suggests the region filter might be:
+- Hidden or hard to find
+- Not relevant to users' tasks
+- Confusing or intimidating
+
+### 2. Delayed First Interactions
+
+Detects when users take too long to start using the dashboard:
+
+```{r delayed_interaction, eval=FALSE}
+issues$delayed_interaction
+#> BID Framework - Notice Stage
+#> Problem: Users take a long time before making their first interaction with the dashboard
+#> Theory: Information Scent (auto-suggested)
+#> Evidence: Median time to first input is 45 seconds, and 10% of sessions had no interactions at all
+```
+
+This indicates users might be:
+- Overwhelmed by the initial view
+- Unsure where to start
+- Looking for information that's not readily apparent
+
+### 3. Frequent Errors
+
+Identifies systematic errors that disrupt user experience:
+
+```{r error_patterns, eval=FALSE}
+issues$error_1
+#> BID Framework - Notice Stage
+#> Problem: Users encounter errors when using the dashboard
+#> Theory: Norman's Gulf of Evaluation (auto-suggested)
+#> Evidence: Error 'Data query failed' occurred 127 times in 15.0% of sessions (in output 'overview_plot'), often after changing 'date_range'
+```
+
+This reveals:
+- Reliability issues with specific features
+- Input validation problems
+- Performance bottlenecks
+
+### 4. Navigation Drop-offs
+
+Finds pages or tabs that users rarely visit:
+
+```{r navigation_dropoff, eval=FALSE}
+issues$navigation_settings_tab
+#> BID Framework - Notice Stage
+#> Problem: The 'settings_tab' page/tab is rarely visited by users
+#> Theory: Information Architecture (auto-suggested)
+#> Evidence: Only 42 sessions (5.0%) visited 'settings_tab', and 90% of those sessions ended there
+```
+
+Low visit rates suggest:
+- Poor information scent
+- Hidden or unclear navigation
+- Irrelevant content
+
+### 5. Confusion Patterns
+
+Detects rapid repeated changes indicating user confusion:
+
+```{r confusion_pattern, eval=FALSE}
+issues$confusion_date_range
+#> BID Framework - Notice Stage
+#> Problem: Users show signs of confusion when interacting with 'date_range'
+#> Theory: Feedback Loops (auto-suggested)
+#> Evidence: 8 sessions showed rapid repeated changes (avg 6 changes in 7.5 seconds), suggesting users are unsure about the input's behavior
+```
+
+This suggests:
+- Unclear feedback when values change
+- Unexpected behavior
+- Poor affordances
+
+## Customizing Analysis Thresholds
+
+You can adjust the sensitivity of the analysis:
+
+```{r custom_thresholds, eval=FALSE}
+issues <- bid_ingest_telemetry(
+  "telemetry.sqlite",
+  thresholds = list(
+    unused_input_threshold = 0.1, # Flag if <10% of sessions use input
+    delay_threshold_seconds = 60, # Flag if >60s before first interaction
+    error_rate_threshold = 0.05, # Flag if >5% of sessions have errors
+    navigation_threshold = 0.3, # Flag if <30% visit a page
+    rapid_change_window = 5, # Look for 5 changes within...
+    rapid_change_count = 3 # ...3 seconds
+  )
+)
+```
+
+## Integrating with BID Workflow
+
+Use the identified issues to drive your BID process:
+
+```{r bid_workflow, eval=FALSE}
+# Take the most critical issue
+critical_issue <- issues$error_1
+
+# Continue with interpretation
+interpret_result <- bid_interpret(
+  previous_stage = critical_issue,
+  central_question = "How can we prevent data query errors?",
+  data_story = list(
+    hook = "15% of users encounter errors",
+    context = "Errors occur after date range changes",
+    tension = "Users lose trust when queries fail",
+    resolution = "Implement robust error handling and loading states"
+  )
+)
+
+# Structure improvements
+structure_result <- bid_structure(
+  previous_stage = interpret_result,
+  layout = "dual_process",
+  concepts = c("Progressive Disclosure", "Feedback Loops"),
+  accessibility = list(
+    error_messages = "Clear, actionable error messages",
+    loading_states = "Accessible loading indicators"
+  )
+)
+
+# Continue through anticipate and validate stages...
+```
+
+## Example: Complete Analysis
+
+Here's a full example analyzing a dashboard with multiple issues:
+
+```{r complete_example, eval=FALSE}
+# 1. Ingest telemetry
+issues <- bid_ingest_telemetry("telemetry.sqlite")
+
+# 2. Prioritize issues by impact
+critical_issues <- list(
+  unused_inputs = names(issues)[grepl("unused_input", names(issues))],
+  errors = names(issues)[grepl("error", names(issues))],
+  delays = "delayed_interaction" %in% names(issues)
+)
+
+# 3. Create a comprehensive improvement plan
+if (length(critical_issues$unused_inputs) > 0) {
+  # Address unused inputs
+  unused_issue <- issues[[critical_issues$unused_inputs[1]]]
+
+  improvement_plan <- bid_interpret(
+    previous_stage = unused_issue,
+    central_question = "Which filters actually help users find insights?"
+  ) |>
+    bid_structure(
+      layout = "breathable",
+      concepts = c("Progressive Disclosure", "Smart Defaults")
+    ) |>
+    bid_anticipate(
+      bias_mitigations = list(
+        choice_overload = "Hide advanced filters until needed",
+        default_effect = "Pre-select most common filter values"
+      )
+    ) |>
+    bid_validate(
+      summary_panel = "Show only relevant filters based on user's task",
+      next_steps = c(
+        "Remove unused filters",
+        "Implement progressive disclosure",
+        "Add contextual help",
+        "Re-test with telemetry after changes"
+      )
+    )
+}
+
+# 4. Generate report
+improvement_report <- bid_report(improvement_plan, format = "html")
+```
+
+## Best Practices
+
+1. **Collect Sufficient Data**: Ensure you have telemetry from at least 50-100 sessions before analysis for reliable patterns.
+
+2. **Regular Analysis**: Run telemetry analysis periodically (e.g., monthly) to catch emerging issues.
+
+3. **Combine with Qualitative Data**: Use telemetry insights alongside user interviews and usability testing.
+
+4. **Track Improvements**: After implementing changes, collect new telemetry to verify improvements:
+
+```{r verify_improvements, eval=FALSE}
+# Before changes
+issues_before <- bid_ingest_telemetry("telemetry_before.sqlite")
+
+# After implementing improvements
+issues_after <- bid_ingest_telemetry("telemetry_after.sqlite")
+
+# Compare issue counts
+cat("Issues before:", length(issues_before), "\n")
+cat("Issues after:", length(issues_after), "\n")
+```
+
+5. **Document Patterns**: Build a knowledge base of common patterns in your domain:
+
+```{r document_patterns, eval=FALSE}
+# Save recurring patterns for future reference
+telemetry_patterns <- list(
+  date_filter_confusion = "Users often struggle with date range inputs - consider using presets",
+  tab_discovery = "Secondary tabs have low discovery - consider better visual hierarchy",
+  error_recovery = "Users abandon after errors - implement graceful error handling"
+)
+```
+
+## Conclusion
+
+The `bid_ingest_telemetry()` function bridges the gap between user behavior data and design decisions. By automatically identifying friction points from real usage patterns, it provides concrete, evidence-based starting points for the BID framework, ultimately leading to more user-friendly Shiny applications.
