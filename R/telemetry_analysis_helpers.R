@@ -193,10 +193,11 @@ find_error_patterns <- function(events, threshold_rate = 0.1) {
           events$event_type == "input" &
           events$timestamp >= (error_time - 5) &
           events$timestamp < error_time,
-        "input_id"
+        "input_id",
+        drop = FALSE
       ]
 
-      if (nrow(recent_inputs) > 0) {
+      if (!is.null(recent_inputs) && nrow(recent_inputs) > 0) {
         associated_inputs <- c(associated_inputs, recent_inputs$input_id)
       }
     }
@@ -260,7 +261,11 @@ find_navigation_dropoffs <- function(events, threshold = 0.2) {
     page <- page_visits$navigation_id[i]
 
     # Find sessions that ended on this page
-    page_sessions <- nav_events[nav_events$navigation_id == page, "session_id"]
+    page_sessions <- nav_events[
+      nav_events$navigation_id == page,
+      "session_id",
+      drop = FALSE
+    ]
 
     exits_on_page <- 0
     for (session in unique(page_sessions$session_id)) {
