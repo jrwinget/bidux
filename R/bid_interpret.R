@@ -74,11 +74,10 @@
 #'
 #' @export
 bid_interpret <- function(
-  previous_stage,
-  central_question = NULL,
-  data_story = NULL,
-  user_personas = NULL
-) {
+    previous_stage,
+    central_question = NULL,
+    data_story = NULL,
+    user_personas = NULL) {
   validate_required_params(previous_stage = previous_stage)
   validate_previous_stage(previous_stage, "Interpret")
 

@@ -307,10 +307,9 @@ find_navigation_dropoffs <- function(events, threshold = 0.2) {
 #' @return List of confusion patterns
 #' @keywords internal
 find_confusion_patterns <- function(
-  events,
-  window_seconds = 10,
-  min_changes = 5
-) {
+    events,
+    window_seconds = 10,
+    min_changes = 5) {
   # Filter to input events
   input_events <- events[events$event_type == "input", ]
 

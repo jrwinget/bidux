@@ -610,7 +610,7 @@ bid_anticipate <- function(
     paste(
       "Key suggestions:",
       paste(
-        bias_suggestions[1:min(3, length(bias_suggestions))],
+        bias_suggestions[seq_len(min(3, length(bias_suggestions)))],
         collapse = ", "
       )
     )

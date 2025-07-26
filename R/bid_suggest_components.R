@@ -15,7 +15,7 @@
 #' @return A tibble containing component suggestions with relevance scores
 #'
 #' @examples
-#' if(interactive()){
+#' if (interactive()) {
 #'   # After completing BID stages
 #'   notice_result <- bid_notice(
 #'     problem = "Users struggle with complex data",
@@ -386,8 +386,7 @@ calculate_relevance_scores <- function(bid_stage, components_db) {
   # Stage-based scoring (highest weight) - need to handle different stage name formats
   stage_pattern <- paste0(
     "Stage ",
-    switch(
-      stage_name,
+    switch(stage_name,
       "Notice" = "1",
       "Interpret" = "2",
       "Structure" = "3",

@@ -42,11 +42,10 @@
 #'
 #' @export
 bid_notice <- function(
-  problem,
-  theory = NULL,
-  evidence = NULL,
-  target_audience = NULL
-) {
+    problem,
+    theory = NULL,
+    evidence = NULL,
+    target_audience = NULL) {
   if (missing(problem) || is.null(problem)) {
     stop("Required parameter 'problem' must be provided", call. = FALSE)
   }
@@ -196,11 +195,10 @@ bid_notice <- function(
 #' @return Character string with suggestions
 #' @keywords internal
 generate_notice_suggestions <- function(
-  problem,
-  theory,
-  evidence,
-  target_audience
-) {
+    problem,
+    theory,
+    evidence,
+    target_audience) {
   suggestions <- character(0)
 
   # Theory-specific suggestions

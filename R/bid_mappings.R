@@ -77,10 +77,9 @@ get_default_theory_mappings <- function() {
 #' @return Character string with suggested theory
 #' @export
 suggest_theory_from_mappings <- function(
-  problem,
-  evidence = NULL,
-  mappings = NULL
-) {
+    problem,
+    evidence = NULL,
+    mappings = NULL) {
   # If no problem text, fall back to Cognitive Load Theory
   if (is.null(problem) || is.na(problem) || nchar(trimws(problem)) == 0) {
     return("Cognitive Load Theory")
@@ -423,7 +422,7 @@ get_accessibility_recommendations <- function(context = "", guidelines = NULL) {
       relevant_guidelines <- top_guidelines$requirement[1:3]
     } else {
       relevant_guidelines <- accessibility_guidelines$requirement[
-        1:min(3, nrow(accessibility_guidelines))
+        seq_len(min(3, nrow(accessibility_guidelines)))
       ]
     }
   }

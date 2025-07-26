@@ -12,7 +12,7 @@
 #' @return A formatted report summarizing the entire BID process
 #'
 #' @examples
-#' if(interactive()){
+#' if (interactive()) {
 #'   # After completing all 5 stages
 #'   validation_result <- bid_validate(...)
 #'
@@ -32,10 +32,9 @@
 #'
 #' @export
 bid_report <- function(
-  validate_stage,
-  format = c("text", "html", "markdown"),
-  include_diagrams = TRUE
-) {
+    validate_stage,
+    format = c("text", "html", "markdown"),
+    include_diagrams = TRUE) {
   format <- match.arg(format)
 
   tryCatch(
@@ -215,38 +214,51 @@ generate_text_report <- function(validate_stage, format, include_diagrams) {
 
   # Suggestions
   suggestions <- safe_extract(validate_stage, "suggestions")
-  prefix <- if (format == "markdown") "- **Suggestions**: " else
+  prefix <- if (format == "markdown") {
+    "- **Suggestions**: "
+  } else {
     "- Suggestions: "
+  }
   report <- c(report, paste0(prefix, suggestions))
   report <- c(report, "")
 
   # Stage 4: Anticipate
   if ("previous_bias" %in% names(validate_stage)) {
-    stage_header <- if (format == "markdown")
-      "## Stage 4: Anticipate User Behavior" else
+    stage_header <- if (format == "markdown") {
+      "## Stage 4: Anticipate User Behavior"
+    } else {
       "Stage 4: Anticipate User Behavior"
+    }
     report <- c(report, stage_header)
 
     bias_mitigations <- safe_extract(validate_stage, "previous_bias")
-    prefix <- if (format == "markdown") "- **Bias Mitigations**: " else
+    prefix <- if (format == "markdown") {
+      "- **Bias Mitigations**: "
+    } else {
       "- Bias Mitigations: "
+    }
     report <- c(report, paste0(prefix, bias_mitigations))
 
     interaction_principles <- safe_extract(
       validate_stage,
       "previous_interaction"
     )
-    prefix <- if (format == "markdown") "- **Interaction Principles**: " else
+    prefix <- if (format == "markdown") {
+      "- **Interaction Principles**: "
+    } else {
       "- Interaction Principles: "
+    }
     report <- c(report, paste0(prefix, interaction_principles))
     report <- c(report, "")
   }
 
   # Stage 3: Structure
   if ("previous_layout" %in% names(validate_stage)) {
-    stage_header <- if (format == "markdown")
-      "## Stage 3: Structure the Dashboard" else
+    stage_header <- if (format == "markdown") {
+      "## Stage 3: Structure the Dashboard"
+    } else {
       "Stage 3: Structure the Dashboard"
+    }
     report <- c(report, stage_header)
 
     layout <- safe_extract(validate_stage, "previous_layout")
@@ -254,21 +266,29 @@ generate_text_report <- function(validate_stage, format, include_diagrams) {
     report <- c(report, paste0(prefix, layout))
 
     concepts <- safe_extract(validate_stage, "previous_concepts")
-    prefix <- if (format == "markdown") "- **Applied Concepts**: " else
+    prefix <- if (format == "markdown") {
+      "- **Applied Concepts**: "
+    } else {
       "- Applied Concepts: "
+    }
     report <- c(report, paste0(prefix, concepts))
 
     accessibility <- safe_extract(validate_stage, "previous_accessibility")
-    prefix <- if (format == "markdown")
-      "- **Accessibility Considerations**: " else
+    prefix <- if (format == "markdown") {
+      "- **Accessibility Considerations**: "
+    } else {
       "- Accessibility Considerations: "
+    }
     report <- c(report, paste0(prefix, accessibility))
     report <- c(report, "")
   }
 
   # Implementation Recommendations
-  impl_header <- if (format == "markdown")
-    "## Implementation Recommendations" else "Implementation Recommendations"
+  impl_header <- if (format == "markdown") {
+    "## Implementation Recommendations"
+  } else {
+    "Implementation Recommendations"
+  }
   report <- c(report, impl_header)
   report <- c(
     report,
@@ -277,8 +297,11 @@ generate_text_report <- function(validate_stage, format, include_diagrams) {
   report <- c(report, "")
 
   # UI Components
-  ui_header <- if (format == "markdown") "### Recommended UI Components" else
+  ui_header <- if (format == "markdown") {
+    "### Recommended UI Components"
+  } else {
     "Recommended UI Components"
+  }
   report <- c(report, ui_header)
 
   # Try to get component suggestions
@@ -289,10 +312,13 @@ generate_text_report <- function(validate_stage, format, include_diagrams) {
         package = "bslib"
       )
       if (nrow(bslib_suggestions) > 0) {
-        prefix <- if (format == "markdown") "**bslib Components:**" else
+        prefix <- if (format == "markdown") {
+          "**bslib Components:**"
+        } else {
           "bslib Components:"
+        }
         report <- c(report, prefix)
-        for (i in 1:min(3, nrow(bslib_suggestions))) {
+        for (i in seq_len(min(3, nrow(bslib_suggestions)))) {
           report <- c(
             report,
             paste0(
@@ -319,10 +345,13 @@ generate_text_report <- function(validate_stage, format, include_diagrams) {
         package = "shiny"
       )
       if (nrow(shiny_suggestions) > 0) {
-        prefix <- if (format == "markdown") "**Shiny Components:**" else
+        prefix <- if (format == "markdown") {
+          "**Shiny Components:**"
+        } else {
           "Shiny Components:"
+        }
         report <- c(report, prefix)
-        for (i in 1:min(3, nrow(shiny_suggestions))) {
+        for (i in seq_len(min(3, nrow(shiny_suggestions)))) {
           report <- c(
             report,
             paste0(
@@ -355,8 +384,11 @@ generate_text_report <- function(validate_stage, format, include_diagrams) {
   report <- c(report, "")
 
   # Learning Resources
-  learn_header <- if (format == "markdown") "## Learning Resources" else
+  learn_header <- if (format == "markdown") {
+    "## Learning Resources"
+  } else {
     "Learning Resources"
+  }
   report <- c(report, learn_header)
   report <- c(
     report,
@@ -694,9 +726,9 @@ generate_html_report_direct <- function(validate_stage, include_diagrams) {
 <p><strong>bslib Components:</strong></p>"
         )
         bslib_items <- paste0(
-          bslib_suggestions$component[1:min(3, nrow(bslib_suggestions))],
+          bslib_suggestions$component[seq_len(min(3, nrow(bslib_suggestions)))],
           ": ",
-          bslib_suggestions$description[1:min(3, nrow(bslib_suggestions))]
+          bslib_suggestions$description[seq_len(min(3, nrow(bslib_suggestions)))]
         )
         html_body <- paste0(html_body, generate_html_list(bslib_items))
       }
@@ -725,9 +757,9 @@ generate_html_report_direct <- function(validate_stage, include_diagrams) {
 <p><strong>Shiny Components:</strong></p>"
         )
         shiny_items <- paste0(
-          shiny_suggestions$component[1:min(3, nrow(shiny_suggestions))],
+          shiny_suggestions$component[seq_len(min(3, nrow(shiny_suggestions)))],
           ": ",
-          shiny_suggestions$description[1:min(3, nrow(shiny_suggestions))]
+          shiny_suggestions$description[seq_len(min(3, nrow(shiny_suggestions)))]
         )
         html_body <- paste0(html_body, generate_html_list(shiny_items))
       }

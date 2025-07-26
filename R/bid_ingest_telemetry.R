@@ -55,10 +55,9 @@
 #'
 #' @export
 bid_ingest_telemetry <- function(
-  path,
-  format = NULL,
-  thresholds = list()
-) {
+    path,
+    format = NULL,
+    thresholds = list()) {
   # Validate inputs
   if (!file.exists(path)) {
     cli::cli_abort("Telemetry file not found: {path}")
