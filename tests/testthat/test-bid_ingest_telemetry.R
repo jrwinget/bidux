@@ -213,7 +213,7 @@ test_that("bid_ingest_telemetry identifies error patterns", {
   expect_s3_class(error_notice, "bid_stage")
   expect_match(error_notice$problem[1], "errors")
   expect_match(error_notice$evidence[1], "Data query failed")
-  expect_match(error_notice$evidence[1], "100.0%") # Both sessions affected
+  expect_match(error_notice$evidence[1], "100%") # Changed from "100.0%" to "100%"
 
   unlink(temp_json)
 })

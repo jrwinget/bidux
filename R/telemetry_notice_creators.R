@@ -1,3 +1,8 @@
+# Functions to create BID Notice stages from telemetry findings
+
+# Import null coalescing operator
+`%||%` <- function(x, y) if (is.null(x)) y else x
+
 #' Create notice stage for unused input
 #' @param input_info List with input usage information
 #' @param total_sessions Total number of sessions

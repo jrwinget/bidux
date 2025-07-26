@@ -55,22 +55,26 @@
 #'
 #' @export
 bid_ingest_telemetry <- function(
-    path,
-    format = NULL,
-    thresholds = list()
-  ) {
+  path,
+  format = NULL,
+  thresholds = list()
+) {
+  # Validate inputs
   if (!file.exists(path)) {
     cli::cli_abort("Telemetry file not found: {path}")
   }
 
+  # Auto-detect format if not specified
   if (is.null(format)) {
     format <- detect_telemetry_format(path)
   }
 
+  # Validate format
   if (!format %in% c("sqlite", "json")) {
     cli::cli_abort("Format must be 'sqlite' or 'json', got: {format}")
   }
 
+  # Set default thresholds
   default_thresholds <- list(
     unused_input_threshold = 0.05,
     delay_threshold_seconds = 30,
@@ -80,8 +84,10 @@ bid_ingest_telemetry <- function(
     rapid_change_count = 5
   )
 
+  # Merge user thresholds with defaults
   thresholds <- modifyList(default_thresholds, thresholds)
 
+  # Read telemetry data
   cli::cli_alert_info("Reading telemetry data from {format} file...")
   events <- read_telemetry_data(path, format)
 
@@ -90,14 +96,16 @@ bid_ingest_telemetry <- function(
     return(list())
   }
 
+  # Get total sessions for percentage calculations
   total_sessions <- length(unique(events$session_id))
   cli::cli_alert_info(
     "Analyzing {nrow(events)} events from {total_sessions} sessions..."
   )
 
+  # Initialize results list
   notice_issues <- list()
 
-  # find unused inputs
+  # 1. Find unused inputs
   unused_inputs <- find_unused_inputs(events, thresholds$unused_input_threshold)
   if (length(unused_inputs) > 0) {
     for (input_info in unused_inputs) {
@@ -112,7 +120,7 @@ bid_ingest_telemetry <- function(
     }
   }
 
-  # find delayed interactions
+  # 2. Find delayed interactions
   delay_info <- find_delayed_sessions(
     events,
     thresholds$delay_threshold_seconds
@@ -125,7 +133,7 @@ bid_ingest_telemetry <- function(
     )
   }
 
-  # find error patterns
+  # 3. Find error patterns
   error_patterns <- find_error_patterns(events, thresholds$error_rate_threshold)
   if (length(error_patterns) > 0) {
     for (i in seq_along(error_patterns)) {
@@ -138,7 +146,7 @@ bid_ingest_telemetry <- function(
     }
   }
 
-  # find navigation drop-offs
+  # 4. Find navigation drop-offs
   if ("navigation" %in% unique(events$event_type)) {
     navigation_issues <- find_navigation_dropoffs(
       events,
@@ -158,7 +166,7 @@ bid_ingest_telemetry <- function(
     }
   }
 
-  # find rapid change patterns (confusion indicators)
+  # 5. Find rapid change patterns (confusion indicators)
   confusion_patterns <- find_confusion_patterns(
     events,
     thresholds$rapid_change_window,
@@ -178,20 +186,14 @@ bid_ingest_telemetry <- function(
     }
   }
 
-  # summary message
+  # Summary message
   if (length(notice_issues) == 0) {
     cli::cli_alert_success(
-      paste(
-        "No significant UX issues identified from telemetry. All tracked",
-        "inputs were used and no systematic problems detected."
-      )
+      "No significant UX issues identified from telemetry. All tracked inputs were used and no systematic problems detected."
     )
   } else {
     cli::cli_alert_warning(
-      paste(
-        "Identified {length(notice_issues)} potential UX issue{?s}",
-        "from telemetry analysis"
-      )
+      "Identified {length(notice_issues)} potential UX issue{?s} from telemetry analysis"
     )
   }
 
@@ -210,10 +212,7 @@ detect_telemetry_format <- function(path) {
     return("json")
   } else {
     cli::cli_abort(
-      paste(
-        "Cannot auto-detect format from extension '.{ext}'.",
-        "Please specify format parameter."
-      )
+      "Cannot auto-detect format from extension '.{ext}'. Please specify format parameter."
     )
   }
 }
@@ -249,17 +248,20 @@ read_telemetry_sqlite <- function(path) {
   con <- NULL
   tryCatch(
     {
+      # Connect to database
       con <- DBI::dbConnect(RSQLite::SQLite(), path)
+
+      # List available tables
       tables <- DBI::dbListTables(con)
 
-      # look for events table (common shiny.telemetry table name)
+      # Look for events table (common shiny.telemetry table name)
       event_table <- NULL
       if ("event_data" %in% tables) {
         event_table <- "event_data"
       } else if ("events" %in% tables) {
         event_table <- "events"
       } else if (length(tables) > 0) {
-        # use first table if no standard name found
+        # Use first table if no standard name found
         event_table <- tables[1]
         cli::cli_warn(
           "No standard event table found, using '{event_table}'"
@@ -268,7 +270,10 @@ read_telemetry_sqlite <- function(path) {
         cli::cli_abort("No tables found in SQLite database")
       }
 
+      # Read events
       events <- DBI::dbReadTable(con, event_table)
+
+      # Normalize column names
       events <- normalize_telemetry_columns(events)
 
       return(events)
@@ -295,36 +300,68 @@ read_telemetry_json <- function(path) {
 
   tryCatch(
     {
+      # Try to read as JSON lines (one JSON object per line)
       lines <- readLines(path, warn = FALSE)
+
+      # Filter out empty lines
       lines <- lines[nchar(trimws(lines)) > 0]
 
       if (length(lines) == 0) {
-        return(data.frame())
+        return(data.frame(
+          timestamp = character(),
+          session_id = character(),
+          event_type = character(),
+          stringsAsFactors = FALSE
+        ))
       }
 
-      # try to parse each line as JSON
-      events_list <- lapply(lines, function(line) {
-        tryCatch(
-          jsonlite::fromJSON(line, flatten = TRUE),
-          error = function(e) NULL
+      # Check if it's a JSON array
+      if (substr(trimws(lines[1]), 1, 1) == "[") {
+        # It's a JSON array, parse as whole
+        events <- jsonlite::fromJSON(
+          paste(lines, collapse = "\n"),
+          flatten = TRUE
         )
-      })
-
-      # remove failed parses
-      events_list <- events_list[!sapply(events_list, is.null)]
-
-      if (length(events_list) == 0) {
-        # try reading entire file as single JSON array
-        events <- jsonlite::fromJSON(path, flatten = TRUE)
-        if (!is.data.frame(events)) {
-          events <- as.data.frame(events)
-        }
       } else {
-        # combine all events into data frame
+        # Try to parse each line as JSON
+        events_list <- lapply(lines, function(line) {
+          tryCatch(
+            jsonlite::fromJSON(line, flatten = TRUE),
+            error = function(e) NULL
+          )
+        })
+
+        # Remove failed parses
+        events_list <- events_list[!sapply(events_list, is.null)]
+
+        if (length(events_list) == 0) {
+          return(data.frame(
+            timestamp = character(),
+            session_id = character(),
+            event_type = character(),
+            stringsAsFactors = FALSE
+          ))
+        }
+
+        # Combine all events into data frame
         events <- dplyr::bind_rows(events_list)
       }
 
-      # normalize column names
+      if (!is.data.frame(events)) {
+        events <- as.data.frame(events)
+      }
+
+      # If empty, return empty data frame with required columns
+      if (nrow(events) == 0) {
+        return(data.frame(
+          timestamp = character(),
+          session_id = character(),
+          event_type = character(),
+          stringsAsFactors = FALSE
+        ))
+      }
+
+      # Normalize column names
       events <- normalize_telemetry_columns(events)
 
       return(events)
@@ -340,8 +377,10 @@ read_telemetry_json <- function(path) {
 #' @return Normalized data frame
 #' @keywords internal
 normalize_telemetry_columns <- function(events) {
+  # Ensure required columns exist
   required_cols <- c("timestamp", "session_id", "event_type")
 
+  # Common column name mappings
   col_mappings <- list(
     timestamp = c("timestamp", "time", "datetime", "created_at"),
     session_id = c("session_id", "session", "sessionid", "session_token"),
@@ -353,10 +392,10 @@ normalize_telemetry_columns <- function(events) {
     navigation_id = c("navigation_id", "page", "tab", "panel")
   )
 
-  # normalize column names
+  # Normalize column names
   for (target_col in names(col_mappings)) {
     if (!target_col %in% names(events)) {
-      # look for alt names
+      # Look for alternative names
       for (alt_name in col_mappings[[target_col]]) {
         if (alt_name %in% names(events)) {
           names(events)[names(events) == alt_name] <- target_col
@@ -366,6 +405,7 @@ normalize_telemetry_columns <- function(events) {
     }
   }
 
+  # Check for required columns
   missing_cols <- setdiff(required_cols, names(events))
   if (length(missing_cols) > 0) {
     cli::cli_abort(
@@ -373,6 +413,7 @@ normalize_telemetry_columns <- function(events) {
     )
   }
 
+  # Convert timestamp to POSIXct if needed
   if (is.character(events$timestamp)) {
     events$timestamp <- as.POSIXct(
       events$timestamp,
@@ -380,11 +421,13 @@ normalize_telemetry_columns <- function(events) {
       tz = "UTC"
     )
 
+    # Try alternative formats if needed
     if (any(is.na(events$timestamp))) {
       events$timestamp <- as.POSIXct(events$timestamp, tz = "UTC")
     }
   }
 
+  # Sort by timestamp
   events <- events[order(events$timestamp), ]
 
   return(events)

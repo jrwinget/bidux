@@ -1,5 +1,11 @@
 # Helper functions for analyzing telemetry data patterns
 
+# Import pipe operator for this file
+`%>%` <- dplyr::`%>%`
+
+# Import null coalescing operator
+`%||%` <- function(x, y) if (is.null(x)) y else x
+
 #' Find unused or under-used inputs
 #' @param events Telemetry events data frame
 #' @param threshold Percentage threshold for considering input unused
@@ -108,10 +114,12 @@ find_delayed_sessions <- function(events, threshold_seconds = 30) {
     median_delay = if (length(delays_finite) > 0) median(delays_finite) else NA,
     mean_delay = if (length(delays_finite) > 0) mean(delays_finite) else NA,
     sessions_over_threshold = sum(
-      session_delays$delay_seconds > threshold_seconds
+      session_delays$delay_seconds > threshold_seconds,
+      na.rm = TRUE
     ),
     rate_over_threshold = sum(
-      session_delays$delay_seconds > threshold_seconds
+      session_delays$delay_seconds > threshold_seconds,
+      na.rm = TRUE
     ) /
       nrow(session_delays),
     has_issues = FALSE
