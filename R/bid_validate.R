@@ -24,10 +24,10 @@
 #'   bid_interpret(
 #'     central_question = "How can we improve selection efficiency?",
 #'     data_story = list(
-#'       hook      = "Too many options",
-#'       context   = "Excessive choices",
-#'       tension   = "User frustration",
-#'       resolution= "Simplify menu"
+#'       hook = "Too many options",
+#'       context = "Excessive choices",
+#'       tension = "User frustration",
+#'       resolution = "Simplify menu"
 #'     )
 #'   )
 #'
@@ -38,8 +38,8 @@
 #' )
 #'
 #' anticipate <- bid_anticipate(
-#'   previous_stage    = structure_result,
-#'   bias_mitigations  = list(
+#'   previous_stage = structure_result,
+#'   bias_mitigations = list(
 #'     anchoring = "Provide reference points",
 #'     framing   = "Use gain-framed messaging"
 #'   )
@@ -47,9 +47,9 @@
 #'
 #' bid_validate(
 #'   previous_stage = anticipate,
-#'   summary_panel  = "Clear summary of key insights with action items",
-#'   collaboration  = "Team annotation and sharing features",
-#'   next_steps     = c(
+#'   summary_panel = "Clear summary of key insights with action items",
+#'   collaboration = "Team annotation and sharing features",
+#'   next_steps = c(
 #'     "Conduct user testing with target audience",
 #'     "Implement accessibility improvements",
 #'     "Add mobile responsiveness"
@@ -58,11 +58,10 @@
 #'
 #' @export
 bid_validate <- function(
-  previous_stage,
-  summary_panel = NULL,
-  collaboration = NULL,
-  next_steps = NULL
-) {
+    previous_stage,
+    summary_panel = NULL,
+    collaboration = NULL,
+    next_steps = NULL) {
   validate_required_params(previous_stage = previous_stage)
   validate_previous_stage(previous_stage, "Validate")
 
@@ -132,8 +131,6 @@ bid_validate <- function(
 }
 
 generate_summary_panel_suggestion <- function(previous_stage) {
-  stage_name <- previous_stage$stage[1]
-
   central_question <- safe_column_access(previous_stage, "central_question", "")
   problem <- safe_column_access(previous_stage, "problem", "")
   theory <- safe_column_access(previous_stage, "theory", "")
@@ -333,11 +330,10 @@ parse_next_steps <- function(next_steps_formatted) {
 }
 
 generate_validation_suggestions <- function(
-  summary_panel,
-  collaboration,
-  next_steps,
-  previous_stage
-) {
+    summary_panel,
+    collaboration,
+    next_steps,
+    previous_stage) {
   suggestions <- character(0)
 
   if (!is.null(summary_panel) && nchar(summary_panel) > 0) {

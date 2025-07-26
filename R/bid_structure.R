@@ -21,7 +21,7 @@
 #'        screen_reader, text_size, alternative_text, focus_indicators,
 #'        semantic_markup, and aria_labels.
 #'
-#' @return A bid_stage object containing the documented information for the 
+#' @return A bid_stage object containing the documented information for the
 #'         "Structure" stage.
 #'
 #' @examples
@@ -75,18 +75,21 @@ bid_structure <- function(
   }
 
   # Get all concepts data
-  d_all_concepts <- tryCatch({
-    bid_concepts()
-  }, error = function(e) {
-    cli::cli_warn("Could not load concepts data: {e$message}")
-    tibble::tibble(
-      concept = character(0),
-      description = character(0),
-      category = character(0),
-      reference = character(0),
-      example = character(0)
-    )
-  })
+  d_all_concepts <- tryCatch(
+    {
+      bid_concepts()
+    },
+    error = function(e) {
+      cli::cli_warn("Could not load concepts data: {e$message}")
+      tibble::tibble(
+        concept = character(0),
+        description = character(0),
+        category = character(0),
+        reference = character(0),
+        example = character(0)
+      )
+    }
+  )
 
   # Validate accessibility parameter
   if (!is.null(accessibility)) {
@@ -434,8 +437,7 @@ get_layout_based_concepts <- function(layout) {
 
   if (length(layout_concepts) == 0 || all(is.na(layout_concepts))) {
     # Fallback to switch statement for backwards compatibility
-    layout_concepts <- switch(
-      layout,
+    layout_concepts <- switch(layout,
       "dual_process" = c("Dual-Processing Theory", "Visual Hierarchy"),
       "grid" = c("Principle of Proximity", "Information Hierarchy"),
       "card" = c("Aesthetic-Usability", "Principle of Proximity"),
@@ -456,18 +458,18 @@ get_layout_based_concepts <- function(layout) {
 match_concepts_to_framework <- function(concepts, d_all_concepts) {
   matched_concepts <- character(0)
   unmatched_concepts <- character(0)
-  
+
   if (length(concepts) == 0 || nrow(d_all_concepts) == 0) {
     return(list(matched = character(0), unmatched = concepts))
   }
-  
+
   for (concept in concepts) {
     if (is.na(concept) || nchar(trimws(concept)) == 0) {
       next
     }
-    
+
     matched_concept <- find_best_concept_match(concept, d_all_concepts)
-    
+
     if (!is.null(matched_concept)) {
       matched_concepts <- c(matched_concepts, matched_concept)
     } else {
@@ -592,8 +594,7 @@ find_best_concept_match <- function(concept, d_all_concepts) {
 }
 
 get_layout_suggestions <- function(layout) {
-  suggestion <- switch(
-    layout,
+  suggestion <- switch(layout,
     "dual_process" = paste(
       "For dual_process layout: Consider separating quick insights (System 1) from detailed analysis",
       "(System 2). Place summary metrics and KPIs at the top, with detailed",
@@ -727,10 +728,9 @@ get_accessibility_suggestions <- function(accessibility) {
 }
 
 build_structure_suggestions <- function(
-  layout_suggestions,
-  concept_tips,
-  accessibility_suggestion
-) {
+    layout_suggestions,
+    concept_tips,
+    accessibility_suggestion) {
   suggestions_parts <- c(layout_suggestions)
 
   if (length(concept_tips) > 0) {

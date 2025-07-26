@@ -85,13 +85,11 @@ is_empty <- function(x) {
 #' @keywords internal
 #' @noRd
 standard_error_msg <- function(
-  type,
-  param_name = NULL,
-  expected = NULL,
-  actual = NULL
-) {
-  switch(
     type,
+    param_name = NULL,
+    expected = NULL,
+    actual = NULL) {
+  switch(type,
     missing_param = paste0(
       "Required parameter",
       if (!is.null(param_name)) paste0(" '", param_name, "'"),

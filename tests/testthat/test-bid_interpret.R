@@ -13,7 +13,7 @@ test_that("bid_interpret returns a tibble with stage 'Interpret'", {
       data
     }
   )
-  
+
   previous_stage <- tibble(
     stage = "Notice",
     problem = "Users struggle with complex data",

@@ -7,9 +7,11 @@
 bid_concepts(search = NULL, fuzzy_match = TRUE, max_distance = 2)
 }
 \arguments{
-\item{search}{A character string to search for. If NULL or empty, returns all concepts.}
+\item{search}{A character string to search for. If NULL or empty, returns all
+concepts.}
 
-\item{fuzzy_match}{Logical indicating whether to use fuzzy string matching (default: TRUE)}
+\item{fuzzy_match}{Logical indicating whether to use fuzzy string matching
+(default: TRUE)}
 
 \item{max_distance}{Maximum string distance for fuzzy matching (default: 2)}
 }

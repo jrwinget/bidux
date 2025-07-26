@@ -24,7 +24,7 @@ The suggestions are based on the design principles and user needs identified
 in the BID process.
 }
 \examples{
-if(interactive()){
+if (interactive()) {
   # After completing BID stages
   notice_result <- bid_notice(
     problem = "Users struggle with complex data",

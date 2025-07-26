@@ -40,10 +40,10 @@ structure_input <- bid_notice(
   bid_interpret(
     central_question = "How can we improve selection efficiency?",
     data_story = list(
-      hook      = "Too many options",
-      context   = "Excessive choices",
-      tension   = "User frustration",
-      resolution= "Simplify menu"
+      hook = "Too many options",
+      context = "Excessive choices",
+      tension = "User frustration",
+      resolution = "Simplify menu"
     )
   )
 
@@ -54,8 +54,8 @@ structure_result <- bid_structure(
 )
 
 anticipate <- bid_anticipate(
-  previous_stage    = structure_result,
-  bias_mitigations  = list(
+  previous_stage = structure_result,
+  bias_mitigations = list(
     anchoring = "Provide reference points",
     framing   = "Use gain-framed messaging"
   )
@@ -63,9 +63,9 @@ anticipate <- bid_anticipate(
 
 bid_validate(
   previous_stage = anticipate,
-  summary_panel  = "Clear summary of key insights with action items",
-  collaboration  = "Team annotation and sharing features",
-  next_steps     = c(
+  summary_panel = "Clear summary of key insights with action items",
+  collaboration = "Team annotation and sharing features",
+  next_steps = c(
     "Conduct user testing with target audience",
     "Implement accessibility improvements",
     "Add mobile responsiveness"

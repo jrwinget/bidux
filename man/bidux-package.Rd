@@ -10,6 +10,13 @@
 
 Provides a framework and toolkit to guide 'shiny' developers in implementing the Behavior Insight Design (BID) framework. The package offers functions for documenting each of the five stages (Notice, Interpret, Structure, Anticipate, and Validate), along with a comprehensive concept dictionary.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://jrwinget.github.io/bidux/}
+}
+
+}
 \author{
 \strong{Maintainer}: Jeremy Winget \email{contact@jrwinget.com} (\href{https://orcid.org/0000-0002-3783-4354}{ORCID})
 

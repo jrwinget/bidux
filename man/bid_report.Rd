@@ -26,7 +26,7 @@ Creates a comprehensive report from a completed BID framework process. This
 report summarizes all stages and provides recommendations for implementation.
 }
 \examples{
-if(interactive()){
+if (interactive()) {
   # After completing all 5 stages
   validation_result <- bid_validate(...)
 
