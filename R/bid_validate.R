@@ -131,8 +131,6 @@ bid_validate <- function(
 }
 
 generate_summary_panel_suggestion <- function(previous_stage) {
-  stage_name <- previous_stage$stage[1]
-
   central_question <- safe_column_access(previous_stage, "central_question", "")
   problem <- safe_column_access(previous_stage, "problem", "")
   theory <- safe_column_access(previous_stage, "theory", "")

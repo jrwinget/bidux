@@ -213,8 +213,6 @@ bid_anticipate <- function(
     accessibility <- previous_stage$accessibility[1]
   }
 
-  bias_concepts <- bid_concepts("bias|anchor|fram|confirm")
-
   if (is.null(bias_mitigations)) {
     suggested_biases <- list()
 

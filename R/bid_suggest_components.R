@@ -79,7 +79,10 @@ bid_suggest_components <- function(bid_stage, package = NULL) {
       return(create_empty_components_result())
     }
 
-    components_with_scores <- calculate_relevance_scores(bid_stage, components_db)
+    components_with_scores <- calculate_relevance_scores(
+      bid_stage,
+      components_db
+    )
   } else {
     suggestions_list <- lapply(valid_packages, function(pkg) {
       pkg_db <- components_db[components_db$package == pkg, ]
@@ -91,9 +94,16 @@ bid_suggest_components <- function(bid_stage, package = NULL) {
       scored_pkg
     })
 
-    suggestions_list <- suggestions_list[!vapply(suggestions_list, is.null, logical(1))]
+    suggestions_list <- suggestions_list[!vapply(
+      suggestions_list,
+      is.null,
+      logical(1)
+    )]
+
     if (length(suggestions_list) == 0) {
-      cli::cli_warn("No component suggestions found across any supported package")
+      cli::cli_warn(
+        "No component suggestions found across any supported package"
+      )
       return(create_empty_components_result())
     }
 
@@ -112,11 +122,17 @@ bid_suggest_components <- function(bid_stage, package = NULL) {
 
   if (!is.null(package)) {
     cli::cli_alert_success(
-      "Found {total_suggestions} {package} component suggestion{?s} for BID {stage_name} stage"
+      paste(
+        "Found {total_suggestions} {package} component suggestion{?s} for",
+        "BID {stage_name} stage"
+      )
     )
   } else {
     cli::cli_alert_success(
-      "Found {total_suggestions} component suggestion{?s} across all packages for BID {stage_name} stage"
+      paste(
+        "Found {total_suggestions} component suggestion{?s} across all",
+        "packages for BID {stage_name} stage"
+      )
     )
   }
 
@@ -406,19 +422,19 @@ calculate_relevance_scores <- function(bid_stage, components_db) {
   ] +
     50
 
-  # Extract information from bid_stage for concept matching
+  # extract information from bid_stage for concept matching
   concepts_to_match <- extract_relevant_concepts(bid_stage)
 
-  # Concept-based scoring with more flexible matching
+  # concept-based scoring with more flexible matching
   for (concept in concepts_to_match) {
-    # Try exact match first
+    # try exact match first
     concept_matches <- grepl(
       concept,
       components_db$cognitive_concepts,
       fixed = TRUE
     )
     if (!any(concept_matches)) {
-      # Try partial matching for common concepts
+      # try partial matching for common concepts
       concept_lower <- tolower(concept)
       if (grepl("visual", concept_lower)) {
         concept_matches <- grepl(
@@ -448,11 +464,10 @@ calculate_relevance_scores <- function(bid_stage, components_db) {
     }
     components_db$relevance[concept_matches] <- components_db$relevance[
       concept_matches
-    ] +
-      25
+    ] + 25
   }
 
-  # Problem/theory-based scoring for additional context
+  # problem/theory-based scoring for additional context
   additional_context <- extract_additional_context(bid_stage)
   for (context_term in additional_context) {
     context_matches <- grepl(
@@ -467,7 +482,7 @@ calculate_relevance_scores <- function(bid_stage, components_db) {
       10
   }
 
-  # Layout-specific scoring for Structure stage
+  # layout-specific scoring for Structure stage
   if (stage_name == "Structure" && "layout" %in% names(bid_stage)) {
     layout_value <- bid_stage$layout[1]
     if (!is.na(layout_value)) {
@@ -487,9 +502,9 @@ calculate_relevance_scores <- function(bid_stage, components_db) {
     }
   }
 
-  # Ensure we always return some components, even if relevance is low
+  # ensure we always return some components, even if relevance is low
   if (all(components_db$relevance == 0)) {
-    # Give small scores to some general components for any stage
+    # give small scores to some general components for any stage
     general_components <- c(
       "card",
       "value_box",
@@ -501,12 +516,11 @@ calculate_relevance_scores <- function(bid_stage, components_db) {
       comp_matches <- grepl(comp, components_db$component, ignore.case = TRUE)
       components_db$relevance[comp_matches] <- components_db$relevance[
         comp_matches
-      ] +
-        5
+      ] + 5
     }
   }
 
-  # Remove components with zero relevance for cleaner output
+  # remove components with zero relevance for cleaner output
   components_db <- components_db[components_db$relevance > 0, ]
 
   return(components_db)
@@ -515,16 +529,16 @@ calculate_relevance_scores <- function(bid_stage, components_db) {
 extract_relevant_concepts <- function(bid_stage) {
   concepts <- character(0)
 
-  # Extract from theory field (Notice stage)
+  # extract from theory field (Notice stage)
   if ("theory" %in% names(bid_stage) && !is.na(bid_stage$theory[1])) {
     theory <- bid_stage$theory[1]
     concepts <- c(concepts, theory)
   }
 
-  # Extract from concepts field (Structure stage)
+  # extract from concepts field (Structure stage)
   if ("concepts" %in% names(bid_stage) && !is.na(bid_stage$concepts[1])) {
     stage_concepts <- bid_stage$concepts[1]
-    # Handle both comma-separated and individual concepts
+    # handle both comma-separated and individual concepts
     if (grepl(",", stage_concepts)) {
       concepts <- c(concepts, trimws(unlist(strsplit(stage_concepts, ","))))
     } else {
@@ -532,7 +546,7 @@ extract_relevant_concepts <- function(bid_stage) {
     }
   }
 
-  # Extract from previous stage information
+  # extract from previous stage information
   previous_fields <- c("previous_theory", "previous_concepts")
   for (field in previous_fields) {
     if (field %in% names(bid_stage) && !is.na(bid_stage[[field]][1])) {
@@ -546,10 +560,10 @@ extract_relevant_concepts <- function(bid_stage) {
 extract_additional_context <- function(bid_stage) {
   context_terms <- character(0)
 
-  # Extract problem keywords
+  # extract problem keywords
   if ("problem" %in% names(bid_stage) && !is.na(bid_stage$problem[1])) {
     problem <- tolower(bid_stage$problem[1])
-    # Extract key terms that might relate to UI components
+    # extract key terms that might relate to UI components
     if (grepl("complex|overwhelm|too many", problem)) {
       context_terms <- c(context_terms, "progressive", "accordion", "tab")
     }
@@ -564,7 +578,7 @@ extract_additional_context <- function(bid_stage) {
     }
   }
 
-  # Extract from central question (Interpret stage)
+  # extract from central question (Interpret stage)
   if (
     "central_question" %in%
       names(bid_stage) &&
@@ -582,7 +596,7 @@ extract_additional_context <- function(bid_stage) {
     }
   }
 
-  # Extract from audience information
+  # extract from audience information
   audience_fields <- c("audience", "target_audience", "previous_audience")
   for (field in audience_fields) {
     if (field %in% names(bid_stage) && !is.na(bid_stage[[field]][1])) {

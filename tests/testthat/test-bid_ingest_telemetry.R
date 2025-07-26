@@ -1,5 +1,3 @@
-# Tests for bid_ingest_telemetry functionality
-
 test_that("bid_ingest_telemetry detects format from file extension", {
   expect_equal(detect_telemetry_format("data.sqlite"), "sqlite")
   expect_equal(detect_telemetry_format("data.sqlite3"), "sqlite")
@@ -20,7 +18,6 @@ test_that("bid_ingest_telemetry validates inputs correctly", {
     "Telemetry file not found"
   )
 
-  # Create temporary file
   temp_file <- tempfile(fileext = ".json")
   writeLines("[]", temp_file)
 
@@ -33,7 +30,6 @@ test_that("bid_ingest_telemetry validates inputs correctly", {
 })
 
 test_that("bid_ingest_telemetry handles empty telemetry data", {
-  # Create empty JSON file
   temp_json <- tempfile(fileext = ".json")
   writeLines("[]", temp_json)
 
@@ -48,10 +44,9 @@ test_that("bid_ingest_telemetry handles empty telemetry data", {
 })
 
 test_that("bid_ingest_telemetry identifies unused inputs", {
-  # Create test telemetry data
   temp_json <- tempfile(fileext = ".json")
 
-  # Create events: 2 sessions, but only one uses input2
+  # create events: 2 sessions, but only one uses input2
   events <- list(
     list(
       timestamp = "2025-01-01 10:00:00",
@@ -83,11 +78,11 @@ test_that("bid_ingest_telemetry identifies unused inputs", {
     )
   )
 
-  # Write JSON lines format
+  # write JSON lines format
   json_lines <- sapply(events, jsonlite::toJSON, auto_unbox = TRUE)
   writeLines(json_lines, temp_json)
 
-  # Run analysis
+  # run analysis
   suppressMessages(
     result <- bid_ingest_telemetry(
       temp_json,
@@ -95,10 +90,10 @@ test_that("bid_ingest_telemetry identifies unused inputs", {
     )
   )
 
-  # Should identify input2 as underused (50% usage)
+  # should identify input2 as underused (50% usage)
   expect_true("unused_input_input2" %in% names(result))
 
-  # Check the notice content
+  # check the notice content
   input2_notice <- result$unused_input_input2
   expect_s3_class(input2_notice, "bid_stage")
   expect_equal(get_stage(input2_notice), "Notice")
@@ -111,7 +106,7 @@ test_that("bid_ingest_telemetry identifies unused inputs", {
 test_that("bid_ingest_telemetry identifies delayed interactions", {
   temp_json <- tempfile(fileext = ".json")
 
-  # Create events with long delays
+  # create events with long delays
   events <- list(
     list(
       timestamp = "2025-01-01 10:00:00",
@@ -124,12 +119,12 @@ test_that("bid_ingest_telemetry identifies delayed interactions", {
       event_type = "input",
       input_id = "input1"
     ),
+    # session2 has no interactions
     list(
       timestamp = "2025-01-01 11:00:00",
       session_id = "session2",
       event_type = "login"
     )
-    # session2 has no interactions
   )
 
   json_lines <- sapply(events, jsonlite::toJSON, auto_unbox = TRUE)
@@ -142,7 +137,7 @@ test_that("bid_ingest_telemetry identifies delayed interactions", {
     )
   )
 
-  # Should identify delay issue
+  # should identify delay issue
   expect_true("delayed_interaction" %in% names(result))
 
   delay_notice <- result$delayed_interaction
@@ -159,7 +154,7 @@ test_that("bid_ingest_telemetry identifies delayed interactions", {
 test_that("bid_ingest_telemetry identifies error patterns", {
   temp_json <- tempfile(fileext = ".json")
 
-  # Create events with errors
+  # create events with errors
   events <- list(
     list(
       timestamp = "2025-01-01 10:00:00",
@@ -206,14 +201,14 @@ test_that("bid_ingest_telemetry identifies error patterns", {
     result <- bid_ingest_telemetry(temp_json)
   )
 
-  # Should identify error pattern
+  # should identify error pattern
   expect_true(any(grepl("error_", names(result))))
 
   error_notice <- result[[grep("error_", names(result))[1]]]
   expect_s3_class(error_notice, "bid_stage")
   expect_match(error_notice$problem[1], "errors")
   expect_match(error_notice$evidence[1], "Data query failed")
-  expect_match(error_notice$evidence[1], "100%") # Changed from "100.0%" to "100%"
+  expect_match(error_notice$evidence[1], "100%")
 
   unlink(temp_json)
 })
@@ -221,7 +216,7 @@ test_that("bid_ingest_telemetry identifies error patterns", {
 test_that("bid_ingest_telemetry identifies navigation drop-offs", {
   temp_json <- tempfile(fileext = ".json")
 
-  # Create events with navigation
+  # create events with navigation
   events <- list(
     list(
       timestamp = "2025-01-01 10:00:00",
@@ -245,13 +240,13 @@ test_that("bid_ingest_telemetry identifies navigation drop-offs", {
       session_id = "session2",
       event_type = "login"
     ),
+    # session2 never visits settings_tab
     list(
       timestamp = "2025-01-01 11:00:05",
       session_id = "session2",
       event_type = "navigation",
       navigation_id = "main_tab"
     )
-    # session2 never visits settings_tab
   )
 
   json_lines <- sapply(events, jsonlite::toJSON, auto_unbox = TRUE)
@@ -264,7 +259,7 @@ test_that("bid_ingest_telemetry identifies navigation drop-offs", {
     )
   )
 
-  # Should identify settings_tab as underused
+  # should identify settings_tab as underused
   expect_true("navigation_settings_tab" %in% names(result))
 
   nav_notice <- result$navigation_settings_tab
@@ -278,11 +273,11 @@ test_that("bid_ingest_telemetry identifies navigation drop-offs", {
 test_that("bid_ingest_telemetry identifies confusion patterns", {
   temp_json <- tempfile(fileext = ".json")
 
-  # Create rapid repeated changes
+  # create rapid repeated changes
   base_time <- as.POSIXct("2025-01-01 10:00:00")
   events <- list()
 
-  # Add login events
+  # add login events
   for (i in 1:3) {
     events[[length(events) + 1]] <- list(
       timestamp = format(base_time + (i - 1) * 3600, "%Y-%m-%d %H:%M:%S"),
@@ -291,7 +286,7 @@ test_that("bid_ingest_telemetry identifies confusion patterns", {
     )
   }
 
-  # Add rapid changes for a problematic input in multiple sessions
+  # add rapid changes for a problematic input in multiple sessions
   for (i in 1:2) {
     for (j in 1:6) {
       events[[length(events) + 1]] <- list(
@@ -319,7 +314,7 @@ test_that("bid_ingest_telemetry identifies confusion patterns", {
     )
   )
 
-  # Should identify confusion pattern
+  # should identify confusion pattern
   expect_true("confusion_confusing_slider" %in% names(result))
 
   confusion_notice <- result$confusion_confusing_slider
@@ -336,10 +331,10 @@ test_that("bid_ingest_telemetry works with SQLite format", {
 
   temp_db <- tempfile(fileext = ".sqlite")
 
-  # Create SQLite database with telemetry data
+  # create SQLite database with telemetry data
   con <- DBI::dbConnect(RSQLite::SQLite(), temp_db)
 
-  # Create events table
+  # create events table
   events_df <- data.frame(
     timestamp = c(
       "2025-01-01 10:00:00",
@@ -355,12 +350,12 @@ test_that("bid_ingest_telemetry works with SQLite format", {
   DBI::dbWriteTable(con, "event_data", events_df)
   DBI::dbDisconnect(con)
 
-  # Test ingestion
+  # test ingestion
   suppressMessages(
     result <- bid_ingest_telemetry(temp_db)
   )
 
-  # Should work without errors
+  # should work without errors
   expect_type(result, "list")
 
   unlink(temp_db)
@@ -369,7 +364,6 @@ test_that("bid_ingest_telemetry works with SQLite format", {
 test_that("bid_ingest_telemetry handles custom thresholds", {
   temp_json <- tempfile(fileext = ".json")
 
-  # Simple test data
   events <- list(
     list(
       timestamp = "2025-01-01 10:00:00",
@@ -387,13 +381,13 @@ test_that("bid_ingest_telemetry handles custom thresholds", {
   json_lines <- sapply(events, jsonlite::toJSON, auto_unbox = TRUE)
   writeLines(json_lines, temp_json)
 
-  # With default threshold (30s), should not flag delay
+  # with default threshold (30s), should not flag delay
   suppressMessages(
     result1 <- bid_ingest_telemetry(temp_json)
   )
   expect_false("delayed_interaction" %in% names(result1))
 
-  # With custom threshold (15s), should flag delay
+  # with custom threshold (15s), should flag delay
   suppressMessages(
     result2 <- bid_ingest_telemetry(
       temp_json,
@@ -406,7 +400,6 @@ test_that("bid_ingest_telemetry handles custom thresholds", {
 })
 
 test_that("telemetry helper functions work correctly", {
-  # Test data
   events <- data.frame(
     timestamp = as.POSIXct(c(
       "2025-01-01 10:00:00",
@@ -421,28 +414,26 @@ test_that("telemetry helper functions work correctly", {
     stringsAsFactors = FALSE
   )
 
-  # Test find_unused_inputs
+  # test find_unused_inputs
   unused <- find_unused_inputs(events, threshold = 0.4)
-  expect_equal(length(unused), 0) # Both inputs used in 50% of sessions
+  expect_equal(length(unused), 0) # both inputs used in 50% of sessions
 
   unused_strict <- find_unused_inputs(events, threshold = 0.6)
-  expect_equal(length(unused_strict), 2) # Both inputs used in only 50%
+  expect_equal(length(unused_strict), 2) # both inputs used in only 50%
 
-  # Test find_delayed_sessions
+  # test find_delayed_sessions
   delays <- find_delayed_sessions(events, threshold = 3)
   expect_true(delays$has_issues) # 5 second delay is over 3 second threshold
 
-  # Test with no login events
+  # test with no login events
   no_login_events <- events[events$event_type != "login", ]
   delays_no_login <- find_delayed_sessions(no_login_events, threshold = 30)
   expect_null(delays_no_login)
 })
 
 test_that("notice creator functions generate valid bid_stage objects", {
-  # Mock bid_notice if needed
   local_mocked_bindings(
     bid_notice = function(problem, evidence, target_audience = NULL) {
-      # Create a minimal bid_stage object
       data <- tibble::tibble(
         stage = "Notice",
         problem = problem,
@@ -461,7 +452,7 @@ test_that("notice creator functions generate valid bid_stage objects", {
     }
   )
 
-  # Test unused input notice
+  # test unused input notice
   input_info <- list(
     input_id = "test_filter",
     sessions_used = 2,
@@ -473,7 +464,7 @@ test_that("notice creator functions generate valid bid_stage objects", {
   expect_match(notice1$problem[1], "test_filter")
   expect_match(notice1$evidence[1], "2 out of 100")
 
-  # Test delay notice
+  # test delay notice
   delay_info <- list(
     median_delay = 45,
     no_action_rate = 0.15,
@@ -485,7 +476,7 @@ test_that("notice creator functions generate valid bid_stage objects", {
   expect_s3_class(notice2, "bid_stage")
   expect_match(notice2$problem[1], "long time")
 
-  # Test error notice
+  # test error notice
   error_info <- list(
     error_message = "Connection timeout",
     output_id = "data_table",

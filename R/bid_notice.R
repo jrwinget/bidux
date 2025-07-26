@@ -3,14 +3,17 @@
 #' @description
 #' This function documents the initial observation and problem identification
 #' stage. It represents stage 1 in the BID framework and now returns a
-#' structured bid_stage object with enhanced metadata and external mapping support.
+#' structured bid_stage object with enhanced metadata and external mapping
+#' support.
 #'
 #' @param problem A character string describing the observed user problem.
 #' @param theory A character string describing the behavioral theory that might
 #'        explain the problem. If NULL, will be auto-suggested using external
 #'        theory mappings.
-#' @param evidence A character string describing evidence supporting the problem.
-#' @param target_audience Optional character string describing the target audience.
+#' @param evidence A character string describing evidence supporting the
+#'        problem.
+#' @param target_audience Optional character string describing the target
+#'        audience.
 #'
 #' @return A bid_stage object containing the documented information for the
 #'         "Notice" stage with enhanced metadata and validation.
@@ -18,7 +21,7 @@
 #' @examples
 #' # Basic usage with auto-suggested theory
 #' notice_result <- bid_notice(
-#'   problem = "Users struggle with complex dropdown menus containing too many options",
+#'   problem = "Users struggling with complex dropdowns and too many options",
 #'   evidence = "User testing shows 65% abandonment rate on filter selection"
 #' )
 #'
@@ -93,18 +96,25 @@ bid_notice <- function(
 
   if (nchar(problem_clean) < 10) {
     warning(
-      "Problem description is very short (< 10 characters). Consider providing more detail.",
+      paste(
+        paste(
+          "Problem description is very short (< 10 characters).",
+          "Consider providing more detail."
+        )
+      ),
       call. = FALSE
     )
   }
   if (nchar(evidence_clean) < 10) {
     warning(
-      "Evidence description is very short (< 10 characters). Consider providing more detail.",
+      paste(
+        "Evidence description is very short (< 10 characters).",
+        "Consider providing more detail."
+      ),
       call. = FALSE
     )
   }
 
-  # Auto-suggest theory using external mappings
   auto_suggested_theory <- FALSE
   theory_confidence <- 1.0
 
@@ -116,7 +126,7 @@ bid_notice <- function(
     )
     auto_suggested_theory <- TRUE
 
-    # Get confidence score for the suggested theory
+    # get confidence score
     default_mappings <- load_theory_mappings()
     matching_row <- default_mappings[default_mappings$theory == theory, ]
     if (nrow(matching_row) > 0) {
@@ -132,7 +142,6 @@ bid_notice <- function(
     ))
   }
 
-  # Generate enhanced suggestions
   suggestions <- generate_notice_suggestions(
     problem_clean,
     theory,
@@ -140,18 +149,18 @@ bid_notice <- function(
     target_audience
   )
 
-  # Create result tibble with cleaned inputs
+  # create result tibble
   result_data <- tibble::tibble(
     stage = "Notice",
-    problem = problem, # Use original problem to preserve exact string
+    problem = problem, # use original problem to preserve exact string
     theory = theory %||% NA_character_,
-    evidence = evidence, # Use original evidence to preserve exact string
+    evidence = evidence, # use original evidence to preserve exact string
     target_audience = target_audience %||% NA_character_,
     suggestions = suggestions,
     timestamp = Sys.time()
   )
 
-  # Create comprehensive metadata
+  # create comprehensive metadata
   metadata <- list(
     auto_suggested_theory = auto_suggested_theory,
     theory_confidence = theory_confidence,
@@ -164,10 +173,10 @@ bid_notice <- function(
     custom_mappings_used = FALSE
   )
 
-  # Create and validate bid_stage object
+  # create and validate bid_stage object
   result <- bid_stage("Notice", result_data, metadata)
 
-  # Enhanced user feedback with progress tracking
+  # enhanced user feedback with progress tracking
   bid_message(
     "Stage 1 (Notice) completed. (20% complete)",
     paste0("Problem: ", truncate_text(problem_clean, 60)),
@@ -201,22 +210,31 @@ generate_notice_suggestions <- function(
     target_audience) {
   suggestions <- character(0)
 
-  # Theory-specific suggestions
+  # theory-specific suggestions
   if (!is.null(theory) && !is.na(theory)) {
     if (theory == "Cognitive Load Theory") {
       suggestions <- c(
         suggestions,
-        "Consider conducting cognitive load assessment to measure mental effort required"
+        paste(
+          "Consider conducting cognitive load assessment to measure mental",
+          "effort required"
+        )
       )
     } else if (theory == "Hick's Law") {
       suggestions <- c(
         suggestions,
-        "Measure decision time and number of choices to validate Hick's Law application"
+        paste(
+          "Measure decision time and number of choices to validate Hick's Law",
+          "application"
+        )
       )
     } else if (theory == "Visual Hierarchies") {
       suggestions <- c(
         suggestions,
-        "Conduct eye-tracking or attention mapping to understand visual processing patterns"
+        paste(
+          "Conduct eye-tracking or attention mapping to understand visual",
+          "processing patterns"
+        )
       )
     } else if (theory == "Information Scent") {
       suggestions <- c(
@@ -236,24 +254,30 @@ generate_notice_suggestions <- function(
     }
   }
 
-  # Evidence quality suggestions
+  # evidence quality suggestions
   if (!is.null(evidence) && !is.na(evidence)) {
     evidence_lower <- tolower(evidence)
     if (!grepl("\\d", evidence)) {
       suggestions <- c(
         suggestions,
-        "Consider adding quantitative metrics to strengthen evidence (e.g., completion rates, time on task)"
+        paste(
+          "Consider adding quantitative metrics to strengthen evidence",
+          "(e.g., completion rates, time on task)"
+        )
       )
     }
     if (!grepl("test|study|research|data|metric", evidence_lower)) {
       suggestions <- c(
         suggestions,
-        "Consider conducting formal user testing or collecting analytics data to support observations"
+        paste(
+          "Consider conducting formal user testing or collecting analytics",
+          "data to support observations"
+        )
       )
     }
   }
 
-  # Target audience suggestions
+  # target audience suggestions
   if (is.null(target_audience) || is.na(target_audience)) {
     suggestions <- c(
       suggestions,
@@ -264,7 +288,10 @@ generate_notice_suggestions <- function(
     if (grepl("varying|different|mixed", audience_lower)) {
       suggestions <- c(
         suggestions,
-        "Consider creating user personas for different skill levels within your audience"
+        paste(
+          "Consider creating user personas for different skill levels within",
+          "your audience"
+        )
       )
     }
   }
@@ -274,32 +301,47 @@ generate_notice_suggestions <- function(
   if (grepl("users struggle|difficult|hard|confus", problem_lower)) {
     suggestions <- c(
       suggestions,
-      "Consider conducting task analysis to understand specific struggle points and failure modes"
+      paste(
+        "Consider conducting task analysis to understand specific struggle",
+        "points and failure modes"
+      )
     )
   }
   if (grepl("slow|delay|time|performance", problem_lower)) {
     suggestions <- c(
       suggestions,
-      "Measure task completion times and identify specific performance bottlenecks"
+      paste(
+        "Measure task completion times and identify specific performance",
+        "bottlenecks"
+      )
     )
   }
   if (grepl("mobile|phone|tablet|touch", problem_lower)) {
     suggestions <- c(
       suggestions,
-      "Ensure mobile-specific usability testing and consider touch interaction patterns"
+      paste(
+        "Ensure mobile-specific usability testing and consider touch",
+        "interaction patterns"
+      )
     )
   }
   if (grepl("too many|overwhelm|choice|option", problem_lower)) {
     suggestions <- c(
       suggestions,
-      "Consider progressive disclosure or categorization to reduce choice complexity"
+      paste(
+        "Consider progressive disclosure or categorization to reduce choice",
+        "complexity"
+      )
     )
   }
 
   # Default suggestion if none generated
   if (length(suggestions) == 0) {
     suggestions <- c(
-      "Problem clearly identified. Consider gathering additional quantitative evidence.",
+      paste(
+        "Problem clearly identified. Consider gathering additional",
+        "quantitative evidence."
+      ),
       "Move to bid_interpret() to develop central question and data story."
     )
   }
@@ -307,11 +349,15 @@ generate_notice_suggestions <- function(
   return(paste(suggestions, collapse = " "))
 }
 
-# Legacy function name support for backward compatibility
+# legacy function name support for backward compatibility
 suggest_theory_from_problem <- function(problem, evidence = NULL) {
   .Deprecated(
     "suggest_theory_from_mappings",
-    msg = "suggest_theory_from_problem is deprecated. Use suggest_theory_from_mappings instead."
+    msg = paste(
+      "suggest_theory_from_problem is deprecated.",
+      "Use suggest_theory_from_mappings instead."
+    )
   )
+  
   suggest_theory_from_mappings(problem, evidence, mappings = NULL)
 }

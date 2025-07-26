@@ -1,5 +1,3 @@
-# Functions for loading and using external knowledge base mappings
-
 #' Load theory mappings from external file or use defaults
 #'
 #' @param custom_mappings Optional custom mappings data frame
@@ -80,12 +78,12 @@ suggest_theory_from_mappings <- function(
     problem,
     evidence = NULL,
     mappings = NULL) {
-  # If no problem text, fall back to Cognitive Load Theory
+  # if no problem text, fall back to Cognitive Load Theory
   if (is.null(problem) || is.na(problem) || nchar(trimws(problem)) == 0) {
     return("Cognitive Load Theory")
   }
 
-  # Combine any user‐provided mappings with the built‐in defaults
+  # combine any user‐provided mappings with the built‐in defaults
   default_mappings <- get_default_theory_mappings()
   if (!is.null(mappings)) {
     # validate that 'mappings' has the required columns
@@ -100,7 +98,7 @@ suggest_theory_from_mappings <- function(
     # put user rows first so they take precedence
     theory_mappings <- rbind(mappings, default_mappings)
   } else {
-    # no custom mappings parameter: attempt to load from extdata CSV
+    # no custom mappings parameter: attempt to load from extdata csv
     theory_mappings <- load_theory_mappings(NULL)
   }
 
@@ -112,9 +110,9 @@ suggest_theory_from_mappings <- function(
   for (i in seq_len(nrow(theory_mappings))) {
     k <- theory_mappings$keywords[i]
 
-    # Determine whether to treat 'k' as regex or as a literal token
+    # determine whether to treat 'k' as regex or as a literal token
     if (!is.null(mappings)) {
-      # If user passed mappings, check if 'k' contains regex metacharacters
+      # if user passed mappings, check if 'k' contains regex metacharacters
       if (grepl("[\\.\\*\\+\\?\\^\\$\\(\\)\\[\\]\\{\\}\\|\\\\]", k)) {
         found_i <- grepl(k, combined_text, perl = TRUE)
       } else {
@@ -245,6 +243,7 @@ load_layout_mappings <- function(custom_mappings = NULL) {
     "layout_concepts.csv",
     package = "bidux"
   )
+
   if (file.exists(mappings_file)) {
     tryCatch(
       {
@@ -374,7 +373,10 @@ get_accessibility_recommendations <- function(context = "", guidelines = NULL) {
 
   if (nrow(accessibility_guidelines) == 0) {
     return(
-      "Consider basic accessibility: color contrast, keyboard navigation, screen reader support"
+      paste(
+        "Consider basic accessibility: color contrast, keyboard navigation,",
+        "screen reader support"
+      )
     )
   }
 

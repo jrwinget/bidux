@@ -1,7 +1,4 @@
-# Functions to create BID Notice stages from telemetry findings
-
-# Import null coalescing operator
-`%||%` <- function(x, y) if (is.null(x)) y else x
+`%||%` <- rlang::`%||%`
 
 #' Create notice stage for unused input
 #' @param input_info List with input usage information
@@ -30,7 +27,7 @@ create_unused_input_notice <- function(input_info, total_sessions) {
     )
   }
 
-  # Call bid_notice to create the stage with auto-suggested theory
+  # create notice stage with auto-suggested theory
   notice <- bid_notice(
     problem = problem,
     evidence = evidence,
@@ -101,7 +98,6 @@ create_delay_notice <- function(delay_info, total_sessions, threshold) {
 create_error_notice <- function(error_info, total_sessions) {
   problem <- "Users encounter errors when using the dashboard"
 
-  # Build evidence string
   evidence_parts <- sprintf(
     "Error '%s' occurred %d times in %.0f%% of sessions",
     truncate_text(error_info$error_message %||% "Unknown error", 50),

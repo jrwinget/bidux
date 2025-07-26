@@ -394,6 +394,8 @@ Check out the vignettes for more information:
   examples
 - `vignette("concepts-reference")` - Detailed guide to implementing key
   concepts
+- `vignette("telemetry-integration")` - Example of integrating telemetry
+  data into the BID process
 
 Visit the [package website](https://jrwinget.github.io/bidux/) for
 complete documentation and examples.

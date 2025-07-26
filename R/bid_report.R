@@ -57,13 +57,19 @@ bid_report <- function(
       if (!("stage" %in% names(validate_stage))) {
         cli::cli_abort(c(
           "x" = "Invalid input: validate_stage must contain a 'stage' column",
-          "i" = "Available columns: {.field {paste(names(validate_stage), collapse = ', ')}}"
+          "i" = paste(
+            "Available columns: {.field {paste(names(validate_stage),",
+            "collapse = ', ')}}"
+          )
         ))
       }
 
       if (validate_stage$stage[1] != "Validate") {
         cli::cli_abort(c(
-          "x" = "Invalid input: validate_stage must be the result from bid_validate()",
+          "x" = paste(
+            "Invalid input: validate_stage must be the result from",
+            "bid_validate()"
+          ),
           "i" = "Current stage: {.val {validate_stage$stage[1]}}",
           "i" = "Use the output from bid_validate() as input to this function"
         ))
@@ -292,7 +298,10 @@ generate_text_report <- function(validate_stage, format, include_diagrams) {
   report <- c(report, impl_header)
   report <- c(
     report,
-    "Based on your application of the BID framework, consider these implementation tips:"
+    paste(
+      "Based on your application of the BID framework, consider these",
+      "implementation tips:"
+    )
   )
   report <- c(report, "")
 
@@ -304,7 +313,7 @@ generate_text_report <- function(validate_stage, format, include_diagrams) {
   }
   report <- c(report, ui_header)
 
-  # Try to get component suggestions
+  # try to get component suggestions
   tryCatch(
     {
       bslib_suggestions <- bid_suggest_components(
@@ -371,7 +380,7 @@ generate_text_report <- function(validate_stage, format, include_diagrams) {
     }
   )
 
-  # Next Steps
+  # next Steps
   next_header <- if (format == "markdown") "## Next Steps" else "Next Steps"
   report <- c(report, next_header)
   report <- c(
@@ -383,7 +392,7 @@ generate_text_report <- function(validate_stage, format, include_diagrams) {
   report <- c(report, "4. Document successful patterns for future projects")
   report <- c(report, "")
 
-  # Learning Resources
+  # learning Resources
   learn_header <- if (format == "markdown") {
     "## Learning Resources"
   } else {
@@ -404,9 +413,9 @@ generate_text_report <- function(validate_stage, format, include_diagrams) {
     "- Check the package documentation at https://github.com/jrwinget/bidux"
   )
 
-  # Format output
+  # format output
   if (format == "text") {
-    # Remove markdown formatting for plain text
+    # remove markdown formatting for plain text
     text_report <- gsub("^#+\\s*", "", report)
     text_report <- gsub("\\*\\*([^*]+)\\*\\*", "\\1", text_report)
     return(paste(text_report, collapse = "\n"))
@@ -415,9 +424,9 @@ generate_text_report <- function(validate_stage, format, include_diagrams) {
   }
 }
 
-# Generate HTML report directly (no markdown conversion)
+# generate HTML report directly (no markdown conversion)
 generate_html_report_direct <- function(validate_stage, include_diagrams) {
-  # Helper function to safely extract data
+  # helper function to safely extract data
   safe_extract <- function(data, field, default = "Not specified") {
     if (field %in% names(data) && length(data[[field]]) > 0) {
       value <- data[[field]][1]
@@ -432,18 +441,17 @@ generate_html_report_direct <- function(validate_stage, include_diagrams) {
     return(default)
   }
 
-  # Helper function to generate HTML lists
+  # helper function to generate HTML lists
   generate_html_list <- function(items, default_text = "None specified") {
     if (is.null(items) || length(items) == 0) {
       return(paste0("<ul><li>", default_text, "</li></ul>"))
     }
 
     if (is.character(items) && length(items) > 0) {
-      # Handle semicolon-separated strings
+      # handle semicolon-separated strings
       if (length(items) == 1 && grepl(";", items)) {
         items <- unlist(strsplit(items, ";"))
       }
-      # Filter out empty strings
       items <- trimws(items)
       items <- items[items != "" & !is.na(items)]
       if (length(items) == 0) {
@@ -586,7 +594,7 @@ generate_html_report_direct <- function(validate_stage, include_diagrams) {
   }
   '
 
-  # Build HTML content directly
+  # build HTML content directly
   html_body <- paste0(
     "<h1>BID Framework Implementation Report</h1>",
     "<p>Generated: ",
@@ -594,7 +602,7 @@ generate_html_report_direct <- function(validate_stage, include_diagrams) {
     "</p>"
   )
 
-  # BID Framework Overview with diagram
+  # BID framework overview with diagram
   if (include_diagrams) {
     html_body <- paste0(
       html_body,

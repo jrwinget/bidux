@@ -283,20 +283,34 @@ bid_interpret <- function(
   if (story_completeness < 0.5) {
     missing_elements <- required_story_elements[!provided_elements]
     story_suggestion <- cli::format_inline(
-      "Your data story is incomplete ({round(story_completeness * 100)}%). Consider adding these missing elements: {paste(missing_elements, collapse = ', ')}."
+      paste(
+        "Your data story is incomplete ({round(story_completeness * 100)}%).",
+        "Consider adding these missing elements:",
+        "{paste(missing_elements, collapse = ', ')}."
+      )
     )
   } else if (story_completeness < 0.75) {
     missing_elements <- required_story_elements[!provided_elements]
     story_suggestion <- cli::format_inline(
-      "Your data story is taking shape ({round(story_completeness * 100)}%). Consider adding: {paste(missing_elements, collapse = ', ')}."
+      paste(
+        "Your data story is taking shape ({round(story_completeness * 100)}%).",
+        "Consider adding: {paste(missing_elements, collapse = ', ')}."
+      )
     )
   } else if (story_completeness < 1) {
     missing_elements <- required_story_elements[!provided_elements]
     story_suggestion <- cli::format_inline(
-      "Your data story is almost complete ({round(story_completeness * 100)}%). Consider adding: {paste(missing_elements, collapse = ', ')}."
+      paste(
+        "Your data story is almost complete",
+        "({round(story_completeness * 100)}%). Consider adding:",
+        "{paste(missing_elements, collapse = ', ')}."
+      )
     )
   } else {
-    story_suggestion <- "Your data story has all key elements. Focus on making each component compelling and relevant."
+    story_suggestion <- paste(
+      "Your data story has all key elements. Focus on making each component",
+      "compelling and relevant."
+    )
   }
 
   question_suggestion <- if (
@@ -315,15 +329,16 @@ bid_interpret <- function(
   if (is.null(user_personas)) {
     audience <- NULL
 
-    # try to get audience from data_story
     if (
+      # try to get audience from data_story
       !is.null(data_story) &&
         "audience" %in% names(data_story) &&
         !is.na(data_story$audience)
     ) {
       audience <- data_story$audience
-    } # try to get audience from previous_stage
+    }
     else if (
+      # try to get audience from previous_stage
       previous_stage$stage[1] == "Notice" &&
         "target_audience" %in% names(previous_stage) &&
         !is.na(previous_stage$target_audience[1])
@@ -548,7 +563,11 @@ bid_interpret <- function(
 safe_data_story_access <- function(data_story, element) {
   if (!is.null(data_story) && element %in% names(data_story)) {
     value <- data_story[[element]]
-    if (!is.null(value) && !is.na(value) && nchar(trimws(as.character(value))) > 0) {
+    if (
+      !is.null(value) &&
+        !is.na(value) &&
+        nchar(trimws(as.character(value))) > 0
+    ) {
       return(as.character(value))
     }
   }
