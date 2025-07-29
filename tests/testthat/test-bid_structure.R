@@ -21,20 +21,20 @@ test_that("bid_structure returns a bid_stage object with stage 'Structure'", {
       )
     }
   )
-  
+
   previous_stage <- tibble(
     stage = "Interpret",
     problem = "The dashboard layout is cluttered.",
     theory = "Visual Hierarchies",
     evidence = "User feedback indicates confusion."
   )
-  
+
   result <- bid_structure(
     previous_stage,
     layout = "dual_process",
     concepts = c("Test Concept")
   )
-  
+
   expect_s3_class(result, "bid_stage")
   expect_equal(result$stage[1], "Structure")
   expect_equal(result$layout[1], "dual_process")

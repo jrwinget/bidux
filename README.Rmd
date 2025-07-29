@@ -61,7 +61,7 @@ library(bidux)
 notice_result <- bid_notice(
   problem = "Users can't find the most important metrics",
   evidence = "User testing showed 70% of users spending >30s looking for key metrics",
-  theory = "Visual Hierarchies",  # Optional - will be suggested if omitted
+  theory = "Visual Hierarchies", # Optional - will be suggested if omitted
   target_audience = "Data analysts with varying technical skills"
 )
 
@@ -91,7 +91,7 @@ interpret_result <- bid_interpret(
 # Stage 3: Structure the Dashboard
 structure_result <- bid_structure(
   previous_stage = interpret_result,
-  layout = "dual_process",  # Options: dual_process, grid, card, tabs, breathable
+  layout = "dual_process", # Options: dual_process, grid, card, tabs, breathable
   concepts = c("principle_of_proximity", "default_effect", "breathable_layouts"),
   accessibility = list(
     color_contrast = "WCAG AA compliant",
@@ -231,6 +231,7 @@ Check out the vignettes for more information:
 * `vignette("introduction-to-bid")` - Overview of the BID framework
 * `vignette("getting-started")` - Quick start guide with implementation examples
 * `vignette("concepts-reference")` - Detailed guide to implementing key concepts
+* `vignette("telemetry-integration")` - Example of integrating telemetry data into the BID process
 
 Visit the [package website](https://jrwinget.github.io/bidux/) for complete documentation and examples.
 

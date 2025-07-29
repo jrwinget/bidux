@@ -13,9 +13,11 @@ bid_notice(problem, theory = NULL, evidence = NULL, target_audience = NULL)
 explain the problem. If NULL, will be auto-suggested using external
 theory mappings.}
 
-\item{evidence}{A character string describing evidence supporting the problem.}
+\item{evidence}{A character string describing evidence supporting the
+problem.}
 
-\item{target_audience}{Optional character string describing the target audience.}
+\item{target_audience}{Optional character string describing the target
+audience.}
 }
 \value{
 A bid_stage object containing the documented information for the
@@ -24,12 +26,13 @@ A bid_stage object containing the documented information for the
 \description{
 This function documents the initial observation and problem identification
 stage. It represents stage 1 in the BID framework and now returns a
-structured bid_stage object with enhanced metadata and external mapping support.
+structured bid_stage object with enhanced metadata and external mapping
+support.
 }
 \examples{
 # Basic usage with auto-suggested theory
 notice_result <- bid_notice(
-  problem = "Users struggle with complex dropdown menus containing too many options",
+  problem = "Users struggling with complex dropdowns and too many options",
   evidence = "User testing shows 65\% abandonment rate on filter selection"
 )
 

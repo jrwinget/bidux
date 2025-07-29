@@ -73,7 +73,7 @@ test_that("bid_validate allows optional parameters", {
   # Should not error when only summary_panel is provided
   expect_no_error(
     bid_validate(
-      previous_stage = anticipate_result, 
+      previous_stage = anticipate_result,
       summary_panel = "Test"
     )
   )
@@ -81,7 +81,7 @@ test_that("bid_validate allows optional parameters", {
   # Should not error when only collaboration is provided
   expect_no_error(
     bid_validate(
-      previous_stage = anticipate_result, 
+      previous_stage = anticipate_result,
       collaboration = "Test"
     )
   )
@@ -116,7 +116,7 @@ test_that("bid_validate provides contextual suggestions", {
     summary_panel = "Dashboard improved",
     collaboration = "Added team features"
   )
-  
+
   # Check that suggestions are contextual (not specific patterns)
   expect_true(nchar(result$suggestions) > 0)
   expect_type(result$suggestions, "character")
