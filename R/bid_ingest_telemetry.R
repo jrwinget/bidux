@@ -293,69 +293,86 @@ read_telemetry_json <- function(path) {
     cli::cli_abort("Package 'jsonlite' is required to read JSON telemetry data")
   }
 
-  tryCatch(
-    {
-      lines <- readLines(path, warn = FALSE)
-      lines <- lines[nchar(trimws(lines)) > 0]
+  tryCatch({
+    # try to read as JSON lines (one JSON object per line)
+    lines <- readLines(path, warn = FALSE)
+    lines <- lines[nchar(trimws(lines)) > 0]
 
-      if (length(lines) == 0) {
-        return(data.frame(
-          timestamp = character(),
-          session_id = character(),
-          event_type = character(),
-          stringsAsFactors = FALSE
-        ))
-      }
-
-      if (substr(trimws(lines[1]), 1, 1) == "[") {
-        events <- jsonlite::fromJSON(
-          paste(lines, collapse = "\n"),
-          flatten = TRUE
-        )
-      } else {
-        events_list <- lapply(lines, function(line) {
-          tryCatch(
-            jsonlite::fromJSON(line, flatten = TRUE),
-            error = function(e) NULL
-          )
-        })
-
-        events_list <- events_list[!sapply(events_list, is.null)]
-
-        if (length(events_list) == 0) {
-          return(data.frame(
-            timestamp = character(),
-            session_id = character(),
-            event_type = character(),
-            stringsAsFactors = FALSE
-          ))
-        }
-
-        events <- dplyr::bind_rows(events_list)
-      }
-
-      if (!is.data.frame(events)) {
-        events <- as.data.frame(events)
-      }
-
-      # if empty, return empty data frame with required columns
-      if (nrow(events) == 0) {
-        return(data.frame(
-          timestamp = character(),
-          session_id = character(),
-          event_type = character(),
-          stringsAsFactors = FALSE
-        ))
-      }
-
-      events <- normalize_telemetry_columns(events)
-
-      return(events)
-    },
-    error = function(e) {
-      cli::cli_abort("Error reading JSON file: {e$message}")
+    if (length(lines) == 0) {
+      return(data.frame(
+        timestamp = character(),
+        session_id = character(),
+        event_type = character(),
+        stringsAsFactors = FALSE
+      ))
     }
-  )
+
+    # check if JSON array
+    if (substr(trimws(lines[1]), 1, 1) == "[") {
+      # if TRUE, parse as whole
+      events <- jsonlite::fromJSON(
+        paste(lines, collapse = "\n"),
+        flatten = TRUE
+      )
+    } else {
+      # if FALSE, try to parse each line as JSON
+      events_list <- lapply(lines, function(line) {
+        tryCatch(
+          jsonlite::fromJSON(line, flatten = TRUE),
+          error = function(e) NULL
+        )
+      })
+
+      events_list <- events_list[!sapply(events_list, is.null)]
+
+      if (length(events_list) == 0) {
+        return(data.frame(
+          timestamp = character(),
+          session_id = character(),
+          event_type = character(),
+          stringsAsFactors = FALSE
+        ))
+      }
+
+      # filter out events that don't have required fields
+      required_fields <- c("timestamp", "session_id", "event_type")
+      valid_events <- lapply(events_list, function(event) {
+        if (is.list(event) && all(required_fields %in% names(event))) {
+          return(event)
+        }
+        return(NULL)
+      })
+
+      valid_events <- valid_events[!sapply(valid_events, is.null)]
+
+      if (length(valid_events) == 0) {
+        cli::cli_abort("No valid events found in JSON file")
+      }
+
+      events <- dplyr::bind_rows(valid_events)
+    }
+
+    if (!is.data.frame(events)) {
+      events <- as.data.frame(events)
+    }
+
+    # if empty, return empty data frame with req columns
+    if (nrow(events) == 0) {
+      return(data.frame(
+        timestamp = character(),
+        session_id = character(),
+        event_type = character(),
+        stringsAsFactors = FALSE
+      ))
+    }
+    
+    # normalize column names
+    events <- normalize_telemetry_columns(events)
+
+    return(events)
+  }, error = function(e) {
+    cli::cli_abort("Error reading JSON file: {e$message}")
+  })
 }
 
 #' Normalize telemetry column names
@@ -363,9 +380,16 @@ read_telemetry_json <- function(path) {
 #' @return Normalized data frame
 #' @keywords internal
 normalize_telemetry_columns <- function(events) {
-  required_cols <- c("timestamp", "session_id", "event_type")
+  if (is.list(events) && !is.data.frame(events)) {
+    # case where events is still a list
+    events <- dplyr::bind_rows(events)
+  }
 
-  # common column name mappings
+  if (!is.data.frame(events)) {
+    cli::cli_abort("Events must be a data frame")
+  }
+
+  # common name mappings
   col_mappings <- list(
     timestamp = c("timestamp", "time", "datetime", "created_at"),
     session_id = c("session_id", "session", "sessionid", "session_token"),
@@ -377,6 +401,7 @@ normalize_telemetry_columns <- function(events) {
     navigation_id = c("navigation_id", "page", "tab", "panel")
   )
 
+  # normalize column names
   for (target_col in names(col_mappings)) {
     if (!target_col %in% names(events)) {
       for (alt_name in col_mappings[[target_col]]) {
@@ -388,8 +413,25 @@ normalize_telemetry_columns <- function(events) {
     }
   }
 
-  missing_cols <- setdiff(required_cols, names(events))
-  if (length(missing_cols) > 0) {
+  # req columns
+  required_cols <- c("timestamp", "session_id", "event_type")
+
+  if (all(required_cols %in% names(events))) {
+    valid_rows <- complete.cases(events[, required_cols])
+
+    for (col in required_cols) {
+      if (is.character(events[[col]])) {
+        valid_rows <- valid_rows & nchar(trimws(events[[col]])) > 0
+      }
+    }
+
+    events <- events[valid_rows, ]
+
+    if (nrow(events) == 0) {
+      cli::cli_abort("No valid events found after filtering")
+    }
+  } else {
+    missing_cols <- setdiff(required_cols, names(events))
     cli::cli_abort(
       "Required columns missing from telemetry data: {missing_cols}"
     )

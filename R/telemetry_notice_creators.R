@@ -1,4 +1,4 @@
-`%||%` <- rlang::`%||%`
+`%||%` <- function(x, y) if (is.null(x)) y else x
 
 #' Create notice stage for unused input
 #' @param input_info List with input usage information
