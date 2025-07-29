@@ -44,6 +44,7 @@
 <li><a class="dropdown-item" href="articles/concepts-reference.html">BID Framework Concepts: Practical Implementation</a></li>
     <li><a class="dropdown-item" href="articles/getting-started.html">Getting Started with bidux</a></li>
     <li><a class="dropdown-item" href="articles/introduction-to-bid.html">introduction-to-bid</a></li>
+    <li><a class="dropdown-item" href="articles/telemetry-integration.html">Integrating shiny.telemetry with BIDUX</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
@@ -103,7 +104,7 @@
 <span><span class="va">notice_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_notice.html">bid_notice</a></span><span class="op">(</span></span>
 <span>  problem <span class="op">=</span> <span class="st">"Users can't find the most important metrics"</span>,</span>
 <span>  evidence <span class="op">=</span> <span class="st">"User testing showed 70% of users spending &gt;30s looking for key metrics"</span>,</span>
-<span>  theory <span class="op">=</span> <span class="st">"Visual Hierarchies"</span>,  <span class="co"># Optional - will be suggested if omitted</span></span>
+<span>  theory <span class="op">=</span> <span class="st">"Visual Hierarchies"</span>, <span class="co"># Optional - will be suggested if omitted</span></span>
 <span>  target_audience <span class="op">=</span> <span class="st">"Data analysts with varying technical skills"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Stage 1 (Notice) completed. (20% complete)</span></span>
@@ -143,7 +144,7 @@
 <span><span class="co"># Stage 3: Structure the Dashboard</span></span>
 <span><span class="va">structure_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_structure.html">bid_structure</a></span><span class="op">(</span></span>
 <span>  previous_stage <span class="op">=</span> <span class="va">interpret_result</span>,</span>
-<span>  layout <span class="op">=</span> <span class="st">"dual_process"</span>,  <span class="co"># Options: dual_process, grid, card, tabs, breathable</span></span>
+<span>  layout <span class="op">=</span> <span class="st">"dual_process"</span>, <span class="co"># Options: dual_process, grid, card, tabs, breathable</span></span>
 <span>  concepts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"principle_of_proximity"</span>, <span class="st">"default_effect"</span>, <span class="st">"breathable_layouts"</span><span class="op">)</span>,</span>
 <span>  accessibility <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    color_contrast <span class="op">=</span> <span class="st">"WCAG AA compliant"</span>,</span>
@@ -433,6 +434,8 @@
 <code><a href="articles/getting-started.html">vignette("getting-started")</a></code> - Quick start guide with implementation examples</li>
 <li>
 <code><a href="articles/concepts-reference.html">vignette("concepts-reference")</a></code> - Detailed guide to implementing key concepts</li>
+<li>
+<code><a href="articles/telemetry-integration.html">vignette("telemetry-integration")</a></code> - Example of integrating telemetry data into the BID process</li>
 </ul>
 <p>Visit the <a href="https://jrwinget.github.io/bidux/">package website</a> for complete documentation and examples.</p>
 </div>

@@ -23,6 +23,7 @@ refines the dashboard. It represents stage 5 in the BID framework."><meta proper
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/concepts-reference.html">BID Framework Concepts: Practical Implementation</a></li>
     <li><a class="dropdown-item" href="../articles/getting-started.html">Getting Started with bidux</a></li>
     <li><a class="dropdown-item" href="../articles/introduction-to-bid.html">introduction-to-bid</a></li>
+    <li><a class="dropdown-item" href="../articles/telemetry-integration.html">Integrating shiny.telemetry with BIDUX</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -93,10 +94,10 @@ stage.</p>
 <span class="r-in"><span>  <span class="fu"><a href="bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    central_question <span class="op">=</span> <span class="st">"How can we improve selection efficiency?"</span>,</span></span>
 <span class="r-in"><span>    data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>      hook      <span class="op">=</span> <span class="st">"Too many options"</span>,</span></span>
-<span class="r-in"><span>      context   <span class="op">=</span> <span class="st">"Excessive choices"</span>,</span></span>
-<span class="r-in"><span>      tension   <span class="op">=</span> <span class="st">"User frustration"</span>,</span></span>
-<span class="r-in"><span>      resolution<span class="op">=</span> <span class="st">"Simplify menu"</span></span></span>
+<span class="r-in"><span>      hook <span class="op">=</span> <span class="st">"Too many options"</span>,</span></span>
+<span class="r-in"><span>      context <span class="op">=</span> <span class="st">"Excessive choices"</span>,</span></span>
+<span class="r-in"><span>      tension <span class="op">=</span> <span class="st">"User frustration"</span>,</span></span>
+<span class="r-in"><span>      resolution <span class="op">=</span> <span class="st">"Simplify menu"</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Auto-suggested theory: Hick's Law (confidence: 90%)</span>
@@ -151,20 +152,12 @@ stage.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - No accessibility considerations specified </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">anticipate</span> <span class="op">&lt;-</span> <span class="fu"><a href="bid_anticipate.html">bid_anticipate</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  previous_stage    <span class="op">=</span> <span class="va">structure_result</span>,</span></span>
-<span class="r-in"><span>  bias_mitigations  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  previous_stage <span class="op">=</span> <span class="va">structure_result</span>,</span></span>
+<span class="r-in"><span>  bias_mitigations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    anchoring <span class="op">=</span> <span class="st">"Provide reference points"</span>,</span></span>
 <span class="r-in"><span>    framing   <span class="op">=</span> <span class="st">"Use gain-framed messaging"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">41</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">7</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Column specification</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Delimiter:</span> ","</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">chr</span> (7): concept, description, category, reference, example, implementation_...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Use `spec()` to retrieve the full column specification for this data.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Specify the column types or set `show_col_types = FALSE` to quiet this message.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Found 7 concept(s) matching 'bias|anchor|fram|confirm'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Automatically suggested interaction principles: progressive_disclosure, hover_effects.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">41</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">7</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Column specification</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span>
@@ -189,9 +182,9 @@ stage.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">bid_validate</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  previous_stage <span class="op">=</span> <span class="va">anticipate</span>,</span></span>
-<span class="r-in"><span>  summary_panel  <span class="op">=</span> <span class="st">"Clear summary of key insights with action items"</span>,</span></span>
-<span class="r-in"><span>  collaboration  <span class="op">=</span> <span class="st">"Team annotation and sharing features"</span>,</span></span>
-<span class="r-in"><span>  next_steps     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  summary_panel <span class="op">=</span> <span class="st">"Clear summary of key insights with action items"</span>,</span></span>
+<span class="r-in"><span>  collaboration <span class="op">=</span> <span class="st">"Team annotation and sharing features"</span>,</span></span>
+<span class="r-in"><span>  next_steps <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="st">"Conduct user testing with target audience"</span>,</span></span>
 <span class="r-in"><span>    <span class="st">"Implement accessibility improvements"</span>,</span></span>
 <span class="r-in"><span>    <span class="st">"Add mobile responsiveness"</span></span></span>

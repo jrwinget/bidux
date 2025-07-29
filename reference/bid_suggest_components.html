@@ -27,6 +27,7 @@ in the BID process."><meta property="og:image" content="https://jrwinget.github.
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/concepts-reference.html">BID Framework Concepts: Practical Implementation</a></li>
     <li><a class="dropdown-item" href="../articles/getting-started.html">Getting Started with bidux</a></li>
     <li><a class="dropdown-item" href="../articles/introduction-to-bid.html">introduction-to-bid</a></li>
+    <li><a class="dropdown-item" href="../articles/telemetry-integration.html">Integrating shiny.telemetry with BIDUX</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -77,7 +78,7 @@ are provided.</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="co"># After completing BID stages</span></span></span>
 <span class="r-in"><span>  <span class="va">notice_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="bid_notice.html">bid_notice</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    problem <span class="op">=</span> <span class="st">"Users struggle with complex data"</span>,</span></span>
