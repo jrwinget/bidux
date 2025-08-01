@@ -78,17 +78,15 @@ bid_interpret <- function(
     central_question = NULL,
     data_story = NULL,
     user_personas = NULL) {
-  validate_required_params(previous_stage = previous_stage)
-  validate_previous_stage(previous_stage, "Interpret")
-
-  if (!is.null(data_story) && !is.list(data_story)) {
-    cli::cli_abort(
-      c(
-        "The data_story parameter must be a list",
-        "i" = "You provided {.cls {class(data_story)}}"
-      )
+  # standardized parameter validation
+  validate_bid_stage_params(
+    previous_stage, 
+    "Interpret",
+    list(
+      data_story = list(value = data_story, type = "list", allow_null = TRUE),
+      central_question = list(value = central_question, type = "character", allow_null = TRUE)
     )
-  }
+  )
 
   if (!is.null(user_personas)) {
     validate_user_personas(user_personas)
@@ -96,8 +94,9 @@ bid_interpret <- function(
 
   if (is.null(central_question)) {
     if (previous_stage$stage[1] == "Notice") {
-      problem <- safe_column_access(previous_stage, "problem")
-      theory <- safe_column_access(previous_stage, "theory")
+      stage_data <- extract_stage_data(previous_stage, c("problem", "theory"))
+      problem <- stage_data$problem
+      theory <- stage_data$theory
 
       if (!is.na(problem)) {
         problem_lower <- tolower(problem)
@@ -178,10 +177,14 @@ bid_interpret <- function(
     data_story <- list()
 
     if (previous_stage$stage[1] == "Notice") {
-      problem <- safe_column_access(previous_stage, "problem")
-      theory <- safe_column_access(previous_stage, "theory")
-      evidence <- safe_column_access(previous_stage, "evidence")
-      target_audience <- safe_column_access(previous_stage, "target_audience")
+      stage_data <- extract_stage_data(
+        previous_stage, 
+        c("problem", "theory", "evidence", "target_audience")
+      )
+      problem <- stage_data$problem
+      theory <- stage_data$theory
+      evidence <- stage_data$evidence
+      target_audience <- stage_data$target_audience
 
       if (!is.na(problem)) {
         # hook
@@ -526,15 +529,13 @@ bid_interpret <- function(
     timestamp = Sys.time()
   )
 
-  metadata <- list(
-    stage_number = 2,
-    total_stages = 5,
+  metadata <- get_stage_metadata(2, list(
     has_central_question = !is.null(central_question),
     story_completeness = story_completeness,
     personas_count = if (!is.null(user_personas)) length(user_personas) else 0,
     auto_generated_question = is.null(central_question),
     auto_generated_story = is.null(data_story)
-  )
+  ))
 
   result <- bid_stage("Interpret", result_data, metadata)
 

@@ -3,8 +3,8 @@ test_that("bid_interpret returns a tibble with stage 'Interpret'", {
     validate_required_params = function(...) invisible(TRUE),
     validate_previous_stage = function(...) invisible(TRUE),
     bid_message = function(...) invisible(NULL),
-    safe_column_access = function(data, column) {
-      if (column %in% names(data)) data[[column]][1] else NA_character_
+    safe_column_access = function(df, column_name, default = NA) {
+      if (column_name %in% names(df)) df[[column_name]][1] else default
     },
     bid_stage = function(stage_name, data, metadata) {
       attr(data, "class") <- c("bid_stage", class(data))
@@ -70,7 +70,7 @@ test_that("bid_interpret errors when data_story is not a list", {
 
   expect_error(
     bid_interpret(previous_stage, data_story = "not a list"),
-    regexp = "The data_story parameter must be a list"
+    regexp = "'data_story' must be a list"
   )
 })
 

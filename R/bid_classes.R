@@ -112,6 +112,17 @@ get_metadata <- function(x) {
 #'         output.
 #' @export
 print.bid_stage <- function(x, ...) {
+  print_stage_header(x)
+  print_stage_content(x)
+  print_stage_footer(x)
+  invisible(x)
+}
+
+#' Print stage header with progress information
+#' @param x A bid_stage object
+#' @keywords internal
+#' @noRd
+print_stage_header <- function(x) {
   stage <- attr(x, "stage")
   created <- attr(x, "created")
   metadata <- attr(x, "metadata")
@@ -124,121 +135,213 @@ print.bid_stage <- function(x, ...) {
   )
   cat("Generated:", format(created, "%Y-%m-%d %H:%M:%S"), "\n")
 
-  # Add metadata info if available
-  if (!is.null(metadata) && length(metadata) > 0) {
-    if (!is.null(metadata$stage_number) && !is.null(metadata$total_stages)) {
-      progress <- round((metadata$stage_number / metadata$total_stages) * 100)
-      cat(
-        "Progress:",
-        progress,
-        "%",
-        paste0("(", metadata$stage_number, "/", metadata$total_stages, ")"),
-        "\n"
-      )
-    }
+  # progress information
+  if (!is.null(metadata$stage_number) && !is.null(metadata$total_stages)) {
+    progress <- round((metadata$stage_number / metadata$total_stages) * 100)
+    cat(
+      "Progress:",
+      progress,
+      "%",
+      paste0("(", metadata$stage_number, "/", metadata$total_stages, ")"),
+      "\n"
+    )
   }
-
   cat("\n")
+}
 
-  # Print key information based on stage
-  if (stage == "Notice") {
-    cat(cli::style_bold("Problem:"), x$problem[1], "\n")
-    if (!is.na(x$theory[1])) {
-      theory_text <- x$theory[1]
-      if (
-        !is.null(metadata$auto_suggested_theory) &&
-          metadata$auto_suggested_theory
-      ) {
-        theory_text <- paste0(
-          theory_text,
-          " ",
-          cli::style_italic("(auto-suggested)")
-        )
-      }
-      cat(cli::style_bold("Theory:"), theory_text, "\n")
-    }
-    if (!is.na(x$evidence[1])) {
-      cat(cli::style_bold("Evidence:"), x$evidence[1], "\n")
-    }
-    if (!is.na(x$target_audience[1])) {
-      cat(cli::style_bold("Target Audience:"), x$target_audience[1], "\n")
-    }
-  } else if (stage == "Interpret") {
-    cat(cli::style_bold("Central Question:"), x$central_question[1], "\n")
-    if (!is.na(x$hook[1])) {
-      cat(cli::style_bold("Story Hook:"), x$hook[1], "\n")
-    }
-    if (!is.null(metadata$story_completeness)) {
-      completeness <- round(metadata$story_completeness * 100)
-      cat(
-        cli::style_bold("Story Completeness:"),
-        paste0(completeness, "%"),
-        "\n"
-      )
-    }
-    if (!is.null(metadata$personas_count) && metadata$personas_count > 0) {
-      cat(
-        cli::style_bold("User Personas:"),
-        metadata$personas_count,
-        "defined\n"
-      )
-    }
-  } else if (stage == "Structure") {
-    cat(cli::style_bold("Layout:"), x$layout[1], "\n")
-    if (!is.na(x$concepts[1])) {
-      concepts_list <- strsplit(x$concepts[1], ",")[[1]]
-      cat(
-        cli::style_bold("Concepts:"),
-        paste(trimws(concepts_list), collapse = ", "),
-        "\n"
-      )
-    }
-    if (!is.na(x$accessibility[1]) && x$accessibility[1] != "NA") {
-      cat(cli::style_bold("Accessibility:"), "Guidelines defined\n")
-    }
-  } else if (stage == "Anticipate") {
-    if (!is.na(x$bias_mitigations[1])) {
-      bias_items <- strsplit(x$bias_mitigations[1], ";")[[1]]
-      bias_count <- length(bias_items)
-      cat(
-        cli::style_bold("Bias Mitigations:"),
-        bias_count,
-        "strategies defined\n"
-      )
-    }
-    if (
-      !is.na(x$interaction_principles[1]) && x$interaction_principles[1] != "NA"
-    ) {
-      cat(cli::style_bold("Interaction Principles:"), "Defined\n")
-    }
-  } else if (stage == "Validate") {
-    if (!is.na(x$summary_panel[1])) {
-      cat(
-        cli::style_bold("Summary Panel:"),
-        truncate_text(x$summary_panel[1], 60),
-        "\n"
-      )
-    }
-    if (!is.na(x$next_steps[1])) {
-      steps_list <- strsplit(x$next_steps[1], ";")[[1]]
-      steps_count <- length(steps_list)
-      cat(cli::style_bold("Next Steps:"), steps_count, "items defined\n")
-    }
-    if (!is.na(x$collaboration[1])) {
-      cat(
-        cli::style_bold("Collaboration:"),
-        truncate_text(x$collaboration[1], 60),
-        "\n"
-      )
+#' Print stage-specific content
+#' @param x A bid_stage object
+#' @keywords internal
+#' @noRd
+print_stage_content <- function(x) {
+  stage <- attr(x, "stage")
+  metadata <- attr(x, "metadata")
+  
+  # get stage-specific display rules
+  display_rules <- get_stage_display_rules()[[stage]]
+  
+  if (!is.null(display_rules)) {
+    for (rule in display_rules) {
+      print_stage_field(x, rule$field, rule$label, rule$format_fn, metadata)
     }
   }
+}
 
+#' Print stage footer with suggestions
+#' @param x A bid_stage object
+#' @keywords internal
+#' @noRd
+print_stage_footer <- function(x) {
   if (!is.na(x$suggestions[1])) {
     cat("\n", cli::style_italic("Suggestions:"), x$suggestions[1], "\n")
   }
-
   cat("\n", cli::style_dim("Use summary() for detailed information"), "\n")
-  invisible(x)
+}
+
+#' Print individual stage field
+#' @param x A bid_stage object
+#' @param field Field name to print
+#' @param label Display label
+#' @param format_fn Optional formatting function
+#' @param metadata Stage metadata
+#' @keywords internal
+#' @noRd
+print_stage_field <- function(x, field, label, format_fn = NULL, metadata = NULL) {
+  if (field %in% names(x) && !is.na(x[[field]][1])) {
+    value <- x[[field]][1]
+    
+    if (!is.null(format_fn)) {
+      value <- format_fn(value, metadata)
+    }
+    
+    cat(cli::style_bold(paste0(label, ":")), value, "\n")
+  }
+}
+
+#' Get display rules for each stage
+#' @return List of display rules by stage
+#' @keywords internal
+#' @noRd
+get_stage_display_rules <- function() {
+  list(
+    Notice = list(
+      list(field = "problem", label = "Problem"),
+      list(field = "theory", label = "Theory", format_fn = format_theory_field),
+      list(field = "evidence", label = "Evidence"),
+      list(field = "target_audience", label = "Target Audience")
+    ),
+    Interpret = list(
+      list(field = "central_question", label = "Central Question"),
+      list(field = "hook", label = "Story Hook"),
+      list(field = "story_completeness", label = "Story Completeness", format_fn = format_percentage_field),
+      list(field = "personas_count", label = "User Personas", format_fn = format_count_field)
+    ),
+    Structure = list(
+      list(field = "layout", label = "Layout"),
+      list(field = "concepts", label = "Concepts", format_fn = format_concepts_field),
+      list(field = "accessibility", label = "Accessibility", format_fn = format_accessibility_field)
+    ),
+    Anticipate = list(
+      list(field = "bias_mitigations", label = "Bias Mitigations", format_fn = format_bias_count_field),
+      list(field = "interaction_principles", label = "Interaction Principles", format_fn = format_defined_field)
+    ),
+    Validate = list(
+      list(field = "summary_panel", label = "Summary Panel", format_fn = function(v, m) truncate_text(v, 60)),
+      list(field = "next_steps", label = "Next Steps", format_fn = format_steps_count_field),
+      list(field = "collaboration", label = "Collaboration", format_fn = function(v, m) truncate_text(v, 60))
+    )
+  )
+}
+
+#' Format theory field with auto-suggestion indicator
+#' @param value Field value
+#' @param metadata Stage metadata
+#' @return Formatted string
+#' @keywords internal
+#' @noRd
+format_theory_field <- function(value, metadata) {
+  if (is.null(value) || is.na(value)) return(NULL)
+  
+  if (!is.null(metadata$auto_suggested_theory) && metadata$auto_suggested_theory) {
+    paste0(value, " ", cli::style_italic("(auto-suggested)"))
+  } else {
+    value
+  }
+}
+
+#' Format percentage field from metadata
+#' @param value Field value (unused, gets from metadata)
+#' @param metadata Stage metadata
+#' @return Formatted percentage string
+#' @keywords internal
+#' @noRd
+format_percentage_field <- function(value, metadata) {
+  if (!is.null(metadata$story_completeness)) {
+    paste0(round(metadata$story_completeness * 100), "%")
+  } else {
+    NULL
+  }
+}
+
+#' Format count field from metadata
+#' @param value Field value (unused, gets from metadata)
+#' @param metadata Stage metadata
+#' @return Formatted count string
+#' @keywords internal
+#' @noRd
+format_count_field <- function(value, metadata) {
+  if (!is.null(metadata$personas_count) && metadata$personas_count > 0) {
+    paste(metadata$personas_count, "defined")
+  } else {
+    NULL
+  }
+}
+
+#' Format concepts field as comma-separated list
+#' @param value Concepts string
+#' @param metadata Stage metadata (unused)
+#' @return Formatted concepts string
+#' @keywords internal
+#' @noRd
+format_concepts_field <- function(value, metadata) {
+  if (is.null(value) || is.na(value)) return(NULL)
+  
+  concepts_list <- strsplit(value, ",")[[1]]
+  paste(trimws(concepts_list), collapse = ", ")
+}
+
+#' Format accessibility field
+#' @param value Accessibility value
+#' @param metadata Stage metadata (unused)
+#' @return Formatted accessibility string
+#' @keywords internal
+#' @noRd
+format_accessibility_field <- function(value, metadata) {
+  if (!is.null(value) && !is.na(value) && value != "NA") {
+    "Guidelines defined"
+  } else {
+    NULL
+  }
+}
+
+#' Format bias mitigations as count
+#' @param value Bias mitigations string
+#' @param metadata Stage metadata (unused)
+#' @return Formatted count string
+#' @keywords internal
+#' @noRd
+format_bias_count_field <- function(value, metadata) {
+  if (is.null(value) || is.na(value)) return(NULL)
+  
+  bias_items <- strsplit(value, ";")[[1]]
+  paste(length(bias_items), "strategies defined")
+}
+
+#' Format steps count
+#' @param value Steps string
+#' @param metadata Stage metadata (unused)
+#' @return Formatted count string
+#' @keywords internal
+#' @noRd
+format_steps_count_field <- function(value, metadata) {
+  if (is.null(value) || is.na(value)) return(NULL)
+  
+  steps_list <- strsplit(value, ";")[[1]]
+  paste(length(steps_list), "items defined")
+}
+
+#' Format simple defined field
+#' @param value Field value
+#' @param metadata Stage metadata (unused) 
+#' @return "Defined" if field has content, NULL otherwise
+#' @keywords internal
+#' @noRd
+format_defined_field <- function(value, metadata) {
+  if (!is.null(value) && !is.na(value) && value != "NA") {
+    "Defined"
+  } else {
+    NULL
+  }
 }
 
 #' Summary method for BID stage objects

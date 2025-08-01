@@ -136,6 +136,107 @@ validate_required_params <- function(...) {
   invisible(NULL)
 }
 
+#' Validate character parameter with length and content checks
+#'
+#' @param value The value to validate
+#' @param param_name Name of the parameter
+#' @param min_length Minimum length after trimming
+#' @param allow_null Whether NULL values are allowed
+#'
+#' @return NULL invisibly if valid, stops with error otherwise
+#'
+#' @keywords internal
+#' @noRd
+validate_character_param <- function(value, param_name, min_length = 1, allow_null = FALSE) {
+  if (is.null(value)) {
+    if (allow_null) return(invisible(NULL))
+    stop(paste0("'", param_name, "' cannot be NULL"), call. = FALSE)
+  }
+  
+  if (!is.character(value) || length(value) != 1) {
+    stop(paste0("'", param_name, "' must be a single character string"), call. = FALSE)
+  }
+  
+  clean_value <- trimws(value)
+  if (nchar(clean_value) < min_length) {
+    stop(paste0("'", param_name, "' cannot be empty or contain only whitespace"), call. = FALSE)
+  }
+  
+  invisible(NULL)
+}
+
+#' Validate list parameter structure
+#'
+#' @param value The list to validate
+#' @param param_name Name of the parameter
+#' @param required_names Required list element names
+#' @param allow_null Whether NULL values are allowed
+#'
+#' @return NULL invisibly if valid, stops with error otherwise
+#'
+#' @keywords internal
+#' @noRd
+validate_list_param <- function(value, param_name, required_names = NULL, allow_null = TRUE) {
+  if (is.null(value)) {
+    if (allow_null) return(invisible(NULL))
+    stop(paste0("'", param_name, "' cannot be NULL"), call. = FALSE)
+  }
+  
+  if (!is.list(value)) {
+    stop(paste0("'", param_name, "' must be a list"), call. = FALSE)
+  }
+  
+  if (!is.null(required_names)) {
+    missing_names <- setdiff(required_names, names(value))
+    if (length(missing_names) > 0) {
+      stop(paste0("'", param_name, "' is missing required elements: ", 
+                  paste(missing_names, collapse = ", ")), call. = FALSE)
+    }
+  }
+  
+  invisible(NULL)
+}
+
+#' Standardized bid stage parameter validation
+#'
+#' @param previous_stage Previous stage object
+#' @param current_stage Current stage name
+#' @param additional_params List of additional parameters to validate
+#'
+#' @return NULL invisibly if valid, stops with error otherwise
+#'
+#' @keywords internal
+#' @noRd
+validate_bid_stage_params <- function(previous_stage, current_stage, additional_params = list()) {
+  # validate previous stage
+  validate_required_params(previous_stage = previous_stage)
+  validate_previous_stage(previous_stage, current_stage)
+  
+  # validate additional parameters
+  for (param_name in names(additional_params)) {
+    param_config <- additional_params[[param_name]]
+    param_value <- param_config$value
+    
+    if (param_config$type == "character") {
+      validate_character_param(
+        param_value, 
+        param_name, 
+        param_config$min_length %||% 1,
+        param_config$allow_null %||% FALSE
+      )
+    } else if (param_config$type == "list") {
+      validate_list_param(
+        param_value,
+        param_name,
+        param_config$required_names %||% NULL,
+        param_config$allow_null %||% TRUE
+      )
+    }
+  }
+  
+  invisible(NULL)
+}
+
 #' Validate previous stage follows BID framework flow
 #'
 #' @param previous_stage The previous stage, either a bid_stage/tibble with a 'stage' column,
@@ -327,6 +428,50 @@ safe_column_access <- function(df, column_name, default = NA) {
   col_value[1]
 }
 
+#' Extract stage data safely from previous stage object
+#'
+#' @param previous_stage Previous stage object (bid_stage or tibble)
+#' @param columns Character vector of column names to extract
+#' @param default_values Named list of default values for each column
+#'
+#' @return Named list with extracted values or defaults
+#'
+#' @keywords internal
+#' @noRd
+extract_stage_data <- function(previous_stage, columns, default_values = list()) {
+  result <- list()
+  
+  for (col in columns) {
+    default_val <- if (col %in% names(default_values)) {
+      default_values[[col]]
+    } else {
+      NA_character_
+    }
+    result[[col]] <- safe_column_access(previous_stage, col, default_val)
+  }
+  
+  return(result)
+}
+
+#' Get stage metadata with defaults
+#'
+#' @param stage_number Current stage number (1-5)
+#' @param custom_metadata Additional metadata to include
+#'
+#' @return List with standardized metadata
+#'
+#' @keywords internal
+#' @noRd
+get_stage_metadata <- function(stage_number, custom_metadata = list()) {
+  base_metadata <- list(
+    stage_number = stage_number,
+    total_stages = 5,
+    validation_status = "completed"
+  )
+  
+  return(c(base_metadata, custom_metadata))
+}
+
 #' Safe list or vector access
 #'
 #' @param lst List or vector to access
@@ -392,10 +537,137 @@ truncate_text <- function(text, max_length) {
     return(text_str)
   }
 
-  # Truncate to (max_length - 3), then append "..."
+  # truncate to (max_length - 3), then append "..."
   if (max_length <= 3) {
     return(strrep(".", min(3, max_length)))
   }
   truncated <- substr(text_str, 1, max_length - 3)
   paste0(truncated, "...")
+}
+
+#' Generate contextual suggestions based on stage and content
+#'
+#' @param stage_name Current BID stage name
+#' @param context_data Named list with stage-specific context
+#' @param suggestion_rules Optional custom suggestion rules
+#'
+#' @return Character string with consolidated suggestions
+#'
+#' @keywords internal
+#' @noRd
+generate_stage_suggestions <- function(stage_name, context_data, suggestion_rules = NULL) {
+  suggestions <- character(0)
+  
+  # use custom rules if provided, otherwise use defaults
+  rules <- suggestion_rules %||% get_default_suggestion_rules()
+  stage_rules <- rules[[stage_name]]
+  
+  if (is.null(stage_rules)) {
+    return("Consider following BID framework best practices for this stage.")
+  }
+  
+  # apply rules based on context
+  # ensure stage_rules is a proper list structure
+  if (!is.list(stage_rules)) {
+    return("Consider following BID framework best practices for this stage.")
+  }
+  
+  # separate default from rules
+  default_suggestion <- stage_rules$default
+  rule_list <- stage_rules[names(stage_rules) != "default"]
+  
+  # process each rule
+  for (rule in rule_list) {
+    # ensure rule is properly structured
+    if (is.list(rule) && !is.null(rule$condition) && !is.null(rule$suggestion)) {
+      if (evaluate_suggestion_condition(rule$condition, context_data)) {
+        suggestions <- c(suggestions, rule$suggestion)
+      }
+    }
+  }
+  
+  # add default suggestions if none match
+  if (length(suggestions) == 0 && !is.null(default_suggestion)) {
+    suggestions <- default_suggestion
+  }
+  
+  return(paste(suggestions, collapse = " "))
+}
+
+#' Get default suggestion rules for all stages
+#'
+#' @return List of suggestion rules by stage
+#'
+#' @keywords internal
+#' @noRd
+get_default_suggestion_rules <- function() {
+  list(
+    Notice = list(
+      list(
+        condition = function(ctx) nchar(ctx$problem %||% "") < 10,
+        suggestion = "Consider providing more detail in problem description."
+      ),
+      list(
+        condition = function(ctx) nchar(ctx$evidence %||% "") < 10,
+        suggestion = "Consider adding quantitative metrics to strengthen evidence."
+      ),
+      list(
+        condition = function(ctx) is.null(ctx$target_audience) || is.na(ctx$target_audience),
+        suggestion = "Define specific target audience to better focus design solutions."
+      ),
+      list(
+        condition = function(ctx) grepl("too many|overwhelm|choice", tolower(ctx$problem %||% "")),
+        suggestion = "Consider progressive disclosure or categorization to reduce choice complexity."
+      ),
+      default = "Problem clearly identified. Consider gathering additional quantitative evidence."
+    ),
+    Interpret = list(
+      list(
+        condition = function(ctx) (ctx$story_completeness %||% 0) < 0.5,
+        suggestion = "Your data story is incomplete. Consider adding missing narrative elements."
+      ),
+      list(
+        condition = function(ctx) (ctx$personas_count %||% 0) == 0,
+        suggestion = "Consider defining specific user personas to better target your design."
+      ),
+      list(
+        condition = function(ctx) nchar(ctx$central_question %||% "") > 100,
+        suggestion = "Consider simplifying your central question for more focus."
+      ),
+      default = "Focus on making each story component compelling and relevant."
+    )
+  )
+}
+
+#' Evaluate suggestion condition against context data
+#'
+#' @param condition Function that evaluates context
+#' @param context_data Named list with context
+#'
+#' @return Logical indicating if condition is met
+#'
+#' @keywords internal
+#' @noRd
+evaluate_suggestion_condition <- function(condition, context_data) {
+  if (!is.function(condition)) {
+    warning("Condition is not a function, skipping", call. = FALSE)
+    return(FALSE)
+  }
+  
+  if (!is.list(context_data) && !is.null(context_data)) {
+    warning("Context data is not a list or NULL, attempting to coerce", call. = FALSE)
+    context_data <- list(context_data)
+  }
+  
+  tryCatch({
+    result <- condition(context_data)
+    if (!is.logical(result) || length(result) != 1) {
+      warning("Condition function returned non-logical or multi-value result", call. = FALSE)
+      return(FALSE)
+    }
+    return(result)
+  }, error = function(e) {
+    warning("Error evaluating suggestion condition: ", e$message, call. = FALSE)
+    FALSE
+  })
 }

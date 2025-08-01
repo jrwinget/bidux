@@ -49,50 +49,15 @@ bid_notice <- function(
     theory = NULL,
     evidence = NULL,
     target_audience = NULL) {
-  if (missing(problem) || is.null(problem)) {
-    stop("Required parameter 'problem' must be provided", call. = FALSE)
-  }
+  # standardized parameter validation
+  validate_character_param(problem, "problem", min_length = 1)
+  validate_character_param(evidence, "evidence", min_length = 1)
+  validate_character_param(theory, "theory", allow_null = TRUE)
+  validate_character_param(target_audience, "target_audience", allow_null = TRUE)
 
-  if (!is.character(problem) || length(problem) != 1) {
-    stop("'problem' must be a single character string", call. = FALSE)
-  }
-
-  if (missing(evidence) || is.null(evidence)) {
-    stop("Required parameter 'evidence' must be provided", call. = FALSE)
-  }
-
-  if (!is.character(evidence) || length(evidence) != 1) {
-    stop("'evidence' must be a single character string", call. = FALSE)
-  }
-
-  if (!is.null(theory) && (!is.character(theory) || length(theory) != 1)) {
-    stop("'theory' must be a single character string or NULL", call. = FALSE)
-  }
-
-  if (
-    !is.null(target_audience) &&
-      (!is.character(target_audience) || length(target_audience) != 1)
-  ) {
-    stop(
-      "'target_audience' must be a single character string or NULL",
-      call. = FALSE
-    )
-  }
-
-  # Input quality validation with warnings
+  # clean input for processing
   problem_clean <- trimws(problem)
   evidence_clean <- trimws(evidence)
-
-  # Check for empty strings after trimming FIRST
-  if (nchar(problem_clean) == 0) {
-    stop("Problem cannot be empty or whitespace only", call. = FALSE)
-  }
-  if (nchar(evidence_clean) == 0) {
-    stop("Evidence cannot be empty or whitespace only", call. = FALSE)
-  }
-
-  # Enhanced parameter validation (moved after empty string check)
-  validate_required_params(problem = problem_clean, evidence = evidence_clean)
 
   if (nchar(problem_clean) < 10) {
     warning(
@@ -142,12 +107,14 @@ bid_notice <- function(
     ))
   }
 
-  suggestions <- generate_notice_suggestions(
-    problem_clean,
-    theory,
-    evidence_clean,
-    target_audience
+  # generate contextual suggestions using unified system
+  context_data <- list(
+    problem = problem_clean,
+    evidence = evidence_clean,
+    theory = theory,
+    target_audience = target_audience
   )
+  suggestions <- generate_stage_suggestions("Notice", context_data)
 
   # create result tibble
   result_data <- tibble::tibble(
@@ -160,18 +127,15 @@ bid_notice <- function(
     timestamp = Sys.time()
   )
 
-  # create comprehensive metadata
-  metadata <- list(
+  # create comprehensive metadata using standardized helper
+  metadata <- get_stage_metadata(1, list(
     auto_suggested_theory = auto_suggested_theory,
     theory_confidence = theory_confidence,
     problem_length = nchar(problem_clean),
     evidence_length = nchar(evidence_clean),
     has_target_audience = !is.null(target_audience),
-    validation_status = "completed",
-    stage_number = 1,
-    total_stages = 5,
     custom_mappings_used = FALSE
-  )
+  ))
 
   # create and validate bid_stage object
   result <- bid_stage("Notice", result_data, metadata)
@@ -193,160 +157,6 @@ bid_notice <- function(
   )
 
   return(result)
-}
-
-#' Enhanced suggestions generator for Notice stage
-#'
-#' @param problem Character string with problem description
-#' @param theory Character string with theory
-#' @param evidence Character string with evidence
-#' @param target_audience Character string with target audience (optional)
-#' @return Character string with suggestions
-#' @keywords internal
-generate_notice_suggestions <- function(
-    problem,
-    theory,
-    evidence,
-    target_audience) {
-  suggestions <- character(0)
-
-  # theory-specific suggestions
-  if (!is.null(theory) && !is.na(theory)) {
-    if (theory == "Cognitive Load Theory") {
-      suggestions <- c(
-        suggestions,
-        paste(
-          "Consider conducting cognitive load assessment to measure mental",
-          "effort required"
-        )
-      )
-    } else if (theory == "Hick's Law") {
-      suggestions <- c(
-        suggestions,
-        paste(
-          "Measure decision time and number of choices to validate Hick's Law",
-          "application"
-        )
-      )
-    } else if (theory == "Visual Hierarchies") {
-      suggestions <- c(
-        suggestions,
-        paste(
-          "Conduct eye-tracking or attention mapping to understand visual",
-          "processing patterns"
-        )
-      )
-    } else if (theory == "Information Scent") {
-      suggestions <- c(
-        suggestions,
-        "Analyze user navigation patterns and information-seeking behavior"
-      )
-    } else if (theory == "Fitts's Law") {
-      suggestions <- c(
-        suggestions,
-        "Measure target sizes and distances, especially for mobile interactions"
-      )
-    } else if (theory == "Aesthetic-Usability") {
-      suggestions <- c(
-        suggestions,
-        "Balance visual appeal with functional usability testing"
-      )
-    }
-  }
-
-  # evidence quality suggestions
-  if (!is.null(evidence) && !is.na(evidence)) {
-    evidence_lower <- tolower(evidence)
-    if (!grepl("\\d", evidence)) {
-      suggestions <- c(
-        suggestions,
-        paste(
-          "Consider adding quantitative metrics to strengthen evidence",
-          "(e.g., completion rates, time on task)"
-        )
-      )
-    }
-    if (!grepl("test|study|research|data|metric", evidence_lower)) {
-      suggestions <- c(
-        suggestions,
-        paste(
-          "Consider conducting formal user testing or collecting analytics",
-          "data to support observations"
-        )
-      )
-    }
-  }
-
-  # target audience suggestions
-  if (is.null(target_audience) || is.na(target_audience)) {
-    suggestions <- c(
-      suggestions,
-      "Define specific target audience to better focus design solutions"
-    )
-  } else {
-    audience_lower <- tolower(target_audience)
-    if (grepl("varying|different|mixed", audience_lower)) {
-      suggestions <- c(
-        suggestions,
-        paste(
-          "Consider creating user personas for different skill levels within",
-          "your audience"
-        )
-      )
-    }
-  }
-
-  # Problem-specific suggestions
-  problem_lower <- tolower(problem)
-  if (grepl("users struggle|difficult|hard|confus", problem_lower)) {
-    suggestions <- c(
-      suggestions,
-      paste(
-        "Consider conducting task analysis to understand specific struggle",
-        "points and failure modes"
-      )
-    )
-  }
-  if (grepl("slow|delay|time|performance", problem_lower)) {
-    suggestions <- c(
-      suggestions,
-      paste(
-        "Measure task completion times and identify specific performance",
-        "bottlenecks"
-      )
-    )
-  }
-  if (grepl("mobile|phone|tablet|touch", problem_lower)) {
-    suggestions <- c(
-      suggestions,
-      paste(
-        "Ensure mobile-specific usability testing and consider touch",
-        "interaction patterns"
-      )
-    )
-  }
-  if (grepl("too many|overwhelm|choice|option", problem_lower)) {
-    suggestions <- c(
-      suggestions,
-      paste(
-        "Consider progressive disclosure or categorization to reduce choice",
-        "complexity"
-      )
-    )
-  }
-
-  # Default suggestion if none generated
-  if (length(suggestions) == 0) {
-    suggestions <- c(
-      paste(
-        "Problem clearly identified. Consider gathering additional",
-        "quantitative evidence."
-      ),
-      "Move to bid_interpret() to develop central question and data story."
-    )
-  }
-
-  return(paste(suggestions, collapse = " "))
 }
 
 # legacy function name support for backward compatibility
