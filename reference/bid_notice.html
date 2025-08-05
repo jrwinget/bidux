@@ -104,14 +104,14 @@ audience.</p></dd>
 <span class="r-in"><span><span class="co"># Print shows human-friendly summary</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">notice_result</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB; font-weight: bold;">BID Framework</span> - <span style="font-weight: bold;">Notice</span> Stage</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-07-29 01:01:54 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-08-05 17:42:34 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Progress: 20 % (1/5) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Problem:</span> Users struggling with complex dropdowns and too many options </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Theory:</span> Hick's Law <span style="font-style: italic;">(auto-suggested)</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Evidence:</span> User testing shows 65% abandonment rate on filter selection </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="font-style: italic;">Suggestions:</span> Measure decision time and number of choices to validate Hick's Law application Define specific target audience to better focus design solutions Consider progressive disclosure or categorization to reduce choice complexity </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="font-style: italic;">Suggestions:</span> Define specific target audience to better focus design solutions. Consider progressive disclosure or categorization to reduce choice complexity. </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="font-weight: 100;">Use summary() for detailed information</span> </span>
 <span class="r-in"><span></span></span>
@@ -120,14 +120,14 @@ audience.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB; font-weight: bold;">=== BID Framework:</span> <span style="font-weight: bold;">Notice</span> <span style="font-weight: bold;">Stage Summary ===</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Metadata:</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    stage_number : 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    total_stages : 5 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    validation_status : completed </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    auto_suggested_theory : Yes </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    theory_confidence : 90% </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    problem_length : 60 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    evidence_length : 59 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    has_target_audience : No </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    validation_status : completed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    stage_number : 1 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    total_stages : 5 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    custom_mappings_used : No </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Stage Data:</span></span>
@@ -135,14 +135,23 @@ audience.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    problem : Users struggling with complex dropdowns and too many options </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    theory : Hick's Law </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    evidence : User testing shows 65% abandonment rate on filter selection </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    suggestions : Measure decision time and number of choices to validate Hick's Law applicatio... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    suggestions : Define specific target audience to better focus design solutions. Consider pr... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-07-29 01:01:54 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-08-05 17:42:34 </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Check stage and metadata</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="get_stage.html">get_stage</a></span><span class="op">(</span><span class="va">notice_result</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Notice"</span>
 <span class="r-in"><span><span class="fu"><a href="get_metadata.html">get_metadata</a></span><span class="op">(</span><span class="va">notice_result</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $stage_number</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $total_stages</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $validation_status</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "completed"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $auto_suggested_theory</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -157,15 +166,6 @@ audience.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $has_target_audience</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $validation_status</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "completed"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $stage_number</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $total_stages</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $custom_mappings_used</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>

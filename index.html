@@ -68,486 +68,132 @@
 </div>
 <!-- badges: start -->
 
-<p>The <a href="https://jrwinget.github.io/bidux/">bidux</a> package helps Shiny developers implement the Behavior Insight Design (BID) framework in their workflow. BID is a 5-stage process that incorporates psychological principles into UI/UX design:</p>
-<ol style="list-style-type: decimal">
-<li>
-<strong>Notice</strong> the Problem - Identify friction points using principles of cognitive load and visual hierarchies</li>
-<li>
-<strong>Interpret</strong> the User’s Need - Create compelling data stories and define user personas</li>
-<li>
-<strong>Structure</strong> the Dashboard - Apply layout patterns and accessibility considerations</li>
-<li>
-<strong>Anticipate</strong> User Behavior - Mitigate cognitive biases and implement effective interaction hints</li>
-<li>
-<strong>Validate</strong> &amp; Empower the User - Provide summary insights and collaborative features</li>
-</ol>
-<p>This structured approach helps developers create more intuitive, user-friendly dashboards by systematically applying behavioral psychology concepts to their design process.</p>
 <div class="section level2">
-<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+<h2 id="id_-overview">📖 Overview<a class="anchor" aria-label="anchor" href="#id_-overview"></a>
 </h2>
-<p>You can install <a href="https://jrwinget.github.io/bidux/">bidux</a> from CRAN:</p>
+<p><a href="https://jrwinget.github.io/bidux/">bidux</a> brings the Behavior Insight Design (BID) framework into your Shiny development workflow. Follow five staged functions (Notice, Interpret, Structure, Anticipate, Validate) to systematically apply psychological principles to UI/UX design and build more intuitive dashboards.</p>
+</div>
+<div class="section level2">
+<h2 id="id_-key-features">🚀 Key Features<a class="anchor" aria-label="anchor" href="#id_-key-features"></a>
+</h2>
+<ul>
+<li>
+<strong>Notice</strong> friction points (<code><a href="reference/bid_notice.html">bid_notice()</a></code>)</li>
+<li>
+<strong>Interpret</strong> user needs (<code><a href="reference/bid_interpret.html">bid_interpret()</a></code>)</li>
+<li>
+<strong>Structure</strong> dashboard layouts (<code><a href="reference/bid_structure.html">bid_structure()</a></code>)</li>
+<li>
+<strong>Anticipate</strong> behavior &amp; biases (<code><a href="reference/bid_anticipate.html">bid_anticipate()</a></code>)</li>
+<li>
+<strong>Validate</strong> &amp; empower users (<code><a href="reference/bid_validate.html">bid_validate()</a></code>)</li>
+<li>
+<strong>Telemetry Integration</strong>: ingest real usage data to auto-detect UX issues (<code><a href="reference/bid_ingest_telemetry.html">bid_ingest_telemetry()</a></code>)</li>
+<li>
+<strong>Component Suggestions</strong>: get tailored UI component ideas for <code>bslib</code>, <code>shiny</code>, <code>reactable</code>, <code>echarts4r</code>, and more</li>
+<li>
+<strong>Reporting</strong>: generate HTML, Markdown, or text reports of your BID process</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="id_-installation">📥 Installation<a class="anchor" aria-label="anchor" href="#id_-installation"></a>
+</h2>
+<p>Install from CRAN:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"bidux"</span><span class="op">)</span></span></code></pre></div>
-<p>Or install the development version from GitHub:</p>
+<p>Or the development version:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"jrwinget/bidux"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="core-functions">Core Functions<a class="anchor" aria-label="anchor" href="#core-functions"></a>
+<h2 id="id_-quick-start">✅ Quick Start<a class="anchor" aria-label="anchor" href="#id_-quick-start"></a>
 </h2>
-<p>The package provides documentation functions for each stage of the BID process:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://jrwinget.github.io/bidux/">bidux</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Stage 1: Notice the Problem</span></span>
-<span><span class="va">notice_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_notice.html">bid_notice</a></span><span class="op">(</span></span>
-<span>  problem <span class="op">=</span> <span class="st">"Users can't find the most important metrics"</span>,</span>
-<span>  evidence <span class="op">=</span> <span class="st">"User testing showed 70% of users spending &gt;30s looking for key metrics"</span>,</span>
-<span>  theory <span class="op">=</span> <span class="st">"Visual Hierarchies"</span>, <span class="co"># Optional - will be suggested if omitted</span></span>
-<span>  target_audience <span class="op">=</span> <span class="st">"Data analysts with varying technical skills"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; Stage 1 (Notice) completed. (20% complete)</span></span>
-<span><span class="co">#&gt;   - Problem: Users can't find the most important metrics</span></span>
-<span><span class="co">#&gt;   - Theory: Visual Hierarchies</span></span>
-<span><span class="co">#&gt;   - Evidence: User testing showed 70% of users spending &gt;30s looking fo...</span></span>
-<span><span class="co">#&gt;   - Next: Use bid_interpret() for Stage 2</span></span>
-<span></span>
-<span><span class="co"># Stage 2: Interpret the User's Need</span></span>
-<span><span class="va">interpret_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span>
-<span>  previous_stage <span class="op">=</span> <span class="va">notice_result</span>,</span>
-<span>  central_question <span class="op">=</span> <span class="st">"How are sales trending against targets?"</span>,</span>
-<span>  data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    hook <span class="op">=</span> <span class="st">"Sales are trending below target in Q2"</span>,</span>
-<span>    context <span class="op">=</span> <span class="st">"Previous quarters exceeded targets"</span>,</span>
-<span>    tension <span class="op">=</span> <span class="st">"What's causing the Q2 decline?"</span>,</span>
-<span>    resolution <span class="op">=</span> <span class="st">"Identify underperforming product categories"</span>,</span>
-<span>    audience <span class="op">=</span> <span class="st">"Marketing team"</span>,</span>
-<span>    metrics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"YTD Sales"</span>, <span class="st">"Quarter Growth Rate"</span>, <span class="st">"Regional Performance"</span><span class="op">)</span>,</span>
-<span>    visual_approach <span class="op">=</span> <span class="st">"Comparative visualization with clear color coding"</span></span>
-<span>  <span class="op">)</span>,</span>
-<span>  user_personas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>      name <span class="op">=</span> <span class="st">"Sales Manager"</span>,</span>
-<span>      goals <span class="op">=</span> <span class="st">"Track team performance"</span>,</span>
-<span>      pain_points <span class="op">=</span> <span class="st">"Too much data to sift through"</span>,</span>
-<span>      technical_level <span class="op">=</span> <span class="st">"Intermediate"</span></span>
-<span>    <span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; Stage 2 (Interpret) completed.</span></span>
-<span><span class="co">#&gt;   - Central question: How are sales trending against targets?</span></span>
-<span><span class="co">#&gt;   - Your data story has all key elements. Focus on making each component compelling and relevant.</span></span>
-<span><span class="co">#&gt;   - Your central question is appropriately scoped.</span></span>
-<span><span class="co">#&gt;   - User personas: 1 defined</span></span>
-<span></span>
-<span><span class="co"># Stage 3: Structure the Dashboard</span></span>
-<span><span class="va">structure_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_structure.html">bid_structure</a></span><span class="op">(</span></span>
-<span>  previous_stage <span class="op">=</span> <span class="va">interpret_result</span>,</span>
-<span>  layout <span class="op">=</span> <span class="st">"dual_process"</span>, <span class="co"># Options: dual_process, grid, card, tabs, breathable</span></span>
-<span>  concepts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"principle_of_proximity"</span>, <span class="st">"default_effect"</span>, <span class="st">"breathable_layouts"</span><span class="op">)</span>,</span>
-<span>  accessibility <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    color_contrast <span class="op">=</span> <span class="st">"WCAG AA compliant"</span>,</span>
-<span>    keyboard_navigation <span class="op">=</span> <span class="st">"All elements focusable"</span>,</span>
-<span>    screen_reader <span class="op">=</span> <span class="st">"Charts include descriptive alt text"</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; Stage 3 (Structure) completed.</span></span>
-<span><span class="co">#&gt;   - Layout: dual_process</span></span>
-<span><span class="co">#&gt;   - Concepts: Principle of Proximity, Default Effect, Breathable Layouts</span></span>
-<span><span class="co">#&gt;   - Accessibility considerations included: color_contrast, keyboard_navigation, screen_reader</span></span>
-<span></span>
-<span><span class="co"># Stage 4: Anticipate User Behavior</span></span>
-<span><span class="va">anticipate_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_anticipate.html">bid_anticipate</a></span><span class="op">(</span></span>
-<span>  previous_stage <span class="op">=</span> <span class="va">structure_result</span>,</span>
-<span>  bias_mitigations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    anchoring <span class="op">=</span> <span class="st">"Using context-aware reference points"</span>,</span>
-<span>    framing <span class="op">=</span> <span class="st">"Providing both positive and negative framings"</span>,</span>
-<span>    confirmation_bias <span class="op">=</span> <span class="st">"Including alternative scenarios"</span></span>
-<span>  <span class="op">)</span>,</span>
-<span>  interaction_principles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    hover_effects <span class="op">=</span> <span class="st">"Show details on hover"</span>,</span>
-<span>    selection_feedback <span class="op">=</span> <span class="st">"Highlight active filters"</span>,</span>
-<span>    progressive_disclosure <span class="op">=</span> <span class="st">"Reveal advanced options progressively"</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; Stage 4 (Anticipate) completed.</span></span>
-<span><span class="co">#&gt;   - Bias mitigations: 3 defined</span></span>
-<span><span class="co">#&gt;   - Interaction principles: 3 defined</span></span>
-<span><span class="co">#&gt;   - Key suggestions: anchoring mitigation: Always show reference points like previous period, budget, or industry average., framing mitigation: Toggle between progress (65% complete) and gap (35% remaining) framing., confirmation_bias mitigation: Consider how this bias affects user decisions.</span></span>
-<span></span>
-<span><span class="co"># Stage 5: Validate &amp; Empower</span></span>
-<span><span class="va">validate_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_validate.html">bid_validate</a></span><span class="op">(</span></span>
-<span>  previous_stage <span class="op">=</span> <span class="va">anticipate_result</span>,</span>
-<span>  summary_panel <span class="op">=</span> <span class="st">"Key insights panel with actionable takeaways"</span>,</span>
-<span>  collaboration <span class="op">=</span> <span class="st">"Team annotation and sharing capabilities"</span>,</span>
-<span>  next_steps <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>    <span class="st">"Review underperforming categories"</span>,</span>
-<span>    <span class="st">"Schedule team discussion"</span>,</span>
-<span>    <span class="st">"Update forecast models"</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; Stage 5 (Validate) completed.</span></span>
-<span><span class="co">#&gt;   - Summary panel: Key insights panel with actionable takeaways</span></span>
-<span><span class="co">#&gt;   - Collaboration: Team annotation and sharing capabilities</span></span>
-<span><span class="co">#&gt;   - Next steps: 3 items defined</span></span>
-<span><span class="co">#&gt;   - Include user testing in your next steps</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="concept-dictionary">Concept Dictionary<a class="anchor" aria-label="anchor" href="#concept-dictionary"></a>
-</h2>
-<p>The package includes a comprehensive dictionary of behavioral psychology concepts:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># List all concepts</span></span>
-<span><span class="va">all_concepts</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_concepts.html">bid_concepts</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">all_concepts</span></span>
-<span><span class="co">#&gt; # A tibble: 41 × 7</span></span>
-<span><span class="co">#&gt;    concept            description category reference example implementation_tips</span></span>
-<span><span class="co">#&gt;    &lt;chr&gt;              &lt;chr&gt;       &lt;chr&gt;    &lt;chr&gt;     &lt;chr&gt;   &lt;chr&gt;              </span></span>
-<span><span class="co">#&gt;  1 Cognitive Load Th… Theory tha… Stage 1  Sweller … Reduci… Use tabs or collap…</span></span>
-<span><span class="co">#&gt;  2 Hick's Law         Principle … Stage 1  Hick (19… Simpli… Reduce dropdown op…</span></span>
-<span><span class="co">#&gt;  3 Visual Hierarchies Design pri… Stage 1  Tufte (1… Emphas… Use size, color, a…</span></span>
-<span><span class="co">#&gt;  4 Data Storytelling… Framework … Stage 2  Matei &amp; … Highli… Start with a clear…</span></span>
-<span><span class="co">#&gt;  5 Processing Fluency The ease w… Stage 2  Alter &amp; … Using … Use clean, consist…</span></span>
-<span><span class="co">#&gt;  6 Emotion &amp; Fluency… How emotio… Stage 2  Song &amp; S… Applyi… Consider subtle co…</span></span>
-<span><span class="co">#&gt;  7 Principle of Prox… Grouping r… Stage 3  Gestalt … Groupi… Place related cont…</span></span>
-<span><span class="co">#&gt;  8 Dual-Processing T… Model dist… Stage 3  Tversky … Provid… Provide both KPI s…</span></span>
-<span><span class="co">#&gt;  9 Default Effect     How defaul… Stage 3  Johnson … Pre-se… Pre-select the mos…</span></span>
-<span><span class="co">#&gt; 10 Aesthetic-Usabili… The effect… Stage 3  Norman (… Creati… Ensure visual cohe…</span></span>
-<span><span class="co">#&gt; # ℹ 31 more rows</span></span>
-<span><span class="co">#&gt; # ℹ 1 more variable: related_concepts &lt;chr&gt;</span></span>
-<span></span>
-<span><span class="co"># Search for specific concepts</span></span>
-<span><span class="va">cognitive_concepts</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_concepts.html">bid_concepts</a></span><span class="op">(</span><span class="st">"cognitive"</span><span class="op">)</span></span>
-<span><span class="va">cognitive_concepts</span></span>
-<span><span class="co">#&gt; # A tibble: 4 × 7</span></span>
-<span><span class="co">#&gt;   concept             description category reference example implementation_tips</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;               &lt;chr&gt;       &lt;chr&gt;    &lt;chr&gt;     &lt;chr&gt;   &lt;chr&gt;              </span></span>
-<span><span class="co">#&gt; 1 Cognitive Load The… Theory tha… Stage 1  Sweller … Reduci… Use tabs or collap…</span></span>
-<span><span class="co">#&gt; 2 Progressive Disclo… Technique … Stage 1  Krug (20… Expand… Use shiny::actionB…</span></span>
-<span><span class="co">#&gt; 3 Cognitive Dimensio… Framework … Stage 1  Green &amp; … Evalua… Evaluate your UI a…</span></span>
-<span><span class="co">#&gt; 4 Breathable Layouts  Using whit… Stage 3  White (2… Using … Use bslib::card_bo…</span></span>
-<span><span class="co">#&gt; # ℹ 1 more variable: related_concepts &lt;chr&gt;</span></span>
-<span></span>
-<span><span class="va">visual_concepts</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_concepts.html">bid_concepts</a></span><span class="op">(</span><span class="st">"visual, hierarchy"</span><span class="op">)</span> <span class="co"># Multiple search terms</span></span>
-<span><span class="va">visual_concepts</span></span>
-<span><span class="co">#&gt; # A tibble: 11 × 7</span></span>
-<span><span class="co">#&gt;    concept            description category reference example implementation_tips</span></span>
-<span><span class="co">#&gt;    &lt;chr&gt;              &lt;chr&gt;       &lt;chr&gt;    &lt;chr&gt;     &lt;chr&gt;   &lt;chr&gt;              </span></span>
-<span><span class="co">#&gt;  1 Visual Hierarchies Design pri… Stage 1  Tufte (1… Emphas… Use size, color, a…</span></span>
-<span><span class="co">#&gt;  2 Principle of Prox… Grouping r… Stage 3  Gestalt … Groupi… Place related cont…</span></span>
-<span><span class="co">#&gt;  3 Gestalt Principles Visual per… Stage 3  Wertheim… Arrang… Use layout_column_…</span></span>
-<span><span class="co">#&gt;  4 Pre-attentive Pro… Visual pro… Stage 2  Healey (… Using … Leverage reactable…</span></span>
-<span><span class="co">#&gt;  5 Change Blindness   Failure to… Stage 4  Rensink … Using … Use transitions or…</span></span>
-<span><span class="co">#&gt;  6 Visual Hierarchy   Organizing… Stage 1  Djamasbi… Creati… Apply different fo…</span></span>
-<span><span class="co">#&gt;  7 Breathable Layouts Using whit… Stage 3  White (2… Using … Use bslib::card_bo…</span></span>
-<span><span class="co">#&gt;  8 Interaction Hints  Visual cue… Stage 4  Norman (… Adding… Add CSS hover stat…</span></span>
-<span><span class="co">#&gt;  9 Visual Feedback    Immediate … Stage 4  Shneider… Highli… Use shinyFeedback …</span></span>
-<span><span class="co">#&gt; 10 Accessibility Con… Ensuring s… Stage 3  WCAG 2.1  Ensuri… Test color combina…</span></span>
-<span><span class="co">#&gt; 11 Information Hiera… Organizati… Stage 3  Djamasbi… Making… Use font size, wei…</span></span>
-<span><span class="co">#&gt; # ℹ 1 more variable: related_concepts &lt;chr&gt;</span></span>
-<span></span>
-<span><span class="co"># Get detailed information about a specific concept</span></span>
-<span><span class="va">anchoring_info</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_concept.html">bid_concept</a></span><span class="op">(</span><span class="st">"anchoring effect"</span><span class="op">)</span></span>
-<span><span class="va">anchoring_info</span></span>
-<span><span class="co">#&gt; # A tibble: 1 × 8</span></span>
-<span><span class="co">#&gt;   concept          description    category reference example implementation_tips</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;            &lt;chr&gt;          &lt;chr&gt;    &lt;chr&gt;     &lt;chr&gt;   &lt;chr&gt;              </span></span>
-<span><span class="co">#&gt; 1 Anchoring Effect Bias where in… Stage 4  Tversky … Using … Always show refere…</span></span>
-<span><span class="co">#&gt; # ℹ 2 more variables: related_concepts &lt;chr&gt;, recommendations &lt;chr&gt;</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="ui-component-suggestions">UI Component Suggestions<a class="anchor" aria-label="anchor" href="#ui-component-suggestions"></a>
-</h2>
-<p>Get concrete implementation ideas for various UI packages:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Get bslib component suggestions</span></span>
-<span><span class="fu"><a href="reference/bid_suggest_components.html">bid_suggest_components</a></span><span class="op">(</span><span class="va">structure_result</span>, package <span class="op">=</span> <span class="st">"bslib"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 10 × 7</span></span>
-<span><span class="co">#&gt;    package component          description bid_stage_relevance cognitive_concepts</span></span>
-<span><span class="co">#&gt;    &lt;chr&gt;   &lt;chr&gt;              &lt;chr&gt;       &lt;chr&gt;               &lt;chr&gt;             </span></span>
-<span><span class="co">#&gt;  1 bslib   layout_columns     Create fle… Stage 3             Visual Hierarchy,…</span></span>
-<span><span class="co">#&gt;  2 bslib   layout_column_wrap Create res… Stage 3             Cognitive Load Th…</span></span>
-<span><span class="co">#&gt;  3 bslib   card               Organize c… Stage 3,Stage 5     Principle of Prox…</span></span>
-<span><span class="co">#&gt;  4 bslib   card_body          Control ca… Stage 3             Breathable Layout…</span></span>
-<span><span class="co">#&gt;  5 bslib   page_sidebar       Build dash… Stage 3             Information Hiera…</span></span>
-<span><span class="co">#&gt;  6 bslib   value_box          Display ke… Stage 2,Stage 3,St… Visual Hierarchy,…</span></span>
-<span><span class="co">#&gt;  7 bslib   nav_panel          Create tab… Stage 1,Stage 3     Cognitive Load Th…</span></span>
-<span><span class="co">#&gt;  8 bslib   accordion          Implement … Stage 1,Stage 3     Progressive Discl…</span></span>
-<span><span class="co">#&gt;  9 bslib   input_dark_mode    Allow user… Stage 3,Stage 5     Aesthetic-Usabili…</span></span>
-<span><span class="co">#&gt; 10 bslib   card_header        Add header… Stage 3             Information Hiera…</span></span>
-<span><span class="co">#&gt; # ℹ 2 more variables: use_cases &lt;chr&gt;, relevance &lt;dbl&gt;</span></span>
-<span></span>
-<span><span class="co"># Get shiny component suggestions</span></span>
-<span><span class="fu"><a href="reference/bid_suggest_components.html">bid_suggest_components</a></span><span class="op">(</span><span class="va">notice_result</span>, package <span class="op">=</span> <span class="st">"shiny"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 10 × 7</span></span>
-<span><span class="co">#&gt;    package component         description  bid_stage_relevance cognitive_concepts</span></span>
-<span><span class="co">#&gt;    &lt;chr&gt;   &lt;chr&gt;             &lt;chr&gt;        &lt;chr&gt;               &lt;chr&gt;             </span></span>
-<span><span class="co">#&gt;  1 shiny   tabsetPanel       Organize re… Stage 1,Stage 3     Information Hiera…</span></span>
-<span><span class="co">#&gt;  2 shiny   conditionalPanel  Show/hide U… Stage 1,Stage 4     Cognitive Load Th…</span></span>
-<span><span class="co">#&gt;  3 shiny   renderUI          Generate UI… Stage 1,Stage 4     Progressive Discl…</span></span>
-<span><span class="co">#&gt;  4 shiny   uiOutput          Display dyn… Stage 1,Stage 4     Progressive Discl…</span></span>
-<span><span class="co">#&gt;  5 shiny   reactive          Create reac… Stage 1,Stage 4     Processing Fluenc…</span></span>
-<span><span class="co">#&gt;  6 shiny   isolate           Control rea… Stage 1,Stage 4     Processing Fluenc…</span></span>
-<span><span class="co">#&gt;  7 shiny   wellPanel         Group relat… Stage 3             Principle of Prox…</span></span>
-<span><span class="co">#&gt;  8 shiny   fluidRow          Create resp… Stage 3             Visual Hierarchy,…</span></span>
-<span><span class="co">#&gt;  9 shiny   column            Control pre… Stage 3             Visual Hierarchy,…</span></span>
-<span><span class="co">#&gt; 10 shiny   updateSelectInput Dynamically… Stage 4             Default Effect,Co…</span></span>
-<span><span class="co">#&gt; # ℹ 2 more variables: use_cases &lt;chr&gt;, relevance &lt;dbl&gt;</span></span>
-<span></span>
-<span><span class="co"># Get reactable component suggestions</span></span>
-<span><span class="fu"><a href="reference/bid_suggest_components.html">bid_suggest_components</a></span><span class="op">(</span><span class="va">anticipate_result</span>, package <span class="op">=</span> <span class="st">"reactable"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 1 × 7</span></span>
-<span><span class="co">#&gt;   package component description bid_stage_relevance cognitive_concepts use_cases</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;   &lt;chr&gt;     &lt;chr&gt;       &lt;chr&gt;               &lt;chr&gt;              &lt;chr&gt;    </span></span>
-<span><span class="co">#&gt; 1 reacta… getReact… Access tab… Stage 4,Stage 5     Norman's Stages o… table in…</span></span>
-<span><span class="co">#&gt; # ℹ 1 more variable: relevance &lt;dbl&gt;</span></span>
-<span></span>
-<span><span class="co"># Get echarts4r component suggestions</span></span>
-<span><span class="fu"><a href="reference/bid_suggest_components.html">bid_suggest_components</a></span><span class="op">(</span><span class="va">validate_result</span>, package <span class="op">=</span> <span class="st">"echarts4r"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 0 × 7</span></span>
-<span><span class="co">#&gt; # ℹ 7 variables: package &lt;chr&gt;, component &lt;chr&gt;, description &lt;chr&gt;,</span></span>
-<span><span class="co">#&gt; #   bid_stage_relevance &lt;chr&gt;, cognitive_concepts &lt;chr&gt;, use_cases &lt;chr&gt;,</span></span>
-<span><span class="co">#&gt; #   relevance &lt;dbl&gt;</span></span>
-<span></span>
-<span><span class="co"># Get suggestions from all supported packages</span></span>
-<span><span class="fu"><a href="reference/bid_suggest_components.html">bid_suggest_components</a></span><span class="op">(</span><span class="va">validate_result</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 12 × 7</span></span>
-<span><span class="co">#&gt;    package component        description   bid_stage_relevance cognitive_concepts</span></span>
-<span><span class="co">#&gt;    &lt;chr&gt;   &lt;chr&gt;            &lt;chr&gt;         &lt;chr&gt;               &lt;chr&gt;             </span></span>
-<span><span class="co">#&gt;  1 shiny   tabsetPanel      Organize rel… Stage 1,Stage 3     Information Hiera…</span></span>
-<span><span class="co">#&gt;  2 shiny   conditionalPanel Show/hide UI… Stage 1,Stage 4     Cognitive Load Th…</span></span>
-<span><span class="co">#&gt;  3 shiny   renderUI         Generate UI … Stage 1,Stage 4     Progressive Discl…</span></span>
-<span><span class="co">#&gt;  4 shiny   uiOutput         Display dyna… Stage 1,Stage 4     Progressive Discl…</span></span>
-<span><span class="co">#&gt;  5 shiny   reactive         Create react… Stage 1,Stage 4     Processing Fluenc…</span></span>
-<span><span class="co">#&gt;  6 shiny   isolate          Control reac… Stage 1,Stage 4     Processing Fluenc…</span></span>
-<span><span class="co">#&gt;  7 bslib   nav_panel        Create tabbe… Stage 1,Stage 3     Cognitive Load Th…</span></span>
-<span><span class="co">#&gt;  8 bslib   accordion        Implement co… Stage 1,Stage 3     Progressive Discl…</span></span>
-<span><span class="co">#&gt;  9 shiny   wellPanel        Group relate… Stage 3             Principle of Prox…</span></span>
-<span><span class="co">#&gt; 10 bslib   card             Organize con… Stage 3,Stage 5     Principle of Prox…</span></span>
-<span><span class="co">#&gt; 11 bslib   layout_columns   Create flexi… Stage 3             Visual Hierarchy,…</span></span>
-<span><span class="co">#&gt; 12 DT      datatable        Display data… Stage 2,Stage 3,St… Information Hiera…</span></span>
-<span><span class="co">#&gt; # ℹ 2 more variables: use_cases &lt;chr&gt;, relevance &lt;dbl&gt;</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="comprehensive-reporting">Comprehensive Reporting<a class="anchor" aria-label="anchor" href="#comprehensive-reporting"></a>
-</h2>
-<p>Generate documentation for your BID implementation:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Generate a report in various formats</span></span>
-<span><span class="va">text_report</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_report.html">bid_report</a></span><span class="op">(</span><span class="va">validate_result</span><span class="op">)</span></span>
-<span><span class="va">html_report</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_report.html">bid_report</a></span><span class="op">(</span><span class="va">validate_result</span>, format <span class="op">=</span> <span class="st">"html"</span><span class="op">)</span></span>
-<span><span class="va">md_report</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_report.html">bid_report</a></span><span class="op">(</span><span class="va">validate_result</span>, format <span class="op">=</span> <span class="st">"markdown"</span>, include_diagrams <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="example-workflow">Example Workflow<a class="anchor" aria-label="anchor" href="#example-workflow"></a>
-</h2>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://shiny.posit.co/" class="external-link">shiny</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://jrwinget.github.io/bidux/">bidux</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Document the entire BID process</span></span>
-<span><span class="va">bid_process</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_notice.html">bid_notice</a></span><span class="op">(</span></span>
-<span>  problem <span class="op">=</span> <span class="st">"Users can't find the most important metrics"</span>,</span>
-<span>  evidence <span class="op">=</span> <span class="st">"User testing showed 70% of users spending &gt;30s looking for key metrics"</span></span>
-<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span><span class="co"># Document a simple BID pipeline</span></span>
+<span><span class="va">process</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="reference/bid_notice.html">bid_notice</a></span><span class="op">(</span></span>
+<span>    problem <span class="op">=</span> <span class="st">"Users struggle to find key metrics"</span>,</span>
+<span>    evidence <span class="op">=</span> <span class="st">"70% of users spent &gt;30s searching"</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span>
-<span>    central_question <span class="op">=</span> <span class="st">"How are sales trending against targets?"</span>,</span>
+<span>    central_question <span class="op">=</span> <span class="st">"Which metrics drive decisions?"</span>,</span>
 <span>    data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>      hook <span class="op">=</span> <span class="st">"Sales are trending below target in Q2"</span>,</span>
-<span>      context <span class="op">=</span> <span class="st">"Previous quarters exceeded targets"</span>,</span>
-<span>      tension <span class="op">=</span> <span class="st">"What's causing the Q2 decline?"</span>,</span>
-<span>      resolution <span class="op">=</span> <span class="st">"Identify underperforming product categories"</span></span>
+<span>      hook <span class="op">=</span> <span class="st">"Key metrics hidden"</span>,</span>
+<span>      resolution <span class="op">=</span> <span class="st">"Surface top metrics up front"</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/bid_structure.html">bid_structure</a></span><span class="op">(</span></span>
-<span>    layout <span class="op">=</span> <span class="st">"dual_process"</span>,</span>
-<span>    concepts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"principle_of_proximity"</span>, <span class="st">"default_effect"</span><span class="op">)</span></span>
+<span>    layout <span class="op">=</span> <span class="st">"dual_process"</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/bid_anticipate.html">bid_anticipate</a></span><span class="op">(</span></span>
-<span>    bias_mitigations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>      anchoring <span class="op">=</span> <span class="st">"Using context-aware reference points"</span>,</span>
-<span>      framing <span class="op">=</span> <span class="st">"Providing both positive and negative framings"</span></span>
-<span>    <span class="op">)</span></span>
+<span>    bias_mitigations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>anchoring <span class="op">=</span> <span class="st">"Contextual defaults"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/bid_validate.html">bid_validate</a></span><span class="op">(</span></span>
-<span>    summary_panel <span class="op">=</span> <span class="st">"Key insights summary"</span>,</span>
-<span>    collaboration <span class="op">=</span> <span class="st">"Team annotation features"</span></span>
+<span>    summary_panel <span class="op">=</span> <span class="st">"Insights summary"</span></span>
 <span>  <span class="op">)</span></span>
-<span><span class="co">#&gt; Auto-suggested theory: Cognitive Load Theory (confidence: 90%)</span></span>
-<span><span class="co">#&gt; Stage 1 (Notice) completed. (20% complete)</span></span>
-<span><span class="co">#&gt;   - Problem: Users can't find the most important metrics</span></span>
-<span><span class="co">#&gt;   - Theory: Cognitive Load Theory (auto-suggested)</span></span>
-<span><span class="co">#&gt;   - Evidence: User testing showed 70% of users spending &gt;30s looking fo...</span></span>
-<span><span class="co">#&gt;   - Theory confidence: 90%</span></span>
-<span><span class="co">#&gt;   - Next: Use bid_interpret() for Stage 2 </span></span>
-<span><span class="co">#&gt; Stage 2 (Interpret) completed.</span></span>
-<span><span class="co">#&gt;   - Central question: How are sales trending against targets?</span></span>
-<span><span class="co">#&gt;   - Your data story has all key elements. Focus on making each component compelling and relevant.</span></span>
-<span><span class="co">#&gt;   - Your central question is appropriately scoped.</span></span>
-<span><span class="co">#&gt;   - No user personas defined</span></span>
-<span><span class="co">#&gt; Stage 3 (Structure) completed.</span></span>
-<span><span class="co">#&gt;   - Layout: dual_process</span></span>
-<span><span class="co">#&gt;   - Concepts: Principle of Proximity, Default Effect</span></span>
-<span><span class="co">#&gt;   - No accessibility considerations specified</span></span>
-<span><span class="co">#&gt; Stage 4 (Anticipate) completed.</span></span>
-<span><span class="co">#&gt;   - Bias mitigations: 2 defined</span></span>
-<span><span class="co">#&gt;   - Interaction principles: 2 defined</span></span>
-<span><span class="co">#&gt;   - Key suggestions: anchoring mitigation: Always show reference points like previous period, budget, or industry average., framing mitigation: Toggle between progress (65% complete) and gap (35% remaining) framing., Consider also addressing these common biases: confirmation</span></span>
-<span><span class="co">#&gt; Stage 5 (Validate) completed.</span></span>
-<span><span class="co">#&gt;   - Summary panel: Key insights summary</span></span>
-<span><span class="co">#&gt;   - Collaboration: Team annotation features</span></span>
-<span><span class="co">#&gt;   - Next steps: 5 items defined</span></span>
-<span><span class="co">#&gt;   - Validation stage is well-defined. Focus on implementation and user testing.</span></span>
-<span><span class="va">bid_process</span></span>
-<span><span class="co">#&gt; # A tibble: 1 × 14</span></span>
-<span><span class="co">#&gt;   stage    summary_panel        collaboration           next_steps previous_bias</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;                &lt;chr&gt;                   &lt;chr&gt;      &lt;chr&gt;        </span></span>
-<span><span class="co">#&gt; 1 Validate Key insights summary Team annotation featur… Conduct u… anchoring: U…</span></span>
-<span><span class="co">#&gt; # ℹ 9 more variables: previous_interaction &lt;json&gt;, previous_layout &lt;chr&gt;,</span></span>
-<span><span class="co">#&gt; #   previous_concepts &lt;chr&gt;, previous_accessibility &lt;chr&gt;,</span></span>
-<span><span class="co">#&gt; #   previous_central_question &lt;chr&gt;, previous_problem &lt;chr&gt;,</span></span>
-<span><span class="co">#&gt; #   previous_theory &lt;chr&gt;, suggestions &lt;chr&gt;, timestamp &lt;dttm&gt;</span></span>
 <span></span>
-<span><span class="co"># Generate implementation suggestions</span></span>
-<span><span class="fu"><a href="reference/bid_suggest_components.html">bid_suggest_components</a></span><span class="op">(</span><span class="va">bid_process</span>, <span class="st">"bslib"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 4 × 7</span></span>
-<span><span class="co">#&gt;   package component description bid_stage_relevance cognitive_concepts use_cases</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;   &lt;chr&gt;     &lt;chr&gt;       &lt;chr&gt;               &lt;chr&gt;              &lt;chr&gt;    </span></span>
-<span><span class="co">#&gt; 1 bslib   nav_panel Create tab… Stage 1,Stage 3     Cognitive Load Th… content …</span></span>
-<span><span class="co">#&gt; 2 bslib   accordion Implement … Stage 1,Stage 3     Progressive Discl… FAQ sect…</span></span>
-<span><span class="co">#&gt; 3 bslib   card      Organize c… Stage 3,Stage 5     Principle of Prox… Content …</span></span>
-<span><span class="co">#&gt; 4 bslib   layout_c… Create fle… Stage 3             Visual Hierarchy,… precise …</span></span>
-<span><span class="co">#&gt; # ℹ 1 more variable: relevance &lt;dbl&gt;</span></span>
+<span><span class="co"># View suggestions</span></span>
+<span><span class="fu"><a href="reference/bid_suggest_components.html">bid_suggest_components</a></span><span class="op">(</span><span class="va">process</span>, package <span class="op">=</span> <span class="st">"bslib"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Create a report</span></span>
-<span><span class="va">report</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_report.html">bid_report</a></span><span class="op">(</span><span class="va">bid_process</span>, format <span class="op">=</span> <span class="st">"html"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># Generate an HTML report</span></span>
+<span><span class="fu"><a href="reference/bid_report.html">bid_report</a></span><span class="op">(</span><span class="va">process</span>, format <span class="op">=</span> <span class="st">"html"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="learn-more">Learn More<a class="anchor" aria-label="anchor" href="#learn-more"></a>
+<h2 id="id_-telemetry-integration">📊 Telemetry Integration<a class="anchor" aria-label="anchor" href="#id_-telemetry-integration"></a>
 </h2>
-<p>Check out the vignettes for more information:</p>
-<ul>
-<li>
-<code><a href="articles/introduction-to-bid.html">vignette("introduction-to-bid")</a></code> - Overview of the BID framework</li>
-<li>
-<code><a href="articles/getting-started.html">vignette("getting-started")</a></code> - Quick start guide with implementation examples</li>
-<li>
-<code><a href="articles/concepts-reference.html">vignette("concepts-reference")</a></code> - Detailed guide to implementing key concepts</li>
-<li>
-<code><a href="articles/telemetry-integration.html">vignette("telemetry-integration")</a></code> - Example of integrating telemetry data into the BID process</li>
-</ul>
-<p>Visit the <a href="https://jrwinget.github.io/bidux/">package website</a> for complete documentation and examples.</p>
-</div>
-<div class="section level2">
-<h2 id="contributing">Contributing<a class="anchor" aria-label="anchor" href="#contributing"></a>
-</h2>
-<p>We welcome contributions to the <a href="https://jrwinget.github.io/bidux/">bidux</a> package! Whether you’re reporting bugs, suggesting new features, or contributing code, your involvement helps make <a href="https://jrwinget.github.io/bidux/">bidux</a> better for everyone.</p>
-<div class="section level3">
-<h3 id="quick-start-for-contributors">Quick Start for Contributors<a class="anchor" aria-label="anchor" href="#quick-start-for-contributors"></a>
-</h3>
+<p>Leverage real user behavior to pinpoint UX friction with <a href="https://github.com/Appsilon/shiny.telemetry" class="external-link">{shiny.telemetry}</a> data:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Ingest telemetry from SQLite or JSON</span></span>
+<span><span class="va">issues</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_ingest_telemetry.html">bid_ingest_telemetry</a></span><span class="op">(</span></span>
+<span>  <span class="st">"telemetry.sqlite"</span>,</span>
+<span>  format <span class="op">=</span> <span class="st">"sqlite"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Inspect detected issues</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span></span></code></pre></div>
+<p><code><a href="reference/bid_ingest_telemetry.html">bid_ingest_telemetry()</a></code> automatically flags five friction indicators:</p>
 <ol style="list-style-type: decimal">
 <li>
-<strong>Check existing issues</strong> - Browse <a href="https://github.com/jrwinget/bidux/issues" class="external-link">open issues</a> to see if your idea or bug has already been reported</li>
+<strong>Unused Inputs</strong>: controls rarely interacted with</li>
 <li>
-<strong>Use issue templates</strong> - When creating new issues, please use our structured templates to provide complete information</li>
+<strong>Delayed Interactions</strong>: long time-to-first-action</li>
 <li>
-<strong>Join discussions</strong> - Participate in <a href="https://github.com/jrwinget/bidux/discussions" class="external-link">GitHub Discussions</a> for questions and ideas</li>
+<strong>Frequent Errors</strong>: recurring error patterns</li>
 <li>
-<strong>Review the documentation</strong> - Check the <a href="https://jrwinget.github.io/bidux/">package website</a> and <a href="https://github.com/jrwinget/bid-framework" class="external-link">BID framework resources</a>
-</li>
+<strong>Navigation Drop-offs</strong>: seldom-visited tabs/pages</li>
+<li>
+<strong>Confusion Patterns</strong>: rapid repeated changes</li>
 </ol>
-</div>
-<div class="section level3">
-<h3 id="types-of-contributions">Types of Contributions<a class="anchor" aria-label="anchor" href="#types-of-contributions"></a>
-</h3>
-<p>We have specific issue templates for different types of contributions:</p>
-<ul>
-<li>
-<strong><a href="https://github.com/jrwinget/bidux/issues/new?template=01_bug-report.yml" class="external-link">🐛 Bug Report</a></strong> - Report issues with existing functionality</li>
-<li>
-<strong><a href="https://github.com/jrwinget/bidux/issues/new?template=02_feature-request.yml" class="external-link">✨ Feature Request</a></strong> - Suggest new features or enhancements</li>
-<li>
-<strong><a href="https://github.com/jrwinget/bidux/issues/new?template=03_documentation-improvement.yml" class="external-link">📖 Documentation</a></strong> - Help improve docs and examples</li>
-<li>
-<strong><a href="https://github.com/jrwinget/bidux/issues/new?template=04_accessibility-issue.yml" class="external-link">♿ Accessibility Issue</a></strong> - Report or fix accessibility barriers</li>
-<li>
-<strong><a href="https://github.com/jrwinget/bidux/issues/new?template=05_theory-suggestion.yml" class="external-link">🧠 Theory Suggestions</a></strong> - Propose new concepts or theories</li>
-<li>
-<strong><a href="https://github.com/jrwinget/bidux/issues/new?template=06_shiny-integration-request.yml" class="external-link">✨ Shiny Integration Requests</a></strong> - Improve integration with Shiny packages</li>
-</ul>
-</div>
-<div class="section level3">
-<h3 id="code-style-guidelines">Code Style Guidelines<a class="anchor" aria-label="anchor" href="#code-style-guidelines"></a>
-</h3>
-<ul>
-<li>Follow the existing code style in the package</li>
-<li>Use descriptive function and variable names</li>
-<li>Include roxygen2 documentation for all functions</li>
-<li>Write clear commit messages</li>
-<li>Consider psychological principles in your implementations</li>
-</ul>
-</div>
-<div class="section level3">
-<h3 id="bid-framework-considerations">BID Framework Considerations<a class="anchor" aria-label="anchor" href="#bid-framework-considerations"></a>
-</h3>
-<p>When contributing, please consider:</p>
-<ul>
-<li>
-<strong>Psychological Accuracy</strong> - Ensure psychological concepts are accurately represented</li>
-<li>
-<strong>Accessibility</strong> - All contributions should maintain or improve accessibility</li>
-<li>
-<strong>User Experience</strong> - Consider how changes affect the user workflow</li>
-<li>
-<strong>Evidence-Based</strong> - Provide references for psychological theories when applicable</li>
-</ul>
-</div>
-<div class="section level3">
-<h3 id="development-setup">Development Setup<a class="anchor" aria-label="anchor" href="#development-setup"></a>
-</h3>
-<p>For more detailed development instructions:</p>
-<ol style="list-style-type: decimal">
-<li><p><strong>Clone the repository</strong>: <code>bash     git clone https://github.com/jrwinget/bidux.git     cd bidux</code></p></li>
-<li>
-<p><strong>Set up your development environment</strong>: ```r # Install package dependencies pak::pak(desc::desc_get_deps()$package)</p>
-<p># Install development tools pak::pak(c(“devtools”, “testthat”, “roxygen2”, “pkgdown”)) ```</p>
-</li>
-<li>
-<p><strong>Run development workflow</strong>: ```r # Load package for development devtools::load_all()</p>
-<p># Run tests devtools::test()</p>
-<p># Build documentation devtools::document()</p>
-<p># Check package devtools::check() ```</p>
-</li>
-</ol>
-</div>
-<div class="section level3">
-<h3 id="questions">Questions?<a class="anchor" aria-label="anchor" href="#questions"></a>
-</h3>
-<ul>
-<li>
-<strong>General questions</strong> - Use <a href="https://github.com/jrwinget/bidux/discussions" class="external-link">GitHub Discussions</a>
-</li>
-<li>
-<strong>Bug reports</strong> - Use the bug report issue template</li>
-<li>
-<strong>Feature ideas</strong> - Use the feature request template</li>
-<li>
-<strong>Direct contact</strong> - Email the maintainer at <a href="mailto:contact@jrwinget.com" class="email">contact@jrwinget.com</a>
-</li>
-</ul>
-<p>Thank you for helping improve <a href="https://jrwinget.github.io/bidux/">bidux</a> and making behavioral psychology more accessible to R developers!</p>
-</div>
+<p>Use these insights to fuel the <strong>Notice</strong> stage and drive data-informed UI improvements. See the full example and thresholds customization in the <a href="vignettes/telemetry-integration.Rmd">Telemetry Integration Vignette</a>.</p>
 </div>
 <div class="section level2">
-<h2 id="code-of-conduct">Code of Conduct<a class="anchor" aria-label="anchor" href="#code-of-conduct"></a>
+<h2 id="id_-vignettes">📚 Vignettes<a class="anchor" aria-label="anchor" href="#id_-vignettes"></a>
 </h2>
-<p>Please note that this project is released with a <a href="https://contributor-covenant.org/version/2/1/CODE_OF_CONDUCT.html" class="external-link">Contributor Code of Conduct</a>. By contributing to this project, you agree to abide by its terms. See the <a href="CODE_OF_CONDUCT.html">CODE_OF_CONDUCT</a> file for details.</p>
+<p>Explore detailed guides:</p>
+<ul>
+<li>
+<code><a href="articles/introduction-to-bid.html">vignette("introduction-to-bid")</a></code>: BID framework overview</li>
+<li>
+<code><a href="articles/getting-started.html">vignette("getting-started")</a></code>: Quick start guide</li>
+<li>
+<code><a href="articles/concepts-reference.html">vignette("concepts-reference")</a></code>: Comprehensive concept dictionary</li>
+<li>
+<code><a href="articles/telemetry-integration.html">vignette("telemetry-integration")</a></code>: Integrating telemetry with BIDUX</li>
+</ul>
 </div>
 <div class="section level2">
-<h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
+<h2 id="id_-contributing">🤝 Contributing<a class="anchor" aria-label="anchor" href="#id_-contributing"></a>
 </h2>
-<p>This project is licensed under the MIT License - see the <a href="LICENSE">LICENSE</a> file for details.</p>
+<p>We welcome all contributions! Please see <a href="CONTRIBUTING.html">CONTRIBUTING.md</a> for guidelines, issue templates, and code style.</p>
+</div>
+<div class="section level2">
+<h2 id="id_-license--code-of-conduct">📜 License &amp; Code of Conduct<a class="anchor" aria-label="anchor" href="#id_-license--code-of-conduct"></a>
+</h2>
+<p>This project is MIT licensed. By contributing, you agree to our <a href="CODE_OF_CONDUCT.html">Code of Conduct</a>.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -568,6 +214,7 @@
 <div class="community">
 <h2 data-toc-skip>Community</h2>
 <ul class="list-unstyled">
+<li><a href="CONTRIBUTING.html">Contributing guide</a></li>
 <li><a href="CODE_OF_CONDUCT.html">Code of conduct</a></li>
 </ul>
 </div>

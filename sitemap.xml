@@ -1,6 +1,7 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://jrwinget.github.io/bidux/404.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/CODE_OF_CONDUCT.html</loc></url>
+<url><loc>https://jrwinget.github.io/bidux/CONTRIBUTING.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/LICENSE-text.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/LICENSE.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/articles/concepts-reference.html</loc></url>
@@ -38,7 +39,6 @@
 <url><loc>https://jrwinget.github.io/bidux/reference/find_navigation_dropoffs.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/find_unused_inputs.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/format_label.html</loc></url>
-<url><loc>https://jrwinget.github.io/bidux/reference/generate_notice_suggestions.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/get_accessibility_recommendations.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/get_concept_bias_mappings.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/get_concepts_data.html</loc></url>
@@ -66,7 +66,6 @@
 <url><loc>https://jrwinget.github.io/bidux/reference/suggest_theory_from_mappings.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/summary.bid_result.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/summary.bid_stage.html</loc></url>
-<url><loc>https://jrwinget.github.io/bidux/reference/truncate_text.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/validate_bid_result.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/validate_bid_stage.html</loc></url>
 </urlset>
