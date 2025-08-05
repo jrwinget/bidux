@@ -309,7 +309,7 @@ test_that("bid_notice generates appropriate suggestions", {
     evidence = "Touch targets are too small"
   )
 
-  # Should generate relevant suggestions 
+  # Should generate relevant suggestions
   expect_true(nchar(result$suggestions) > 0)
   expect_match(result$suggestions, "target audience|design solutions", ignore.case = TRUE)
 

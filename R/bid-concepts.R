@@ -125,10 +125,10 @@ bid_concept <- function(concept_name, add_recommendations = TRUE) {
 get_concepts_data <- function() {
   # reuse the unified loading pattern
   required_cols <- c(
-    "concept", "description", "category", "reference", 
+    "concept", "description", "category", "reference",
     "example", "implementation_tips", "related_concepts"
   )
-  
+
   # load external data and ensure it's returned as tibble
   data <- load_external_data(
     "bid_concepts_data.csv",
@@ -136,7 +136,7 @@ get_concepts_data <- function() {
     get_default_concepts_data,
     NULL
   )
-  
+
   return(tibble::as_tibble(data))
 }
 

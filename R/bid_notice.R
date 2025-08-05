@@ -168,6 +168,6 @@ suggest_theory_from_problem <- function(problem, evidence = NULL) {
       "Use suggest_theory_from_mappings instead."
     )
   )
-  
+
   suggest_theory_from_mappings(problem, evidence, mappings = NULL)
 }

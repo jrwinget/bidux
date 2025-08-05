@@ -1,14 +1,4 @@
-# Telemetry Analysis System
-#
-# This file contains all telemetry-related functionality:
-# - Telemetry data ingestion and reading
-# - Telemetry analysis helper functions  
-# - Notice creation from telemetry analysis
-
-# Note: This file combines functionality from:
-# - telemetry-ingestion.R (bid_ingest_telemetry + data readers)
-# - telemetry-analysis.R (analysis helper functions)
-# - telemetry-notices.R (notice creation functions)#' Ingest telemetry data and identify UX friction points
+#' Ingest telemetry data and identify UX friction points
 #'
 #' @description
 #' This function ingests telemetry data from shiny.telemetry output (SQLite or
@@ -303,39 +293,13 @@ read_telemetry_json <- function(path) {
     cli::cli_abort("Package 'jsonlite' is required to read JSON telemetry data")
   }
 
-  tryCatch({
-    # try to read as JSON lines (one JSON object per line)
-    lines <- readLines(path, warn = FALSE)
-    lines <- lines[nchar(trimws(lines)) > 0]
+  tryCatch(
+    {
+      # try to read as JSON lines (one JSON object per line)
+      lines <- readLines(path, warn = FALSE)
+      lines <- lines[nchar(trimws(lines)) > 0]
 
-    if (length(lines) == 0) {
-      return(data.frame(
-        timestamp = character(),
-        session_id = character(),
-        event_type = character(),
-        stringsAsFactors = FALSE
-      ))
-    }
-
-    # check if JSON array
-    if (substr(trimws(lines[1]), 1, 1) == "[") {
-      # if TRUE, parse as whole
-      events <- jsonlite::fromJSON(
-        paste(lines, collapse = "\n"),
-        flatten = TRUE
-      )
-    } else {
-      # if FALSE, try to parse each line as JSON
-      events_list <- lapply(lines, function(line) {
-        tryCatch(
-          jsonlite::fromJSON(line, flatten = TRUE),
-          error = function(e) NULL
-        )
-      })
-
-      events_list <- events_list[!sapply(events_list, is.null)]
-
-      if (length(events_list) == 0) {
+      if (length(lines) == 0) {
         return(data.frame(
           timestamp = character(),
           session_id = character(),
@@ -344,45 +308,74 @@ read_telemetry_json <- function(path) {
         ))
       }
 
-      # filter out events that don't have required fields
-      required_fields <- c("timestamp", "session_id", "event_type")
-      valid_events <- lapply(events_list, function(event) {
-        if (is.list(event) && all(required_fields %in% names(event))) {
-          return(event)
+      # check if JSON array
+      if (substr(trimws(lines[1]), 1, 1) == "[") {
+        # if TRUE, parse as whole
+        events <- jsonlite::fromJSON(
+          paste(lines, collapse = "\n"),
+          flatten = TRUE
+        )
+      } else {
+        # if FALSE, try to parse each line as JSON
+        events_list <- lapply(lines, function(line) {
+          tryCatch(
+            jsonlite::fromJSON(line, flatten = TRUE),
+            error = function(e) NULL
+          )
+        })
+
+        events_list <- events_list[!sapply(events_list, is.null)]
+
+        if (length(events_list) == 0) {
+          return(data.frame(
+            timestamp = character(),
+            session_id = character(),
+            event_type = character(),
+            stringsAsFactors = FALSE
+          ))
         }
-        return(NULL)
-      })
 
-      valid_events <- valid_events[!sapply(valid_events, is.null)]
+        # filter out events that don't have required fields
+        required_fields <- c("timestamp", "session_id", "event_type")
+        valid_events <- lapply(events_list, function(event) {
+          if (is.list(event) && all(required_fields %in% names(event))) {
+            return(event)
+          }
+          return(NULL)
+        })
 
-      if (length(valid_events) == 0) {
-        cli::cli_abort("No valid events found in JSON file")
+        valid_events <- valid_events[!sapply(valid_events, is.null)]
+
+        if (length(valid_events) == 0) {
+          cli::cli_abort("No valid events found in JSON file")
+        }
+
+        events <- dplyr::bind_rows(valid_events)
       }
 
-      events <- dplyr::bind_rows(valid_events)
-    }
+      if (!is.data.frame(events)) {
+        events <- as.data.frame(events)
+      }
 
-    if (!is.data.frame(events)) {
-      events <- as.data.frame(events)
-    }
+      # if empty, return empty data frame with req columns
+      if (nrow(events) == 0) {
+        return(data.frame(
+          timestamp = character(),
+          session_id = character(),
+          event_type = character(),
+          stringsAsFactors = FALSE
+        ))
+      }
 
-    # if empty, return empty data frame with req columns
-    if (nrow(events) == 0) {
-      return(data.frame(
-        timestamp = character(),
-        session_id = character(),
-        event_type = character(),
-        stringsAsFactors = FALSE
-      ))
-    }
-    
-    # normalize column names
-    events <- normalize_telemetry_columns(events)
+      # normalize column names
+      events <- normalize_telemetry_columns(events)
 
-    return(events)
-  }, error = function(e) {
-    cli::cli_abort("Error reading JSON file: {e$message}")
-  })
+      return(events)
+    },
+    error = function(e) {
+      cli::cli_abort("Error reading JSON file: {e$message}")
+    }
+  )
 }
 
 #' Normalize telemetry column names
@@ -477,14 +470,14 @@ normalize_telemetry_columns <- function(events) {
 #' @keywords internal
 find_unused_inputs <- function(events, threshold = 0.05) {
   input_events <- events[events$event_type == "input", ]
-  
+
   if (nrow(input_events) == 0) {
     return(list())
   }
-  
+
   # Get total sessions
   total_sessions <- length(unique(events$session_id))
-  
+
   # Count sessions per input
   input_usage <- input_events |>
     dplyr::distinct(session_id, input_id) |>
@@ -493,17 +486,17 @@ find_unused_inputs <- function(events, threshold = 0.05) {
       usage_rate = sessions_used / total_sessions,
       is_unused = usage_rate <= threshold
     )
-  
+
   # Also find inputs that appear in UI but were never used
   # (This would require knowledge of all available inputs, which we don't have
   # from telemetry alone, so we focus on rarely used inputs)
-  
+
   unused_inputs <- input_usage[input_usage$is_unused, ]
-  
+
   if (nrow(unused_inputs) == 0) {
     return(list())
   }
-  
+
   # Convert to list format for easier processing
   result <- lapply(seq_len(nrow(unused_inputs)), function(i) {
     list(
@@ -512,7 +505,7 @@ find_unused_inputs <- function(events, threshold = 0.05) {
       usage_rate = unused_inputs$usage_rate[i]
     )
   })
-  
+
   return(result)
 }
 
@@ -525,11 +518,11 @@ find_delayed_sessions <- function(events, threshold_seconds = 30) {
   # Find login events
   login_events <- events[events$event_type == "login", c("session_id", "timestamp")]
   names(login_events)[2] <- "login_time"
-  
+
   if (nrow(login_events) == 0) {
     return(NULL)
   }
-  
+
   # Find first user action per session (input, navigation, or custom event)
   action_types <- c("input", "navigation", "custom")
   first_actions <- events[events$event_type %in% action_types, ] |>
@@ -537,10 +530,10 @@ find_delayed_sessions <- function(events, threshold_seconds = 30) {
     dplyr::slice_min(timestamp, n = 1) |>
     dplyr::ungroup() |>
     dplyr::select(session_id, first_action_time = timestamp, first_action_type = event_type)
-  
+
   # Join login times with first actions
   session_delays <- dplyr::left_join(login_events, first_actions, by = "session_id")
-  
+
   # Calculate delays
   session_delays$delay_seconds <- as.numeric(
     difftime(
@@ -549,14 +542,14 @@ find_delayed_sessions <- function(events, threshold_seconds = 30) {
       units = "secs"
     )
   )
-  
+
   # Handle sessions with no actions (infinite delay)
   no_action_sessions <- sum(is.na(session_delays$delay_seconds))
   session_delays$delay_seconds[is.na(session_delays$delay_seconds)] <- Inf
-  
+
   # Calculate statistics
   delays_finite <- session_delays$delay_seconds[is.finite(session_delays$delay_seconds)]
-  
+
   result <- list(
     total_sessions = nrow(session_delays),
     no_action_sessions = no_action_sessions,
@@ -567,14 +560,14 @@ find_delayed_sessions <- function(events, threshold_seconds = 30) {
     rate_over_threshold = sum(session_delays$delay_seconds > threshold_seconds, na.rm = TRUE) / nrow(session_delays),
     has_issues = FALSE
   )
-  
+
   # Determine if there are issues
-  if (result$no_action_rate > 0.1 || 
-      (!is.na(result$median_delay) && result$median_delay > threshold_seconds) ||
-      result$rate_over_threshold > 0.2) {
+  if (result$no_action_rate > 0.1 ||
+    (!is.na(result$median_delay) && result$median_delay > threshold_seconds) ||
+    result$rate_over_threshold > 0.2) {
     result$has_issues <- TRUE
   }
-  
+
   return(result)
 }
 
@@ -586,13 +579,13 @@ find_delayed_sessions <- function(events, threshold_seconds = 30) {
 find_error_patterns <- function(events, threshold_rate = 0.1) {
   # Filter to error events
   error_events <- events[events$event_type == "error", ]
-  
+
   if (nrow(error_events) == 0) {
     return(list())
   }
-  
+
   total_sessions <- length(unique(events$session_id))
-  
+
   # Count errors by message and output
   error_patterns <- error_events |>
     dplyr::group_by(error_message, output_id) |>
@@ -606,41 +599,42 @@ find_error_patterns <- function(events, threshold_rate = 0.1) {
     ) |>
     dplyr::filter(session_rate >= threshold_rate | count >= 5) |>
     dplyr::arrange(dplyr::desc(count))
-  
+
   if (nrow(error_patterns) == 0) {
     return(list())
   }
-  
+
   # Find associated context (what inputs triggered errors)
   result <- lapply(seq_len(nrow(error_patterns)), function(i) {
     pattern <- error_patterns[i, ]
-    
+
     # Find inputs changed just before these errors
     error_sessions <- error_events[
       error_events$error_message == pattern$error_message &
-      (error_events$output_id %||% "") == (pattern$output_id %||% ""),
+        (error_events$output_id %||% "") == (pattern$output_id %||% ""),
       c("session_id", "timestamp")
     ]
-    
+
     # Look for inputs changed within 5 seconds before error
     associated_inputs <- character(0)
     for (j in seq_len(nrow(error_sessions))) {
       session <- error_sessions$session_id[j]
       error_time <- error_sessions$timestamp[j]
-      
+
       recent_inputs <- events[
         events$session_id == session &
-        events$event_type == "input" &
-        events$timestamp >= (error_time - 5) &
-        events$timestamp < error_time,
-        "input_id", drop = FALSE
+          events$event_type == "input" &
+          events$timestamp >= (error_time - 5) &
+          events$timestamp < error_time,
+        "input_id",
+        drop = FALSE
       ]
-      
+
       if (!is.null(recent_inputs) && nrow(recent_inputs) > 0) {
         associated_inputs <- c(associated_inputs, recent_inputs$input_id)
       }
     }
-    
+
     # Get most common associated input
     if (length(associated_inputs) > 0) {
       input_table <- table(associated_inputs)
@@ -648,7 +642,7 @@ find_error_patterns <- function(events, threshold_rate = 0.1) {
     } else {
       top_input <- NULL
     }
-    
+
     list(
       error_message = pattern$error_message,
       output_id = pattern$output_id,
@@ -658,7 +652,7 @@ find_error_patterns <- function(events, threshold_rate = 0.1) {
       associated_input = top_input
     )
   })
-  
+
   return(result)
 }
 
@@ -670,13 +664,13 @@ find_error_patterns <- function(events, threshold_rate = 0.1) {
 find_navigation_dropoffs <- function(events, threshold = 0.2) {
   # Filter navigation events
   nav_events <- events[events$event_type == "navigation", ]
-  
+
   if (nrow(nav_events) == 0) {
     return(list())
   }
-  
+
   total_sessions <- length(unique(events$session_id))
-  
+
   # Count page visits
   page_visits <- nav_events |>
     dplyr::group_by(navigation_id) |>
@@ -690,18 +684,18 @@ find_navigation_dropoffs <- function(events, threshold = 0.2) {
     ) |>
     dplyr::filter(visit_rate < threshold) |>
     dplyr::arrange(visit_rate)
-  
+
   if (nrow(page_visits) == 0) {
     return(list())
   }
-  
+
   # Analyze exit patterns
   result <- lapply(seq_len(nrow(page_visits)), function(i) {
     page <- page_visits$navigation_id[i]
-    
+
     # Find sessions that ended on this page
     page_sessions <- nav_events[nav_events$navigation_id == page, "session_id", drop = FALSE]
-    
+
     exits_on_page <- 0
     for (session in unique(page_sessions$session_id)) {
       session_events <- events[events$session_id == session, ]
@@ -709,7 +703,7 @@ find_navigation_dropoffs <- function(events, threshold = 0.2) {
         session_events$event_type == "navigation",
         c("timestamp", "navigation_id")
       ]
-      
+
       if (nrow(last_nav) > 0) {
         last_nav <- last_nav[which.max(last_nav$timestamp), ]
         if (last_nav$navigation_id == page) {
@@ -717,7 +711,7 @@ find_navigation_dropoffs <- function(events, threshold = 0.2) {
         }
       }
     }
-    
+
     list(
       page = page,
       visit_count = page_visits$visit_count[i],
@@ -731,7 +725,7 @@ find_navigation_dropoffs <- function(events, threshold = 0.2) {
       }
     )
   })
-  
+
   return(result)
 }
 
@@ -744,27 +738,27 @@ find_navigation_dropoffs <- function(events, threshold = 0.2) {
 find_confusion_patterns <- function(events, window_seconds = 10, min_changes = 5) {
   # Filter to input events
   input_events <- events[events$event_type == "input", ]
-  
+
   if (nrow(input_events) == 0) {
     return(list())
   }
-  
+
   # Group by session and input
   confusion_patterns <- list()
-  
+
   sessions <- unique(input_events$session_id)
   for (session in sessions) {
     session_inputs <- input_events[input_events$session_id == session, ]
-    
+
     # Check each input for rapid changes
     inputs <- unique(session_inputs$input_id)
     for (input in inputs) {
       input_changes <- session_inputs[session_inputs$input_id == input, ]
-      
+
       if (nrow(input_changes) >= min_changes) {
         # Check for rapid changes using sliding window
         timestamps <- sort(input_changes$timestamp)
-        
+
         for (i in seq_len(length(timestamps) - min_changes + 1)) {
           window_end <- i + min_changes - 1
           time_diff <- as.numeric(
@@ -774,7 +768,7 @@ find_confusion_patterns <- function(events, window_seconds = 10, min_changes = 5
               units = "secs"
             )
           )
-          
+
           if (time_diff <= window_seconds) {
             # Found confusion pattern
             confusion_patterns[[length(confusion_patterns) + 1]] <- list(
@@ -784,36 +778,36 @@ find_confusion_patterns <- function(events, window_seconds = 10, min_changes = 5
               time_window = time_diff,
               timestamp = timestamps[i]
             )
-            break  # Only record once per input/session
+            break # Only record once per input/session
           }
         }
       }
     }
   }
-  
+
   # Aggregate by input to find systematic issues
   if (length(confusion_patterns) == 0) {
     return(list())
   }
-  
+
   # Count occurrences by input
   input_confusion_counts <- table(
     sapply(confusion_patterns, function(x) x$input_id)
   )
-  
+
   # Only return inputs with multiple confused sessions
   systematic_inputs <- names(input_confusion_counts)[input_confusion_counts >= 2]
-  
+
   if (length(systematic_inputs) == 0) {
     return(list())
   }
-  
+
   # Create summary for systematic confusion patterns
   result <- lapply(systematic_inputs, function(input) {
     input_patterns <- confusion_patterns[
       sapply(confusion_patterns, function(x) x$input_id == input)
     ]
-    
+
     list(
       input_id = input,
       affected_sessions = length(input_patterns),
@@ -821,7 +815,7 @@ find_confusion_patterns <- function(events, window_seconds = 10, min_changes = 5
       avg_time_window = mean(sapply(input_patterns, function(x) x$time_window))
     )
   })
-  
+
   return(result)
 }
 
@@ -1021,4 +1015,3 @@ create_confusion_notice <- function(confusion_info, total_sessions) {
 
   return(notice)
 }
-

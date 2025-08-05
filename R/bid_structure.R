@@ -558,4 +558,3 @@ build_structure_suggestions <- function(
 
   return(paste(suggestions_parts, collapse = " "))
 }
-

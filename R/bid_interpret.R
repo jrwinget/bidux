@@ -80,7 +80,7 @@ bid_interpret <- function(
     user_personas = NULL) {
   # standardized parameter validation
   validate_bid_stage_params(
-    previous_stage, 
+    previous_stage,
     "Interpret",
     list(
       data_story = list(value = data_story, type = "list", allow_null = TRUE),
@@ -178,7 +178,7 @@ bid_interpret <- function(
 
     if (previous_stage$stage[1] == "Notice") {
       stage_data <- extract_stage_data(
-        previous_stage, 
+        previous_stage,
         c("problem", "theory", "evidence", "target_audience")
       )
       problem <- stage_data$problem
@@ -339,8 +339,7 @@ bid_interpret <- function(
         !is.na(data_story$audience)
     ) {
       audience <- data_story$audience
-    }
-    else if (
+    } else if (
       # try to get audience from previous_stage
       previous_stage$stage[1] == "Notice" &&
         "target_audience" %in% names(previous_stage) &&
@@ -560,4 +559,3 @@ bid_interpret <- function(
 
   return(result)
 }
-

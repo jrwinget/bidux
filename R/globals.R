@@ -3,7 +3,7 @@ utils::globalVariables(
   c(
     "concept", # used in bid_concept() filtering
     "relevance", # used in bid_suggest_components() ordering
-    
+
     # Telemetry analysis variables
     "session_id", # used in find_delayed_sessions and find_error_patterns
     "event_type", # used in find_delayed_sessions
@@ -20,7 +20,7 @@ utils::globalVariables(
     "change_count", # used in find_confusion_patterns
     "avg_changes", # used in find_confusion_patterns
     "usage_rate", # used in find_unused_inputs
-    
+
     # Accessibility validation variables
     "screen_reader", # used in validate_accessibility_parameter
     "keyboard_navigation", # used in validate_accessibility_parameter
@@ -30,7 +30,7 @@ utils::globalVariables(
     "focus_indicators", # used in validate_accessibility_parameter
     "semantic_markup", # used in validate_accessibility_parameter
     "aria_labels", # used in validate_accessibility_parameter
-    
+
     # Concept matching variables
     "category", # used in concept matching functions
     "description", # used in concept descriptions
@@ -42,7 +42,7 @@ utils::globalVariables(
     "theory", # used in theory mappings and suggestions
     "layout", # used in layout mappings
     "components", # used in component suggestions
-    
+
     # Stage validation variables
     "stage", # used in stage validation
     "problem", # used in problem validation
@@ -58,7 +58,7 @@ utils::globalVariables(
     "accessibility", # used in accessibility validation
     "bias_mitigations", # used in bias mitigation validation
     "interaction_principles", # used in interaction principle validation
-    
+
     # Component suggestion variables
     "framework", # used in component framework filtering
     "stage_relevance", # used in stage-specific component scoring
@@ -69,10 +69,10 @@ utils::globalVariables(
     "component_name", # used in component identification
     "component_type", # used in component type filtering
     "component_description", # used in component descriptions
-    
+
     # Additional telemetry variables
     "navigation_id", # used in find_navigation_dropoffs
-    "unique_sessions", # used in find_navigation_dropoffs  
+    "unique_sessions", # used in find_navigation_dropoffs
     "visit_rate", # used in find_navigation_dropoffs
     "input_id", # used in find_unused_inputs
     "sessions_used" # used in find_unused_inputs

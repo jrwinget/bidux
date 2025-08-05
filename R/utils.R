@@ -149,19 +149,21 @@ validate_required_params <- function(...) {
 #' @noRd
 validate_character_param <- function(value, param_name, min_length = 1, allow_null = FALSE) {
   if (is.null(value)) {
-    if (allow_null) return(invisible(NULL))
+    if (allow_null) {
+      return(invisible(NULL))
+    }
     stop(paste0("'", param_name, "' cannot be NULL"), call. = FALSE)
   }
-  
+
   if (!is.character(value) || length(value) != 1) {
     stop(paste0("'", param_name, "' must be a single character string"), call. = FALSE)
   }
-  
+
   clean_value <- trimws(value)
   if (nchar(clean_value) < min_length) {
     stop(paste0("'", param_name, "' cannot be empty or contain only whitespace"), call. = FALSE)
   }
-  
+
   invisible(NULL)
 }
 
@@ -178,22 +180,26 @@ validate_character_param <- function(value, param_name, min_length = 1, allow_nu
 #' @noRd
 validate_list_param <- function(value, param_name, required_names = NULL, allow_null = TRUE) {
   if (is.null(value)) {
-    if (allow_null) return(invisible(NULL))
+    if (allow_null) {
+      return(invisible(NULL))
+    }
     stop(paste0("'", param_name, "' cannot be NULL"), call. = FALSE)
   }
-  
+
   if (!is.list(value)) {
     stop(paste0("'", param_name, "' must be a list"), call. = FALSE)
   }
-  
+
   if (!is.null(required_names)) {
     missing_names <- setdiff(required_names, names(value))
     if (length(missing_names) > 0) {
-      stop(paste0("'", param_name, "' is missing required elements: ", 
-                  paste(missing_names, collapse = ", ")), call. = FALSE)
+      stop(paste0(
+        "'", param_name, "' is missing required elements: ",
+        paste(missing_names, collapse = ", ")
+      ), call. = FALSE)
     }
   }
-  
+
   invisible(NULL)
 }
 
@@ -211,16 +217,16 @@ validate_bid_stage_params <- function(previous_stage, current_stage, additional_
   # validate previous stage
   validate_required_params(previous_stage = previous_stage)
   validate_previous_stage(previous_stage, current_stage)
-  
+
   # validate additional parameters
   for (param_name in names(additional_params)) {
     param_config <- additional_params[[param_name]]
     param_value <- param_config$value
-    
+
     if (param_config$type == "character") {
       validate_character_param(
-        param_value, 
-        param_name, 
+        param_value,
+        param_name,
         param_config$min_length %||% 1,
         param_config$allow_null %||% FALSE
       )
@@ -233,7 +239,7 @@ validate_bid_stage_params <- function(previous_stage, current_stage, additional_
       )
     }
   }
-  
+
   invisible(NULL)
 }
 
@@ -440,7 +446,7 @@ safe_column_access <- function(df, column_name, default = NA) {
 #' @noRd
 extract_stage_data <- function(previous_stage, columns, default_values = list()) {
   result <- list()
-  
+
   for (col in columns) {
     default_val <- if (col %in% names(default_values)) {
       default_values[[col]]
@@ -449,7 +455,7 @@ extract_stage_data <- function(previous_stage, columns, default_values = list())
     }
     result[[col]] <- safe_column_access(previous_stage, col, default_val)
   }
-  
+
   return(result)
 }
 
@@ -468,7 +474,7 @@ get_stage_metadata <- function(stage_number, custom_metadata = list()) {
     total_stages = 5,
     validation_status = "completed"
   )
-  
+
   return(c(base_metadata, custom_metadata))
 }
 
@@ -557,25 +563,25 @@ truncate_text <- function(text, max_length) {
 #' @noRd
 generate_stage_suggestions <- function(stage_name, context_data, suggestion_rules = NULL) {
   suggestions <- character(0)
-  
+
   # use custom rules if provided, otherwise use defaults
   rules <- suggestion_rules %||% get_default_suggestion_rules()
   stage_rules <- rules[[stage_name]]
-  
+
   if (is.null(stage_rules)) {
     return("Consider following BID framework best practices for this stage.")
   }
-  
+
   # apply rules based on context
   # ensure stage_rules is a proper list structure
   if (!is.list(stage_rules)) {
     return("Consider following BID framework best practices for this stage.")
   }
-  
+
   # separate default from rules
   default_suggestion <- stage_rules$default
   rule_list <- stage_rules[names(stage_rules) != "default"]
-  
+
   # process each rule
   for (rule in rule_list) {
     # ensure rule is properly structured
@@ -585,12 +591,12 @@ generate_stage_suggestions <- function(stage_name, context_data, suggestion_rule
       }
     }
   }
-  
+
   # add default suggestions if none match
   if (length(suggestions) == 0 && !is.null(default_suggestion)) {
     suggestions <- default_suggestion
   }
-  
+
   return(paste(suggestions, collapse = " "))
 }
 
@@ -653,23 +659,26 @@ evaluate_suggestion_condition <- function(condition, context_data) {
     warning("Condition is not a function, skipping", call. = FALSE)
     return(FALSE)
   }
-  
+
   if (!is.list(context_data) && !is.null(context_data)) {
     warning("Context data is not a list or NULL, attempting to coerce", call. = FALSE)
     context_data <- list(context_data)
   }
-  
-  tryCatch({
-    result <- condition(context_data)
-    if (!is.logical(result) || length(result) != 1) {
-      warning("Condition function returned non-logical or multi-value result", call. = FALSE)
-      return(FALSE)
+
+  tryCatch(
+    {
+      result <- condition(context_data)
+      if (!is.logical(result) || length(result) != 1) {
+        warning("Condition function returned non-logical or multi-value result", call. = FALSE)
+        return(FALSE)
+      }
+      return(result)
+    },
+    error = function(e) {
+      warning("Error evaluating suggestion condition: ", e$message, call. = FALSE)
+      FALSE
     }
-    return(result)
-  }, error = function(e) {
-    warning("Error evaluating suggestion condition: ", e$message, call. = FALSE)
-    FALSE
-  })
+  )
 }
 
 # Safe access to data story elements

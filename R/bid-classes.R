@@ -156,10 +156,10 @@ print_stage_header <- function(x) {
 print_stage_content <- function(x) {
   stage <- attr(x, "stage")
   metadata <- attr(x, "metadata")
-  
+
   # get stage-specific display rules
   display_rules <- get_stage_display_rules()[[stage]]
-  
+
   if (!is.null(display_rules)) {
     for (rule in display_rules) {
       print_stage_field(x, rule$field, rule$label, rule$format_fn, metadata)
@@ -186,14 +186,19 @@ print_stage_footer <- function(x) {
 #' @param metadata Stage metadata
 #' @keywords internal
 #' @noRd
-print_stage_field <- function(x, field, label, format_fn = NULL, metadata = NULL) {
+print_stage_field <- function(
+    x,
+    field,
+    label,
+    format_fn = NULL,
+    metadata = NULL) {
   if (field %in% names(x) && !is.na(x[[field]][1])) {
     value <- x[[field]][1]
-    
+
     if (!is.null(format_fn)) {
       value <- format_fn(value, metadata)
     }
-    
+
     cat(cli::style_bold(paste0(label, ":")), value, "\n")
   }
 }
@@ -213,22 +218,58 @@ get_stage_display_rules <- function() {
     Interpret = list(
       list(field = "central_question", label = "Central Question"),
       list(field = "hook", label = "Story Hook"),
-      list(field = "story_completeness", label = "Story Completeness", format_fn = format_percentage_field),
-      list(field = "personas_count", label = "User Personas", format_fn = format_count_field)
+      list(
+        field = "story_completeness",
+        label = "Story Completeness",
+        format_fn = format_percentage_field
+      ),
+      list(
+        field = "personas_count",
+        label = "User Personas",
+        format_fn = format_count_field
+      )
     ),
     Structure = list(
       list(field = "layout", label = "Layout"),
-      list(field = "concepts", label = "Concepts", format_fn = format_concepts_field),
-      list(field = "accessibility", label = "Accessibility", format_fn = format_accessibility_field)
+      list(
+        field = "concepts",
+        label = "Concepts",
+        format_fn = format_concepts_field
+      ),
+      list(
+        field = "accessibility",
+        label = "Accessibility",
+        format_fn = format_accessibility_field
+      )
     ),
     Anticipate = list(
-      list(field = "bias_mitigations", label = "Bias Mitigations", format_fn = format_bias_count_field),
-      list(field = "interaction_principles", label = "Interaction Principles", format_fn = format_defined_field)
+      list(
+        field = "bias_mitigations",
+        label = "Bias Mitigations",
+        format_fn = format_bias_count_field
+      ),
+      list(
+        field = "interaction_principles",
+        label = "Interaction Principles",
+        format_fn = format_defined_field
+      )
     ),
     Validate = list(
-      list(field = "summary_panel", label = "Summary Panel", format_fn = function(v, m) truncate_text(v, 60)),
-      list(field = "next_steps", label = "Next Steps", format_fn = format_steps_count_field),
-      list(field = "collaboration", label = "Collaboration", format_fn = function(v, m) truncate_text(v, 60))
+      list(
+        field = "summary_panel",
+        label = "Summary Panel",
+        format_fn = function(v, m) truncate_text(v, 60)
+      ),
+      list(
+        field = "next_steps",
+        label = "Next Steps",
+        format_fn = format_steps_count_field
+      ),
+      list(
+        field = "collaboration",
+        label = "Collaboration",
+        format_fn = function(v, m) truncate_text(v, 60)
+      )
     )
   )
 }
@@ -240,8 +281,10 @@ get_stage_display_rules <- function() {
 #' @keywords internal
 #' @noRd
 format_theory_field <- function(value, metadata) {
-  if (is.null(value) || is.na(value)) return(NULL)
-  
+  if (is.null(value) || is.na(value)) {
+    return(NULL)
+  }
+
   if (!is.null(metadata$auto_suggested_theory) && metadata$auto_suggested_theory) {
     paste0(value, " ", cli::style_italic("(auto-suggested)"))
   } else {
@@ -284,8 +327,10 @@ format_count_field <- function(value, metadata) {
 #' @keywords internal
 #' @noRd
 format_concepts_field <- function(value, metadata) {
-  if (is.null(value) || is.na(value)) return(NULL)
-  
+  if (is.null(value) || is.na(value)) {
+    return(NULL)
+  }
+
   concepts_list <- strsplit(value, ",")[[1]]
   paste(trimws(concepts_list), collapse = ", ")
 }
@@ -311,8 +356,10 @@ format_accessibility_field <- function(value, metadata) {
 #' @keywords internal
 #' @noRd
 format_bias_count_field <- function(value, metadata) {
-  if (is.null(value) || is.na(value)) return(NULL)
-  
+  if (is.null(value) || is.na(value)) {
+    return(NULL)
+  }
+
   bias_items <- strsplit(value, ";")[[1]]
   paste(length(bias_items), "strategies defined")
 }
@@ -324,15 +371,17 @@ format_bias_count_field <- function(value, metadata) {
 #' @keywords internal
 #' @noRd
 format_steps_count_field <- function(value, metadata) {
-  if (is.null(value) || is.na(value)) return(NULL)
-  
+  if (is.null(value) || is.na(value)) {
+    return(NULL)
+  }
+
   steps_list <- strsplit(value, ";")[[1]]
   paste(length(steps_list), "items defined")
 }
 
 #' Format simple defined field
 #' @param value Field value
-#' @param metadata Stage metadata (unused) 
+#' @param metadata Stage metadata (unused)
 #' @return "Defined" if field has content, NULL otherwise
 #' @keywords internal
 #' @noRd

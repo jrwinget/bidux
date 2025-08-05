@@ -9,7 +9,11 @@
 #'
 #' @keywords internal
 #' @noRd
-load_external_data <- function(filename, required_cols, default_fn, custom_data = NULL) {
+load_external_data <- function(
+    filename,
+    required_cols,
+    default_fn,
+    custom_data = NULL) {
   # use custom data if provided and valid
   if (!is.null(custom_data)) {
     if (!all(required_cols %in% names(custom_data))) {
@@ -25,24 +29,27 @@ load_external_data <- function(filename, required_cols, default_fn, custom_data 
   # attempt to load from external file
   data_file <- system.file("extdata", filename, package = "bidux")
   if (file.exists(data_file)) {
-    tryCatch({
-      data <- readr::read_csv(data_file, show_col_types = FALSE)
-      
-      # validate required columns
-      if (all(required_cols %in% names(data))) {
-        return(data)
-      } else {
+    tryCatch(
+      {
+        data <- readr::read_csv(data_file, show_col_types = FALSE)
+
+        # validate required columns
+        if (all(required_cols %in% names(data))) {
+          return(data)
+        } else {
+          warning(
+            "External file missing required columns, using defaults",
+            call. = FALSE
+          )
+        }
+      },
+      error = function(e) {
         warning(
-          "External file missing required columns, using defaults",
+          "Could not load external file: ", e$message,
           call. = FALSE
         )
       }
-    }, error = function(e) {
-      warning(
-        "Could not load external file: ", e$message,
-        call. = FALSE
-      )
-    })
+    )
   }
 
   # fallback to defaults
@@ -173,7 +180,7 @@ load_concept_bias_mappings <- function(custom_mappings = NULL) {
       stringsAsFactors = FALSE
     )
   }
-  
+
   load_external_data(
     "concept_bias_mappings.csv",
     c("concept", "bias_type", "mitigation_strategy"),
@@ -310,7 +317,7 @@ load_accessibility_guidelines <- function(custom_guidelines = NULL) {
       stringsAsFactors = FALSE
     )
   }
-  
+
   load_external_data(
     "accessibility_guidelines.csv",
     c("guideline", "requirement", "wcag_level"),
