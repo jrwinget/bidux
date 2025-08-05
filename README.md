@@ -52,7 +52,7 @@ Or the development version:
 pak::pak("jrwinget/bidux")
 ```
 
-## ⚡️ Quick Start
+## ✅ Quick Start
 
 ``` r
 library(shiny)
@@ -91,7 +91,7 @@ bid_report(process, format = "html")
 ## 📊 Telemetry Integration
 
 Leverage real user behavior to pinpoint UX friction with
-`{shiny.telemetry}` data:
+[{shiny.telemetry}](https://github.com/Appsilon/shiny.telemetry) data:
 
 ``` r
 # Ingest telemetry from SQLite or JSON
