@@ -38,10 +38,42 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.0" id="bidux-020">bidux 0.2.0<a class="anchor" aria-label="anchor" href="#bidux-020"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.2.0" id="id_-bidux-020-2025-08-05"># bidux 0.2.0 (2025-08-05)<a class="anchor" aria-label="anchor" href="#id_-bidux-020-2025-08-05"></a></h2>
+<div class="section level4">
+<h4 id="new-features-0-2-0">NEW FEATURES<a class="anchor" aria-label="anchor" href="#new-features-0-2-0"></a></h4>
+<ul><li><p><strong>Telemetry-driven UX friction detection.</strong> New <code><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry()</a></code> ingests <a href="https://appsilon.github.io/shiny.telemetry/" class="external-link">shiny.telemetry</a> data (SQLite or JSON), applies configurable thresholds, detects friction patterns (e.g., unused inputs, delayed interactions, error clusters, navigation drop-offs, confusion), and generates BID notices and reports. Includes robust input validation, format auto-detection, and clearer CLI summaries. (#18)</p></li>
+<li><p><strong>Telemetry integration vignette.</strong> A new vignette shows how to set up <a href="https://appsilon.github.io/shiny.telemetry/" class="external-link">shiny.telemetry</a>, run <code><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry()</a></code>, interpret indicators, and customize thresholds within the BID workflow. (#18)</p></li>
+</ul></div>
+<div class="section level4">
+<h4 id="minor-improvements-0-2-0">MINOR IMPROVEMENTS<a class="anchor" aria-label="anchor" href="#minor-improvements-0-2-0"></a></h4>
+<ul><li><p><strong>Modular printing and display rules.</strong> <code><a href="../reference/print.bid_stage.html">print.bid_stage()</a></code> refactored into <code>print_stage_header()</code>, <code>print_stage_content()</code>, and <code>print_stage_footer()</code> with reusable field printing and stage-specific display rules for clearer, more consistent output.</p></li>
+<li><p><strong>Consistent data loading.</strong> Introduced <code>load_external_data()</code>; concept, theory, bias, layout, and accessibility loaders now share one code path with sensible fallbacks.</p></li>
+<li><p><strong>Suggestion generation &amp; validation utilities.</strong> Consolidated helpers: <code>generate_stage_suggestions()</code>, <code>get_default_suggestion_rules()</code>, and <code>evaluate_suggestion_condition()</code>; standardized parameter checks with <code>validate_character_param()</code>, <code>validate_list_param()</code>, and <code>validate_bid_stage_params()</code>.</p></li>
+<li><p><strong>Stronger parsing &amp; normalization.</strong> Telemetry JSON handling now supports both JSON arrays and JSON-lines; column normalization validates and standardizes inputs; percentage/label formatting made more consistent.</p></li>
+<li><p><strong>Safety &amp; style passes.</strong> Safer subsetting (<code>drop = FALSE</code>), safer indexing (<code><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len()</a></code>), tightened conditionals/bracing and indentation, aligned function signatures and lists, and general formatting cleanup for readability and maintainability.</p></li>
+</ul></div>
+<div class="section level4">
+<h4 id="bug-fixes-0-2-0">BUG FIXES<a class="anchor" aria-label="anchor" href="#bug-fixes-0-2-0"></a></h4>
+<ul><li>None.</li>
+</ul></div>
+<div class="section level4">
+<h4 id="deprecated-and-defunct-0-2-0">DEPRECATED AND DEFUNCT<a class="anchor" aria-label="anchor" href="#deprecated-and-defunct-0-2-0"></a></h4>
+<ul><li>None.</li>
+</ul></div>
+<div class="section level4">
+<h4 id="documentation-fixes-0-2-0">DOCUMENTATION FIXES<a class="anchor" aria-label="anchor" href="#documentation-fixes-0-2-0"></a></h4>
+<ul><li><p><strong>Docs &amp; guides.</strong> Added <strong>CONTRIBUTING</strong> guidelines and a <strong>Code of Conduct</strong>; standardized GitHub issue templates for clear, consistent reports. (#16)</p></li>
+<li><p><strong>README overhaul.</strong> Reorganized overview, features, installation, and a concise quick start; added a telemetry section; improved examples; suppressed noisy messages during README generation; added a CRAN downloads badge. (#15, #16)</p></li>
+<li><p><strong>Reference updates.</strong> Exported and documented <code><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry()</a></code>; refreshed <code>man/</code> pages and package index to reflect new modules and function locations. (#18)</p></li>
+</ul></div>
+<div class="section level4">
+<h4 id="refactoring--internals-no-user-facing-api-changes-0-2-0">REFACTORING &amp; INTERNALS (no user-facing API changes)<a class="anchor" aria-label="anchor" href="#refactoring--internals-no-user-facing-api-changes-0-2-0"></a></h4>
+<ul><li><p><strong>File organization.</strong> Standardized dash-separated filenames (e.g., <code>bid-classes.R</code>, <code>bid-concepts.R</code>); centralized telemetry ingestion/analysis/notice creation into <code>telemetry.R</code>; moved shared helpers into <code>utils.R</code>.</p></li>
+<li><p><strong>Namespace &amp; dependencies.</strong> Added <code>DBI</code> and <code>RSQLite</code> to <code>Imports</code>, and <code>importFrom(stats, complete.cases)</code>; relaxed version constraints for <code>cli</code>, <code>dplyr</code>, and <code>jsonlite</code>; expanded <code>NAMESPACE</code> with explicit imports.</p></li>
+</ul></div>
 </div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.1.0" id="bidux-010">bidux 0.1.0<a class="anchor" aria-label="anchor" href="#bidux-010"></a></h2><p class="text-muted">CRAN release: 2025-06-13</p>
+<h2 class="pkg-version" data-toc-text="0.1.0" id="id_-bidux-010-2025-06-16"># bidux 0.1.0 (2025-06-16)<a class="anchor" aria-label="anchor" href="#id_-bidux-010-2025-06-16"></a></h2><p class="text-muted">CRAN release: 2025-06-13</p>
 <ul><li>Initial CRAN submission.</li>
 <li>Complete implementation of the Behavior Insight Design (BID) framework with 5 sequential stages: Notice, Interpret, Structure, Anticipate, and Validate.</li>
 <li>Added initial concept dictionary with 41+ behavioral science principles.</li>
