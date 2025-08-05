@@ -296,38 +296,6 @@ generate_next_steps_suggestion <- function(previous_stage) {
   return(next_steps)
 }
 
-format_next_steps <- function(next_steps) {
-  if (is.null(next_steps)) {
-    return(NA_character_)
-  }
-
-  if (is.character(next_steps)) {
-    if (length(next_steps) == 1) {
-      if (grepl(";", next_steps)) {
-        return(next_steps)
-      } else {
-        return(next_steps)
-      }
-    } else {
-      return(paste(next_steps, collapse = "; "))
-    }
-  }
-
-  next_steps_char <- as.character(next_steps)
-  return(paste(next_steps_char, collapse = "; "))
-}
-
-parse_next_steps <- function(next_steps_formatted) {
-  if (is.na(next_steps_formatted) || is.null(next_steps_formatted)) {
-    return(character(0))
-  }
-
-  if (grepl(";", next_steps_formatted)) {
-    return(trimws(unlist(strsplit(next_steps_formatted, ";"))))
-  } else {
-    return(next_steps_formatted)
-  }
-}
 
 generate_validation_suggestions <- function(
     summary_panel,
