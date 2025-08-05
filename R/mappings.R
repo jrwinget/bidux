@@ -1,43 +1,73 @@
-#' Load theory mappings from external file or use defaults
+#' Generic data loader with fallback to defaults
 #'
-#' @param custom_mappings Optional custom mappings data frame
-#' @return Data frame with theory mappings
+#' @param filename CSV filename in extdata
+#' @param required_cols Required column names
+#' @param default_fn Function to generate default data
+#' @param custom_data Optional custom data frame
+#'
+#' @return Data frame with loaded or default data
+#'
 #' @keywords internal
-load_theory_mappings <- function(custom_mappings = NULL) {
-  if (!is.null(custom_mappings)) {
-    required_cols <- c("keywords", "theory", "confidence")
-    if (!all(required_cols %in% names(custom_mappings))) {
+#' @noRd
+load_external_data <- function(
+    filename,
+    required_cols,
+    default_fn,
+    custom_data = NULL) {
+  # use custom data if provided and valid
+  if (!is.null(custom_data)) {
+    if (!all(required_cols %in% names(custom_data))) {
       stop(
-        "Custom mappings must contain columns: ",
+        "Custom data must contain columns: ",
         paste(required_cols, collapse = ", "),
         call. = FALSE
       )
     }
-    return(custom_mappings)
+    return(custom_data)
   }
 
-  mappings_file <- system.file(
-    "extdata",
-    "theory_mappings.csv",
-    package = "bidux"
-  )
-  if (file.exists(mappings_file)) {
+  # attempt to load from external file
+  data_file <- system.file("extdata", filename, package = "bidux")
+  if (file.exists(data_file)) {
     tryCatch(
       {
-        mappings <- readr::read_csv(mappings_file, show_col_types = FALSE)
-        return(mappings)
+        data <- readr::read_csv(data_file, show_col_types = FALSE)
+
+        # validate required columns
+        if (all(required_cols %in% names(data))) {
+          return(data)
+        } else {
+          warning(
+            "External file missing required columns, using defaults",
+            call. = FALSE
+          )
+        }
       },
       error = function(e) {
         warning(
-          "Could not load theory mappings file: ",
-          e$message,
+          "Could not load external file: ", e$message,
           call. = FALSE
         )
       }
     )
   }
 
-  return(get_default_theory_mappings())
+  # fallback to defaults
+  return(default_fn())
+}
+
+#' Load theory mappings from external file or use defaults
+#'
+#' @param custom_mappings Optional custom mappings data frame
+#' @return Data frame with theory mappings
+#' @keywords internal
+load_theory_mappings <- function(custom_mappings = NULL) {
+  load_external_data(
+    "theory_mappings.csv",
+    c("keywords", "theory", "confidence"),
+    get_default_theory_mappings,
+    custom_mappings
+  )
 }
 
 #' Get default theory mappings (fallback)
@@ -142,44 +172,21 @@ suggest_theory_from_mappings <- function(
 #' @return Data frame with concept-bias mappings
 #' @keywords internal
 load_concept_bias_mappings <- function(custom_mappings = NULL) {
-  if (!is.null(custom_mappings)) {
-    required_cols <- c("concept", "bias_type", "mitigation_strategy")
-    if (!all(required_cols %in% names(custom_mappings))) {
-      stop(
-        "Custom concept-bias mappings must contain columns: ",
-        paste(required_cols, collapse = ", "),
-        call. = FALSE
-      )
-    }
-    return(custom_mappings)
-  }
-
-  mappings_file <- system.file(
-    "extdata",
-    "concept_bias_mappings.csv",
-    package = "bidux"
-  )
-  if (file.exists(mappings_file)) {
-    tryCatch(
-      {
-        return(readr::read_csv(mappings_file, show_col_types = FALSE))
-      },
-      error = function(e) {
-        warning(
-          "Could not load concept-bias mappings file: ",
-          e$message,
-          call. = FALSE
-        )
-      }
+  get_empty_concept_bias_mappings <- function() {
+    data.frame(
+      concept = character(0),
+      bias_type = character(0),
+      mitigation_strategy = character(0),
+      stringsAsFactors = FALSE
     )
   }
 
-  return(data.frame(
-    concept = character(0),
-    bias_type = character(0),
-    mitigation_strategy = character(0),
-    stringsAsFactors = FALSE
-  ))
+  load_external_data(
+    "concept_bias_mappings.csv",
+    c("concept", "bias_type", "mitigation_strategy"),
+    get_empty_concept_bias_mappings,
+    custom_mappings
+  )
 }
 
 #' Get bias mitigation strategies for concepts
@@ -226,40 +233,12 @@ get_concept_bias_mappings <- function(concepts, mappings = NULL) {
 #' @return Data frame with layout-concept mappings
 #' @keywords internal
 load_layout_mappings <- function(custom_mappings = NULL) {
-  if (!is.null(custom_mappings)) {
-    required_cols <- c("layout", "primary_concepts", "description")
-    if (!all(required_cols %in% names(custom_mappings))) {
-      stop(
-        "Custom layout mappings must contain columns: ",
-        paste(required_cols, collapse = ", "),
-        call. = FALSE
-      )
-    }
-    return(custom_mappings)
-  }
-
-  mappings_file <- system.file(
-    "extdata",
+  load_external_data(
     "layout_concepts.csv",
-    package = "bidux"
+    c("layout", "primary_concepts", "description"),
+    get_default_layout_mappings,
+    custom_mappings
   )
-
-  if (file.exists(mappings_file)) {
-    tryCatch(
-      {
-        return(readr::read_csv(mappings_file, show_col_types = FALSE))
-      },
-      error = function(e) {
-        warning(
-          "Could not load layout mappings file: ",
-          e$message,
-          call. = FALSE
-        )
-      }
-    )
-  }
-
-  return(get_default_layout_mappings())
 }
 
 #' Get default layout mappings (fallback)
@@ -326,40 +305,25 @@ get_layout_concepts <- function(layout, mappings = NULL) {
 #' @return Data frame with accessibility guidelines
 #' @keywords internal
 load_accessibility_guidelines <- function(custom_guidelines = NULL) {
-  if (!is.null(custom_guidelines)) {
-    return(custom_guidelines)
-  }
-
-  guidelines_file <- system.file(
-    "extdata",
-    "accessibility_guidelines.csv",
-    package = "bidux"
-  )
-  if (file.exists(guidelines_file)) {
-    tryCatch(
-      {
-        return(readr::read_csv(guidelines_file, show_col_types = FALSE))
-      },
-      error = function(e) {
-        warning(
-          "Could not load accessibility guidelines file: ",
-          e$message,
-          call. = FALSE
-        )
-      }
+  get_default_accessibility_guidelines <- function() {
+    data.frame(
+      guideline = c("color_contrast", "keyboard_navigation", "screen_reader"),
+      requirement = c(
+        "4.5:1 ratio for normal text",
+        "All interactive elements keyboard accessible",
+        "Descriptive alt text and ARIA labels"
+      ),
+      wcag_level = c("AA", "AA", "AA"),
+      stringsAsFactors = FALSE
     )
   }
 
-  return(data.frame(
-    guideline = c("color_contrast", "keyboard_navigation", "screen_reader"),
-    requirement = c(
-      "4.5:1 ratio for normal text",
-      "All interactive elements keyboard accessible",
-      "Descriptive alt text and ARIA labels"
-    ),
-    wcag_level = c("AA", "AA", "AA"),
-    stringsAsFactors = FALSE
-  ))
+  load_external_data(
+    "accessibility_guidelines.csv",
+    c("guideline", "requirement", "wcag_level"),
+    get_default_accessibility_guidelines,
+    custom_guidelines
+  )
 }
 
 #' Get accessibility recommendations for a given context

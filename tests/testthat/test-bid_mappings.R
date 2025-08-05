@@ -27,7 +27,7 @@ test_that("load_theory_mappings works with custom mappings", {
 
   expect_error(
     load_theory_mappings(incomplete_mappings),
-    "Custom mappings must contain columns"
+    "Custom data must contain columns"
   )
 })
 
@@ -285,19 +285,19 @@ test_that("mapping functions validate input properly", {
   # Test theory mappings validation
   expect_error(
     load_theory_mappings(data.frame(keywords = "test")), # missing required columns
-    "Custom mappings must contain columns"
+    "Custom data must contain columns"
   )
 
   # Test concept bias mappings validation
   expect_error(
     load_concept_bias_mappings(data.frame(concept = "test")), # missing required columns
-    "Custom concept-bias mappings must contain columns"
+    "Custom data must contain columns"
   )
 
   # Test layout mappings validation
   expect_error(
     load_layout_mappings(data.frame(layout = "test")), # missing required columns
-    "Custom layout mappings must contain columns"
+    "Custom data must contain columns"
   )
 })
 

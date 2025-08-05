@@ -123,46 +123,21 @@ bid_concept <- function(concept_name, add_recommendations = TRUE) {
 #' @return A tibble with all BID framework concepts
 #' @keywords internal
 get_concepts_data <- function() {
-  # try to load from external data file first
-  concepts_file <- system.file(
-    "extdata",
-    "bid_concepts_data.csv",
-    package = "bidux"
+  # reuse the unified loading pattern
+  required_cols <- c(
+    "concept", "description", "category", "reference",
+    "example", "implementation_tips", "related_concepts"
   )
 
-  if (file.exists(concepts_file)) {
-    tryCatch(
-      {
-        concepts <- readr::read_csv(concepts_file)
-        required_cols <- c(
-          "concept",
-          "description",
-          "category",
-          "reference",
-          "example",
-          "implementation_tips",
-          "related_concepts"
-        )
-        if (all(required_cols %in% names(concepts))) {
-          return(tibble::as_tibble(concepts))
-        } else {
-          warning(
-            "External concepts file missing required columns, using defaults",
-            call. = FALSE
-          )
-        }
-      },
-      error = function(e) {
-        warning(
-          "Could not load external concepts file: ",
-          e$message,
-          call. = FALSE
-        )
-      }
-    )
-  }
+  # load external data and ensure it's returned as tibble
+  data <- load_external_data(
+    "bid_concepts_data.csv",
+    required_cols,
+    get_default_concepts_data,
+    NULL
+  )
 
-  return(get_default_concepts_data())
+  return(tibble::as_tibble(data))
 }
 
 #' Get default concepts data (fallback when external file unavailable)

@@ -65,10 +65,9 @@
 #'
 #' @export
 bid_anticipate <- function(
-  previous_stage,
-  bias_mitigations = NULL,
-  interaction_principles = NULL
-) {
+    previous_stage,
+    bias_mitigations = NULL,
+    interaction_principles = NULL) {
   if (missing(previous_stage) || is.null(previous_stage)) {
     stop("Required parameter 'previous_stage' must be provided", call. = FALSE)
   }

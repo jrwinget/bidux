@@ -380,7 +380,6 @@ generate_text_report <- function(validate_stage, format, include_diagrams) {
 
 # generate HTML report directly (no markdown conversion)
 generate_html_report_direct <- function(validate_stage, include_diagrams) {
-
   # helper function to generate HTML lists
   generate_html_list <- function(items, default_text = "None specified") {
     if (is.null(items) || length(items) == 0) {
