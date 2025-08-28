@@ -161,7 +161,7 @@ test_that("load_layout_mappings works correctly", {
 
   # Test with custom mappings
   custom_mappings <- data.frame(
-    
+    layout = "custom_layout",
     primary_concepts = "Test Concept 1, Test Concept 2",
     description = "Custom layout description"
   )

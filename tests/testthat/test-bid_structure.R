@@ -318,12 +318,12 @@ test_that("layout heuristics work correctly with different field combinations", 
   # Test data story fields
   story_stage <- tibble::tibble(
     stage = "Interpret", 
-    data_story = list(
+    data_story = list(list(
       hook = "Users need quick access to summaries",
       context = "But also detailed breakdowns when needed", 
       tension = "Two different modes of interaction",
       resolution = "Dual mode interface"
-    ),
+    )),
     timestamp = Sys.time()
   )
   

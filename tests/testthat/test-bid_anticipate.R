@@ -28,7 +28,7 @@ test_that("bid_anticipate works with valid inputs", {
   expect_equal(result$stage, "Anticipate")
   expect_match(result$bias_mitigations, "anchoring: Provide reference points")
   expect_match(result$bias_mitigations, "framing: Use consistent positive framing")
-  expect_equal(result$previous_layout, "dual_process")
+  expect_equal(result$previous_layout, "breathable")
   expect_true(!is.na(result$suggestions))
 })
 
@@ -116,10 +116,10 @@ test_that("bid_anticipate auto-suggests bias_mitigations when NULL", {
   expect_false(is.na(result$bias_mitigations[1]))
   expect_true(nchar(result$bias_mitigations[1]) > 0)
 
-  # should suggest at least anchoring, framing or confirmation bias
+  # should suggest common bias mitigations (updated for 0.2.0 auto-suggestions)
   expect_match(
     result$bias_mitigations,
-    "anchoring|framing|confirm",
+    "attention bias|belief perseverance|cognitive load|association bias|choice architecture",
     ignore.case = TRUE,
     perl = TRUE
   )

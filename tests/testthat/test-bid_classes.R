@@ -117,7 +117,7 @@ test_that("print.bid_stage works for all stage types", {
   # Structure stage
   structure_data <- tibble(
     stage = "Structure",
-    
+    layout = "breathable",
     concepts = "Visual Hierarchy, Cognitive Load",
     accessibility = "WCAG AA compliant",
     suggestions = "Test suggestions",

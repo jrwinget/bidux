@@ -112,7 +112,7 @@ str(issues)
 
 Use these insights to fuel the **Notice** stage and drive data-informed
 UI improvements. See the full example and thresholds customization in
-the See the package vignette ‘Telemetry Integration’ for a full example
+the See the package vignette 'Telemetry Integration' for a full example
 (accessible via `vignette("telemetry-integration", package="bidux")`).
 
 ## 📚 Vignettes

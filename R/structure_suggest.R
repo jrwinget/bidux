@@ -29,15 +29,23 @@
 #' @keywords internal
 suggest_layout_from_previous <- function(previous_stage) {
   # Extract and normalize text from various fields in previous_stage
+  # Handle both flattened columns (from bid_interpret) and nested data_story
   txt <- paste(
     safe_lower(safe_column_access(previous_stage, "problem", "")),
     safe_lower(safe_column_access(previous_stage, "evidence", "")),
     safe_lower(safe_column_access(previous_stage, "central_question", "")),
-    safe_lower(safe_data_story_access(previous_stage, "hook")),
-    safe_lower(safe_data_story_access(previous_stage, "context")),
-    safe_lower(safe_data_story_access(previous_stage, "tension")),
-    safe_lower(safe_data_story_access(previous_stage, "resolution")),
-    safe_lower(safe_data_story_access(previous_stage, "audience")),
+    # Try flattened columns first (from bid_interpret output)
+    safe_lower(safe_column_access(previous_stage, "hook", "")),
+    safe_lower(safe_column_access(previous_stage, "context", "")),
+    safe_lower(safe_column_access(previous_stage, "tension", "")),
+    safe_lower(safe_column_access(previous_stage, "resolution", "")),
+    safe_lower(safe_column_access(previous_stage, "audience", "")),
+    # Fallback to nested data_story access (for other tibble structures)
+    safe_lower(safe_stage_data_story_access(previous_stage, "hook")),
+    safe_lower(safe_stage_data_story_access(previous_stage, "context")),
+    safe_lower(safe_stage_data_story_access(previous_stage, "tension")),
+    safe_lower(safe_stage_data_story_access(previous_stage, "resolution")),
+    safe_lower(safe_stage_data_story_access(previous_stage, "audience")),
     collapse = " "
   )
 
@@ -88,15 +96,23 @@ suggest_layout_from_previous <- function(previous_stage) {
 #' @keywords internal
 layout_rationale <- function(previous_stage, chosen) {
   # Extract text for pattern matching
+  # Handle both flattened columns (from bid_interpret) and nested data_story
   txt <- paste(
     safe_lower(safe_column_access(previous_stage, "problem", "")),
     safe_lower(safe_column_access(previous_stage, "evidence", "")),
     safe_lower(safe_column_access(previous_stage, "central_question", "")),
-    safe_lower(safe_data_story_access(previous_stage, "hook")),
-    safe_lower(safe_data_story_access(previous_stage, "context")),
-    safe_lower(safe_data_story_access(previous_stage, "tension")),
-    safe_lower(safe_data_story_access(previous_stage, "resolution")),
-    safe_lower(safe_data_story_access(previous_stage, "audience")),
+    # Try flattened columns first (from bid_interpret output)
+    safe_lower(safe_column_access(previous_stage, "hook", "")),
+    safe_lower(safe_column_access(previous_stage, "context", "")),
+    safe_lower(safe_column_access(previous_stage, "tension", "")),
+    safe_lower(safe_column_access(previous_stage, "resolution", "")),
+    safe_lower(safe_column_access(previous_stage, "audience", "")),
+    # Fallback to nested data_story access (for other tibble structures)
+    safe_lower(safe_stage_data_story_access(previous_stage, "hook")),
+    safe_lower(safe_stage_data_story_access(previous_stage, "context")),
+    safe_lower(safe_stage_data_story_access(previous_stage, "tension")),
+    safe_lower(safe_stage_data_story_access(previous_stage, "resolution")),
+    safe_lower(safe_stage_data_story_access(previous_stage, "audience")),
     collapse = " "
   )
   
@@ -148,20 +164,32 @@ safe_lower <- function(x) {
   tolower(trimws(paste(x, collapse = " ")))
 }
 
-#' Safe access to data_story elements
+#' Safe access to data_story elements from previous stage
 #' @param previous_stage Previous stage data
 #' @param element Name of data_story element to access
 #' @return Character string or empty string if not found
 #' @keywords internal
-safe_data_story_access <- function(previous_stage, element) {
+safe_stage_data_story_access <- function(previous_stage, element) {
   data_story <- safe_column_access(previous_stage, "data_story", NULL)
   if (is.null(data_story)) {
     return("")
   }
-  if (is.list(data_story) && element %in% names(data_story)) {
-    value <- data_story[[element]]
-    if (!is.null(value) && !is.na(value) && nchar(trimws(as.character(value))) > 0) {
-      return(as.character(value))
+  
+  # Handle tibble list column case - data_story is a list with unnamed elements
+  if (is.list(data_story) && length(data_story) > 0) {
+    # If names are present, use direct access
+    if (element %in% names(data_story)) {
+      value <- data_story[[element]]
+      if (!is.null(value) && !is.na(value) && nchar(trimws(as.character(value))) > 0) {
+        return(as.character(value))
+      }
+    }
+    # If no names (typical tibble list column), access first element
+    else if (is.list(data_story[[1]]) && element %in% names(data_story[[1]])) {
+      value <- data_story[[1]][[element]]
+      if (!is.null(value) && !is.na(value) && nchar(trimws(as.character(value))) > 0) {
+        return(as.character(value))
+      }
     }
   }
   return("")
