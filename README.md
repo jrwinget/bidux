@@ -71,9 +71,7 @@ process <-
       resolution = "Surface top metrics up front"
     )
   ) |>
-  bid_structure(
-    layout = "dual_process"
-  ) |>
+  bid_structure() |>
   bid_anticipate(
     bias_mitigations = list(anchoring = "Contextual defaults")
   ) |>

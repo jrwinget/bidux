@@ -12,7 +12,7 @@ test_that("bid_anticipate works with valid inputs", {
         context = "Dashboard has evolved over time"
       )
     ),
-    layout = "dual_process",
+    
     concepts = c("Principle of Proximity", "Default Effect")
   )
 
@@ -46,7 +46,7 @@ test_that("bid_anticipate fails with missing parameters", {
         context = "Dashboard has evolved over time"
       )
     ),
-    layout = "dual_process",
+    
     concepts = c("Principle of Proximity", "Default Effect")
   )
 
@@ -74,7 +74,7 @@ test_that("bid_anticipate suggests missing common biases", {
         context = "Dashboard has evolved over time"
       )
     ),
-    layout = "dual_process",
+    
     concepts = c("Principle of Proximity", "Default Effect")
   )
 
@@ -101,7 +101,7 @@ test_that("bid_anticipate auto-suggests bias_mitigations when NULL", {
         context = "Dashboard has evolved over time"
       )
     ),
-    layout = "dual_process",
+    
     concepts = c("Principle of Proximity", "Default Effect")
   )
 
@@ -139,7 +139,7 @@ test_that("bid_anticipate auto-suggests interaction_principles when NULL", {
         context = "Dashboard has evolved over time"
       )
     ),
-    layout = "dual_process",
+    
     concepts = c("Principle of Proximity", "Default Effect")
   )
 
@@ -220,7 +220,7 @@ test_that("bid_anticipate handles NA values in previous_stage fields", {
 test_that("bid_anticipate handles edge cases in bias_mitigations parameter", {
   structure_result <- tibble(
     stage = "Structure",
-    layout = "dual_process",
+    
     concepts = "Visual Hierarchy",
     timestamp = Sys.time()
   )
@@ -265,7 +265,7 @@ test_that("bid_anticipate handles edge cases in bias_mitigations parameter", {
 test_that("bid_anticipate handles edge cases in interaction_principles param", {
   structure_result <- tibble(
     stage = "Structure",
-    layout = "dual_process",
+    
     concepts = "Visual Hierarchy",
     timestamp = Sys.time()
   )
@@ -303,7 +303,7 @@ test_that("bid_anticipate handles edge cases in interaction_principles param", {
 test_that("bid_anticipate correctly parses JSON in interaction_principles", {
   structure_result <- tibble(
     stage = "Structure",
-    layout = "dual_process",
+    
     concepts = "Visual Hierarchy",
     timestamp = Sys.time()
   )

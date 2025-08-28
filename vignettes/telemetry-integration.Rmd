@@ -217,12 +217,7 @@ interpret_result <- bid_interpret(
 # Structure improvements
 structure_result <- bid_structure(
   previous_stage = interpret_result,
-  layout = "dual_process",
-  concepts = c("Progressive Disclosure", "Feedback Loops"),
-  accessibility = list(
-    error_messages = "Clear, actionable error messages",
-    loading_states = "Accessible loading indicators"
-  )
+  concepts = c("Progressive Disclosure", "Feedback Loops")
 )
 
 # Continue through anticipate and validate stages...
@@ -253,7 +248,6 @@ if (length(critical_issues$unused_inputs) > 0) {
     central_question = "Which filters actually help users find insights?"
   ) |>
     bid_structure(
-      layout = "breathable",
       concepts = c("Progressive Disclosure", "Smart Defaults")
     ) |>
     bid_anticipate(

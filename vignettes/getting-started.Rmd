@@ -148,25 +148,19 @@ Now determine the layout and key design principles to implement:
 # Document the dashboard structure
 structure_result <- bid_structure(
   previous_stage = interpret_result,
-  layout = "dual_process",
   concepts = c(
     "Principle of Proximity",
     "Default Effect",
     "Visual Hierarchy",
     "Breathable Layouts"
-  ),
-  accessibility = list(
-    color_contrast = "Using WCAG AA-compliant color contrasts",
-    keyboard_navigation = "All interactive elements are keyboard accessible",
-    screen_reader = "Charts include descriptive alt text"
   )
 )
 
 structure_result |>
-  dplyr::select(layout, concepts, accessibility)
+  dplyr::select(layout, concepts_detected, suggestions)
 ```
 
-The function provides layout-specific suggestions based on the psychological concepts we've chosen to apply, and acknowledges our accessibility considerations.
+The function automatically selects an appropriate layout based on the content from previous stages and provides ranked, actionable suggestions organized by UX concepts. The layout selection is transparent with clear rationale for why a particular layout was chosen.
 
 ### Stage 4: Anticipate User Behavior
 

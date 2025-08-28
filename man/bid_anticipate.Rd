@@ -45,7 +45,6 @@ structure_info <- bid_structure(
       resolution = "Simplify menu"
     )
   ),
-  layout = "dual_process",
   concepts = c("principle_of_proximity", "default_effect")
 )
 

@@ -4,36 +4,50 @@
 \alias{bid_structure}
 \title{Document Dashboard Structure Stage in BID Framework}
 \usage{
-bid_structure(previous_stage, layout, concepts = NULL, accessibility = NULL)
+bid_structure(previous_stage, concepts = NULL, ...)
 }
 \arguments{
 \item{previous_stage}{A tibble or list output from an earlier BID stage
 function.}
 
-\item{layout}{A character string indicating the layout type (e.g.,
-"dual_process", "grid", "card", "tabs", "breathable").}
-
-\item{concepts}{A character vector of BID concepts applied in this stage.
+\item{concepts}{A character vector of additional BID concepts to include.
 Concepts can be provided in natural language (e.g., "Principle of
 Proximity") or with underscores (e.g., "principle_of_proximity"). The
 function uses fuzzy matching to identify the concepts. If NULL, will
-attempt to detect relevant concepts from previous stages.}
+detect relevant concepts from previous stages automatically.}
 
-\item{accessibility}{A list of accessibility considerations (optional).
-Common parameters include: color_contrast, keyboard_navigation,
-screen_reader, text_size, alternative_text, focus_indicators,
-semantic_markup, and aria_labels.}
+\item{...}{Additional parameters. If \code{layout} is provided via \code{...}, the
+function will abort with a helpful error message.}
 }
 \value{
-A bid_stage object containing the documented information for the
-"Structure" stage.
+A bid_stage object containing:
+\item{stage}{"Structure"}
+\item{layout}{Auto-selected layout type}
+\item{suggestions}{List of concept groups with ranked suggestions}
+\item{concepts_detected}{Vector of all concepts used}
 }
 \description{
-This function documents the structure of the dashboard, including layout and
-design elements such as proximity, dual-processing, and default effects.
-It supports modern layout approaches like breathable layouts and visual
-hierarchies, while ensuring accessibility considerations are properly
-documented.
+This function documents the structure of the dashboard with automatic layout
+selection and generates ranked, concept-grouped actionable UI/UX suggestions.
+Layout is intelligently chosen based on content analysis of previous stages
+using deterministic heuristics. Returns structured recommendations with
+specific component pointers and implementation rationales.
+}
+\details{
+\strong{Layout Auto-Selection}: Uses deterministic heuristics to analyze content
+from previous stages and select the most appropriate layout:
+\itemize{
+\item \strong{breathable}: For information overload/confusion patterns
+\item \strong{dual_process}: For overview vs detail needs
+\item \strong{grid}: For grouping/comparison requirements
+\item \strong{card}: For modular/chunked content
+\item \strong{tabs}: For categorical organization (unless telemetry shows issues)
+}
+
+\strong{Suggestion Engine}: Generates ranked, actionable recommendations grouped
+by UX concepts. Each suggestion includes specific Shiny/bslib components,
+implementation details, and rationale. Suggestions are scored based on
+relevance, layout appropriateness, and contextual factors.
 }
 \examples{
 interpret <- bid_notice(
@@ -50,11 +64,9 @@ interpret <- bid_notice(
     )
   )
 
-# Basic usage with natural language concept names
-bid_structure(
-  previous_stage = interpret,
-  layout = "dual_process",
-  concepts = c("Principle of Proximity", "Default Effect")
-)
+# Auto-selected layout with concept-grouped suggestions
+structure_result <- bid_structure(previous_stage = interpret)
+print(structure_result$layout)  # Auto-selected layout
+print(structure_result$suggestions)  # Ranked suggestions by concept
 
 }

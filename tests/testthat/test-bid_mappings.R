@@ -161,7 +161,7 @@ test_that("load_layout_mappings works correctly", {
 
   # Test with custom mappings
   custom_mappings <- data.frame(
-    layout = "custom_layout",
+    
     primary_concepts = "Test Concept 1, Test Concept 2",
     description = "Custom layout description"
   )
@@ -296,7 +296,7 @@ test_that("mapping functions validate input properly", {
 
   # Test layout mappings validation
   expect_error(
-    load_layout_mappings(data.frame(layout = "test")), # missing required columns
+    load_layout_mappings(data.frame()), # missing required columns
     "Custom data must contain columns"
   )
 })

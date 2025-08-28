@@ -14,7 +14,7 @@ test_that("bid_report generates text report with expected content", {
             context = "Dashboard has evolved over time"
           )
         ),
-        layout = "dual_process",
+        
         concepts = c("Principle of Proximity", "Default Effect")
       ),
       bias_mitigations = list(
@@ -57,7 +57,7 @@ test_that("bid_report generates HTML report with correct format", {
             context = "Dashboard has evolved over time"
           )
         ),
-        layout = "dual_process",
+        
         concepts = c("Principle of Proximity", "Default Effect")
       ),
       bias_mitigations = list(
@@ -139,7 +139,7 @@ test_that("bid_report includes diagrams when requested", {
           ),
           central_question = "Test question"
         ),
-        layout = "dual_process"
+        
       ),
       bias_mitigations = list(anchoring = "Test")
     ),
@@ -177,7 +177,7 @@ test_that("bid_report handles different formats", {
           ),
           central_question = "Test question"
         ),
-        layout = "dual_process"
+        
       ),
       bias_mitigations = list(anchoring = "Test")
     ),

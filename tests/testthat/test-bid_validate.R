@@ -13,7 +13,7 @@ test_that("bid_validate works with valid inputs", {
           context = "Dashboard has evolved over time"
         )
       ),
-      layout = "dual_process",
+      
       concepts = c("Principle of Proximity", "Default Effect")
     ),
     bias_mitigations = list(
@@ -61,7 +61,7 @@ test_that("bid_validate allows optional parameters", {
           context = "Dashboard has evolved over time"
         )
       ),
-      layout = "dual_process",
+      
       concepts = c("Principle of Proximity", "Default Effect")
     ),
     bias_mitigations = list(
@@ -102,7 +102,7 @@ test_that("bid_validate provides contextual suggestions", {
           context = "Dashboard has evolved over time"
         )
       ),
-      layout = "dual_process",
+      
       concepts = c("Principle of Proximity", "Default Effect")
     ),
     bias_mitigations = list(
@@ -137,7 +137,7 @@ test_that("bid_validate auto-suggests summary_panel when NULL", {
           context = "Dashboard has evolved over time"
         )
       ),
-      layout = "dual_process",
+      
       concepts = c("Principle of Proximity", "Default Effect")
     ),
     bias_mitigations = list(
@@ -176,7 +176,7 @@ test_that("bid_validate auto-suggests collaboration when NULL", {
           context = "Dashboard has evolved over time"
         )
       ),
-      layout = "dual_process",
+      
       concepts = c("Principle of Proximity", "Default Effect")
     ),
     bias_mitigations = list(
@@ -219,7 +219,7 @@ test_that("bid_validate auto-suggests next_steps when NULL", {
           context = "Dashboard has evolved over time"
         )
       ),
-      layout = "dual_process",
+      
       concepts = c("Principle of Proximity", "Default Effect")
     ),
     bias_mitigations = list(
