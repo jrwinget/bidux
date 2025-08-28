@@ -1,4 +1,4 @@
-# bidux 0.2.0 (2025-08-28)
+# bidux 0.3.0 (2025-08-28)
 ==========================
 
 ### BREAKING CHANGES
@@ -15,13 +15,32 @@
 
 * **Enhanced CLI feedback.** Clear messages show the auto-selected layout with rationale, plus a helpful tip about using `bid_concept("<concept>")` to learn more about any detected concepts.
 
+### IMPROVEMENTS
+
+* **Comprehensive test coverage.** Added extensive tests for all heuristic branches, suggestion structure validation, CLI message verification, telemetry integration, and error handling for the deprecated `layout` parameter.
+
+### BUG FIXES
+
+* None.
+
+### DEPRECATED AND DEFUNCT
+
+* None.
+
+### DOCUMENTATION FIXES
+
+* None.
+
+# bidux 0.2.0 (2025-08-05)
+==========================
+
+### NEW FEATURES
+
 * **Telemetry-driven UX friction detection.** New `bid_ingest_telemetry()` ingests `{shiny.telemetry}` data (SQLite or JSON), applies configurable thresholds, detects friction patterns (e.g., unused inputs, delayed interactions, error clusters, navigation drop-offs, confusion), and generates BID notices and reports. Includes robust input validation, format auto-detection, and clearer CLI summaries. (#18)
 
 * **Telemetry integration vignette.** A new vignette shows how to set up `{shiny.telemetry}`, run `bid_ingest_telemetry()`, interpret indicators, and customize thresholds within the BID workflow. (#18)
 
-### IMPROVEMENTS
-
-* **Comprehensive test coverage.** Added extensive tests for all heuristic branches, suggestion structure validation, CLI message verification, telemetry integration, and error handling for the deprecated `layout` parameter.
+### MINOR IMPROVEMENTS
 
 * **Modular printing and display rules.** `print.bid_stage()` refactored into `print_stage_header()`, `print_stage_content()`, and `print_stage_footer()` with reusable field printing and stage-specific display rules for clearer, more consistent output.
 
