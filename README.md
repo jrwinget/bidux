@@ -91,7 +91,7 @@ bid_report(process, format = "html")
 ## 📊 Telemetry Integration
 
 Leverage real user behavior to pinpoint UX friction with
-[{shiny.telemetry}](https://github.com/Appsilon/shiny.telemetry) data:
+[`{shiny.telemetry}`](https://github.com/Appsilon/shiny.telemetry) data:
 
 ``` r
 # Ingest telemetry from SQLite or JSON
@@ -114,8 +114,8 @@ str(issues)
 
 Use these insights to fuel the **Notice** stage and drive data-informed
 UI improvements. See the full example and thresholds customization in
-the [Telemetry Integration
-Vignette](vignettes/telemetry-integration.Rmd).
+the See the package vignette ‘Telemetry Integration’ for a full example
+(accessible via `vignette("telemetry-integration", package="bidux")`).
 
 ## 📚 Vignettes
 
@@ -128,11 +128,11 @@ Explore detailed guides:
 
 ## 🤝 Contributing
 
-We welcome all contributions! Please see
-[CONTRIBUTING.md](.github/CONTRIBUTING.md) for guidelines, issue
-templates, and code style.
+We welcome all contributions! Please see [Contributing
+Guide](https://github.com/jrwinget/bidux/blob/main/.github/CONTRIBUTING.md)
+for guidelines, issue templates, and code style.
 
 ## 📜 License & Code of Conduct
 
 This project is MIT licensed. By contributing, you agree to our [Code of
-Conduct](.github/CODE_OF_CONDUCT.md).
+Conduct](https://github.com/jrwinget/bidux/blob/main/.github/CODE_OF_CONDUCT.md).
