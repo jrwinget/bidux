@@ -9,7 +9,7 @@ body:
     attributes:
       value: |
         Thank you for suggesting Shiny integration improvements! The {bidux} package aims to work seamlessly with the Shiny ecosystem to help developers create better UX experiences.
-  
+
   - type: input
     id: contact
     attributes:
@@ -18,7 +18,7 @@ body:
       placeholder: ex. email@example.com
     validations:
       required: false
-  
+
   - type: dropdown
     id: shiny_package
     attributes:
@@ -41,7 +41,7 @@ body:
         - "Other (specify in description)"
     validations:
       required: true
-  
+
   - type: textarea
     id: integration_summary
     attributes:
@@ -50,7 +50,7 @@ body:
       placeholder: Summarize what integration you're requesting
     validations:
       required: true
-  
+
   - type: dropdown
     id: integration_type
     attributes:
@@ -61,13 +61,13 @@ body:
         - "Enhanced component suggestions"
         - "BID-compliant component wrappers"
         - "Accessibility improvements"
-        - "Behavioral psychology integration"
+        - "Behavioral science integration"
         - "Automated BID validation"
         - "Documentation/examples"
         - "Other"
     validations:
       required: true
-  
+
   - type: checkboxes
     id: bid_stage_support
     attributes:
@@ -80,7 +80,7 @@ body:
         - label: "Stage 4: Anticipate - Behavioral predictions"
         - label: "Stage 5: Validate - User empowerment"
         - label: "Cross-stage functionality"
-  
+
   - type: textarea
     id: current_limitation
     attributes:
@@ -88,14 +88,14 @@ body:
       description: What limitation does this integration address?
       placeholder: |
         Describe the current limitation:
-        
+
         - What can't you currently do?
         - What workflow is inefficient?
         - What BID principles are missing?
         - How does this affect user experience?
     validations:
       required: true
-  
+
   - type: textarea
     id: proposed_solution
     attributes:
@@ -103,18 +103,18 @@ body:
       description: How would you like this integration to work?
       placeholder: |
         Describe your proposed solution:
-        
+
         - What functions would be added/modified?
         - How would users interact with this?
         - What would the API look like?
-        
+
         ```r
         # Example usage
         bid_suggest_components(stage_result, package = "your_package")
         ```
     validations:
       required: true
-  
+
   - type: textarea
     id: psychological_benefits
     attributes:
@@ -122,14 +122,14 @@ body:
       description: What psychological or UX benefits would this integration provide?
       placeholder: |
         Describe the benefits:
-        
+
         - Which cognitive principles would be better supported?
         - How would user experience improve?
         - What accessibility gains would result?
         - Which biases would be better addressed?
     validations:
       required: true
-  
+
   - type: textarea
     id: use_cases
     attributes:
@@ -137,17 +137,17 @@ body:
       description: Provide specific use cases for this integration
       placeholder: |
         Describe specific scenarios:
-        
+
         **Use Case 1:** [Description]
         - Current approach: [how it works now]
         - With integration: [how it would work]
-        
+
         **Use Case 2:** [Description]
         - Current approach: [how it works now]
         - With integration: [how it would work]
     validations:
       required: true
-  
+
   - type: textarea
     id: example_implementation
     attributes:
@@ -157,21 +157,21 @@ body:
         ```r
         library(bidux)
         library(your_target_package)
-        
+
         # Example workflow
         stage_result <- bid_notice(
           problem = "Example problem",
           evidence = "Example evidence"
         )
-        
+
         # Your proposed integration
         suggestions <- bid_suggest_components(stage_result, package = "your_package")
-        
+
         # Expected output or behavior
         ```
     validations:
       required: true
-  
+
   - type: textarea
     id: technical_considerations
     attributes:
@@ -179,7 +179,7 @@ body:
       description: What technical aspects should be considered?
       placeholder: |
         Consider technical aspects:
-        
+
         - Package dependencies
         - Version compatibility
         - Performance implications
@@ -187,7 +187,7 @@ body:
         - Testing needs
     validations:
       required: false
-  
+
   - type: dropdown
     id: priority
     attributes:
@@ -200,7 +200,7 @@ body:
         - "Low - Minor improvement"
     validations:
       required: true
-  
+
   - type: checkboxes
     id: contribution
     attributes:
@@ -210,7 +210,7 @@ body:
         - label: I would be willing to test this integration
         - label: I would be willing to provide examples/documentation
         - label: I have experience with the target Shiny package
-  
+
   - type: textarea
     id: additional_context
     attributes:
@@ -223,7 +223,7 @@ body:
         - Community discussions
     validations:
       required: false
-  
+
   - type: checkboxes
     id: checklist
     attributes:

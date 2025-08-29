@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-The `{bidux}` package helps Shiny developers create more effective dashboards using the **Behavior Insight Design (BID) Framework**. This framework integrates psychological principles, UX best practices, and data storytelling techniques to guide the development of dashboards that are easier to understand, more engaging, and more effective at supporting user decisions.
+The `{bidux}` package helps Shiny developers create more effective dashboards using the **Behavior Insight Design (BID) Framework**. This framework integrates behavioral science, UX best practices, and data storytelling techniques to guide the development of dashboards that are easier to understand, more engaging, and more effective at supporting user decisions.
 
 ```{r setup}
 library(bidux)
@@ -38,7 +38,7 @@ This sequential process forms a structured approach to dashboard design, with ea
 
 ## Exploring the Concept Dictionary
 
-The BID framework is built on established psychological and design principles. To explore these concepts, use `bid_concepts()` to list all available concepts, or search for specific terms:
+The BID framework is built on established science and design principles. To explore these concepts, use `bid_concepts()` to list all available concepts, or search for specific terms:
 
 ```{r concepts}
 # List all concepts
@@ -269,7 +269,7 @@ Here's how to integrate the BID framework into your development process:
 
 ## Conclusion
 
-The `{bidux}` package makes it easier to apply psychological principles and UX best practices to your Shiny dashboards. By following the 5-stage BID framework, you can create applications that are more intuitive, engaging, and effective for your users.
+The `{bidux}` package makes it easier to apply behavioral science and UX best practices to your Shiny dashboards. By following the 5-stage BID framework, you can create applications that are more intuitive, engaging, and effective for your users.
 
 Future versions of `{bidux}` will include:
 
@@ -281,4 +281,4 @@ Future versions of `{bidux}` will include:
 
 Visit [github.com/jrwinget/bidux](https://github.com/jrwinget/bidux) for updates and to contribute to the package development. We welcome feedback and suggestions to help make the BID framework even more effective for Shiny developers.
 
-Remember that good dashboard design is an iterative process that benefits from continuous user feedback. The BID framework provides structure to this process while ensuring psychological principles are incorporated throughout your development workflow.
+Remember that good dashboard design is an iterative process that benefits from continuous user feedback. The BID framework provides structure to this process while ensuring common principles are incorporated throughout your development workflow.

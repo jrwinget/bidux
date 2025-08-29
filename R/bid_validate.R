@@ -202,20 +202,12 @@ generate_summary_panel_suggestion <- function(previous_stage) {
 }
 
 generate_collaboration_suggestion <- function(previous_stage, include_empower_tools = TRUE) {
-  audience_fields <- c("audience", "target_audience", "previous_audience")
-  audience <- ""
-
-  for (field in audience_fields) {
-    audience_value <- safe_column_access(previous_stage, field, "")
-    if (audience_value != "" && !is.na(audience_value)) {
-      audience <- audience_value
-      break
-    }
-  }
+  # use the standardized helper function for consistency
+  audience <- get_audience_from_previous(previous_stage)
 
   base_suggestion <- "Enable team sharing and collaborative decision-making features"
 
-  if (audience != "" && !is.na(audience)) {
+  if (!is.na(audience) && nchar(trimws(audience)) > 0) {
     audience_lower <- tolower(audience)
 
     empowerment_suffix <- if (include_empower_tools) {

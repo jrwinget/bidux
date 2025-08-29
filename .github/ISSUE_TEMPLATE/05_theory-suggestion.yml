@@ -1,15 +1,15 @@
 name: Theory Suggestion
 description: Suggest new theories or concepts to integrate into {bidux}
-title: "[Psychology]: "
-labels: ["psychology", "enhancement", "triage"]
+title: "[Behavioral Science]: "
+labels: ["behavioral science", "enhancement", "triage"]
 assignees:
   - jrwinget
 body:
   - type: markdown
     attributes:
       value: |
-        Thank you for suggesting new theories or concepts! The BID framework benefits from incorporating the latest research in behavioral psychology and cognitive science.
-  
+        Thank you for suggesting new theories or concepts! The BID framework benefits from incorporating the latest research in behavioral and cognitive science.
+
   - type: input
     id: contact
     attributes:
@@ -18,7 +18,7 @@ body:
       placeholder: ex. email@example.com
     validations:
       required: false
-  
+
   - type: textarea
     id: theory_name
     attributes:
@@ -27,7 +27,7 @@ body:
       placeholder: e.g., "Cognitive Load Theory", "Dual Process Theory", "Embodied Cognition"
     validations:
       required: true
-  
+
   - type: textarea
     id: theory_description
     attributes:
@@ -35,14 +35,14 @@ body:
       description: Provide a clear description of the theory or concept
       placeholder: |
         Describe the theory:
-        
+
         - Core principles and mechanisms
         - Key researchers and foundational work
         - Main findings and applications
         - Relationship to existing theories in {bidux}
     validations:
       required: true
-  
+
   - type: textarea
     id: academic_references
     attributes:
@@ -50,14 +50,14 @@ body:
       description: Provide key academic references for this theory
       placeholder: |
         List key papers, books, or researchers:
-        
+
         - Author, A. (Year). Title. Journal, Volume(Issue), pages.
         - Author, B. (Year). Book Title. Publisher.
         - Key researchers: [names]
         - Seminal papers: [citations]
     validations:
       required: true
-  
+
   - type: checkboxes
     id: bid_stage_relevance
     attributes:
@@ -70,7 +70,7 @@ body:
         - label: "Stage 4: Anticipate - Behavioral prediction and bias mitigation"
         - label: "Stage 5: Validate - User empowerment and feedback"
         - label: "Cross-stage integration"
-  
+
   - type: textarea
     id: ux_applications
     attributes:
@@ -78,7 +78,7 @@ body:
       description: How would this theory apply to user interface design?
       placeholder: |
         Describe specific applications:
-        
+
         - Interface design implications
         - User experience improvements
         - Specific UI patterns or principles
@@ -86,7 +86,7 @@ body:
         - Design recommendations
     validations:
       required: true
-  
+
   - type: textarea
     id: bidux_integration
     attributes:
@@ -94,19 +94,19 @@ body:
       description: How would you integrate this theory into the {bidux} package?
       placeholder: |
         Propose specific integration:
-        
+
         - New functions or parameters
         - Modifications to existing functions
         - New concept dictionary entries
         - Documentation updates
         - Example implementations
-        
+
         ```r
         # Example code integration
         ```
     validations:
       required: true
-  
+
   - type: textarea
     id: practical_examples
     attributes:
@@ -114,17 +114,17 @@ body:
       description: Provide concrete examples of how this theory would improve BID implementations
       placeholder: |
         Provide specific examples:
-        
+
         **Example 1:** [Scenario description]
         - Current approach: [description]
         - With new theory: [improvement]
-        
+
         **Example 2:** [Scenario description]
         - Current approach: [description]
         - With new theory: [improvement]
     validations:
       required: true
-  
+
   - type: textarea
     id: evidence_base
     attributes:
@@ -132,7 +132,7 @@ body:
       description: What empirical evidence supports this theory's application to UI/UX?
       placeholder: |
         Describe supporting evidence:
-        
+
         - Experimental studies
         - Meta-analyses
         - Real-world applications
@@ -140,7 +140,7 @@ body:
         - Replication status
     validations:
       required: true
-  
+
   - type: dropdown
     id: implementation_complexity
     attributes:
@@ -154,7 +154,7 @@ body:
         - "Unknown - Needs further analysis"
     validations:
       required: true
-  
+
   - type: textarea
     id: potential_challenges
     attributes:
@@ -162,7 +162,7 @@ body:
       description: What challenges might arise from integrating this theory?
       placeholder: |
         Consider potential issues:
-        
+
         - Conflicts with existing theories
         - Implementation difficulties
         - User complexity
@@ -170,7 +170,7 @@ body:
         - Validation challenges
     validations:
       required: false
-  
+
   - type: checkboxes
     id: theory_status
     attributes:
@@ -182,7 +182,7 @@ body:
         - label: "Controversial or debated theory"
         - label: "Recently developed theory"
         - label: "Classic theory with modern applications"
-  
+
   - type: textarea
     id: additional_context
     attributes:
@@ -196,7 +196,7 @@ body:
         - Future research directions
     validations:
       required: false
-  
+
   - type: checkboxes
     id: checklist
     attributes:

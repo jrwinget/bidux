@@ -25,11 +25,11 @@ library(echarts4r)
 
 # BID Framework Concepts: Practical Implementation
 
-The Behavior Insight Design (BID) framework integrates psychological principles into UI/UX design for Shiny dashboards. This guide focuses on practical implementation of key concepts using modern packages like {bslib}, {reactable}, and {echarts4r}.
+The Behavior Insight Design (BID) framework integrates behavioral science into UI/UX design for Shiny dashboards. This guide focuses on practical implementation of key concepts using modern packages like {bslib}, {reactable}, and {echarts4r}.
 
 ## Framework Overview
 
-The BID framework consists of 5 sequential stages, each incorporating specific psychological principles:
+The BID framework consists of 5 sequential stages, each incorporating specific psychological tendencies and design principles:
 
 1. **Interpret**: Understand user needs (Data Storytelling, User Personas)
 2. **Notice**: Identify friction points (Cognitive Load, Visual Hierarchy)
@@ -929,4 +929,4 @@ bid_concept("Anchoring Effect") |>
   select(concept, description, implementation_tips)
 ```
 
-The BID framework provides a systematic approach to incorporating psychological principles into your dashboard design, resulting in more intuitive, usable, and effective Shiny applications.
+The BID framework provides a systematic approach to incorporating behavioral science into your dashboard design, resulting in more intuitive, usable, and effective Shiny applications.

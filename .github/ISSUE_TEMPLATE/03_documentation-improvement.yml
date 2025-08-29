@@ -9,7 +9,7 @@ body:
     attributes:
       value: |
         Thank you for helping improve the {bidux} documentation! Clear documentation is essential for helping users understand and apply the BID framework effectively.
-  
+
   - type: input
     id: contact
     attributes:
@@ -18,7 +18,7 @@ body:
       placeholder: ex. email@example.com
     validations:
       required: false
-  
+
   - type: dropdown
     id: doc_type
     attributes:
@@ -36,7 +36,7 @@ body:
         - "Other"
     validations:
       required: true
-  
+
   - type: textarea
     id: location
     attributes:
@@ -44,7 +44,7 @@ body:
       description: Where is the documentation that needs improvement?
       placeholder: |
         Specify the exact location:
-        
+
         - Function name: `function_name()`
         - File path: `path/to/file.R`
         - Vignette title: "Getting Started with bidux"
@@ -52,7 +52,7 @@ body:
         - Other: [description]
     validations:
       required: true
-  
+
   - type: textarea
     id: current_issue
     attributes:
@@ -60,14 +60,14 @@ body:
       description: What's wrong with the current documentation?
       placeholder: |
         Describe the problem:
-        
+
         - What is unclear or confusing?
         - What information is missing?
         - What examples don't work?
         - What could be explained better?
     validations:
       required: true
-  
+
   - type: textarea
     id: improvement_suggestion
     attributes:
@@ -75,7 +75,7 @@ body:
       description: How should the documentation be improved?
       placeholder: |
         Provide specific suggestions:
-        
+
         - New content to add
         - Existing content to clarify
         - Examples to include
@@ -83,7 +83,7 @@ body:
         - Visual aids needed
     validations:
       required: true
-  
+
   - type: dropdown
     id: user_level
     attributes:
@@ -97,7 +97,7 @@ body:
         - "All levels"
     validations:
       required: true
-  
+
   - type: textarea
     id: bid_context
     attributes:
@@ -105,13 +105,13 @@ body:
       description: How does this documentation relate to the BID framework?
       placeholder: |
         Explain the BID context:
-        
+
         - Which BID stage(s) does this affect?
-        - What psychological principles are involved?
+        - What behavioral science principles are involved?
         - How does this help users apply BID effectively?
     validations:
       required: false
-  
+
   - type: textarea
     id: proposed_content
     attributes:
@@ -119,15 +119,15 @@ body:
       description: If you have specific content suggestions, provide them here
       placeholder: |
         Provide draft content if you have it:
-        
+
         ```r
         # Example code
         ```
-        
+
         Or suggested text improvements...
     validations:
       required: false
-  
+
   - type: checkboxes
     id: contribution
     attributes:
@@ -136,7 +136,7 @@ body:
         - label: I would be willing to help write this documentation
         - label: I would be willing to review improved documentation
         - label: I can provide additional examples or use cases
-  
+
   - type: textarea
     id: additional_context
     attributes:
@@ -148,7 +148,7 @@ body:
         - Links to related issues or discussions
     validations:
       required: false
-  
+
   - type: checkboxes
     id: checklist
     attributes:
