@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">bidux</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -219,25 +219,20 @@ We’ve also added user personas to better target our design.</p>
 <code class="sourceCode R"><span><span class="co"># Document the dashboard structure</span></span>
 <span><span class="va">structure_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_structure.html">bid_structure</a></span><span class="op">(</span></span>
 <span>  previous_stage <span class="op">=</span> <span class="va">interpret_result</span>,</span>
-<span>  layout <span class="op">=</span> <span class="st">"dual_process"</span>,</span>
 <span>  concepts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>    <span class="st">"Principle of Proximity"</span>,</span>
 <span>    <span class="st">"Default Effect"</span>,</span>
 <span>    <span class="st">"Visual Hierarchy"</span>,</span>
 <span>    <span class="st">"Breathable Layouts"</span></span>
-<span>  <span class="op">)</span>,</span>
-<span>  accessibility <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    color_contrast <span class="op">=</span> <span class="st">"Using WCAG AA-compliant color contrasts"</span>,</span>
-<span>    keyboard_navigation <span class="op">=</span> <span class="st">"All interactive elements are keyboard accessible"</span>,</span>
-<span>    screen_reader <span class="op">=</span> <span class="st">"Charts include descriptive alt text"</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">structure_result</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">layout</span>, <span class="va">concepts</span>, <span class="va">accessibility</span><span class="op">)</span></span></code></pre></div>
-<p>The function provides layout-specific suggestions based on the
-psychological concepts we’ve chosen to apply, and acknowledges our
-accessibility considerations.</p>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">layout</span>, <span class="va">concepts_detected</span>, <span class="va">suggestions</span><span class="op">)</span></span></code></pre></div>
+<p>The function automatically selects an appropriate layout based on the
+content from previous stages and provides ranked, actionable suggestions
+organized by UX concepts. The layout selection is transparent with clear
+rationale for why a particular layout was chosen.</p>
 </div>
 <div class="section level3">
 <h3 id="stage-4-anticipate-user-behavior">Stage 4: Anticipate User Behavior<a class="anchor" aria-label="anchor" href="#stage-4-anticipate-user-behavior"></a>

@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">bidux</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -260,12 +260,7 @@ behavior - Poor affordances</p>
 <span><span class="co"># Structure improvements</span></span>
 <span><span class="va">structure_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_structure.html">bid_structure</a></span><span class="op">(</span></span>
 <span>  previous_stage <span class="op">=</span> <span class="va">interpret_result</span>,</span>
-<span>  layout <span class="op">=</span> <span class="st">"dual_process"</span>,</span>
-<span>  concepts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Progressive Disclosure"</span>, <span class="st">"Feedback Loops"</span><span class="op">)</span>,</span>
-<span>  accessibility <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    error_messages <span class="op">=</span> <span class="st">"Clear, actionable error messages"</span>,</span>
-<span>    loading_states <span class="op">=</span> <span class="st">"Accessible loading indicators"</span></span>
-<span>  <span class="op">)</span></span>
+<span>  concepts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Progressive Disclosure"</span>, <span class="st">"Feedback Loops"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Continue through anticipate and validate stages...</span></span></code></pre></div>
@@ -295,7 +290,6 @@ behavior - Poor affordances</p>
 <span>    central_question <span class="op">=</span> <span class="st">"Which filters actually help users find insights?"</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/bid_structure.html">bid_structure</a></span><span class="op">(</span></span>
-<span>      layout <span class="op">=</span> <span class="st">"breathable"</span>,</span>
 <span>      concepts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Progressive Disclosure"</span>, <span class="st">"Smart Defaults"</span><span class="op">)</span></span>
 <span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/bid_anticipate.html">bid_anticipate</a></span><span class="op">(</span></span>

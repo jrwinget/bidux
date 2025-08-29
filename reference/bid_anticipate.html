@@ -11,7 +11,7 @@ It also supports adding interaction hints and visual feedback elements."><meta p
 
     <a class="navbar-brand me-2" href="../index.html">bidux</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -99,7 +99,6 @@ stage.</p>
 <span class="r-in"><span>      resolution <span class="op">=</span> <span class="st">"Simplify menu"</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span>,</span></span>
-<span class="r-in"><span>  layout <span class="op">=</span> <span class="st">"dual_process"</span>,</span></span>
 <span class="r-in"><span>  concepts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"principle_of_proximity"</span>, <span class="st">"default_effect"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Auto-suggested theory: Hick's Law (confidence: 90%)</span>
@@ -114,17 +113,13 @@ stage.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Your data story has all key elements. Focus on making each component compelling and relevant.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Your central question is appropriately scoped.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - No user personas defined </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Returning all 41 concepts</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Implementation tips for selected concepts: </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> • <span style="font-weight: bold;">Principle of Proximity</span>: Place related controls and visualizations in</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> proximity to each other.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> • <span style="font-weight: bold;">Default Effect</span>: Pre-select the most useful timeframe or metrics for initial</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> view.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Auto-selected layout: breathable</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Detected information overload patterns; choosing 'breathable' to reduce cognitive load.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Tip: Learn more about any concept via bid_concept("&lt;concept&gt;").</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Stage 3 (Structure) completed.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Layout: dual_process</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Concepts: Principle of Proximity, Default Effect</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - No accessibility considerations specified </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Auto-selected layout: breathable</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Concept groups generated: 5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Total concepts: 5 </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Basic usage</span></span></span>
 <span class="r-in"><span><span class="fu">bid_anticipate</span><span class="op">(</span></span></span>
@@ -134,17 +129,17 @@ stage.</p>
 <span class="r-in"><span>    framing <span class="op">=</span> <span class="st">"Toggle between positive and negative framing"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Automatically suggested interaction principles: progressive_disclosure, hover_effects.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Automatically suggested interaction principles: subtle_animations, contextual_controls, visual_prominence, progressive_interaction.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Anchoring Effect</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Framing &amp; Loss Aversion</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Stage 4 (Anticipate) completed.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Bias mitigations: 2 defined</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Interaction principles: 2 defined</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Interaction principles: 4 defined</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Key suggestions: anchoring mitigation: Always show reference points like previous period, budget, or industry average., framing mitigation: Toggle between progress (65% complete) and gap (35% remaining) framing., Consider also addressing these common biases: confirmation </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 8</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   stage      bias_mitigations             interaction_principles previous_layout</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                        <span style="color: #949494; font-style: italic;">&lt;json&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Anticipate anchoring: Use context-awar… <span style="color: #949494;">"</span>{\"progressive_discl… dual_process   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Anticipate anchoring: Use context-awar… <span style="color: #949494;">"</span>{\"subtle_animations… breathable     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 4 more variables: previous_concepts &lt;chr&gt;, previous_accessibility &lt;chr&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   suggestions &lt;chr&gt;, timestamp &lt;dttm&gt;</span></span>
 <span class="r-in"><span></span></span>
@@ -152,21 +147,18 @@ stage.</p>
 <span class="r-in"><span><span class="fu">bid_anticipate</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  previous_stage <span class="op">=</span> <span class="va">structure_info</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Automatically suggested bias mitigations: association bias, clustering illusion, status quo bias, choice architecture, framing.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Automatically suggested interaction principles: progressive_disclosure, hover_effects.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Concept 'association bias' not found</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Concept 'clustering illusion' not found</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Concept 'status quo bias' not found</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Concept 'choice architecture' not found</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Framing &amp; Loss Aversion</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Automatically suggested bias mitigations: attention bias, belief perseverance, cognitive load.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Automatically suggested interaction principles: subtle_animations, contextual_controls, visual_prominence, progressive_interaction.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Concept 'attention bias' not found</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Cognitive Load Theory</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Stage 4 (Anticipate) completed.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Bias mitigations: 5 defined</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Interaction principles: 2 defined</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Key suggestions: association bias mitigation: Consider how this bias affects user decisions., clustering illusion mitigation: Consider how this bias affects user decisions., status quo bias mitigation: Consider how this bias affects user decisions. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Bias mitigations: 3 defined</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Interaction principles: 4 defined</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Key suggestions: attention bias mitigation: Consider how this bias affects user decisions., belief perseverance mitigation: Proactively show content that might disprove initial assumptions., cognitive load mitigation: Use tabs or collapsible sections to organize complex information. </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 8</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   stage      bias_mitigations             interaction_principles previous_layout</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                        <span style="color: #949494; font-style: italic;">&lt;json&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Anticipate <span style="color: #949494;">"</span>association bias: Consider… <span style="color: #949494;">"</span>{\"progressive_discl… dual_process   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Anticipate <span style="color: #949494;">"</span>attention bias: Consider h… <span style="color: #949494;">"</span>{\"subtle_animations… breathable     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 4 more variables: previous_concepts &lt;chr&gt;, previous_accessibility &lt;chr&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   suggestions &lt;chr&gt;, timestamp &lt;dttm&gt;</span></span>
 <span class="r-in"><span></span></span>
@@ -192,7 +184,7 @@ stage.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 8</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   stage      bias_mitigations             interaction_principles previous_layout</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                        <span style="color: #949494; font-style: italic;">&lt;json&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Anticipate anchoring: Use context-awar… <span style="color: #949494;">"</span>{\"hover_effects\":\… dual_process   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Anticipate anchoring: Use context-awar… <span style="color: #949494;">"</span>{\"hover_effects\":\… breathable     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 4 more variables: previous_concepts &lt;chr&gt;, previous_accessibility &lt;chr&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   suggestions &lt;chr&gt;, timestamp &lt;dttm&gt;</span></span>
 <span class="r-in"><span></span></span>
