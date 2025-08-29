@@ -76,8 +76,8 @@
 </h2>
 <p>The <a href="https://jrwinget.github.io/bidux/">bidux</a> package helps Shiny developers create more
 effective dashboards using the <strong>Behavior Insight Design (BID)
-Framework</strong>. This framework integrates psychological principles,
-UX best practices, and data storytelling techniques to guide the
+Framework</strong>. This framework integrates behavioral science, UX
+best practices, and data storytelling techniques to guide the
 development of dashboards that are easier to understand, more engaging,
 and more effective at supporting user decisions.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
@@ -90,17 +90,17 @@ and more effective at supporting user decisions.</p>
 <p>The BID framework consists of 5 sequential stages:</p>
 <ol style="list-style-type: decimal">
 <li>
-<strong>Notice</strong> the Problem - Identify friction points and
-user struggles</li>
-<li>
 <strong>Interpret</strong> the User’s Need - Understand the core
 questions and insights needed</li>
 <li>
-<strong>Structure</strong> the Dashboard - Organize information for
-intuitive comprehension</li>
+<strong>Notice</strong> the Problem - Identify friction points and
+user struggles</li>
 <li>
 <strong>Anticipate</strong> User Behavior - Consider cognitive
 biases that influence perception</li>
+<li>
+<strong>Structure</strong> the Dashboard - Organize information for
+intuitive comprehension</li>
 <li>
 <strong>Validate</strong> &amp; Empower the User - Provide clear
 takeaways and collaborative features</li>
@@ -112,7 +112,7 @@ stages.</p>
 <div class="section level2">
 <h2 id="exploring-the-concept-dictionary">Exploring the Concept Dictionary<a class="anchor" aria-label="anchor" href="#exploring-the-concept-dictionary"></a>
 </h2>
-<p>The BID framework is built on established psychological and design
+<p>The BID framework is built on established science and design
 principles. To explore these concepts, use <code><a href="../reference/bid_concepts.html">bid_concepts()</a></code>
 to list all available concepts, or search for specific terms:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -151,34 +151,13 @@ partial matching:</p>
 <p>Let’s walk through a complete example of using the BID framework to
 document and improve a dashboard project.</p>
 <div class="section level3">
-<h3 id="stage-1-notice-the-problem">Stage 1: Notice the Problem<a class="anchor" aria-label="anchor" href="#stage-1-notice-the-problem"></a>
+<h3 id="stage-1-interpret-the-users-need">Stage 1: Interpret the User’s Need<a class="anchor" aria-label="anchor" href="#stage-1-interpret-the-users-need"></a>
 </h3>
-<p>Start by identifying the specific problems users are encountering
-with your dashboard or interface:</p>
+<p>Start by clarifying the central question your dashboard needs to
+answer and structure the data story:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Document the problem</span></span>
-<span><span class="va">notice_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_notice.html">bid_notice</a></span><span class="op">(</span></span>
-<span>  problem <span class="op">=</span> <span class="st">"Users are overwhelmed by too many filter options and struggle to find relevant insights"</span>,</span>
-<span>  evidence <span class="op">=</span> <span class="st">"User testing shows 65% of first-time users fail to complete their intended task within 2 minutes"</span>,</span>
-<span>  target_audience <span class="op">=</span> <span class="st">"Marketing team members with varying technical skills"</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">notice_result</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">problem</span>, <span class="va">theory</span>, <span class="va">evidence</span>, <span class="va">target_audience</span><span class="op">)</span></span></code></pre></div>
-<p>Notice that the function automatically selected an appropriate theory
-based on our problem description. It also provides suggestions for
-addressing cognitive load which you can access from the
-<code>suggestions</code> column.</p>
-</div>
-<div class="section level3">
-<h3 id="stage-2-interpret-the-users-need">Stage 2: Interpret the User’s Need<a class="anchor" aria-label="anchor" href="#stage-2-interpret-the-users-need"></a>
-</h3>
-<p>Next, clarify the central question your dashboard needs to answer and
-structure the data story:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Document the user's need</span></span>
 <span><span class="va">interpret_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span>
-<span>  previous_stage <span class="op">=</span> <span class="va">notice_result</span>,</span>
 <span>  central_question <span class="op">=</span> <span class="st">"How are our marketing campaigns performing across different channels?"</span>,</span>
 <span>  data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    hook <span class="op">=</span> <span class="st">"Recent campaign performance varies significantly across channels"</span>,</span>
@@ -212,53 +191,62 @@ suggestions for improvement (in the <code>suggestions</code> column).
 We’ve also added user personas to better target our design.</p>
 </div>
 <div class="section level3">
-<h3 id="stage-3-structure-the-dashboard">Stage 3: Structure the Dashboard<a class="anchor" aria-label="anchor" href="#stage-3-structure-the-dashboard"></a>
+<h3 id="stage-2-notice-the-problem">Stage 2: Notice the Problem<a class="anchor" aria-label="anchor" href="#stage-2-notice-the-problem"></a>
 </h3>
-<p>Now determine the layout and key design principles to implement:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Document the dashboard structure</span></span>
-<span><span class="va">structure_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_structure.html">bid_structure</a></span><span class="op">(</span></span>
+<p>Now identify the specific problems users are encountering with your
+dashboard or interface:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Document the problem</span></span>
+<span><span class="va">notice_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_notice.html">bid_notice</a></span><span class="op">(</span></span>
 <span>  previous_stage <span class="op">=</span> <span class="va">interpret_result</span>,</span>
-<span>  concepts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>    <span class="st">"Principle of Proximity"</span>,</span>
-<span>    <span class="st">"Default Effect"</span>,</span>
-<span>    <span class="st">"Visual Hierarchy"</span>,</span>
-<span>    <span class="st">"Breathable Layouts"</span></span>
-<span>  <span class="op">)</span></span>
+<span>  problem <span class="op">=</span> <span class="st">"Users are overwhelmed by too many filter options and struggle to find relevant insights"</span>,</span>
+<span>  evidence <span class="op">=</span> <span class="st">"User testing shows 65% of first-time users fail to complete their intended task within 2 minutes"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">structure_result</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">layout</span>, <span class="va">concepts_detected</span>, <span class="va">suggestions</span><span class="op">)</span></span></code></pre></div>
-<p>The function automatically selects an appropriate layout based on the
-content from previous stages and provides ranked, actionable suggestions
-organized by UX concepts. The layout selection is transparent with clear
-rationale for why a particular layout was chosen.</p>
+<span><span class="va">notice_result</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">problem</span>, <span class="va">theory</span>, <span class="va">evidence</span><span class="op">)</span></span></code></pre></div>
+<p>Notice that the function automatically selected an appropriate theory
+based on our problem description. It also provides suggestions for
+addressing cognitive load which you can access from the
+<code>suggestions</code> column.</p>
 </div>
 <div class="section level3">
-<h3 id="stage-4-anticipate-user-behavior">Stage 4: Anticipate User Behavior<a class="anchor" aria-label="anchor" href="#stage-4-anticipate-user-behavior"></a>
+<h3 id="stage-3-anticipate-user-behavior">Stage 3: Anticipate User Behavior<a class="anchor" aria-label="anchor" href="#stage-3-anticipate-user-behavior"></a>
 </h3>
-<p>Identify potential cognitive biases that might affect how users
+<p>Next, identify potential cognitive biases that might affect how users
 interpret your dashboard:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Document bias mitigation strategies</span></span>
 <span><span class="va">anticipate_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_anticipate.html">bid_anticipate</a></span><span class="op">(</span></span>
-<span>  previous_stage <span class="op">=</span> <span class="va">structure_result</span>,</span>
+<span>  previous_stage <span class="op">=</span> <span class="va">notice_result</span>,</span>
 <span>  bias_mitigations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    anchoring <span class="op">=</span> <span class="st">"Include previous period performance as reference points"</span>,</span>
 <span>    framing <span class="op">=</span> <span class="st">"Provide toggle between ROI improvement vs. ROI gap views"</span>,</span>
 <span>    confirmation_bias <span class="op">=</span> <span class="st">"Highlight unexpected patterns that contradict common assumptions"</span></span>
-<span>  <span class="op">)</span>,</span>
-<span>  interaction_principles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    hover_effects <span class="op">=</span> <span class="st">"Show detailed metrics on hover for each channel"</span>,</span>
-<span>    selection_feedback <span class="op">=</span> <span class="st">"Highlight active filters with color and icon changes"</span>,</span>
-<span>    progressive_disclosure <span class="op">=</span> <span class="st">"Reveal advanced options only when basic filters are applied"</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">anticipate_result</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">bias_mitigations</span>, <span class="va">interaction_principles</span><span class="op">)</span></span></code></pre></div>
-<p>The function evaluates our bias mitigation strategies and interaction
-principles, providing implementation suggestions for both.</p>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">bias_mitigations</span><span class="op">)</span></span></code></pre></div>
+<p>The function evaluates our bias mitigation strategies, providing
+implementation suggestions.</p>
+</div>
+<div class="section level3">
+<h3 id="stage-4-structure-the-dashboard">Stage 4: Structure the Dashboard<a class="anchor" aria-label="anchor" href="#stage-4-structure-the-dashboard"></a>
+</h3>
+<p>Now determine the layout and key design principles to implement:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Document the dashboard structure</span></span>
+<span><span class="va">structure_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_structure.html">bid_structure</a></span><span class="op">(</span></span>
+<span>  previous_stage <span class="op">=</span> <span class="va">anticipate_result</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">structure_result</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">layout</span>, <span class="va">concepts</span>, <span class="va">suggestions</span><span class="op">)</span></span></code></pre></div>
+<p>The function automatically selects an appropriate layout based on the
+content from previous stages and provides ranked, actionable suggestions
+organized by UX concepts. The layout selection is transparent with clear
+rationale for why a particular layout was chosen.</p>
 </div>
 <div class="section level3">
 <h3 id="stage-5-validate-empower-the-user">Stage 5: Validate &amp; Empower the User<a class="anchor" aria-label="anchor" href="#stage-5-validate-empower-the-user"></a>
@@ -268,7 +256,7 @@ and the ability to collaborate:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Document validation approach</span></span>
 <span><span class="va">validate_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_validate.html">bid_validate</a></span><span class="op">(</span></span>
-<span>  previous_stage <span class="op">=</span> <span class="va">anticipate_result</span>,</span>
+<span>  previous_stage <span class="op">=</span> <span class="va">structure_result</span>,</span>
 <span>  summary_panel <span class="op">=</span> <span class="st">"Executive summary highlighting top and bottom performers, key trends, and recommended actions for the next marketing cycle"</span>,</span>
 <span>  collaboration <span class="op">=</span> <span class="st">"Team annotation capability allowing marketing team members to add context and insights to specific data points"</span>,</span>
 <span>  next_steps <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
@@ -299,7 +287,7 @@ common R packages:</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Get {reactable} suggestions for showing data</span></span>
-<span><span class="fu"><a href="../reference/bid_suggest_components.html">bid_suggest_components</a></span><span class="op">(</span><span class="va">anticipate_result</span>, package <span class="op">=</span> <span class="st">"reactable"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span><span class="fu"><a href="../reference/bid_suggest_components.html">bid_suggest_components</a></span><span class="op">(</span><span class="va">structure_result</span>, package <span class="op">=</span> <span class="st">"reactable"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">component</span>, <span class="va">description</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
 <span></span>
@@ -379,10 +367,10 @@ experience</li>
 <div class="section level2">
 <h2 id="conclusion">Conclusion<a class="anchor" aria-label="anchor" href="#conclusion"></a>
 </h2>
-<p>The <a href="https://jrwinget.github.io/bidux/">bidux</a> package makes it easier to apply
-psychological principles and UX best practices to your Shiny dashboards.
-By following the 5-stage BID framework, you can create applications that
-are more intuitive, engaging, and effective for your users.</p>
+<p>The <a href="https://jrwinget.github.io/bidux/">bidux</a> package makes it easier to apply behavioral
+science and UX best practices to your Shiny dashboards. By following the
+5-stage BID framework, you can create applications that are more
+intuitive, engaging, and effective for your users.</p>
 <p>Future versions of <a href="https://jrwinget.github.io/bidux/">bidux</a> will include:</p>
 <ul>
 <li>User stories workflow integration following the Gherkin method</li>
@@ -397,7 +385,7 @@ feedback and suggestions to help make the BID framework even more
 effective for Shiny developers.</p>
 <p>Remember that good dashboard design is an iterative process that
 benefits from continuous user feedback. The BID framework provides
-structure to this process while ensuring psychological principles are
+structure to this process while ensuring common principles are
 incorporated throughout your development workflow.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

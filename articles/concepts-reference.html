@@ -80,40 +80,41 @@
 <div class="section level2">
 <h2 id="bid-framework-concepts-practical-implementation">BID Framework Concepts: Practical Implementation<a class="anchor" aria-label="anchor" href="#bid-framework-concepts-practical-implementation"></a>
 </h2>
-<p>The Behavior Insight Design (BID) framework integrates psychological
-principles into UI/UX design for Shiny dashboards. This guide focuses on
+<p>The Behavior Insight Design (BID) framework integrates behavioral
+science into UI/UX design for Shiny dashboards. This guide focuses on
 practical implementation of key concepts using modern packages like
 {bslib}, {reactable}, and {echarts4r}.</p>
 <div class="section level3">
 <h3 id="framework-overview">Framework Overview<a class="anchor" aria-label="anchor" href="#framework-overview"></a>
 </h3>
 <p>The BID framework consists of 5 sequential stages, each incorporating
-specific psychological principles:</p>
+specific psychological tendencies and design principles:</p>
 <ol style="list-style-type: decimal">
-<li>
-<strong>Notice</strong>: Identify friction points (Cognitive Load,
-Visual Hierarchy)</li>
 <li>
 <strong>Interpret</strong>: Understand user needs (Data
 Storytelling, User Personas)</li>
 <li>
-<strong>Structure</strong>: Organize information (Layout Patterns,
-Breathable Designs)</li>
+<strong>Notice</strong>: Identify friction points (Cognitive Load,
+Visual Hierarchy)</li>
 <li>
 <strong>Anticipate</strong>: Mitigate biases (Anchoring,
 Framing)</li>
+<li>
+<strong>Structure</strong>: Organize information (Layout Patterns,
+Breathable Designs)</li>
 <li>
 <strong>Validate</strong>: Empower the user (Peak-End Rule,
 Collaboration)</li>
 </ol>
 </div>
 <div class="section level3">
-<h3 id="stage-1-notice---reducing-cognitive-load">Stage 1: Notice - Reducing Cognitive Load<a class="anchor" aria-label="anchor" href="#stage-1-notice---reducing-cognitive-load"></a>
+<h3 id="stage-1-interpret---implementing-data-storytelling">Stage 1: Interpret - Implementing Data Storytelling<a class="anchor" aria-label="anchor" href="#stage-1-interpret---implementing-data-storytelling"></a>
 </h3>
-<p>Cognitive load is the amount of mental effort required to use your
-interface. High cognitive load leads to user frustration and errors.</p>
+<p>Data storytelling helps users understand the meaning behind data
+through a narrative structure with hook, context, tension, and
+resolution.</p>
 <div class="section level4">
-<h4 id="using-bslib-to-reduce-cognitive-load">Using {bslib} to Reduce Cognitive Load<a class="anchor" aria-label="anchor" href="#using-bslib-to-reduce-cognitive-load"></a>
+<h4 id="using-echarts4r-for-data-storytelling">Using {echarts4r} for Data Storytelling<a class="anchor" aria-label="anchor" href="#using-echarts4r-for-data-storytelling"></a>
 </h4>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ui</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rstudio.github.io/bslib/reference/page_fillable.html" class="external-link">page_fillable</a></span><span class="op">(</span></span>
@@ -171,7 +172,8 @@ interface. High cognitive load leads to user frustration and errors.</p>
 <span>            <span class="fu"><a href="https://rstudio.github.io/bslib/reference/card_body.html" class="external-link">card_body</a></span><span class="op">(</span></span>
 <span>              <span class="fu">h5</span><span class="op">(</span><span class="st">"Regions"</span><span class="op">)</span>,</span>
 <span>              <span class="fu">selectInput</span><span class="op">(</span></span>
-<span>                <span class="st">"region"</span>, <span class="st">"Region:"</span>,</span>
+<span>                <span class="st">"region"</span>,</span>
+<span>                <span class="st">"Region:"</span>,</span>
 <span>                choices <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"All"</span>, <span class="st">"North"</span>, <span class="st">"South"</span>, <span class="st">"East"</span>, <span class="st">"West"</span><span class="op">)</span></span>
 <span>              <span class="op">)</span></span>
 <span>            <span class="op">)</span></span>
@@ -230,25 +232,24 @@ interface. High cognitive load leads to user frustration and errors.</p>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
-<h4 id="key-design-principles-for-reducing-cognitive-load">Key Design Principles for Reducing Cognitive Load:<a class="anchor" aria-label="anchor" href="#key-design-principles-for-reducing-cognitive-load"></a>
+<h4 id="key-design-principles-for-data-storytelling">Key Design Principles for Data Storytelling:<a class="anchor" aria-label="anchor" href="#key-design-principles-for-data-storytelling"></a>
 </h4>
 <ol style="list-style-type: decimal">
-<li>Group related controls and information together</li>
-<li>Use consistent layouts and patterns</li>
-<li>Implement progressive disclosure to hide complexity</li>
-<li>Limit the number of choices presented at once</li>
-<li>Use clear visual hierarchy to guide attention</li>
+<li>Start with a compelling hook to grab attention</li>
+<li>Provide relevant context and background</li>
+<li>Highlight the challenge or opportunity (tension)</li>
+<li>Offer clear insights and actionable recommendations</li>
+<li>Use progressive disclosure to reveal the story</li>
 </ol>
 </div>
 </div>
 <div class="section level3">
-<h3 id="stage-2-interpret---implementing-data-storytelling">Stage 2: Interpret - Implementing Data Storytelling<a class="anchor" aria-label="anchor" href="#stage-2-interpret---implementing-data-storytelling"></a>
+<h3 id="stage-2-notice---reducing-cognitive-load">Stage 2: Notice - Reducing Cognitive Load<a class="anchor" aria-label="anchor" href="#stage-2-notice---reducing-cognitive-load"></a>
 </h3>
-<p>Data storytelling helps users understand the meaning behind data
-through a narrative structure with hook, context, tension, and
-resolution.</p>
+<p>Cognitive load is the amount of mental effort required to use your
+interface. High cognitive load leads to user frustration and errors.</p>
 <div class="section level4">
-<h4 id="using-echarts4r-for-data-storytelling">Using {echarts4r} for Data Storytelling<a class="anchor" aria-label="anchor" href="#using-echarts4r-for-data-storytelling"></a>
+<h4 id="using-bslib-to-reduce-cognitive-load">Using {bslib} to Reduce Cognitive Load<a class="anchor" aria-label="anchor" href="#using-bslib-to-reduce-cognitive-load"></a>
 </h4>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ui</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rstudio.github.io/bslib/reference/page_fillable.html" class="external-link">page_fillable</a></span><span class="op">(</span></span>
@@ -442,31 +443,24 @@ resolution.</p>
 <span><span class="op">}</span></span></code></pre></div>
 </div>
 <div class="section level4">
-<h4 id="key-elements-of-effective-data-storytelling">Key Elements of Effective Data Storytelling:<a class="anchor" aria-label="anchor" href="#key-elements-of-effective-data-storytelling"></a>
+<h4 id="key-elements-for-reducing-cognitive-load">Key Elements for Reducing Cognitive Load:<a class="anchor" aria-label="anchor" href="#key-elements-for-reducing-cognitive-load"></a>
 </h4>
 <ol style="list-style-type: decimal">
-<li>
-<strong>Hook</strong>: Start with a compelling insight to grab
-attention</li>
-<li>
-<strong>Context</strong>: Provide background information and
-historical data</li>
-<li>
-<strong>Tension</strong>: Highlight the challenge, problem, or
-opportunity</li>
-<li>
-<strong>Resolution</strong>: Offer insights and actionable
-recommendations</li>
+<li>Group related controls and information together</li>
+<li>Use consistent layouts and patterns</li>
+<li>Implement progressive disclosure to hide complexity</li>
+<li>Limit the number of choices presented at once</li>
+<li>Use clear visual hierarchy to guide attention</li>
 </ol>
 </div>
 </div>
 <div class="section level3">
-<h3 id="stage-3-structure---breathable-layouts">Stage 3: Structure - Breathable Layouts<a class="anchor" aria-label="anchor" href="#stage-3-structure---breathable-layouts"></a>
+<h3 id="stage-3-anticipate---mitigating-anchoring-bias">Stage 3: Anticipate - Mitigating Anchoring Bias<a class="anchor" aria-label="anchor" href="#stage-3-anticipate---mitigating-anchoring-bias"></a>
 </h3>
-<p>Breathable layouts use whitespace effectively to create visual rhythm
-and reduce cognitive load.</p>
+<p>Anchoring bias occurs when users rely too heavily on the first piece
+of information they encounter when making decisions.</p>
 <div class="section level4">
-<h4 id="using-bslib-for-breathable-layouts">Using {bslib} for Breathable Layouts<a class="anchor" aria-label="anchor" href="#using-bslib-for-breathable-layouts"></a>
+<h4 id="using-reactable-and-echarts4r-to-mitigate-anchoring">Using {reactable} and {echarts4r} to Mitigate Anchoring<a class="anchor" aria-label="anchor" href="#using-reactable-and-echarts4r-to-mitigate-anchoring"></a>
 </h4>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ui</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rstudio.github.io/bslib/reference/page_fillable.html" class="external-link">page_fillable</a></span><span class="op">(</span></span>
@@ -605,14 +599,8 @@ each section</li>
 with spacing</li>
 </ol>
 </div>
-</div>
-<div class="section level3">
-<h3 id="stage-4-anticipate---mitigating-anchoring-bias">Stage 4: Anticipate - Mitigating Anchoring Bias<a class="anchor" aria-label="anchor" href="#stage-4-anticipate---mitigating-anchoring-bias"></a>
-</h3>
-<p>Anchoring bias occurs when users rely too heavily on the first piece
-of information they encounter when making decisions.</p>
 <div class="section level4">
-<h4 id="using-reactable-and-echarts4r-to-mitigate-anchoring">Using {reactable} and {echarts4r} to Mitigate Anchoring<a class="anchor" aria-label="anchor" href="#using-reactable-and-echarts4r-to-mitigate-anchoring"></a>
+<h4 id="using-bslib-for-breathable-layouts">Using {bslib} for Breathable Layouts<a class="anchor" aria-label="anchor" href="#using-bslib-for-breathable-layouts"></a>
 </h4>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ui</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rstudio.github.io/bslib/reference/page_fillable.html" class="external-link">page_fillable</a></span><span class="op">(</span></span>
@@ -841,7 +829,8 @@ of information they encounter when making decisions.</p>
 <span>      <span class="op">}</span></span>
 <span>    <span class="op">}</span></span>
 <span></span>
-<span>    <span class="fu">reactable</span><span class="op">(</span><span class="va">data</span>,</span>
+<span>    <span class="fu">reactable</span><span class="op">(</span></span>
+<span>      <span class="va">data</span>,</span>
 <span>      columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>        metric <span class="op">=</span> <span class="fu">colDef</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Metric"</span><span class="op">)</span>,</span>
 <span>        actual <span class="op">=</span> <span class="fu">colDef</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Actual"</span><span class="op">)</span>,</span>
@@ -1071,7 +1060,7 @@ dictionary:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bid_concept.html">bid_concept</a></span><span class="op">(</span><span class="st">"Anchoring Effect"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">select</span><span class="op">(</span><span class="va">concept</span>, <span class="va">description</span>, <span class="va">implementation_tips</span><span class="op">)</span></span></code></pre></div>
 <p>The BID framework provides a systematic approach to incorporating
-psychological principles into your dashboard design, resulting in more
+behavioral science into your dashboard design, resulting in more
 intuitive, usable, and effective Shiny applications.</p>
 </div>
 </div>

@@ -71,26 +71,26 @@
 <div class="section level2">
 <h2 id="id_-overview">📖 Overview<a class="anchor" aria-label="anchor" href="#id_-overview"></a>
 </h2>
-<p><a href="https://jrwinget.github.io/bidux/">bidux</a> brings the Behavior Insight Design (BID) framework into your Shiny development workflow. Follow five staged functions (Notice, Interpret, Structure, Anticipate, Validate) to systematically apply psychological principles to UI/UX design and build more intuitive dashboards.</p>
+<p><a href="https://jrwinget.github.io/bidux/">bidux</a> brings the Behavior Insight Design (BID) framework into your Shiny development workflow. Follow five staged functions (Interpret, Notice, Anticipate, Structure, Validate) to systematically apply behavioral science to UI/UX design and build more intuitive dashboards.</p>
 </div>
 <div class="section level2">
 <h2 id="id_-key-features">🚀 Key Features<a class="anchor" aria-label="anchor" href="#id_-key-features"></a>
 </h2>
 <ul>
 <li>
-<strong>Notice</strong> friction points (<code><a href="reference/bid_notice.html">bid_notice()</a></code>)</li>
-<li>
 <strong>Interpret</strong> user needs (<code><a href="reference/bid_interpret.html">bid_interpret()</a></code>)</li>
 <li>
-<strong>Structure</strong> dashboard layouts (<code><a href="reference/bid_structure.html">bid_structure()</a></code>)</li>
+<strong>Notice</strong> friction points (<code><a href="reference/bid_notice.html">bid_notice()</a></code>)</li>
 <li>
 <strong>Anticipate</strong> behavior &amp; biases (<code><a href="reference/bid_anticipate.html">bid_anticipate()</a></code>)</li>
+<li>
+<strong>Structure</strong> dashboard layouts (<code><a href="reference/bid_structure.html">bid_structure()</a></code>)</li>
 <li>
 <strong>Validate</strong> &amp; empower users (<code><a href="reference/bid_validate.html">bid_validate()</a></code>)</li>
 <li>
 <strong>Telemetry Integration</strong>: ingest real usage data to auto-detect UX issues (<code><a href="reference/bid_ingest_telemetry.html">bid_ingest_telemetry()</a></code>)</li>
 <li>
-<strong>Component Suggestions</strong>: get tailored UI component ideas for <code>bslib</code>, <code>shiny</code>, <code>reactable</code>, <code>echarts4r</code>, and more</li>
+<strong>Component Suggestions</strong>: get tailored UI component ideas for <a href="https://rstudio.github.io/bslib/" class="external-link">bslib</a>, <a href="https://shiny.posit.co/" class="external-link">shiny</a>, <a href="https://glin.github.io/reactable/" class="external-link">reactable</a>, <a href="https://echarts4r.john-coene.com/" class="external-link">echarts4r</a>, and more</li>
 <li>
 <strong>Reporting</strong>: generate HTML, Markdown, or text reports of your BID process</li>
 </ul>
@@ -114,24 +114,25 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://jrwinget.github.io/bidux/">bidux</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Document a simple BID pipeline</span></span>
-<span><span class="va">process</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu"><a href="reference/bid_notice.html">bid_notice</a></span><span class="op">(</span></span>
-<span>    problem <span class="op">=</span> <span class="st">"Users struggle to find key metrics"</span>,</span>
-<span>    evidence <span class="op">=</span> <span class="st">"70% of users spent &gt;30s searching"</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span>
+<span><span class="va">process</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span>
 <span>    central_question <span class="op">=</span> <span class="st">"Which metrics drive decisions?"</span>,</span>
 <span>    data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>      hook <span class="op">=</span> <span class="st">"Key metrics hidden"</span>,</span>
 <span>      resolution <span class="op">=</span> <span class="st">"Surface top metrics up front"</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="reference/bid_structure.html">bid_structure</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/bid_notice.html">bid_notice</a></span><span class="op">(</span></span>
+<span>    problem <span class="op">=</span> <span class="st">"Users struggle to find key metrics"</span>,</span>
+<span>    evidence <span class="op">=</span> <span class="st">"70% of users spent &gt;30s searching"</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/bid_anticipate.html">bid_anticipate</a></span><span class="op">(</span></span>
 <span>    bias_mitigations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>anchoring <span class="op">=</span> <span class="st">"Contextual defaults"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/bid_structure.html">bid_structure</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/bid_validate.html">bid_validate</a></span><span class="op">(</span></span>
-<span>    summary_panel <span class="op">=</span> <span class="st">"Insights summary"</span></span>
+<span>    include_exp_design <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>    include_telemetry <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>    include_empower_tools <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="co"># View suggestions</span></span>

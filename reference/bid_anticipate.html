@@ -53,7 +53,8 @@ It also supports adding interaction hints and visual feedback elements.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bid_anticipate</span><span class="op">(</span></span>
 <span>  <span class="va">previous_stage</span>,</span>
 <span>  bias_mitigations <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  interaction_principles <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  include_accessibility <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -72,9 +73,14 @@ the function will suggest bias mitigations based on information from
 previous stages.</p></dd>
 
 
-<dt id="arg-interaction-principles">interaction_principles<a class="anchor" aria-label="anchor" href="#arg-interaction-principles"></a></dt>
-<dd><p>A named list of interaction principles
-(optional).</p></dd>
+<dt id="arg-include-accessibility">include_accessibility<a class="anchor" aria-label="anchor" href="#arg-include-accessibility"></a></dt>
+<dd><p>Logical indicating whether to include
+accessibility mitigations. Default is TRUE.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Additional parameters. If 'interaction_principles' is provided,
+it will be ignored with a warning.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -129,64 +135,66 @@ stage.</p>
 <span class="r-in"><span>    framing <span class="op">=</span> <span class="st">"Toggle between positive and negative framing"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Automatically suggested interaction principles: subtle_animations, contextual_controls, visual_prominence, progressive_interaction.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Added accessibility mitigation based on layout context.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Anchoring Effect</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Framing &amp; Loss Aversion</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Accessibility Contrast</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Stage 4 (Anticipate) completed.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Bias mitigations: 2 defined</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Interaction principles: 4 defined</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Key suggestions: anchoring mitigation: Always show reference points like previous period, budget, or industry average., framing mitigation: Toggle between progress (65% complete) and gap (35% remaining) framing., Consider also addressing these common biases: confirmation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 8</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   stage      bias_mitigations             interaction_principles previous_layout</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                        <span style="color: #949494; font-style: italic;">&lt;json&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Anticipate anchoring: Use context-awar… <span style="color: #949494;">"</span>{\"subtle_animations… breathable     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 4 more variables: previous_concepts &lt;chr&gt;, previous_accessibility &lt;chr&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   suggestions &lt;chr&gt;, timestamp &lt;dttm&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Bias mitigations: 3 defined</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Accessibility considerations included</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Key suggestions: anchoring mitigation: Always show reference points like previous period, budget, or industry average., framing mitigation: Toggle between progress (65% complete) and gap (35% remaining) framing., accessibility mitigation: Test color combinations with WebAIM's contrast checker to meet WCAG standards. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 13</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   stage      bias_mitigations    accessibility previous_layout previous_concepts</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Anticipate anchoring: Use con… accessibilit… breathable      Cognitive Load T…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 8 more variables: previous_central_question &lt;lgl&gt;, previous_hook &lt;lgl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   previous_problem &lt;lgl&gt;, previous_theory &lt;lgl&gt;, previous_audience &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   previous_personas &lt;chr&gt;, suggestions &lt;chr&gt;, timestamp &lt;dttm&gt;</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Let the function suggest bias mitigations based on previous stages</span></span></span>
 <span class="r-in"><span><span class="fu">bid_anticipate</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  previous_stage <span class="op">=</span> <span class="va">structure_info</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Automatically suggested bias mitigations: attention bias, belief perseverance, cognitive load.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Automatically suggested interaction principles: subtle_animations, contextual_controls, visual_prominence, progressive_interaction.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Automatically suggested bias mitigations: attention bias, belief perseverance, cognitive load, accessibility.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Concept 'attention bias' not found</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Cognitive Load Theory</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Accessibility Contrast</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Stage 4 (Anticipate) completed.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Bias mitigations: 3 defined</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Interaction principles: 4 defined</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Bias mitigations: 4 defined</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Accessibility considerations included</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Key suggestions: attention bias mitigation: Consider how this bias affects user decisions., belief perseverance mitigation: Proactively show content that might disprove initial assumptions., cognitive load mitigation: Use tabs or collapsible sections to organize complex information. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 8</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   stage      bias_mitigations             interaction_principles previous_layout</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                        <span style="color: #949494; font-style: italic;">&lt;json&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Anticipate <span style="color: #949494;">"</span>attention bias: Consider h… <span style="color: #949494;">"</span>{\"subtle_animations… breathable     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 4 more variables: previous_concepts &lt;chr&gt;, previous_accessibility &lt;chr&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   suggestions &lt;chr&gt;, timestamp &lt;dttm&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 13</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   stage      bias_mitigations    accessibility previous_layout previous_concepts</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Anticipate <span style="color: #949494;">"</span>attention bias: C… accessibilit… breathable      Cognitive Load T…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 8 more variables: previous_central_question &lt;lgl&gt;, previous_hook &lt;lgl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   previous_problem &lt;lgl&gt;, previous_theory &lt;lgl&gt;, previous_audience &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   previous_personas &lt;chr&gt;, suggestions &lt;chr&gt;, timestamp &lt;dttm&gt;</span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># With interaction principles</span></span></span>
+<span class="r-in"><span><span class="co"># with accessibility included (default)</span></span></span>
 <span class="r-in"><span><span class="fu">bid_anticipate</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  previous_stage <span class="op">=</span> <span class="va">structure_info</span>,</span></span>
 <span class="r-in"><span>  bias_mitigations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    anchoring <span class="op">=</span> <span class="st">"Use context-aware references"</span>,</span></span>
 <span class="r-in"><span>    framing <span class="op">=</span> <span class="st">"Toggle between positive and negative framing"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span>,</span></span>
-<span class="r-in"><span>  interaction_principles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    hover_effects <span class="op">=</span> <span class="st">"Show additional information on hover"</span>,</span></span>
-<span class="r-in"><span>    selection_feedback <span class="op">=</span> <span class="st">"Highlight active filters with color change"</span>,</span></span>
-<span class="r-in"><span>    progressive_actions <span class="op">=</span> <span class="st">"Show advanced options only if basic ones are used"</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span>  include_accessibility <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Added accessibility mitigation based on layout context.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Anchoring Effect</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Framing &amp; Loss Aversion</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Accessibility Contrast</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Stage 4 (Anticipate) completed.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Bias mitigations: 2 defined</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Interaction principles: 3 defined</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Key suggestions: anchoring mitigation: Always show reference points like previous period, budget, or industry average., framing mitigation: Toggle between progress (65% complete) and gap (35% remaining) framing., Consider also addressing these common biases: confirmation </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 8</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   stage      bias_mitigations             interaction_principles previous_layout</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                        <span style="color: #949494; font-style: italic;">&lt;json&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Anticipate anchoring: Use context-awar… <span style="color: #949494;">"</span>{\"hover_effects\":\… breathable     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 4 more variables: previous_concepts &lt;chr&gt;, previous_accessibility &lt;chr&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   suggestions &lt;chr&gt;, timestamp &lt;dttm&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Bias mitigations: 3 defined</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Accessibility considerations included</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Key suggestions: anchoring mitigation: Always show reference points like previous period, budget, or industry average., framing mitigation: Toggle between progress (65% complete) and gap (35% remaining) framing., accessibility mitigation: Test color combinations with WebAIM's contrast checker to meet WCAG standards. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 13</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   stage      bias_mitigations    accessibility previous_layout previous_concepts</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Anticipate anchoring: Use con… accessibilit… breathable      Cognitive Load T…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 8 more variables: previous_central_question &lt;lgl&gt;, previous_hook &lt;lgl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   previous_problem &lt;lgl&gt;, previous_theory &lt;lgl&gt;, previous_audience &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   previous_personas &lt;chr&gt;, suggestions &lt;chr&gt;, timestamp &lt;dttm&gt;</span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

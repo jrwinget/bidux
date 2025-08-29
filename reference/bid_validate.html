@@ -51,7 +51,10 @@ refines the dashboard. It represents stage 5 in the BID framework.</p>
 <span>  <span class="va">previous_stage</span>,</span>
 <span>  summary_panel <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  collaboration <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  next_steps <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  next_steps <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  include_exp_design <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  include_telemetry <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  include_empower_tools <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -77,6 +80,21 @@ collaboration and sharing.</p></dd>
 <dt id="arg-next-steps">next_steps<a class="anchor" aria-label="anchor" href="#arg-next-steps"></a></dt>
 <dd><p>A character vector or string describing recommended next
 steps for implementation and iteration.</p></dd>
+
+
+<dt id="arg-include-exp-design">include_exp_design<a class="anchor" aria-label="anchor" href="#arg-include-exp-design"></a></dt>
+<dd><p>Logical indicating whether to include experiment
+design suggestions. Default is TRUE.</p></dd>
+
+
+<dt id="arg-include-telemetry">include_telemetry<a class="anchor" aria-label="anchor" href="#arg-include-telemetry"></a></dt>
+<dd><p>Logical indicating whether to include telemetry
+tracking and monitoring suggestions. Default is TRUE.</p></dd>
+
+
+<dt id="arg-include-empower-tools">include_empower_tools<a class="anchor" aria-label="anchor" href="#arg-include-empower-tools"></a></dt>
+<dd><p>Logical indicating whether to include
+context-aware empowerment tool suggestions. Default is TRUE.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -132,13 +150,14 @@ stage.</p>
 <span class="r-in"><span>    framing   <span class="op">=</span> <span class="st">"Use gain-framed messaging"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Automatically suggested interaction principles: subtle_animations, contextual_controls, visual_prominence, progressive_interaction.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Added accessibility mitigation based on layout context.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Anchoring Effect</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Framing &amp; Loss Aversion</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Accessibility Contrast</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Stage 4 (Anticipate) completed.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Bias mitigations: 2 defined</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Interaction principles: 4 defined</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Key suggestions: anchoring mitigation: Always show reference points like previous period, budget, or industry average., framing mitigation: Toggle between progress (65% complete) and gap (35% remaining) framing., Consider also addressing these common biases: confirmation </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Bias mitigations: 3 defined</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Accessibility considerations included</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Key suggestions: anchoring mitigation: Always show reference points like previous period, budget, or industry average., framing mitigation: Toggle between progress (65% complete) and gap (35% remaining) framing., accessibility mitigation: Test color combinations with WebAIM's contrast checker to meet WCAG standards. </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">bid_validate</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  previous_stage <span class="op">=</span> <span class="va">anticipate</span>,</span></span>
@@ -154,15 +173,16 @@ stage.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Summary panel: Clear summary of key insights with action items</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Collaboration: Team annotation and sharing features</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Next steps: 3 items defined</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Validation stage is well-defined. Focus on implementation and user testing. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 14</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Include telemetry and monitoring in your post-launch validation Consider adding user empowerment tools to enhance collaboration </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 16</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   stage    summary_panel                  collaboration next_steps previous_bias</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Validate Clear summary of key insights… Team annotat… Conduct u… anchoring: P…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 9 more variables: previous_interaction &lt;json&gt;, previous_layout &lt;chr&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   previous_concepts &lt;chr&gt;, previous_accessibility &lt;chr&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   previous_central_question &lt;chr&gt;, previous_problem &lt;chr&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   previous_theory &lt;chr&gt;, suggestions &lt;chr&gt;, timestamp &lt;dttm&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 11 more variables: previous_accessibility &lt;chr&gt;, previous_layout &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   previous_concepts &lt;chr&gt;, previous_central_question &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   previous_hook &lt;chr&gt;, previous_problem &lt;chr&gt;, previous_theory &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   previous_audience &lt;chr&gt;, previous_personas &lt;chr&gt;, suggestions &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   timestamp &lt;dttm&gt;</span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

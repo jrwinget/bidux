@@ -245,9 +245,8 @@ behavior - Poor affordances</p>
 <code class="sourceCode R"><span><span class="co"># Take the most critical issue</span></span>
 <span><span class="va">critical_issue</span> <span class="op">&lt;-</span> <span class="va">issues</span><span class="op">$</span><span class="va">error_1</span></span>
 <span></span>
-<span><span class="co"># Continue with interpretation</span></span>
+<span><span class="co"># Start with interpretation</span></span>
 <span><span class="va">interpret_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span>
-<span>  previous_stage <span class="op">=</span> <span class="va">critical_issue</span>,</span>
 <span>  central_question <span class="op">=</span> <span class="st">"How can we prevent data query errors?"</span>,</span>
 <span>  data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    hook <span class="op">=</span> <span class="st">"15% of users encounter errors"</span>,</span>
@@ -257,13 +256,37 @@ behavior - Poor affordances</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Structure improvements</span></span>
-<span><span class="va">structure_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_structure.html">bid_structure</a></span><span class="op">(</span></span>
+<span><span class="co"># Notice the specific problem</span></span>
+<span><span class="va">notice_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_notice.html">bid_notice</a></span><span class="op">(</span></span>
 <span>  previous_stage <span class="op">=</span> <span class="va">interpret_result</span>,</span>
-<span>  concepts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Progressive Disclosure"</span>, <span class="st">"Feedback Loops"</span><span class="op">)</span></span>
+<span>  problem <span class="op">=</span> <span class="va">critical_issue</span><span class="op">$</span><span class="va">problem</span>,</span>
+<span>  evidence <span class="op">=</span> <span class="va">critical_issue</span><span class="op">$</span><span class="va">evidence</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Continue through anticipate and validate stages...</span></span></code></pre></div>
+<span><span class="co"># Anticipate user behavior and biases</span></span>
+<span><span class="va">anticipate_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_anticipate.html">bid_anticipate</a></span><span class="op">(</span></span>
+<span>  previous_stage <span class="op">=</span> <span class="va">notice_result</span>,</span>
+<span>  bias_mitigations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    anchoring <span class="op">=</span> <span class="st">"Show loading states to set proper expectations"</span>,</span>
+<span>    confirmation_bias <span class="op">=</span> <span class="st">"Display error context to help users understand issues"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Structure improvements</span></span>
+<span><span class="va">structure_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_structure.html">bid_structure</a></span><span class="op">(</span></span>
+<span>  previous_stage <span class="op">=</span> <span class="va">anticipate_result</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Validate and provide next steps</span></span>
+<span><span class="va">validate_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_validate.html">bid_validate</a></span><span class="op">(</span></span>
+<span>  previous_stage <span class="op">=</span> <span class="va">structure_result</span>,</span>
+<span>  summary_panel <span class="op">=</span> <span class="st">"Error handling improvements with clear user feedback"</span>,</span>
+<span>  next_steps <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">"Implement loading states"</span>,</span>
+<span>    <span class="st">"Add error context"</span>,</span>
+<span>    <span class="st">"Test with users"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="example-complete-analysis">Example: Complete Analysis<a class="anchor" aria-label="anchor" href="#example-complete-analysis"></a>
@@ -282,15 +305,21 @@ behavior - Poor affordances</p>
 <span></span>
 <span><span class="co"># 3. Create a comprehensive improvement plan</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">critical_issues</span><span class="op">$</span><span class="va">unused_inputs</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="co"># Address unused inputs</span></span>
+<span>  <span class="co"># Address unused inputs following the updated BID workflow</span></span>
 <span>  <span class="va">unused_issue</span> <span class="op">&lt;-</span> <span class="va">issues</span><span class="op">[[</span><span class="va">critical_issues</span><span class="op">$</span><span class="va">unused_inputs</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">]</span></span>
 <span></span>
 <span>  <span class="va">improvement_plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span>
-<span>    previous_stage <span class="op">=</span> <span class="va">unused_issue</span>,</span>
-<span>    central_question <span class="op">=</span> <span class="st">"Which filters actually help users find insights?"</span></span>
+<span>    central_question <span class="op">=</span> <span class="st">"Which filters actually help users find insights?"</span>,</span>
+<span>    data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      hook <span class="op">=</span> <span class="st">"Several filters are never used by users"</span>,</span>
+<span>      context <span class="op">=</span> <span class="st">"Dashboard has 5 filter controls"</span>,</span>
+<span>      tension <span class="op">=</span> <span class="st">"Too many options create choice overload"</span>,</span>
+<span>      resolution <span class="op">=</span> <span class="st">"Show only relevant filters based on user tasks"</span></span>
+<span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="../reference/bid_structure.html">bid_structure</a></span><span class="op">(</span></span>
-<span>      concepts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Progressive Disclosure"</span>, <span class="st">"Smart Defaults"</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="../reference/bid_notice.html">bid_notice</a></span><span class="op">(</span></span>
+<span>      problem <span class="op">=</span> <span class="va">unused_issue</span><span class="op">$</span><span class="va">problem</span>,</span>
+<span>      evidence <span class="op">=</span> <span class="va">unused_issue</span><span class="op">$</span><span class="va">evidence</span></span>
 <span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/bid_anticipate.html">bid_anticipate</a></span><span class="op">(</span></span>
 <span>      bias_mitigations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -298,8 +327,9 @@ behavior - Poor affordances</p>
 <span>        default_effect <span class="op">=</span> <span class="st">"Pre-select most common filter values"</span></span>
 <span>      <span class="op">)</span></span>
 <span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/bid_structure.html">bid_structure</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/bid_validate.html">bid_validate</a></span><span class="op">(</span></span>
-<span>      summary_panel <span class="op">=</span> <span class="st">"Show only relevant filters based on user's task"</span>,</span>
+<span>      summary_panel <span class="op">=</span> <span class="st">"Simplified filtering with progressive disclosure"</span>,</span>
 <span>      next_steps <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>        <span class="st">"Remove unused filters"</span>,</span>
 <span>        <span class="st">"Implement progressive disclosure"</span>,</span>

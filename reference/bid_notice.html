@@ -53,7 +53,7 @@ support.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bid_notice</span><span class="op">(</span><span class="va">problem</span>, theory <span class="op">=</span> <span class="cn">NULL</span>, evidence <span class="op">=</span> <span class="cn">NULL</span>, target_audience <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bid_notice</span><span class="op">(</span><span class="va">problem</span>, theory <span class="op">=</span> <span class="cn">NULL</span>, evidence <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -75,9 +75,9 @@ theory mappings.</p></dd>
 problem.</p></dd>
 
 
-<dt id="arg-target-audience">target_audience<a class="anchor" aria-label="anchor" href="#arg-target-audience"></a></dt>
-<dd><p>Optional character string describing the target
-audience.</p></dd>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Additional parameters. Deprecated parameters like 'target_audience'
+will generate warnings if provided.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -104,7 +104,7 @@ audience.</p></dd>
 <span class="r-in"><span><span class="co"># Print shows human-friendly summary</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">notice_result</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB; font-weight: bold;">BID Framework</span> - <span style="font-weight: bold;">Notice</span> Stage</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-08-29 15:47:49 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-08-29 21:00:20 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Progress: 20 % (1/5) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Problem:</span> Users struggling with complex dropdowns and too many options </span>
@@ -127,7 +127,6 @@ audience.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    theory_confidence : 90% </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    problem_length : 60 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    evidence_length : 59 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    has_target_audience : No </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    custom_mappings_used : No </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Stage Data:</span></span>
@@ -137,7 +136,7 @@ audience.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    evidence : User testing shows 65% abandonment rate on filter selection </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    suggestions : Define specific target audience to better focus design solutions. Consider pr... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-08-29 15:47:49 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-08-29 21:00:20 </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Check stage and metadata</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="get_stage.html">get_stage</a></span><span class="op">(</span><span class="va">notice_result</span><span class="op">)</span></span></span>
@@ -164,19 +163,15 @@ audience.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $evidence_length</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 59</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $has_target_audience</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $custom_mappings_used</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># With explicit theory</span></span></span>
+<span class="r-in"><span><span class="co"># with explicit theory</span></span></span>
 <span class="r-in"><span><span class="va">notice_explicit</span> <span class="op">&lt;-</span> <span class="fu">bid_notice</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  problem <span class="op">=</span> <span class="st">"Mobile interface is difficult to navigate"</span>,</span></span>
 <span class="r-in"><span>  theory <span class="op">=</span> <span class="st">"Fitts's Law"</span>,</span></span>
-<span class="r-in"><span>  evidence <span class="op">=</span> <span class="st">"Mobile users report frustration with small touch targets"</span>,</span></span>
-<span class="r-in"><span>  target_audience <span class="op">=</span> <span class="st">"Mobile users with varying technical expertise"</span></span></span>
+<span class="r-in"><span>  evidence <span class="op">=</span> <span class="st">"Mobile users report frustration with small touch targets"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Stage 1 (Notice) completed. (20% complete)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Problem: Mobile interface is difficult to navigate</span>

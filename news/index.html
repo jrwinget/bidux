@@ -38,35 +38,96 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.3.0" id="id_-bidux-030-2025-08-28"># bidux 0.3.0 (2025-08-28)<a class="anchor" aria-label="anchor" href="#id_-bidux-030-2025-08-28"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.3.0" id="id_-bidux-030-2025-08-29"># bidux 0.3.0 (2025-08-29)<a class="anchor" aria-label="anchor" href="#id_-bidux-030-2025-08-29"></a></h2>
 <div class="section level4">
 <h4 id="breaking-changes-0-3-0">BREAKING CHANGES<a class="anchor" aria-label="anchor" href="#breaking-changes-0-3-0"></a></h4>
+<ul><li><p><strong>BID stage order updated to: Interpret → Notice → Anticipate → Structure → Validate.</strong> This reflects the most natural workflow while maintaining flexibility for iterative usage.</p></li>
+<li><p><strong><code><a href="../reference/bid_notice.html">bid_notice()</a></code> no longer accepts <code>target_audience</code> parameter.</strong> Audience information should now be managed through the <code><a href="../reference/bid_interpret.html">bid_interpret()</a></code> stage using the <code>data_story</code> or <code>user_personas</code> parameters. The function will warn if the deprecated parameter is provided.</p></li>
+<li><p><strong><code><a href="../reference/bid_anticipate.html">bid_anticipate()</a></code> no longer accepts <code>interaction_principles</code> parameter.</strong> This parameter has been removed in favor of the new <code>include_accessibility</code> parameter (default: TRUE). The function will warn if the deprecated parameter is provided.</p></li>
+<li>
+<p><strong>Field name changes for consistency:</strong></p>
 <ul><li>
-<strong><code><a href="../reference/bid_structure.html">bid_structure()</a></code> no longer accepts a <code>layout</code> parameter.</strong> Layout is now automatically selected based on content analysis of previous stages using deterministic heuristics. The function will abort with a helpful error message if the deprecated <code>layout</code> parameter is provided.</li>
+<code>previous_question</code> → <code>previous_central_question</code>
+</li>
+<li>
+<code>previous_story_hook</code> → <code>previous_hook</code>
+</li>
+<li>
+<code>user_personas</code> → <code>personas</code> (in bid_interpret output)</li>
+</ul></li>
+<li><p><strong><code><a href="../reference/bid_structure.html">bid_structure()</a></code> no longer accepts a <code>layout</code> parameter.</strong> Layout is now automatically selected based on content analysis of previous stages using deterministic heuristics. The function will abort with a helpful error message if the deprecated <code>layout</code> parameter is provided.</p></li>
 </ul></div>
 <div class="section level4">
 <h4 id="new-features-0-3-0">NEW FEATURES<a class="anchor" aria-label="anchor" href="#new-features-0-3-0"></a></h4>
-<ul><li><p><strong>Automatic layout inference for <code><a href="../reference/bid_structure.html">bid_structure()</a></code>.</strong> Uses sophisticated heuristics to analyze content from previous BID stages (problem, evidence, data story elements) and automatically select the most appropriate layout (breathable, dual_process, grid, card, or tabs).</p></li>
+<ul><li><p><strong>Enhanced <code><a href="../reference/bid_validate.html">bid_validate()</a></code> with experiment/telemetry/empowerment flags.</strong> New optional parameters: <code>include_exp_design</code> (default: TRUE), <code>include_telemetry</code> (default: TRUE), and <code>include_empower_tools</code> (default: TRUE) for context-aware suggestions.</p></li>
+<li><p><strong>Accessibility-focused bias mitigation in <code><a href="../reference/bid_anticipate.html">bid_anticipate()</a></code>.</strong> New <code>include_accessibility</code> parameter adds layout-specific accessibility recommendations to bias mitigation strategies.</p></li>
+<li><p><strong>Improved context propagation.</strong> All <code>previous_problem</code>, <code>previous_theory</code>, <code>previous_audience</code>, and <code>previous_personas</code> now properly propagate through the entire pipeline to the Validate stage.</p></li>
+<li><p><strong>Automatic layout inference for <code><a href="../reference/bid_structure.html">bid_structure()</a></code>.</strong> Uses sophisticated heuristics to analyze content from previous BID stages (problem, evidence, data story elements) and automatically select the most appropriate layout (breathable, dual_process, grid, card, or tabs).</p></li>
 <li><p><strong>Ranked, concept-grouped actionable suggestions.</strong> <code><a href="../reference/bid_structure.html">bid_structure()</a></code> now returns structured UI/UX recommendations organized by UX concepts (e.g., Cognitive Load Theory, Progressive Disclosure) with specific Shiny/bslib component pointers, implementation rationales, and relevance scores (0-1).</p></li>
 <li><p><strong>Telemetry-aware suggestion scoring.</strong> Layout selection and suggestion ranking now consider telemetry data, automatically avoiding problematic patterns (e.g., avoiding tabs if <code>nav_dropoff_tabs</code> is detected).</p></li>
 <li><p><strong>Enhanced CLI feedback.</strong> Clear messages show the auto-selected layout with rationale, plus a helpful tip about using <code>bid_concept("&lt;concept&gt;")</code> to learn more about any detected concepts.</p></li>
 </ul></div>
 <div class="section level4">
 <h4 id="improvements-0-3-0">IMPROVEMENTS<a class="anchor" aria-label="anchor" href="#improvements-0-3-0"></a></h4>
-<ul><li>
-<strong>Comprehensive test coverage.</strong> Added extensive tests for all heuristic branches, suggestion structure validation, CLI message verification, telemetry integration, and error handling for the deprecated <code>layout</code> parameter.</li>
+<ul><li><p><strong>Field name normalization.</strong> Added <code>normalize_previous_stage()</code> helper function to handle legacy field names and ensure consistent data flow between stages.</p></li>
+<li><p><strong>Enhanced helper functions.</strong> Updated utility functions with time stubbing support (<code>.now()</code>) and improved safe column access patterns.</p></li>
+<li><p><strong>Comprehensive test coverage.</strong> Added extensive tests for all heuristic branches, suggestion structure validation, CLI message verification, telemetry integration, and error handling for the deprecated <code>layout</code> parameter.</p></li>
 </ul></div>
 <div class="section level4">
 <h4 id="bug-fixes-0-3-0">BUG FIXES<a class="anchor" aria-label="anchor" href="#bug-fixes-0-3-0"></a></h4>
 <ul><li>None.</li>
 </ul></div>
 <div class="section level4">
+<h4 id="migration-guide-0-3-0">MIGRATION GUIDE<a class="anchor" aria-label="anchor" href="#migration-guide-0-3-0"></a></h4>
+<p>To update existing code for bidux 0.3.0:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># OLD (0.2.x)</span></span>
+<span><span class="va">notice</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_notice.html">bid_notice</a></span><span class="op">(</span></span>
+<span>  problem <span class="op">=</span> <span class="st">"Users confused"</span>, </span>
+<span>  evidence <span class="op">=</span> <span class="st">"High error rate"</span>,</span>
+<span>  target_audience <span class="op">=</span> <span class="st">"Analysts"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># NEW (0.3.0)</span></span>
+<span><span class="va">notice</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_notice.html">bid_notice</a></span><span class="op">(</span></span>
+<span>  problem <span class="op">=</span> <span class="st">"Users confused"</span>, </span>
+<span>  evidence <span class="op">=</span> <span class="st">"High error rate"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">interpret</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span>
+<span>  previous_stage <span class="op">=</span> <span class="va">notice</span>,</span>
+<span>  data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    audience <span class="op">=</span> <span class="st">"Analysts"</span>  <span class="co"># Move audience here</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># OLD (0.2.x)</span></span>
+<span><span class="va">anticipate</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_anticipate.html">bid_anticipate</a></span><span class="op">(</span></span>
+<span>  previous_stage <span class="op">=</span> <span class="va">structure_result</span>,</span>
+<span>  interaction_principles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>hover <span class="op">=</span> <span class="st">"Show details on hover"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># NEW (0.3.0)</span></span>
+<span><span class="va">anticipate</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_anticipate.html">bid_anticipate</a></span><span class="op">(</span></span>
+<span>  previous_stage <span class="op">=</span> <span class="va">structure_result</span>,</span>
+<span>  include_accessibility <span class="op">=</span> <span class="cn">TRUE</span>  <span class="co"># New accessibility focus</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Field name updates in downstream code:</span></span>
+<span><span class="co"># Access previous_central_question instead of previous_question</span></span>
+<span><span class="co"># Access previous_hook instead of previous_story_hook</span></span></code></pre></div>
+</div>
+<div class="section level4">
 <h4 id="deprecated-and-defunct-0-3-0">DEPRECATED AND DEFUNCT<a class="anchor" aria-label="anchor" href="#deprecated-and-defunct-0-3-0"></a></h4>
-<ul><li>None.</li>
+<ul><li>
+<code>target_audience</code> parameter in <code><a href="../reference/bid_notice.html">bid_notice()</a></code> (deprecated, will be removed in 0.4.0)</li>
+<li>
+<code>interaction_principles</code> parameter in <code><a href="../reference/bid_anticipate.html">bid_anticipate()</a></code> (deprecated, will be removed in 0.4.0)</li>
 </ul></div>
 <div class="section level4">
 <h4 id="documentation-fixes-0-3-0">DOCUMENTATION FIXES<a class="anchor" aria-label="anchor" href="#documentation-fixes-0-3-0"></a></h4>
-<ul><li>None.</li>
+<ul><li>Updated function documentation to reflect parameter changes and new stage ordering</li>
+<li>Updated examples to use new recommended workflow: Interpret → Notice → Anticipate → Structure → Validate</li>
 </ul></div>
 </div>
     <div class="section level2">
