@@ -13,8 +13,12 @@ test_that("bid_notice returns a bid_stage object with correct structure", {
 
   # Check required columns
   expected_cols <- c(
-    "stage", "problem", "theory", "evidence",
-    "suggestions", "timestamp"
+    "stage",
+    "problem",
+    "theory",
+    "evidence",
+    "suggestions",
+    "timestamp"
   )
   expect_equal(sort(names(result)), sort(expected_cols))
   expect_equal(result$stage, "Notice")
@@ -115,7 +119,7 @@ test_that("bid_notice errors with proper validation messages", {
   # target_audience parameter is now deprecated and ignored with warning
   expect_warning(
     bid_notice(
-      problem = "Valid problem", 
+      problem = "Valid problem",
       evidence = "Valid evidence",
       target_audience = 101112
     ),
@@ -306,7 +310,11 @@ test_that("bid_notice generates appropriate suggestions", {
 
   # Should generate relevant suggestions
   expect_true(nchar(result$suggestions) > 0)
-  expect_match(result$suggestions, "target audience|design solutions", ignore.case = TRUE)
+  expect_match(
+    result$suggestions,
+    "target audience|design solutions",
+    ignore.case = TRUE
+  )
 
   result2 <- bid_notice(
     problem = "Users struggle with too many choices",
@@ -315,5 +323,9 @@ test_that("bid_notice generates appropriate suggestions", {
 
   # Should generate relevant suggestions
   expect_true(nchar(result2$suggestions) > 0)
-  expect_match(result2$suggestions, "target audience|design solutions", ignore.case = TRUE)
+  expect_match(
+    result2$suggestions,
+    "target audience|design solutions",
+    ignore.case = TRUE
+  )
 })

@@ -71,36 +71,38 @@ bid_structure <- function(
       "i" = "Remove the `layout` argument to use automatic selection."
     ))
   }
-  
-  # Validate required parameters
+
   validate_required_params(previous_stage = previous_stage)
   validate_previous_stage(previous_stage, "Structure")
-  
-  # Auto-select layout using heuristics
+
   chosen_layout <- suggest_layout_from_previous(previous_stage)
-  
-  # Provide transparent feedback about layout choice
+
   cli::cli_alert_info("Auto-selected layout: {chosen_layout}")
   cli::cli_alert_info(layout_rationale(previous_stage, chosen_layout))
 
-  # Generate ranked, concept-grouped suggestions
-  suggestion_groups <- structure_suggestions(previous_stage, chosen_layout, concepts)
-  
-  # Extract all detected concepts
+  # generate ranked, concept-grouped suggestions
+  suggestion_groups <- structure_suggestions(
+    previous_stage,
+    chosen_layout,
+    concepts
+  )
+
   concepts_detected <- sapply(suggestion_groups, function(g) g$concept)
   if (length(concepts_detected) == 0) {
     concepts_detected <- character(0)
   }
 
-  # normalize previous stage to ensure field name consistency
   normalized_previous <- normalize_previous_stage(previous_stage)
-  
+
   # prepare result data
   result_data <- tibble::tibble(
     stage = "Structure",
     layout = chosen_layout,
     concepts = paste(concepts_detected, collapse = ", "),
-    previous_central_question = safe_column_access(normalized_previous, "central_question"),
+    previous_central_question = safe_column_access(
+      normalized_previous,
+      "central_question"
+    ),
     previous_hook = safe_column_access(normalized_previous, "hook"),
     previous_problem = safe_column_access(normalized_previous, "problem"),
     previous_theory = safe_column_access(normalized_previous, "theory"),
@@ -130,4 +132,3 @@ bid_structure <- function(
 
   return(result)
 }
-

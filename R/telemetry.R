@@ -515,26 +515,37 @@ find_unused_inputs <- function(events, threshold = 0.05) {
 #' @return List with delay statistics
 #' @keywords internal
 find_delayed_sessions <- function(events, threshold_seconds = 30) {
-  # Find login events
-  login_events <- events[events$event_type == "login", c("session_id", "timestamp")]
+  # find login events
+  login_events <- events[
+    events$event_type == "login",
+    c("session_id", "timestamp")
+  ]
   names(login_events)[2] <- "login_time"
 
   if (nrow(login_events) == 0) {
     return(NULL)
   }
 
-  # Find first user action per session (input, navigation, or custom event)
+  # find first user action per session (input, navigation, or custom event)
   action_types <- c("input", "navigation", "custom")
   first_actions <- events[events$event_type %in% action_types, ] |>
     dplyr::group_by(session_id) |>
     dplyr::slice_min(timestamp, n = 1) |>
     dplyr::ungroup() |>
-    dplyr::select(session_id, first_action_time = timestamp, first_action_type = event_type)
+    dplyr::select(
+      session_id,
+      first_action_time = timestamp,
+      first_action_type = event_type
+    )
 
-  # Join login times with first actions
-  session_delays <- dplyr::left_join(login_events, first_actions, by = "session_id")
+  # join login times with first actions
+  session_delays <- dplyr::left_join(
+    login_events,
+    first_actions,
+    by = "session_id"
+  )
 
-  # Calculate delays
+  # calculate delays
   session_delays$delay_seconds <- as.numeric(
     difftime(
       session_delays$first_action_time,
@@ -543,12 +554,14 @@ find_delayed_sessions <- function(events, threshold_seconds = 30) {
     )
   )
 
-  # Handle sessions with no actions (infinite delay)
+  # handle sessions with no actions (infinite delay)
   no_action_sessions <- sum(is.na(session_delays$delay_seconds))
   session_delays$delay_seconds[is.na(session_delays$delay_seconds)] <- Inf
 
-  # Calculate statistics
-  delays_finite <- session_delays$delay_seconds[is.finite(session_delays$delay_seconds)]
+  # calculate statistics
+  delays_finite <- session_delays$delay_seconds[is.finite(
+    session_delays$delay_seconds
+  )]
 
   result <- list(
     total_sessions = nrow(session_delays),
@@ -556,15 +569,25 @@ find_delayed_sessions <- function(events, threshold_seconds = 30) {
     no_action_rate = no_action_sessions / nrow(session_delays),
     median_delay = if (length(delays_finite) > 0) median(delays_finite) else NA,
     mean_delay = if (length(delays_finite) > 0) mean(delays_finite) else NA,
-    sessions_over_threshold = sum(session_delays$delay_seconds > threshold_seconds, na.rm = TRUE),
-    rate_over_threshold = sum(session_delays$delay_seconds > threshold_seconds, na.rm = TRUE) / nrow(session_delays),
+    sessions_over_threshold = sum(
+      session_delays$delay_seconds > threshold_seconds,
+      na.rm = TRUE
+    ),
+    rate_over_threshold = sum(
+      session_delays$delay_seconds > threshold_seconds,
+      na.rm = TRUE
+    ) /
+      nrow(session_delays),
     has_issues = FALSE
   )
 
-  # Determine if there are issues
-  if (result$no_action_rate > 0.1 ||
-    (!is.na(result$median_delay) && result$median_delay > threshold_seconds) ||
-    result$rate_over_threshold > 0.2) {
+  # determine if there are issues
+  if (
+    result$no_action_rate > 0.1 ||
+      (!is.na(result$median_delay) &&
+        result$median_delay > threshold_seconds) ||
+      result$rate_over_threshold > 0.2
+  ) {
     result$has_issues <- TRUE
   }
 
@@ -577,7 +600,7 @@ find_delayed_sessions <- function(events, threshold_seconds = 30) {
 #' @return List of error patterns
 #' @keywords internal
 find_error_patterns <- function(events, threshold_rate = 0.1) {
-  # Filter to error events
+  # filter to error events
   error_events <- events[events$event_type == "error", ]
 
   if (nrow(error_events) == 0) {
@@ -586,7 +609,7 @@ find_error_patterns <- function(events, threshold_rate = 0.1) {
 
   total_sessions <- length(unique(events$session_id))
 
-  # Count errors by message and output
+  # count errors by message and output
   error_patterns <- error_events |>
     dplyr::group_by(error_message, output_id) |>
     dplyr::summarize(
@@ -604,18 +627,18 @@ find_error_patterns <- function(events, threshold_rate = 0.1) {
     return(list())
   }
 
-  # Find associated context (what inputs triggered errors)
+  # find associated context (what inputs triggered errors)
   result <- lapply(seq_len(nrow(error_patterns)), function(i) {
     pattern <- error_patterns[i, ]
 
-    # Find inputs changed just before these errors
+    # find inputs changed just before these errors
     error_sessions <- error_events[
       error_events$error_message == pattern$error_message &
         (error_events$output_id %||% "") == (pattern$output_id %||% ""),
       c("session_id", "timestamp")
     ]
 
-    # Look for inputs changed within 5 seconds before error
+    # look for inputs changed within 5 seconds before error
     associated_inputs <- character(0)
     for (j in seq_len(nrow(error_sessions))) {
       session <- error_sessions$session_id[j]
@@ -635,7 +658,7 @@ find_error_patterns <- function(events, threshold_rate = 0.1) {
       }
     }
 
-    # Get most common associated input
+    # get most common associated input
     if (length(associated_inputs) > 0) {
       input_table <- table(associated_inputs)
       top_input <- names(input_table)[which.max(input_table)]
@@ -671,7 +694,7 @@ find_navigation_dropoffs <- function(events, threshold = 0.2) {
 
   total_sessions <- length(unique(events$session_id))
 
-  # Count page visits
+  # count page visits
   page_visits <- nav_events |>
     dplyr::group_by(navigation_id) |>
     dplyr::summarize(
@@ -689,12 +712,16 @@ find_navigation_dropoffs <- function(events, threshold = 0.2) {
     return(list())
   }
 
-  # Analyze exit patterns
+  # analyze exit patterns
   result <- lapply(seq_len(nrow(page_visits)), function(i) {
     page <- page_visits$navigation_id[i]
 
-    # Find sessions that ended on this page
-    page_sessions <- nav_events[nav_events$navigation_id == page, "session_id", drop = FALSE]
+    # find sessions that ended on this page
+    page_sessions <- nav_events[
+      nav_events$navigation_id == page,
+      "session_id",
+      drop = FALSE
+    ]
 
     exits_on_page <- 0
     for (session in unique(page_sessions$session_id)) {
@@ -736,27 +763,27 @@ find_navigation_dropoffs <- function(events, threshold = 0.2) {
 #' @return List of confusion patterns
 #' @keywords internal
 find_confusion_patterns <- function(events, window_seconds = 10, min_changes = 5) {
-  # Filter to input events
+  # filter to input events
   input_events <- events[events$event_type == "input", ]
 
   if (nrow(input_events) == 0) {
     return(list())
   }
 
-  # Group by session and input
+  # group by session and input
   confusion_patterns <- list()
 
   sessions <- unique(input_events$session_id)
   for (session in sessions) {
     session_inputs <- input_events[input_events$session_id == session, ]
 
-    # Check each input for rapid changes
+    # check each input for rapid changes
     inputs <- unique(session_inputs$input_id)
     for (input in inputs) {
       input_changes <- session_inputs[session_inputs$input_id == input, ]
 
       if (nrow(input_changes) >= min_changes) {
-        # Check for rapid changes using sliding window
+        # check for rapid changes using sliding window
         timestamps <- sort(input_changes$timestamp)
 
         for (i in seq_len(length(timestamps) - min_changes + 1)) {
@@ -770,7 +797,7 @@ find_confusion_patterns <- function(events, window_seconds = 10, min_changes = 5
           )
 
           if (time_diff <= window_seconds) {
-            # Found confusion pattern
+            # found confusion pattern
             confusion_patterns[[length(confusion_patterns) + 1]] <- list(
               session_id = session,
               input_id = input,
@@ -778,31 +805,33 @@ find_confusion_patterns <- function(events, window_seconds = 10, min_changes = 5
               time_window = time_diff,
               timestamp = timestamps[i]
             )
-            break # Only record once per input/session
+            break # only record once per input/session
           }
         }
       }
     }
   }
 
-  # Aggregate by input to find systematic issues
+  # aggregate by input to find systematic issues
   if (length(confusion_patterns) == 0) {
     return(list())
   }
 
-  # Count occurrences by input
+  # count occurrences by input
   input_confusion_counts <- table(
     sapply(confusion_patterns, function(x) x$input_id)
   )
 
-  # Only return inputs with multiple confused sessions
-  systematic_inputs <- names(input_confusion_counts)[input_confusion_counts >= 2]
+  # only return inputs with multiple confused sessions
+  systematic_inputs <- names(input_confusion_counts)[
+    input_confusion_counts >= 2
+  ]
 
   if (length(systematic_inputs) == 0) {
     return(list())
   }
 
-  # Create summary for systematic confusion patterns
+  # create summary for systematic confusion patterns
   result <- lapply(systematic_inputs, function(input) {
     input_patterns <- confusion_patterns[
       sapply(confusion_patterns, function(x) x$input_id == input)
@@ -811,7 +840,9 @@ find_confusion_patterns <- function(events, window_seconds = 10, min_changes = 5
     list(
       input_id = input,
       affected_sessions = length(input_patterns),
-      total_rapid_changes = sum(sapply(input_patterns, function(x) x$change_count)),
+      total_rapid_changes = sum(sapply(input_patterns, function(x) {
+        x$change_count
+      })),
       avg_time_window = mean(sapply(input_patterns, function(x) x$time_window))
     )
   })

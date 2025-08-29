@@ -14,7 +14,7 @@ test_that("bid_report generates text report with expected content", {
             context = "Dashboard has evolved over time"
           )
         ),
-        
+
         concepts = c("Principle of Proximity", "Default Effect")
       ),
       bias_mitigations = list(
@@ -57,7 +57,7 @@ test_that("bid_report generates HTML report with correct format", {
             context = "Dashboard has evolved over time"
           )
         ),
-        
+
         concepts = c("Principle of Proximity", "Default Effect")
       ),
       bias_mitigations = list(
@@ -95,7 +95,10 @@ test_that("bid_report generates HTML report with correct format", {
 test_that("bid_report fails with incorrect input", {
   # Updated error message to match actual implementation
   expect_error(bid_report(NULL), "Invalid input: validate_stage cannot be NULL")
-  expect_error(bid_report(list()), "Invalid input: validate_stage must be a tibble")
+  expect_error(
+    bid_report(list()),
+    "Invalid input: validate_stage must be a tibble"
+  )
 
   expect_error(
     bid_report(tibble(stage = "NotValidate")),
@@ -139,7 +142,6 @@ test_that("bid_report includes diagrams when requested", {
           ),
           central_question = "Test question"
         ),
-        
       ),
       bias_mitigations = list(anchoring = "Test")
     ),
@@ -177,7 +179,6 @@ test_that("bid_report handles different formats", {
           ),
           central_question = "Test question"
         ),
-        
       ),
       bias_mitigations = list(anchoring = "Test")
     ),

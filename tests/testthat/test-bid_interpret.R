@@ -297,7 +297,6 @@ test_that("bid_interpret validates personas structure correctly", {
     timestamp = Sys.time()
   )
 
-
   expect_error(
     bid_interpret(
       previous_stage,

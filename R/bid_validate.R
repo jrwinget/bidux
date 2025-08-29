@@ -72,7 +72,7 @@ bid_validate <- function(
     include_empower_tools = TRUE) {
   validate_required_params(previous_stage = previous_stage)
   validate_previous_stage(previous_stage, "Validate")
-  
+
   # validate boolean parameters
   validate_logical_param(include_exp_design, "include_exp_design")
   validate_logical_param(include_telemetry, "include_telemetry")
@@ -84,7 +84,10 @@ bid_validate <- function(
   }
 
   if (is.null(collaboration)) {
-    collaboration <- generate_collaboration_suggestion(previous_stage, include_empower_tools)
+    collaboration <- generate_collaboration_suggestion(
+      previous_stage,
+      include_empower_tools
+    )
     cli::cli_alert_info(paste0(
       "Suggested collaboration features: ",
       collaboration
@@ -92,7 +95,11 @@ bid_validate <- function(
   }
 
   if (is.null(next_steps)) {
-    next_steps <- generate_next_steps_suggestion(previous_stage, include_exp_design, include_telemetry)
+    next_steps <- generate_next_steps_suggestion(
+      previous_stage,
+      include_exp_design,
+      include_telemetry
+    )
     cli::cli_alert_info("Suggested next steps:")
     for (step in next_steps) {
       cli::cli_li(step)
@@ -111,7 +118,7 @@ bid_validate <- function(
     include_empower_tools
   )
 
-  # normalize previous stage to ensure field name consistency  
+  # normalize previous stage to ensure field name consistency
   normalized_previous <- normalize_previous_stage(previous_stage)
   previous_info <- extract_previous_stage_info(normalized_previous)
 
@@ -124,7 +131,8 @@ bid_validate <- function(
     previous_accessibility = previous_info$accessibility %||% NA_character_,
     previous_layout = previous_info$layout %||% NA_character_,
     previous_concepts = previous_info$concepts %||% NA_character_,
-    previous_central_question = previous_info$central_question %||% NA_character_,
+    previous_central_question = previous_info$central_question %||%
+      NA_character_,
     previous_hook = previous_info$hook %||% NA_character_,
     previous_problem = previous_info$problem %||% NA_character_,
     previous_theory = previous_info$theory %||% NA_character_,
@@ -201,7 +209,10 @@ generate_summary_panel_suggestion <- function(previous_stage) {
   return(base_suggestion)
 }
 
-generate_collaboration_suggestion <- function(previous_stage, include_empower_tools = TRUE) {
+generate_collaboration_suggestion <- function(
+  previous_stage,
+  include_empower_tools = TRUE
+) {
   # use the standardized helper function for consistency
   audience <- get_audience_from_previous(previous_stage)
 
@@ -223,7 +234,7 @@ generate_collaboration_suggestion <- function(previous_stage, include_empower_to
     } else {
       ""
     }
-    
+
     if (grepl("executive|leadership|manager", audience_lower)) {
       return(paste0(
         "Executive-focused collaboration with summary sharing and decision tracking",
@@ -257,7 +268,11 @@ generate_collaboration_suggestion <- function(previous_stage, include_empower_to
   return(base_suggestion)
 }
 
-generate_next_steps_suggestion <- function(previous_stage, include_exp_design = TRUE, include_telemetry = TRUE) {
+generate_next_steps_suggestion <- function(
+  previous_stage,
+  include_exp_design = TRUE,
+  include_telemetry = TRUE
+) {
   stage_name <- previous_stage$stage[1]
   next_steps <- character(0)
 
@@ -325,7 +340,7 @@ generate_next_steps_suggestion <- function(previous_stage, include_exp_design = 
       "Plan controlled experiments to measure impact of bias mitigations"
     )
   }
-  
+
   # add telemetry and monitoring recommendations if requested
   if (include_telemetry) {
     next_steps <- c(
@@ -420,16 +435,33 @@ generate_validation_suggestions <- function(
   }
 
   # add suggestions based on flags
-  if (include_exp_design && !any(grepl("test|experiment", tolower(steps_list)))) {
-    suggestions <- c(suggestions, "Consider adding experimental design and A/B testing to your validation plan")
+  if (
+    include_exp_design && !any(grepl("test|experiment", tolower(steps_list)))
+  ) {
+    suggestions <- c(
+      suggestions,
+      "Consider adding experimental design and A/B testing to your validation plan"
+    )
   }
-  
-  if (include_telemetry && !any(grepl("telemetry|monitor|track", tolower(steps_list)))) {
-    suggestions <- c(suggestions, "Include telemetry and monitoring in your post-launch validation")
+
+  if (
+    include_telemetry &&
+      !any(grepl("telemetry|monitor|track", tolower(steps_list)))
+  ) {
+    suggestions <- c(
+      suggestions,
+      "Include telemetry and monitoring in your post-launch validation"
+    )
   }
-  
-  if (include_empower_tools && !grepl("empower|explain|help", tolower(collaboration %||% ""))) {
-    suggestions <- c(suggestions, "Consider adding user empowerment tools to enhance collaboration")
+
+  if (
+    include_empower_tools &&
+      !grepl("empower|explain|help", tolower(collaboration %||% ""))
+  ) {
+    suggestions <- c(
+      suggestions,
+      "Consider adding user empowerment tools to enhance collaboration"
+    )
   }
 
   if (length(suggestions) == 0) {
@@ -547,7 +579,7 @@ extract_previous_stage_info <- function(previous_stage) {
     )
     info$audience <- safe_column_access(
       previous_stage,
-      "audience", 
+      "audience",
       NA_character_
     )
     info$personas <- safe_column_access(

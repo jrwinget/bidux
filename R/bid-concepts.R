@@ -103,7 +103,8 @@ bid_concept <- function(concept_name, add_recommendations = TRUE) {
 
   # add recommendations based on stage
   if (add_recommendations) {
-    stage_recs <- switch(result$category[1],
+    stage_recs <- switch(
+      result$category[1],
       "Stage 1" = "NOTICE: Use this concept when identifying user problems and cognitive barriers",
       "Stage 2" = "INTERPRET: Apply this concept when developing data stories and central questions",
       "Stage 3" = "STRUCTURE: Implement this concept in dashboard layout and information organization",
@@ -125,8 +126,13 @@ bid_concept <- function(concept_name, add_recommendations = TRUE) {
 get_concepts_data <- function() {
   # reuse the unified loading pattern
   required_cols <- c(
-    "concept", "description", "category", "reference",
-    "example", "implementation_tips", "related_concepts"
+    "concept",
+    "description",
+    "category",
+    "reference",
+    "example",
+    "implementation_tips",
+    "related_concepts"
   )
 
   # load external data and ensure it's returned as tibble

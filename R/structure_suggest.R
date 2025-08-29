@@ -50,35 +50,60 @@ suggest_layout_from_previous <- function(previous_stage) {
   )
 
   # Heuristic 1: Dual-process for overview vs detail patterns (check first since it's more specific)
-  if (grepl("summary vs detail|overview and detail|quick vs deep|fast vs thorough|two modes|at a glance|quick access.*summaries|detailed breakdowns|two different modes|dual mode|quick access to summaries.*detailed breakdowns|summaries.*detailed breakdowns", txt)) {
+  if (
+    grepl(
+      "summary vs detail|overview and detail|quick vs deep|fast vs thorough|two modes|at a glance|quick access.*summaries|detailed breakdowns|two different modes|dual mode|quick access to summaries.*detailed breakdowns|summaries.*detailed breakdowns",
+      txt
+    )
+  ) {
     return("dual_process")
   }
-  
-  # Heuristic 2: Breathable layout for overload/confusion patterns  
-  if (grepl("\\boverload|overwhelmed|too many|confus|clutter|busy|noise|cognitive load|whitespace\\b", txt)) {
+
+  # Heuristic 2: Breathable layout for overload/confusion patterns
+  if (
+    grepl(
+      "\\boverload|overwhelmed|too many|confus|clutter|busy|noise|cognitive load|whitespace\\b",
+      txt
+    )
+  ) {
     return("breathable")
   }
-  
+
   # Heuristic 3: Grid layout for grouping/hierarchy patterns
-  if (grepl("\\bgroup|cluster|related metrics|compare panels|visual hierarchy|proximity\\b", txt)) {
+  if (
+    grepl(
+      "\\bgroup|cluster|related metrics|compare panels|visual hierarchy|proximity\\b",
+      txt
+    )
+  ) {
     return("grid")
   }
-  
+
   # Heuristic 4: Card layout for modular/chunked patterns
-  if (grepl("\\bcards|chunks|tiles|modular blocks|per-item summary|entity cards\\b", txt)) {
+  if (
+    grepl(
+      "\\bcards|chunks|tiles|modular blocks|per-item summary|entity cards\\b",
+      txt
+    )
+  ) {
     return("card")
   }
-  
+
   # Heuristic 5: Tabs layout for sections/categories, but check telemetry
-  if (grepl("\\bsections|categories|module separation|progressive disclosure|stepwise\\b", txt)) {
+  if (
+    grepl(
+      "\\bsections|categories|module separation|progressive disclosure|stepwise\\b",
+      txt
+    )
+  ) {
     # Check if telemetry indicates tab navigation issues
     telemetry_data <- safe_column_access(previous_stage, "telemetry", NULL)
     if (!is.null(telemetry_data) && isTRUE(telemetry_data$nav_dropoff_tabs)) {
-      return("grid")  # Fallback to grid if tabs have telemetry issues
+      return("grid") # Fallback to grid if tabs have telemetry issues
     }
     return("tabs")
   }
-  
+
   # Heuristic 6: Default fallback
   "breathable"
 }
@@ -115,23 +140,40 @@ layout_rationale <- function(previous_stage, chosen) {
     safe_lower(safe_stage_data_story_access(previous_stage, "audience")),
     collapse = " "
   )
-  
+
   # Generate specific rationale based on detected patterns
-  rationale <- switch(chosen,
+  rationale <- switch(
+    chosen,
     "dual_process" = {
       "Detected overview vs detail patterns; choosing 'dual_process' for quick insights and detailed analysis."
     },
     "breathable" = {
-      if (grepl("\\boverload|overwhelmed|too many|confus|clutter|busy|noise|cognitive load\\b", txt)) {
+      if (
+        grepl(
+          "\\boverload|overwhelmed|too many|confus|clutter|busy|noise|cognitive load\\b",
+          txt
+        )
+      ) {
         "Detected information overload patterns; choosing 'breathable' to reduce cognitive load."
       } else {
         "Selected 'breathable' as safe default to ensure clean, uncluttered layout."
       }
     },
     "grid" = {
-      if (grepl("\\bsections|categories|module separation|progressive disclosure|stepwise\\b", txt) && 
+      if (
+        grepl(
+          "\\bsections|categories|module separation|progressive disclosure|stepwise\\b",
+          txt
+        ) &&
           !is.null(safe_column_access(previous_stage, "telemetry", NULL)) &&
-          isTRUE(safe_column_access(previous_stage, "telemetry", NULL)$nav_dropoff_tabs)) {
+          isTRUE(
+            safe_column_access(
+              previous_stage,
+              "telemetry",
+              NULL
+            )$nav_dropoff_tabs
+          )
+      ) {
         "Detected section-based content but telemetry shows tab navigation issues; choosing 'grid' instead."
       } else {
         "Detected grouping and comparison needs; choosing 'grid' for related content organization."
@@ -145,7 +187,7 @@ layout_rationale <- function(previous_stage, chosen) {
     },
     sprintf("Selected '%s' based on detected content and user context.", chosen)
   )
-  
+
   return(rationale)
 }
 
@@ -174,20 +216,29 @@ safe_stage_data_story_access <- function(previous_stage, element) {
   if (is.null(data_story)) {
     return("")
   }
-  
+
   # Handle tibble list column case - data_story is a list with unnamed elements
   if (is.list(data_story) && length(data_story) > 0) {
     # If names are present, use direct access
     if (element %in% names(data_story)) {
       value <- data_story[[element]]
-      if (!is.null(value) && !is.na(value) && nchar(trimws(as.character(value))) > 0) {
+      if (
+        !is.null(value) &&
+          !is.na(value) &&
+          nchar(trimws(as.character(value))) > 0
+      ) {
         return(as.character(value))
       }
-    }
-    # If no names (typical tibble list column), access first element
-    else if (is.list(data_story[[1]]) && element %in% names(data_story[[1]])) {
+    } else if (
+      is.list(data_story[[1]]) && element %in% names(data_story[[1]])
+    ) {
+      # If no names (typical tibble list column), access first element
       value <- data_story[[1]][[element]]
-      if (!is.null(value) && !is.na(value) && nchar(trimws(as.character(value))) > 0) {
+      if (
+        !is.null(value) &&
+          !is.na(value) &&
+          nchar(trimws(as.character(value))) > 0
+      ) {
         return(as.character(value))
       }
     }

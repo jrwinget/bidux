@@ -13,7 +13,7 @@ test_that("bid_validate works with valid inputs", {
           context = "Dashboard has evolved over time"
         )
       ),
-      
+
       concepts = c("Principle of Proximity", "Default Effect")
     ),
     bias_mitigations = list(
@@ -61,7 +61,7 @@ test_that("bid_validate allows optional parameters", {
           context = "Dashboard has evolved over time"
         )
       ),
-      
+
       concepts = c("Principle of Proximity", "Default Effect")
     ),
     bias_mitigations = list(
@@ -92,7 +92,7 @@ test_that("bid_validate validates boolean parameters", {
     bid_structure(
       bid_interpret(
         bid_notice(
-          problem = "Complex interface", 
+          problem = "Complex interface",
           theory = "Cognitive Load Theory",
           evidence = "User complaints"
         ),
@@ -105,7 +105,7 @@ test_that("bid_validate validates boolean parameters", {
     ),
     bias_mitigations = list(anchoring = "Provide reference points")
   )
-  
+
   # Test invalid include_exp_design
   expect_error(
     bid_validate(
@@ -114,7 +114,7 @@ test_that("bid_validate validates boolean parameters", {
     ),
     "Parameter 'include_exp_design' must be a single logical value \\(TRUE/FALSE\\)"
   )
-  
+
   # Test invalid include_telemetry
   expect_error(
     bid_validate(
@@ -123,8 +123,8 @@ test_that("bid_validate validates boolean parameters", {
     ),
     "Parameter 'include_telemetry' must be a single logical value \\(TRUE/FALSE\\)"
   )
-  
-  # Test invalid include_empower_tools  
+
+  # Test invalid include_empower_tools
   expect_error(
     bid_validate(
       previous_stage = anticipate_result,
@@ -132,7 +132,7 @@ test_that("bid_validate validates boolean parameters", {
     ),
     "Parameter 'include_empower_tools' must be a single logical value \\(TRUE/FALSE\\)"
   )
-  
+
   # Test valid boolean values work
   expect_no_error(
     bid_validate(
@@ -159,7 +159,7 @@ test_that("bid_validate provides contextual suggestions", {
           context = "Dashboard has evolved over time"
         )
       ),
-      
+
       concepts = c("Principle of Proximity", "Default Effect")
     ),
     bias_mitigations = list(
@@ -194,7 +194,7 @@ test_that("bid_validate auto-suggests summary_panel when NULL", {
           context = "Dashboard has evolved over time"
         )
       ),
-      
+
       concepts = c("Principle of Proximity", "Default Effect")
     ),
     bias_mitigations = list(
@@ -233,7 +233,7 @@ test_that("bid_validate auto-suggests collaboration when NULL", {
           context = "Dashboard has evolved over time"
         )
       ),
-      
+
       concepts = c("Principle of Proximity", "Default Effect")
     ),
     bias_mitigations = list(
@@ -276,7 +276,7 @@ test_that("bid_validate auto-suggests next_steps when NULL", {
           context = "Dashboard has evolved over time"
         )
       ),
-      
+
       concepts = c("Principle of Proximity", "Default Effect")
     ),
     bias_mitigations = list(
@@ -450,4 +450,185 @@ test_that("bid_validate properly handles interaction_principles JSON", {
   expect_s3_class(result, "tbl_df")
   # previous_interaction was removed in refactor, no longer testing it
   expect_type(result$suggestions, "character")
+})
+
+test_that("bid_validate tailors collaboration by audience and empower flag", {
+  # Executive audience with empower tools (default TRUE)
+  prev_exec <- tibble::tibble(
+    stage = "Interpret",
+    audience = "Executive managers",
+    central_question = "How to compare regions?",
+    timestamp = Sys.time()
+  )
+
+  suppressMessages({
+    res_exec <- bid_validate(
+      previous_stage = prev_exec,
+      summary_panel = "Summary",
+      collaboration = NULL
+    )
+  })
+  expect_true(grepl(
+    "Executive-focused collaboration",
+    res_exec$collaboration,
+    ignore.case = TRUE
+  ))
+  expect_true(
+    grepl(
+      "decision tracking|empowerment",
+      res_exec$suggestions,
+      ignore.case = TRUE
+    ) ||
+      grepl("Executive", res_exec$collaboration, ignore.case = TRUE)
+  )
+
+  # Analyst audience without empower tools
+  prev_analyst <- tibble::tibble(
+    stage = "Interpret",
+    audience = "Data analysts",
+    central_question = "How to compare models?",
+    timestamp = Sys.time()
+  )
+
+  suppressMessages({
+    res_analyst <- bid_validate(
+      previous_stage = prev_analyst,
+      summary_panel = "Summary",
+      collaboration = NULL,
+      include_empower_tools = FALSE
+    )
+  })
+  expect_true(grepl(
+    "Advanced collaboration tools",
+    res_analyst$collaboration,
+    ignore.case = TRUE
+  ))
+  # ensure empower phrasing is not forced when flag is FALSE
+  expect_false(grepl("empower", res_analyst$collaboration, ignore.case = TRUE))
+})
+
+test_that("bid_validate adds exp design and telemetry suggestions when missing", {
+  prev <- tibble::tibble(
+    stage = "Anticipate",
+    bias_mitigations = "anchoring: Provide reference points",
+    timestamp = Sys.time()
+  )
+
+  res <- bid_validate(
+    previous_stage = prev,
+    summary_panel = "Brief summary",
+    collaboration = "Basic sharing",
+    next_steps = c("Document decisions"), # no 'test'/'experiment'/'telemetry' terms
+    include_exp_design = TRUE,
+    include_telemetry = TRUE
+  )
+
+  expect_s3_class(res, "tbl_df")
+  expect_true(grepl(
+    "experimental design|A/B",
+    res$suggestions,
+    ignore.case = TRUE
+  ))
+  expect_true(grepl("telemetry|monitor", res$suggestions, ignore.case = TRUE))
+})
+
+test_that("bid_validate auto-summary handles compare/trend and problem/find/mobile/theory branches", {
+  # central_question contains 'compare'
+  prev_compare <- tibble::tibble(
+    stage = "Interpret",
+    central_question = "How do we compare A vs B?",
+    timestamp = Sys.time()
+  )
+  suppressMessages({
+    r1 <- bid_validate(
+      previous_stage = prev_compare,
+      summary_panel = NULL,
+      collaboration = "x"
+    )
+  })
+  expect_true(grepl(
+    "Comparative summary",
+    r1$summary_panel,
+    ignore.case = TRUE
+  ))
+
+  # central_question contains 'trend'
+  prev_trend <- tibble::tibble(
+    stage = "Interpret",
+    central_question = "What trend over time should we watch?",
+    timestamp = Sys.time()
+  )
+  suppressMessages({
+    r2 <- bid_validate(
+      previous_stage = prev_trend,
+      summary_panel = NULL,
+      collaboration = "x"
+    )
+  })
+  expect_true(grepl("Time-based summary", r2$summary_panel, ignore.case = TRUE))
+
+  # problem contains 'find/search' and 'mobile'
+  prev_problem <- tibble::tibble(
+    stage = "Notice",
+    problem = "Hard to find information on mobile",
+    timestamp = Sys.time()
+  )
+  suppressMessages({
+    r3 <- bid_validate(
+      previous_stage = prev_problem,
+      summary_panel = NULL,
+      collaboration = "x"
+    )
+  })
+  expect_true(grepl(
+    "navigation paths|Mobile-optimized",
+    r3$summary_panel,
+    ignore.case = TRUE
+  ))
+
+  # theory contains 'visual'
+  prev_theory <- tibble::tibble(
+    stage = "Notice",
+    theory = "Visual Hierarchy",
+    timestamp = Sys.time()
+  )
+  suppressMessages({
+    r4 <- bid_validate(
+      previous_stage = prev_theory,
+      summary_panel = NULL,
+      collaboration = "x"
+    )
+  })
+  expect_true(grepl(
+    "Visually hierarchical summary",
+    r4$summary_panel,
+    ignore.case = TRUE
+  ))
+})
+
+test_that("bid_validate extracts previous info for Structure and cooperation concept path", {
+  prev_structure <- tibble::tibble(
+    stage = "Structure",
+    layout = "grid",
+    concepts = "Cooperation",
+    accessibility = "Color contrast AA",
+    previous_central_question = "How to simplify?",
+    timestamp = Sys.time()
+  )
+
+  suppressMessages({
+    res <- bid_validate(
+      previous_stage = prev_structure,
+      summary_panel = "S",
+      collaboration = NULL
+    ) # triggers concept-based collab path
+  })
+  expect_equal(res$previous_layout, "grid")
+  expect_true(grepl(
+    "Structured collaboration workflows",
+    res$collaboration,
+    ignore.case = TRUE
+  ))
+  expect_match(res$previous_concepts, "Cooperation")
+  expect_match(res$previous_accessibility, "Color contrast AA")
 })

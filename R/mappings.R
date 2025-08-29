@@ -45,7 +45,8 @@ load_external_data <- function(
       },
       error = function(e) {
         warning(
-          "Could not load external file: ", e$message,
+          "Could not load external file: ",
+          e$message,
           call. = FALSE
         )
       }

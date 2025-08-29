@@ -10,7 +10,7 @@
 #' @param bias_mitigations A named list of bias mitigation strategies. If NULL,
 #'        the function will suggest bias mitigations based on information from
 #'        previous stages.
-#' @param include_accessibility Logical indicating whether to include 
+#' @param include_accessibility Logical indicating whether to include
 #'        accessibility mitigations. Default is TRUE.
 #' @param ... Additional parameters. If 'interaction_principles' is provided,
 #'        it will be ignored with a warning.
@@ -81,7 +81,7 @@ bid_anticipate <- function(
     # remove from dots to avoid issues
     dots$interaction_principles <- NULL
   }
-  
+
   # check for any other unexpected parameters
   if (length(dots) > 0) {
     unexpected_params <- names(dots)
@@ -139,7 +139,9 @@ bid_anticipate <- function(
   }
 
   # validate accessibility parameter
-  if (!is.logical(include_accessibility) || length(include_accessibility) != 1) {
+  if (
+    !is.logical(include_accessibility) || length(include_accessibility) != 1
+  ) {
     cli::cli_warn(c(
       "!" = "include_accessibility must be a single logical value (TRUE/FALSE).",
       "i" = "Using default value TRUE."
@@ -365,10 +367,12 @@ bid_anticipate <- function(
         "
       )
     }
-    
+
     # add accessibility mitigation if requested and not already present
-    if (include_accessibility && !"accessibility" %in% names(suggested_biases)) {
-      # get layout from previous stage to provide context-specific accessibility advice
+    if (
+      include_accessibility && !"accessibility" %in% names(suggested_biases)
+    ) {
+      # get layout from previous stage for context-specific accessibility advice
       layout_context <- if (!is.na(layout)) layout else "general"
       accessibility_advice <- get_accessibility_advice(layout_context)
       suggested_biases$accessibility <- accessibility_advice
@@ -386,11 +390,15 @@ bid_anticipate <- function(
   }
 
   # add user-provided accessibility mitigations if not auto-suggested
-  if (include_accessibility && !is.null(bias_mitigations) && !"accessibility" %in% names(bias_mitigations)) {
+  if (
+    include_accessibility &&
+      !is.null(bias_mitigations) &&
+      !"accessibility" %in% names(bias_mitigations)
+  ) {
     layout_context <- if (!is.na(layout)) layout else "general"
     accessibility_advice <- get_accessibility_advice(layout_context)
     bias_mitigations$accessibility <- accessibility_advice
-    
+
     message("Added accessibility mitigation based on layout context.")
   }
 
@@ -433,7 +441,7 @@ bid_anticipate <- function(
 
   # generate suggestions based on accessibility inclusion
   accessibility_suggestions <- character(0)
-  
+
   if (include_accessibility) {
     if ("accessibility" %in% names(bias_mitigations)) {
       accessibility_suggestions <- c(
@@ -442,7 +450,7 @@ bid_anticipate <- function(
       )
     } else {
       accessibility_suggestions <- c(
-        accessibility_suggestions, 
+        accessibility_suggestions,
         "consider adding accessibility mitigations for inclusive design."
       )
     }
@@ -454,7 +462,7 @@ bid_anticipate <- function(
 
   # normalize previous stage to ensure field name consistency
   normalized_previous <- normalize_previous_stage(previous_stage)
-  
+
   result <- tibble::tibble(
     stage = "Anticipate",
     bias_mitigations = paste(
@@ -478,7 +486,10 @@ bid_anticipate <- function(
     } else {
       NA_character_
     },
-    previous_central_question = safe_column_access(normalized_previous, "central_question"),
+    previous_central_question = safe_column_access(
+      normalized_previous,
+      "central_question"
+    ),
     previous_hook = safe_column_access(normalized_previous, "hook"),
     previous_problem = safe_column_access(normalized_previous, "problem"),
     previous_theory = safe_column_access(normalized_previous, "theory"),

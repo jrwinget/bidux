@@ -238,7 +238,11 @@ structure_result <- bid_structure(
 validate_result <- bid_validate(
   previous_stage = structure_result,
   summary_panel = "Error handling improvements with clear user feedback",
-  next_steps = c("Implement loading states", "Add error context", "Test with users")
+  next_steps = c(
+    "Implement loading states",
+    "Add error context",
+    "Test with users"
+  )
 )
 ```
 

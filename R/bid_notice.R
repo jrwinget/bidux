@@ -61,7 +61,7 @@ bid_notice <- function(
     # remove from dots to avoid issues
     dots$target_audience <- NULL
   }
-  
+
   # check for any other unexpected parameters
   if (length(dots) > 0) {
     unexpected_params <- names(dots)
@@ -70,7 +70,7 @@ bid_notice <- function(
       "i" = "These will be ignored."
     ))
   }
-  
+
   # standardized parameter validation
   validate_character_param(problem, "problem", min_length = 1)
   validate_character_param(evidence, "evidence", min_length = 1)
@@ -147,13 +147,16 @@ bid_notice <- function(
   )
 
   # create comprehensive metadata using standardized helper
-  metadata <- get_stage_metadata(1, list(
-    auto_suggested_theory = auto_suggested_theory,
-    theory_confidence = theory_confidence,
-    problem_length = nchar(problem_clean),
-    evidence_length = nchar(evidence_clean),
-    custom_mappings_used = FALSE
-  ))
+  metadata <- get_stage_metadata(
+    1,
+    list(
+      auto_suggested_theory = auto_suggested_theory,
+      theory_confidence = theory_confidence,
+      problem_length = nchar(problem_clean),
+      evidence_length = nchar(evidence_clean),
+      custom_mappings_used = FALSE
+    )
+  )
 
   # create and validate bid_stage object
   result <- bid_stage("Notice", result_data, metadata)

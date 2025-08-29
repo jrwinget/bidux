@@ -99,7 +99,8 @@ ui <- page_fillable(
             card_body(
               h5("Regions"),
               selectInput(
-                "region", "Region:",
+                "region",
+                "Region:",
                 choices = c("All", "North", "South", "East", "West")
               )
             )
@@ -732,7 +733,8 @@ server <- function(input, output, session) {
       }
     }
 
-    reactable(data,
+    reactable(
+      data,
       columns = list(
         metric = colDef(name = "Metric"),
         actual = colDef(name = "Actual"),

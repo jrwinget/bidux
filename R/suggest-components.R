@@ -94,11 +94,13 @@ bid_suggest_components <- function(bid_stage, package = NULL) {
       scored_pkg
     })
 
-    suggestions_list <- suggestions_list[!vapply(
-      suggestions_list,
-      is.null,
-      logical(1)
-    )]
+    suggestions_list <- suggestions_list[
+      !vapply(
+        suggestions_list,
+        is.null,
+        logical(1)
+      )
+    ]
 
     if (length(suggestions_list) == 0) {
       cli::cli_warn(
@@ -395,14 +397,13 @@ get_components_database <- function() {
 
 calculate_relevance_scores <- function(bid_stage, components_db) {
   stage_name <- bid_stage$stage[1]
-
-  # Initialize relevance scores
   components_db$relevance <- 0
 
-  # Stage-based scoring (highest weight) - need to handle different stage name formats
+  # stage-based scoring (highest weight) - need to handle different stage name formats
   stage_pattern <- paste0(
     "Stage ",
-    switch(stage_name,
+    switch(
+      stage_name,
       "Notice" = "1",
       "Interpret" = "2",
       "Structure" = "3",
@@ -464,7 +465,8 @@ calculate_relevance_scores <- function(bid_stage, components_db) {
     }
     components_db$relevance[concept_matches] <- components_db$relevance[
       concept_matches
-    ] + 25
+    ] +
+      25
   }
 
   # problem/theory-based scoring for additional context
@@ -516,7 +518,8 @@ calculate_relevance_scores <- function(bid_stage, components_db) {
       comp_matches <- grepl(comp, components_db$component, ignore.case = TRUE)
       components_db$relevance[comp_matches] <- components_db$relevance[
         comp_matches
-      ] + 5
+      ] +
+        5
     }
   }
 
