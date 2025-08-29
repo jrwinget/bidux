@@ -31,19 +31,19 @@ The Behavior Insight Design (BID) framework integrates psychological principles 
 
 The BID framework consists of 5 sequential stages, each incorporating specific psychological principles:
 
-1. **Notice**: Identify friction points (Cognitive Load, Visual Hierarchy)
-2. **Interpret**: Understand user needs (Data Storytelling, User Personas)
-3. **Structure**: Organize information (Layout Patterns, Breathable Designs)
-4. **Anticipate**: Mitigate biases (Anchoring, Framing)
+1. **Interpret**: Understand user needs (Data Storytelling, User Personas)
+2. **Notice**: Identify friction points (Cognitive Load, Visual Hierarchy)
+3. **Anticipate**: Mitigate biases (Anchoring, Framing)
+4. **Structure**: Organize information (Layout Patterns, Breathable Designs)
 5. **Validate**: Empower the user (Peak-End Rule, Collaboration)
 
-## Stage 1: Notice - Reducing Cognitive Load
+## Stage 1: Interpret - Implementing Data Storytelling
 
-Cognitive load is the amount of mental effort required to use your interface. High cognitive load leads to user frustration and errors.
+Data storytelling helps users understand the meaning behind data through a narrative structure with hook, context, tension, and resolution.
 
-### Using {bslib} to Reduce Cognitive Load
+### Using {echarts4r} for Data Storytelling
 
-```{r cognitive-load}
+```{r data-storytelling-overview}
 ui <- page_fillable(
   theme = bs_theme(
     version = 5,
@@ -158,21 +158,21 @@ ui <- page_fillable(
 )
 ```
 
-### Key Design Principles for Reducing Cognitive Load:
+### Key Design Principles for Data Storytelling:
 
-1. Group related controls and information together
-2. Use consistent layouts and patterns
-3. Implement progressive disclosure to hide complexity
-4. Limit the number of choices presented at once
-5. Use clear visual hierarchy to guide attention
+1. Start with a compelling hook to grab attention
+2. Provide relevant context and background
+3. Highlight the challenge or opportunity (tension)
+4. Offer clear insights and actionable recommendations
+5. Use progressive disclosure to reveal the story
 
-## Stage 2: Interpret - Implementing Data Storytelling
+## Stage 2: Notice - Reducing Cognitive Load
 
-Data storytelling helps users understand the meaning behind data through a narrative structure with hook, context, tension, and resolution.
+Cognitive load is the amount of mental effort required to use your interface. High cognitive load leads to user frustration and errors.
 
-### Using {echarts4r} for Data Storytelling
+### Using {bslib} to Reduce Cognitive Load
 
-```{r data-storytelling}
+```{r cognitive-load}
 ui <- page_fillable(
   theme = bs_theme(
     version = 5,
@@ -364,20 +364,21 @@ server <- function(input, output, session) {
 }
 ```
 
-### Key Elements of Effective Data Storytelling:
+### Key Elements for Reducing Cognitive Load:
 
-1. **Hook**: Start with a compelling insight to grab attention
-2. **Context**: Provide background information and historical data
-3. **Tension**: Highlight the challenge, problem, or opportunity
-4. **Resolution**: Offer insights and actionable recommendations
+1. Group related controls and information together
+2. Use consistent layouts and patterns
+3. Implement progressive disclosure to hide complexity
+4. Limit the number of choices presented at once
+5. Use clear visual hierarchy to guide attention
 
-## Stage 3: Structure - Breathable Layouts
+## Stage 3: Anticipate - Mitigating Anchoring Bias
 
-Breathable layouts use whitespace effectively to create visual rhythm and reduce cognitive load.
+Anchoring bias occurs when users rely too heavily on the first piece of information they encounter when making decisions.
 
-### Using {bslib} for Breathable Layouts
+### Using {reactable} and {echarts4r} to Mitigate Anchoring
 
-```{r breathable-layouts}
+```{r anchoring-bias-overview}
 ui <- page_fillable(
   theme = bs_theme(
     version = 5,
@@ -502,13 +503,9 @@ ui <- page_fillable(
 4. **Content density**: Limit the amount of information in each section
 5. **Visual rhythm**: Create a consistent visual pattern with spacing
 
-## Stage 4: Anticipate - Mitigating Anchoring Bias
+### Using {bslib} for Breathable Layouts
 
-Anchoring bias occurs when users rely too heavily on the first piece of information they encounter when making decisions.
-
-### Using {reactable} and {echarts4r} to Mitigate Anchoring
-
-```{r anchoring-bias}
+```{r breathable-layouts}
 ui <- page_fillable(
   theme = bs_theme(
     version = 5

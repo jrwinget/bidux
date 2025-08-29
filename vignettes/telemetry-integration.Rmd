@@ -202,9 +202,8 @@ Use the identified issues to drive your BID process:
 # Take the most critical issue
 critical_issue <- issues$error_1
 
-# Continue with interpretation
+# Start with interpretation
 interpret_result <- bid_interpret(
-  previous_stage = critical_issue,
   central_question = "How can we prevent data query errors?",
   data_story = list(
     hook = "15% of users encounter errors",
@@ -214,13 +213,33 @@ interpret_result <- bid_interpret(
   )
 )
 
-# Structure improvements
-structure_result <- bid_structure(
+# Notice the specific problem
+notice_result <- bid_notice(
   previous_stage = interpret_result,
-  concepts = c("Progressive Disclosure", "Feedback Loops")
+  problem = critical_issue$problem,
+  evidence = critical_issue$evidence
 )
 
-# Continue through anticipate and validate stages...
+# Anticipate user behavior and biases
+anticipate_result <- bid_anticipate(
+  previous_stage = notice_result,
+  bias_mitigations = list(
+    anchoring = "Show loading states to set proper expectations",
+    confirmation_bias = "Display error context to help users understand issues"
+  )
+)
+
+# Structure improvements
+structure_result <- bid_structure(
+  previous_stage = anticipate_result
+)
+
+# Validate and provide next steps
+validate_result <- bid_validate(
+  previous_stage = structure_result,
+  summary_panel = "Error handling improvements with clear user feedback",
+  next_steps = c("Implement loading states", "Add error context", "Test with users")
+)
 ```
 
 ## Example: Complete Analysis
@@ -240,15 +259,21 @@ critical_issues <- list(
 
 # 3. Create a comprehensive improvement plan
 if (length(critical_issues$unused_inputs) > 0) {
-  # Address unused inputs
+  # Address unused inputs following the updated BID workflow
   unused_issue <- issues[[critical_issues$unused_inputs[1]]]
 
   improvement_plan <- bid_interpret(
-    previous_stage = unused_issue,
-    central_question = "Which filters actually help users find insights?"
+    central_question = "Which filters actually help users find insights?",
+    data_story = list(
+      hook = "Several filters are never used by users",
+      context = "Dashboard has 5 filter controls",
+      tension = "Too many options create choice overload",
+      resolution = "Show only relevant filters based on user tasks"
+    )
   ) |>
-    bid_structure(
-      concepts = c("Progressive Disclosure", "Smart Defaults")
+    bid_notice(
+      problem = unused_issue$problem,
+      evidence = unused_issue$evidence
     ) |>
     bid_anticipate(
       bias_mitigations = list(
@@ -256,8 +281,9 @@ if (length(critical_issues$unused_inputs) > 0) {
         default_effect = "Pre-select most common filter values"
       )
     ) |>
+    bid_structure() |>
     bid_validate(
-      summary_panel = "Show only relevant filters based on user's task",
+      summary_panel = "Simplified filtering with progressive disclosure",
       next_steps = c(
         "Remove unused filters",
         "Implement progressive disclosure",

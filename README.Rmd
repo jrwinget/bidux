@@ -27,17 +27,17 @@ knitr::opts_chunk$set(
 
 ## 📖 Overview
 
-`{bidux}` brings the Behavior Insight Design (BID) framework into your Shiny development workflow. Follow five staged functions (Notice, Interpret, Structure, Anticipate, Validate) to systematically apply psychological principles to UI/UX design and build more intuitive dashboards.
+`{bidux}` brings the Behavior Insight Design (BID) framework into your Shiny development workflow. Follow five staged functions (Interpret, Notice, Anticipate, Structure, Validate) to systematically apply psychological principles to UI/UX design and build more intuitive dashboards.
 
 ## 🚀 Key Features
 
-* **Notice** friction points (`bid_notice()`)
 * **Interpret** user needs (`bid_interpret()`)
-* **Structure** dashboard layouts (`bid_structure()`)
+* **Notice** friction points (`bid_notice()`)
 * **Anticipate** behavior & biases (`bid_anticipate()`)
+* **Structure** dashboard layouts (`bid_structure()`)
 * **Validate** & empower users (`bid_validate()`)
 * **Telemetry Integration**: ingest real usage data to auto-detect UX issues (`bid_ingest_telemetry()`)
-* **Component Suggestions**: get tailored UI component ideas for `bslib`, `shiny`, `reactable`, `echarts4r`, and more
+* **Component Suggestions**: get tailored UI component ideas for `{bslib}`, `{shiny}`, `{reactable}`, `{echarts4r}`, and more
 * **Reporting**: generate HTML, Markdown, or text reports of your BID process
 
 ## 📥 Installation
@@ -62,24 +62,25 @@ library(shiny)
 library(bidux)
 
 # Document a simple BID pipeline
-process <-
-  bid_notice(
-    problem = "Users struggle to find key metrics",
-    evidence = "70% of users spent >30s searching"
-  ) |>
-  bid_interpret(
+process <- bid_interpret(
     central_question = "Which metrics drive decisions?",
     data_story = list(
       hook = "Key metrics hidden",
       resolution = "Surface top metrics up front"
     )
   ) |>
-  bid_structure() |>
+  bid_notice(
+    problem = "Users struggle to find key metrics",
+    evidence = "70% of users spent >30s searching"
+  ) |>
   bid_anticipate(
     bias_mitigations = list(anchoring = "Contextual defaults")
   ) |>
+  bid_structure() |>
   bid_validate(
-    summary_panel = "Insights summary"
+    include_exp_design = FALSE,
+    include_telemetry = TRUE,
+    include_empowerment_tools = TRUE
   )
 
 # View suggestions

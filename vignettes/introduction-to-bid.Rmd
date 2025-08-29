@@ -19,10 +19,10 @@ knitr::opts_chunk$set(
 The Behavior Insight Design (BID) framework guides developers in integrating behavioral science into UI/UX design. It helps in understanding psychological principles and biases that affect user interactions.
 
 The five stages of the BID framework are:
-1. **Notice the Problem**: Identify friction points and areas of high cognitive load.
-2. **Interpret the User's Need**: Clarify the core question and build a data narrative.
-3. **Structure the Dashboard**: Organize layout and design to enhance usability.
-4. **Anticipate User Behavior**: Mitigate biases such as anchoring and framing.
+1. **Interpret the User's Need**: Clarify the core question and build a data narrative.
+2. **Notice the Problem**: Identify friction points and areas of high cognitive load.
+3. **Anticipate User Behavior**: Mitigate biases such as anchoring and framing.
+4. **Structure the Dashboard**: Organize layout and design to enhance usability.
 5. **Validate & Empower the User**: Summarize insights and facilitate collaborative decision-making.
 
 This vignette introduces the core ideas behind each stage and how they interact to create effective, bias-aware dashboards.
