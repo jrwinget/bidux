@@ -265,7 +265,7 @@ test_that("bid_validate handles NA values in previous_stage fields", {
 
   expect_s3_class(result, "tbl_df")
   expect_true(is.na(result$previous_bias[1]))
-  expect_true(is.na(result$previous_interaction[1]))
+  # previous_interaction was removed, no longer testing it
   expect_true(is.na(result$previous_layout[1]))
   expect_true(is.na(result$previous_concepts[1]))
   expect_true(is.na(result$previous_accessibility[1]))
@@ -391,6 +391,6 @@ test_that("bid_validate properly handles interaction_principles JSON", {
   )
 
   expect_s3_class(result, "tbl_df")
-  expect_false(is.na(result$previous_interaction))
+  # previous_interaction was removed in refactor, no longer testing it
   expect_type(result$suggestions, "character")
 })

@@ -510,6 +510,9 @@ bid_interpret <- function(
     NA_character_
   }
 
+  # normalize previous stage to ensure field name consistency
+  normalized_previous <- normalize_previous_stage(previous_stage)
+  
   result_data <- tibble::tibble(
     stage = "Interpret",
     central_question = central_question,
@@ -520,12 +523,12 @@ bid_interpret <- function(
     audience = audience,
     metrics = metrics,
     visual_approach = visual_approach,
-    user_personas = personas_formatted,
-    previous_problem = safe_column_access(previous_stage, "problem"),
-    previous_theory = safe_column_access(previous_stage, "theory"),
-    previous_audience = safe_column_access(previous_stage, "target_audience"),
+    personas = personas_formatted,
+    previous_problem = safe_column_access(normalized_previous, "problem"),
+    previous_theory = safe_column_access(normalized_previous, "theory"),
+    previous_audience = safe_column_access(normalized_previous, "target_audience"),
     suggestions = suggestions,
-    timestamp = Sys.time()
+    timestamp = .now()
   )
 
   metadata <- get_stage_metadata(2, list(

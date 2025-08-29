@@ -4,7 +4,7 @@
 \alias{bid_notice}
 \title{Document User Notice Stage in BID Framework}
 \usage{
-bid_notice(problem, theory = NULL, evidence = NULL, target_audience = NULL)
+bid_notice(problem, theory = NULL, evidence = NULL, ...)
 }
 \arguments{
 \item{problem}{A character string describing the observed user problem.}
@@ -16,8 +16,8 @@ theory mappings.}
 \item{evidence}{A character string describing evidence supporting the
 problem.}
 
-\item{target_audience}{Optional character string describing the target
-audience.}
+\item{...}{Additional parameters. Deprecated parameters like 'target_audience'
+will generate warnings if provided.}
 }
 \value{
 A bid_stage object containing the documented information for the
@@ -46,12 +46,11 @@ summary(notice_result)
 get_stage(notice_result)
 get_metadata(notice_result)
 
-# With explicit theory
+# with explicit theory
 notice_explicit <- bid_notice(
   problem = "Mobile interface is difficult to navigate",
   theory = "Fitts's Law",
-  evidence = "Mobile users report frustration with small touch targets",
-  target_audience = "Mobile users with varying technical expertise"
+  evidence = "Mobile users report frustration with small touch targets"
 )
 
 }

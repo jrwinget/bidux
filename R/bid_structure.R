@@ -92,18 +92,23 @@ bid_structure <- function(
     concepts_detected <- character(0)
   }
 
-  # Prepare result data
+  # normalize previous stage to ensure field name consistency
+  normalized_previous <- normalize_previous_stage(previous_stage)
+  
+  # prepare result data
   result_data <- tibble::tibble(
     stage = "Structure",
     layout = chosen_layout,
     concepts = paste(concepts_detected, collapse = ", "),
-    previous_question = safe_column_access(previous_stage, "central_question"),
-    previous_story_hook = safe_column_access(previous_stage, "hook"),
-    previous_audience = get_audience_from_previous(previous_stage),
-    previous_personas = get_personas_from_previous(previous_stage),
+    previous_central_question = safe_column_access(normalized_previous, "central_question"),
+    previous_hook = safe_column_access(normalized_previous, "hook"),
+    previous_problem = safe_column_access(normalized_previous, "problem"),
+    previous_theory = safe_column_access(normalized_previous, "theory"),
+    previous_audience = get_audience_from_previous(normalized_previous),
+    previous_personas = get_personas_from_previous(normalized_previous),
     suggestions = suggestion_groups,
     concepts_detected = concepts_detected,
-    timestamp = Sys.time()
+    timestamp = .now()
   )
 
   metadata <- list(

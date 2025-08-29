@@ -147,19 +147,17 @@ test_that("bid_anticipate auto-suggests interaction_principles when NULL", {
     result <- bid_anticipate(
       previous_stage = structure_result,
       bias_mitigations = list(anchoring = "Test"),
-      interaction_principles = NULL
+      include_accessibility = TRUE
     )
   )
 
   expect_s3_class(result, "tbl_df")
-  expect_false(is.na(result$interaction_principles[1]))
-
-  expect_match(
-    result$interaction_principles,
-    "hover|feedback|selection|progressive",
-    ignore.case = TRUE,
-    perl = TRUE
-  )
+  # interaction_principles is no longer in the result
+  expect_false("interaction_principles" %in% names(result))
+  
+  # accessibility should be included and not NA
+  expect_true("accessibility" %in% names(result))
+  expect_false(is.na(result$accessibility[1]))
 })
 
 test_that("bid_anticipate handles different layout types appropriately", {
@@ -210,7 +208,8 @@ test_that("bid_anticipate handles NA values in previous_stage fields", {
   expect_s3_class(result, "tbl_df")
   expect_true(is.na(result$previous_layout[1]))
   expect_true(is.na(result$previous_concepts[1]))
-  expect_true(is.na(result$previous_accessibility[1]))
+  # accessibility is now included by default, so it should not be NA
+  expect_false(is.na(result$accessibility[1]))
 
   # should still generate valid suggestions
   expect_false(is.na(result$bias_mitigations[1]))
@@ -279,31 +278,26 @@ test_that("bid_anticipate handles edge cases in interaction_principles param", {
         hover = "This has valid name"
       )
     ),
-    "interaction_principles must be a non-empty named list"
+    "interaction_principles.*deprecated"
   )
 
-  suppressMessages(
-    result <- bid_anticipate(
-      previous_stage = structure_result,
-      bias_mitigations = list(anchoring = "Test"),
-      interaction_principles = list(
-        hover = 123,
-        feedback = TRUE
-      )
-    )
+  # interaction_principles is now deprecated, should not be in columns
+  expect_false("interaction_principles" %in% names(result))
+  
+  # Test that accessibility is included by default
+  result2 <- bid_anticipate(
+    previous_stage = structure_result,
+    bias_mitigations = list(anchoring = "Test")
   )
-
-  expect_s3_class(result, "tbl_df")
-  expect_match(result$interaction_principles, "hover")
-  expect_match(result$interaction_principles, "123")
-  expect_match(result$interaction_principles, "feedback")
-  expect_match(result$interaction_principles, "TRUE")
+  
+  expect_s3_class(result2, "tbl_df")
+  expect_true("accessibility" %in% names(result2))
+  expect_false(is.na(result2$accessibility))
 })
 
-test_that("bid_anticipate correctly parses JSON in interaction_principles", {
+test_that("bid_anticipate warns for deprecated interaction_principles and includes accessibility", {
   structure_result <- tibble(
     stage = "Structure",
-    
     concepts = "Visual Hierarchy",
     timestamp = Sys.time()
   )
@@ -313,13 +307,18 @@ test_that("bid_anticipate correctly parses JSON in interaction_principles", {
     feedback = "Highlight selection"
   )
 
-  result <- bid_anticipate(
-    previous_stage = structure_result,
-    bias_mitigations = list(anchoring = "Test"),
-    interaction_principles = json_interaction
+  expect_warning(
+    result <- bid_anticipate(
+      previous_stage = structure_result,
+      bias_mitigations = list(anchoring = "Test"),
+      interaction_principles = json_interaction
+    ),
+    "interaction_principles.*deprecated"
   )
 
   expect_s3_class(result, "tbl_df")
-  expect_match(result$interaction_principles, "hover", fixed = TRUE)
-  expect_match(result$interaction_principles, "feedback", fixed = TRUE)
+  # interaction_principles should no longer be in columns
+  expect_false("interaction_principles" %in% names(result))
+  # accessibility should be included instead
+  expect_true("accessibility" %in% names(result))
 })

@@ -8,7 +8,10 @@ bid_validate(
   previous_stage,
   summary_panel = NULL,
   collaboration = NULL,
-  next_steps = NULL
+  next_steps = NULL,
+  include_exp_design = TRUE,
+  include_telemetry = TRUE,
+  include_empowerment_tools = TRUE
 )
 }
 \arguments{
@@ -23,6 +26,15 @@ collaboration and sharing.}
 
 \item{next_steps}{A character vector or string describing recommended next
 steps for implementation and iteration.}
+
+\item{include_exp_design}{Logical indicating whether to include experiment
+design suggestions. Default is TRUE.}
+
+\item{include_telemetry}{Logical indicating whether to include telemetry
+tracking and monitoring suggestions. Default is TRUE.}
+
+\item{include_empowerment_tools}{Logical indicating whether to include
+context-aware empowerment tool suggestions. Default is TRUE.}
 }
 \value{
 A tibble containing the documented information for the "Validate"

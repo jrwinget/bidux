@@ -31,7 +31,7 @@ test_that("bid_interpret returns a tibble with stage 'Interpret'", {
 
 test_that("bid_interpret uses provided central_question", {
   local_mocked_bindings(
-    validate_user_personas = function(user_personas) invisible(NULL),
+    validate_user_personas = function(personas) invisible(NULL),
     bid_concepts = function(search = NULL) {
       tibble::tibble(
         concept = "Data Storytelling Framework",
@@ -58,7 +58,7 @@ test_that("bid_interpret uses provided central_question", {
 
 test_that("bid_interpret errors when data_story is not a list", {
   local_mocked_bindings(
-    validate_user_personas = function(user_personas) invisible(NULL)
+    validate_user_personas = function(personas) invisible(NULL)
   )
 
   previous_stage <- tibble::tibble(
@@ -74,10 +74,10 @@ test_that("bid_interpret errors when data_story is not a list", {
   )
 })
 
-test_that("bid_interpret errors when user_personas is invalid", {
+test_that("bid_interpret errors when personas is invalid", {
   local_mocked_bindings(
-    validate_user_personas = function(user_personas) {
-      cli::cli_abort("Invalid user_personas provided")
+    validate_user_personas = function(personas) {
+      cli::cli_abort("Invalid personas provided")
     }
   )
 
@@ -90,7 +90,7 @@ test_that("bid_interpret errors when user_personas is invalid", {
 
   expect_error(
     bid_interpret(previous_stage, user_personas = "not a list"),
-    regexp = "Invalid user_personas provided"
+    regexp = "Invalid personas provided"
   )
 })
 
@@ -212,7 +212,7 @@ test_that("bid_interpret handles edge cases in data_story parameter", {
   expect_equal(result$resolution[1], "Test resolution")
 })
 
-test_that("bid_interpret handles edge cases in user_personas parameter", {
+test_that("bid_interpret handles edge cases in personas parameter", {
   previous_stage <- tibble::tibble(
     stage = "Notice",
     problem = "Test problem",
@@ -231,7 +231,7 @@ test_that("bid_interpret handles edge cases in user_personas parameter", {
   )
 
   expect_s3_class(result, "bid_stage")
-  expect_false(is.na(result$user_personas[1]))
+  expect_false(is.na(result$personas[1]))
 
   suppressWarnings(
     result <- bid_interpret(
@@ -242,7 +242,7 @@ test_that("bid_interpret handles edge cases in user_personas parameter", {
   )
 
   expect_s3_class(result, "bid_stage")
-  expect_true(is.na(result$user_personas[1]))
+  expect_true(is.na(result$personas[1]))
 
   suppressWarnings(
     result <- bid_interpret(
@@ -264,9 +264,9 @@ test_that("bid_interpret handles edge cases in user_personas parameter", {
   )
 
   expect_s3_class(result, "bid_stage")
-  expect_false(is.na(result$user_personas[1]))
-  expect_match(result$user_personas[1], "Complete Persona")
-  expect_match(result$user_personas[1], "Partial Persona")
+  expect_false(is.na(result$personas[1]))
+  expect_match(result$personas[1], "Complete Persona")
+  expect_match(result$personas[1], "Partial Persona")
 })
 
 test_that("bid_interpret handles NA values in previous_stage", {
@@ -289,7 +289,7 @@ test_that("bid_interpret handles NA values in previous_stage", {
   expect_true(is.na(result$previous_audience[1]))
 })
 
-test_that("bid_interpret validates user_personas structure correctly", {
+test_that("bid_interpret validates personas structure correctly", {
   previous_stage <- tibble::tibble(
     stage = "Notice",
     problem = "Test problem",
@@ -325,6 +325,6 @@ test_that("bid_interpret validates user_personas structure correctly", {
   )
 
   expect_s3_class(result, "bid_stage")
-  expect_match(result$user_personas, "Persona 1", fixed = TRUE)
-  expect_match(result$user_personas, "Persona 2", fixed = TRUE)
+  expect_match(result$personas, "Persona 1", fixed = TRUE)
+  expect_match(result$personas, "Persona 2", fixed = TRUE)
 })

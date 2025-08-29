@@ -952,11 +952,52 @@ format_accessibility_for_storage <- function(accessibility) {
   }
 }
 
-# Generic helper to get audience from previous stage
+# normalize previous stage to use canonical field names
+normalize_previous_stage <- function(previous_stage) {
+  if (is.null(previous_stage)) {
+    return(NULL)
+  }
+  
+  # convert to tibble if needed
+  if (inherits(previous_stage, "bid_stage")) {
+    stage_data <- as.data.frame(previous_stage)
+  } else if (is.data.frame(previous_stage)) {
+    stage_data <- previous_stage
+  } else {
+    return(previous_stage) # return as-is if not recognizable
+  }
+  
+  # rename legacy field names to canonical ones
+  if ("previous_question" %in% names(stage_data)) {
+    stage_data$previous_central_question <- stage_data$previous_question
+    stage_data$previous_question <- NULL
+  }
+  
+  if ("previous_story_hook" %in% names(stage_data)) {
+    stage_data$previous_hook <- stage_data$previous_story_hook
+    stage_data$previous_story_hook <- NULL
+  }
+  
+  # coalesce audience fields if needed
+  if ("audience" %in% names(stage_data) && 
+      (is.na(stage_data$audience[1]) || is.null(stage_data$audience[1]))) {
+    if ("previous_audience" %in% names(stage_data) && 
+        !is.na(stage_data$previous_audience[1])) {
+      stage_data$audience[1] <- stage_data$previous_audience[1]
+    }
+  }
+  
+  return(tibble::as_tibble(stage_data))
+}
+
+# generic helper to get audience from previous stage
 get_audience_from_previous <- function(previous_stage) {
+  # normalize first
+  normalized_stage <- normalize_previous_stage(previous_stage)
+  
   audience_fields <- c("audience", "target_audience", "previous_audience")
   for (field in audience_fields) {
-    value <- safe_column_access(previous_stage, field)
+    value <- safe_column_access(normalized_stage, field)
     if (!is.na(value) && nchar(trimws(value)) > 0) {
       return(value)
     }
@@ -964,11 +1005,14 @@ get_audience_from_previous <- function(previous_stage) {
   return(NA_character_)
 }
 
-# Generic helper to get personas from previous stage
+# generic helper to get personas from previous stage
 get_personas_from_previous <- function(previous_stage) {
-  persona_fields <- c("user_personas", "previous_personas")
+  # normalize first
+  normalized_stage <- normalize_previous_stage(previous_stage)
+  
+  persona_fields <- c("user_personas", "previous_personas", "personas")
   for (field in persona_fields) {
-    value <- safe_column_access(previous_stage, field)
+    value <- safe_column_access(normalized_stage, field)
     if (!is.na(value) && nchar(trimws(value)) > 0) {
       return(value)
     }
@@ -976,7 +1020,12 @@ get_personas_from_previous <- function(previous_stage) {
   return(NA_character_)
 }
 
-# Generic next steps formatting
+# time wrapper for test stubbing
+.now <- function() {
+  Sys.time()
+}
+
+# generic next steps formatting
 format_next_steps <- function(next_steps) {
   if (is.null(next_steps)) {
     return(NA_character_)

@@ -854,8 +854,7 @@ create_unused_input_notice <- function(input_info, total_sessions) {
   # create notice stage with auto-suggested theory
   notice <- bid_notice(
     problem = problem,
-    evidence = evidence,
-    target_audience = NULL
+    evidence = evidence
   )
 
   return(notice)
@@ -907,8 +906,7 @@ create_delay_notice <- function(delay_info, total_sessions, threshold) {
 
   notice <- bid_notice(
     problem = problem,
-    evidence = evidence,
-    target_audience = NULL
+    evidence = evidence
   )
 
   return(notice)
@@ -982,8 +980,7 @@ create_navigation_notice <- function(nav_info, total_sessions) {
 
   notice <- bid_notice(
     problem = problem,
-    evidence = evidence,
-    target_audience = NULL
+    evidence = evidence
   )
 
   return(notice)
@@ -1009,8 +1006,7 @@ create_confusion_notice <- function(confusion_info, total_sessions) {
 
   notice <- bid_notice(
     problem = problem,
-    evidence = evidence,
-    target_audience = NULL
+    evidence = evidence
   )
 
   return(notice)
