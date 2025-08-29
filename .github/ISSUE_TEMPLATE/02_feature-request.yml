@@ -9,9 +9,9 @@ body:
     attributes:
       value: |
         Thank you for suggesting a new feature! Your ideas help make {bidux} better for everyone.
-        
+
         **Before submitting:** Please check the [roadmap](#roadmap) and existing issues to see if this feature is already planned or requested.
-  
+
   - type: input
     id: contact
     attributes:
@@ -20,7 +20,7 @@ body:
       placeholder: ex. email@example.com
     validations:
       required: false
-  
+
   - type: textarea
     id: feature_summary
     attributes:
@@ -29,7 +29,7 @@ body:
       placeholder: Summarize your feature request in 1-2 sentences
     validations:
       required: true
-  
+
   - type: dropdown
     id: feature_category
     attributes:
@@ -38,7 +38,7 @@ body:
       options:
         - "New BID stage function"
         - "Enhancement to existing function"
-        - "New psychological theory integration"
+        - "New behavioral science theory integration"
         - "Shiny integration improvement"
         - "Accessibility feature"
         - "Reporting/documentation enhancement"
@@ -47,7 +47,7 @@ body:
         - "Other"
     validations:
       required: true
-  
+
   - type: dropdown
     id: bid_stage_target
     attributes:
@@ -64,7 +64,7 @@ body:
         - "Not applicable"
     validations:
       required: true
-  
+
   - type: textarea
     id: problem_statement
     attributes:
@@ -72,13 +72,13 @@ body:
       description: What problem does this feature solve?
       placeholder: |
         Describe the current limitation or problem that this feature would address:
-        
+
         - What are users currently unable to do?
         - What workflow is currently difficult or inefficient?
-        - What psychological principles are missing from the current implementation?
+        - What behavioral science principles are missing from the current implementation?
     validations:
       required: true
-  
+
   - type: textarea
     id: proposed_solution
     attributes:
@@ -86,18 +86,18 @@ body:
       description: Describe your proposed solution in detail
       placeholder: |
         Provide a detailed description of your proposed solution:
-        
+
         - How would this feature work?
         - What would the API look like?
         - How would users interact with this feature?
-        
+
         ```r
         # Example usage (if applicable)
         proposed_function(...)
         ```
     validations:
       required: true
-  
+
   - type: textarea
     id: psychological_rationale
     attributes:
@@ -105,14 +105,14 @@ body:
       description: What behavioral psychology principles support this feature?
       placeholder: |
         Explain the psychological or UX principles that justify this feature:
-        
+
         - Which cognitive biases does this address?
         - How does this improve user experience?
-        - What psychological theories support this approach?
+        - What behavioral science theories support this approach?
         - References to relevant research (if applicable)
     validations:
       required: false
-  
+
   - type: textarea
     id: alternatives
     attributes:
@@ -120,13 +120,13 @@ body:
       description: What alternative solutions have you considered?
       placeholder: |
         Describe any alternative approaches you've considered:
-        
+
         - Other potential solutions
         - Workarounds you've tried
         - Why the proposed solution is preferable
     validations:
       required: false
-  
+
   - type: dropdown
     id: priority
     attributes:
@@ -139,7 +139,7 @@ body:
         - "Low - Minor improvement"
     validations:
       required: true
-  
+
   - type: dropdown
     id: complexity
     attributes:
@@ -153,7 +153,7 @@ body:
         - "Unknown - Hard to estimate"
     validations:
       required: true
-  
+
   - type: textarea
     id: use_cases
     attributes:
@@ -161,13 +161,13 @@ body:
       description: Provide specific examples of how this feature would be used
       placeholder: |
         Describe specific scenarios where this feature would be valuable:
-        
+
         1. Use case 1: [Description]
         2. Use case 2: [Description]
         3. Use case 3: [Description]
     validations:
       required: true
-  
+
   - type: textarea
     id: additional_context
     attributes:
@@ -180,7 +180,7 @@ body:
         - Any other relevant information
     validations:
       required: false
-  
+
   - type: checkboxes
     id: contribution
     attributes:
@@ -189,7 +189,7 @@ body:
         - label: I would be willing to contribute to implementing this feature
         - label: I would be willing to help with testing this feature
         - label: I would be willing to help with documentation for this feature
-  
+
   - type: checkboxes
     id: checklist
     attributes:

@@ -12,8 +12,8 @@
 #'        theory mappings.
 #' @param evidence A character string describing evidence supporting the
 #'        problem.
-#' @param target_audience Optional character string describing the target
-#'        audience.
+#' @param ... Additional parameters. Deprecated parameters like 'target_audience'
+#'        will generate warnings if provided.
 #'
 #' @return A bid_stage object containing the documented information for the
 #'         "Notice" stage with enhanced metadata and validation.
@@ -35,12 +35,11 @@
 #' get_stage(notice_result)
 #' get_metadata(notice_result)
 #'
-#' # With explicit theory
+#' # with explicit theory
 #' notice_explicit <- bid_notice(
 #'   problem = "Mobile interface is difficult to navigate",
 #'   theory = "Fitts's Law",
-#'   evidence = "Mobile users report frustration with small touch targets",
-#'   target_audience = "Mobile users with varying technical expertise"
+#'   evidence = "Mobile users report frustration with small touch targets"
 #' )
 #'
 #' @export
@@ -48,12 +47,34 @@ bid_notice <- function(
     problem,
     theory = NULL,
     evidence = NULL,
-    target_audience = NULL) {
+    ...) {
+  # handle deprecated target_audience parameter via ...
+  dots <- list(...)
+  target_audience <- NULL
+  if ("target_audience" %in% names(dots)) {
+    cli::cli_warn(c(
+      "!" = "The 'target_audience' parameter has been deprecated and removed.",
+      "i" = "Audience information should now be managed through the bid_interpret() stage.",
+      "i" = "This parameter will be ignored in this version."
+    ))
+    target_audience <- dots$target_audience
+    # remove from dots to avoid issues
+    dots$target_audience <- NULL
+  }
+
+  # check for any other unexpected parameters
+  if (length(dots) > 0) {
+    unexpected_params <- names(dots)
+    cli::cli_warn(c(
+      "!" = "Unexpected parameters provided: {paste(unexpected_params, collapse = ', ')}",
+      "i" = "These will be ignored."
+    ))
+  }
+
   # standardized parameter validation
   validate_character_param(problem, "problem", min_length = 1)
   validate_character_param(evidence, "evidence", min_length = 1)
   validate_character_param(theory, "theory", allow_null = TRUE)
-  validate_character_param(target_audience, "target_audience", allow_null = TRUE)
 
   # clean input for processing
   problem_clean <- trimws(problem)
@@ -111,8 +132,7 @@ bid_notice <- function(
   context_data <- list(
     problem = problem_clean,
     evidence = evidence_clean,
-    theory = theory,
-    target_audience = target_audience
+    theory = theory
   )
   suggestions <- generate_stage_suggestions("Notice", context_data)
 
@@ -122,20 +142,21 @@ bid_notice <- function(
     problem = problem, # use original problem to preserve exact string
     theory = theory %||% NA_character_,
     evidence = evidence, # use original evidence to preserve exact string
-    target_audience = target_audience %||% NA_character_,
     suggestions = suggestions,
-    timestamp = Sys.time()
+    timestamp = .now()
   )
 
   # create comprehensive metadata using standardized helper
-  metadata <- get_stage_metadata(1, list(
-    auto_suggested_theory = auto_suggested_theory,
-    theory_confidence = theory_confidence,
-    problem_length = nchar(problem_clean),
-    evidence_length = nchar(evidence_clean),
-    has_target_audience = !is.null(target_audience),
-    custom_mappings_used = FALSE
-  ))
+  metadata <- get_stage_metadata(
+    1,
+    list(
+      auto_suggested_theory = auto_suggested_theory,
+      theory_confidence = theory_confidence,
+      problem_length = nchar(problem_clean),
+      evidence_length = nchar(evidence_clean),
+      custom_mappings_used = FALSE
+    )
+  )
 
   # create and validate bid_stage object
   result <- bid_stage("Notice", result_data, metadata)

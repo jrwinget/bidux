@@ -84,7 +84,11 @@ bid_interpret <- function(
     "Interpret",
     list(
       data_story = list(value = data_story, type = "list", allow_null = TRUE),
-      central_question = list(value = central_question, type = "character", allow_null = TRUE)
+      central_question = list(
+        value = central_question,
+        type = "character",
+        allow_null = TRUE
+      )
     )
   )
 
@@ -510,6 +514,9 @@ bid_interpret <- function(
     NA_character_
   }
 
+  # normalize previous stage to ensure field name consistency
+  normalized_previous <- normalize_previous_stage(previous_stage)
+
   result_data <- tibble::tibble(
     stage = "Interpret",
     central_question = central_question,
@@ -520,21 +527,31 @@ bid_interpret <- function(
     audience = audience,
     metrics = metrics,
     visual_approach = visual_approach,
-    user_personas = personas_formatted,
-    previous_problem = safe_column_access(previous_stage, "problem"),
-    previous_theory = safe_column_access(previous_stage, "theory"),
-    previous_audience = safe_column_access(previous_stage, "target_audience"),
+    personas = personas_formatted,
+    previous_problem = safe_column_access(normalized_previous, "problem"),
+    previous_theory = safe_column_access(normalized_previous, "theory"),
+    previous_audience = safe_column_access(
+      normalized_previous,
+      "target_audience"
+    ),
     suggestions = suggestions,
-    timestamp = Sys.time()
+    timestamp = .now()
   )
 
-  metadata <- get_stage_metadata(2, list(
-    has_central_question = !is.null(central_question),
-    story_completeness = story_completeness,
-    personas_count = if (!is.null(user_personas)) length(user_personas) else 0,
-    auto_generated_question = is.null(central_question),
-    auto_generated_story = is.null(data_story)
-  ))
+  metadata <- get_stage_metadata(
+    2,
+    list(
+      has_central_question = !is.null(central_question),
+      story_completeness = story_completeness,
+      personas_count = if (!is.null(user_personas)) {
+        length(user_personas)
+      } else {
+        0
+      },
+      auto_generated_question = is.null(central_question),
+      auto_generated_story = is.null(data_story)
+    )
+  )
 
   result <- bid_stage("Interpret", result_data, metadata)
 

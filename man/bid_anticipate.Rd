@@ -7,7 +7,8 @@
 bid_anticipate(
   previous_stage,
   bias_mitigations = NULL,
-  interaction_principles = NULL
+  include_accessibility = TRUE,
+  ...
 )
 }
 \arguments{
@@ -18,8 +19,11 @@ function.}
 the function will suggest bias mitigations based on information from
 previous stages.}
 
-\item{interaction_principles}{A named list of interaction principles
-(optional).}
+\item{include_accessibility}{Logical indicating whether to include
+accessibility mitigations. Default is TRUE.}
+
+\item{...}{Additional parameters. If 'interaction_principles' is provided,
+it will be ignored with a warning.}
 }
 \value{
 A tibble containing the documented information for the "Anticipate"
@@ -62,18 +66,14 @@ bid_anticipate(
   previous_stage = structure_info
 )
 
-# With interaction principles
+# with accessibility included (default)
 bid_anticipate(
   previous_stage = structure_info,
   bias_mitigations = list(
     anchoring = "Use context-aware references",
     framing = "Toggle between positive and negative framing"
   ),
-  interaction_principles = list(
-    hover_effects = "Show additional information on hover",
-    selection_feedback = "Highlight active filters with color change",
-    progressive_actions = "Show advanced options only if basic ones are used"
-  )
+  include_accessibility = TRUE
 )
 
 }

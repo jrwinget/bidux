@@ -10,8 +10,10 @@
 #' @param bias_mitigations A named list of bias mitigation strategies. If NULL,
 #'        the function will suggest bias mitigations based on information from
 #'        previous stages.
-#' @param interaction_principles A named list of interaction principles
-#'        (optional).
+#' @param include_accessibility Logical indicating whether to include
+#'        accessibility mitigations. Default is TRUE.
+#' @param ... Additional parameters. If 'interaction_principles' is provided,
+#'        it will be ignored with a warning.
 #'
 #' @return A tibble containing the documented information for the "Anticipate"
 #'         stage.
@@ -48,27 +50,45 @@
 #'   previous_stage = structure_info
 #' )
 #'
-#' # With interaction principles
+#' # with accessibility included (default)
 #' bid_anticipate(
 #'   previous_stage = structure_info,
 #'   bias_mitigations = list(
 #'     anchoring = "Use context-aware references",
 #'     framing = "Toggle between positive and negative framing"
 #'   ),
-#'   interaction_principles = list(
-#'     hover_effects = "Show additional information on hover",
-#'     selection_feedback = "Highlight active filters with color change",
-#'     progressive_actions = "Show advanced options only if basic ones are used"
-#'   )
+#'   include_accessibility = TRUE
 #' )
 #'
 #' @export
 bid_anticipate <- function(
     previous_stage,
     bias_mitigations = NULL,
-    interaction_principles = NULL) {
+    include_accessibility = TRUE,
+    ...) {
   if (missing(previous_stage) || is.null(previous_stage)) {
     stop("Required parameter 'previous_stage' must be provided", call. = FALSE)
+  }
+
+  # handle deprecated interaction_principles parameter via ...
+  dots <- list(...)
+  if ("interaction_principles" %in% names(dots)) {
+    cli::cli_warn(c(
+      "!" = "The 'interaction_principles' parameter has been deprecated and removed.",
+      "i" = "Interaction principles are no longer explicitly tracked in the Anticipate stage.",
+      "i" = "This parameter will be ignored in this version."
+    ))
+    # remove from dots to avoid issues
+    dots$interaction_principles <- NULL
+  }
+
+  # check for any other unexpected parameters
+  if (length(dots) > 0) {
+    unexpected_params <- names(dots)
+    cli::cli_warn(c(
+      "!" = "Unexpected parameters provided: {paste(unexpected_params, collapse = ', ')}",
+      "i" = "These will be ignored."
+    ))
   }
 
   validate_previous_stage(previous_stage, "Anticipate")
@@ -118,33 +138,15 @@ bid_anticipate <- function(
     }
   }
 
-  if (!is.null(interaction_principles)) {
-    if (!is.list(interaction_principles)) {
-      cli::cli_abort(c(
-        "The interaction_principles parameter must be a list",
-        "i" = "You provided {.cls {class(interaction_principles)}}"
-      ))
-    }
-
-    if (
-      length(interaction_principles) == 0 ||
-        is.null(names(interaction_principles)) ||
-        any(names(interaction_principles) == "")
-    ) {
-      cli::cli_warn(
-        c(
-          "!" = "interaction_principles must be a non-empty named list.",
-          "i" = "Using automatically generated interaction principles instead."
-        )
-      )
-      interaction_principles <- NULL
-    }
-
-    for (i in seq_along(interaction_principles)) {
-      if (!is.character(interaction_principles[[i]])) {
-        interaction_principles[[i]] <- as.character(interaction_principles[[i]])
-      }
-    }
+  # validate accessibility parameter
+  if (
+    !is.logical(include_accessibility) || length(include_accessibility) != 1
+  ) {
+    cli::cli_warn(c(
+      "!" = "include_accessibility must be a single logical value (TRUE/FALSE).",
+      "i" = "Using default value TRUE."
+    ))
+    include_accessibility <- TRUE
   }
 
   layout <- NA_character_
@@ -355,15 +357,25 @@ bid_anticipate <- function(
     if (length(suggested_biases) == 0) {
       suggested_biases <- list(
         anchoring = "
-          Provide multiple reference points to reduce anchoring effect
+          provide multiple reference points to reduce anchoring effect
         ",
         framing = "
-          Toggle between positive and negative framing of the same data
+          toggle between positive and negative framing of the same data
         ",
         confirmation_bias = "
-          Include evidence that challenges common assumptions
+          include evidence that challenges common assumptions
         "
       )
+    }
+
+    # add accessibility mitigation if requested and not already present
+    if (
+      include_accessibility && !"accessibility" %in% names(suggested_biases)
+    ) {
+      # get layout from previous stage for context-specific accessibility advice
+      layout_context <- if (!is.na(layout)) layout else "general"
+      accessibility_advice <- get_accessibility_advice(layout_context)
+      suggested_biases$accessibility <- accessibility_advice
     }
 
     bias_mitigations <- suggested_biases
@@ -377,105 +389,17 @@ bid_anticipate <- function(
     )
   }
 
-  if (is.null(interaction_principles)) {
-    suggested_principles <- list()
+  # add user-provided accessibility mitigations if not auto-suggested
+  if (
+    include_accessibility &&
+      !is.null(bias_mitigations) &&
+      !"accessibility" %in% names(bias_mitigations)
+  ) {
+    layout_context <- if (!is.na(layout)) layout else "general"
+    accessibility_advice <- get_accessibility_advice(layout_context)
+    bias_mitigations$accessibility <- accessibility_advice
 
-    if (previous_stage$stage[1] == "Structure") {
-      layout_interaction_map <- list(
-        "dual_process" = c(
-          "progressive_disclosure" = "
-            Reveal detailed analysis only when users want to explore further
-          ",
-          "hover_effects" = "
-            Show additional context on hover for quick insights
-          "
-        ),
-        "grid" = c(
-          "selection_feedback" = "
-            Highlight selected grid cells with visual feedback
-          ",
-          "cross_filtering" = "
-            Allow filtering one grid cell to affect related cells
-          "
-        ),
-        "card" = c(
-          "card_expansion" = "Allow cards to expand for more details on click",
-          "card_hover" = "Use subtle hover effects to indicate interactivity"
-        ),
-        "tabs" = c(
-          "tab_feedback" = "Use clear visual indicators for the active tab",
-          "persistent_elements" = "Keep key controls consistent across tabs"
-        ),
-        "breathable" = c(
-          "subtle_animations" = "
-            Use subtle animations to guide attention without clutter
-          ",
-          "contextual_controls" = "
-            Show controls only when relevant to reduce visual noise
-          "
-        )
-      )
-
-      if (!is.na(layout) && layout %in% names(layout_interaction_map)) {
-        for (principle_name in names(layout_interaction_map[[layout]])) {
-          suggested_principles[[principle_name]] <- layout_interaction_map[[
-            layout
-          ]][[principle_name]]
-        }
-      }
-
-      if (length(concepts) > 0) {
-        concept_interaction_map <- list(
-          "Visual Hierarchy" = c(
-            "visual_prominence" = paste(
-              "Give interactive elements visual prominence proportional",
-              "to importance"
-            )
-          ),
-          "Progressive Disclosure" = c(
-            "progressive_interaction" = "
-              Reveal more complex options only after basic ones are used
-            "
-          ),
-          "Interaction Hints" = c(
-            "hover_effects" = "Use hover effects to suggest interactivity",
-            "cursor_changes" = "Change cursor to indicate interactive elements"
-          ),
-          "Visual Feedback" = c(
-            "selection_feedback" = "
-              Provide immediate visual feedback for user actions
-            ",
-            "state_indicators" = "
-              Use clear visual indicators for different states
-            "
-          )
-        )
-
-        for (concept in concepts) {
-          concept <- trimws(concept)
-          for (known_concept in names(concept_interaction_map)) {
-            if (grepl(tolower(known_concept), tolower(concept))) {
-              principles <- concept_interaction_map[[known_concept]]
-              for (principle_name in names(principles)) {
-                suggested_principles[[principle_name]] <- principles[[
-                  principle_name
-                ]]
-              }
-            }
-          }
-        }
-      }
-    }
-
-    if (length(suggested_principles) > 0) {
-      interaction_principles <- suggested_principles
-
-      message(paste0(
-        "Automatically suggested interaction principles: ",
-        paste(names(interaction_principles), collapse = ", "),
-        "."
-      ))
-    }
+    message("Added accessibility mitigation based on layout context.")
   }
 
   bias_suggestions <- character(0)
@@ -515,59 +439,29 @@ bid_anticipate <- function(
     bias_suggestions <- c(bias_suggestions, missing_bias_suggestions)
   }
 
-  interaction_suggestions <- character(0)
+  # generate suggestions based on accessibility inclusion
+  accessibility_suggestions <- character(0)
 
-  if (!is.null(interaction_principles) && length(interaction_principles) > 0) {
-    for (principle_name in names(interaction_principles)) {
-      interaction_suggestions <- c(
-        interaction_suggestions,
-        paste0(principle_name, ": ", interaction_principles[[principle_name]])
+  if (include_accessibility) {
+    if ("accessibility" %in% names(bias_mitigations)) {
+      accessibility_suggestions <- c(
+        accessibility_suggestions,
+        "accessibility considerations have been included in bias mitigations."
+      )
+    } else {
+      accessibility_suggestions <- c(
+        accessibility_suggestions,
+        "consider adding accessibility mitigations for inclusive design."
       )
     }
-
-    interaction_msg <- paste0(
-      "Good job including interaction principles. ",
-      "These will help users understand how to interact with your dashboard."
-    )
-  } else {
-    interaction_msg <- paste(
-      "Consider adding interaction principles like hover effects,",
-      "selection feedback, and progressive disclosure to guide users."
-    )
-
-    interaction_suggestions <- c(interaction_suggestions, interaction_msg)
-  }
-
-  interaction_formatted <- if (
-    !is.null(interaction_principles) &&
-      length(interaction_principles) > 0
-  ) {
-    tryCatch(
-      {
-        jsonlite::toJSON(interaction_principles, auto_unbox = TRUE)
-      },
-      error = function(e) {
-        cli::cli_warn(
-          c(
-            "Failed to convert interaction_principles to JSON",
-            "i" = "Using string representation instead"
-          )
-        )
-        paste(
-          names(interaction_principles),
-          interaction_principles,
-          sep = ": ",
-          collapse = "; "
-        )
-      }
-    )
-  } else {
-    NA_character_
   }
 
   bias_text <- paste(bias_suggestions, collapse = " ")
-  interaction_text <- paste(interaction_suggestions, collapse = " ")
-  suggestions <- paste(bias_text, interaction_text, sep = " ")
+  accessibility_text <- paste(accessibility_suggestions, collapse = " ")
+  suggestions <- paste(bias_text, accessibility_text, sep = " ")
+
+  # normalize previous stage to ensure field name consistency
+  normalized_previous <- normalize_previous_stage(previous_stage)
 
   result <- tibble::tibble(
     stage = "Anticipate",
@@ -577,31 +471,41 @@ bid_anticipate <- function(
       sep = ": ",
       collapse = "; "
     ),
-    interaction_principles = interaction_formatted,
+    accessibility = if (include_accessibility) {
+      if ("accessibility" %in% names(bias_mitigations)) {
+        bias_mitigations$accessibility
+      } else {
+        "accessibility mitigation not specified"
+      }
+    } else {
+      NA_character_
+    },
     previous_layout = if (!is.na(layout)) layout else NA_character_,
     previous_concepts = if (length(concepts) > 0) {
       paste(concepts, collapse = ", ")
     } else {
       NA_character_
     },
-    previous_accessibility = if (!is.na(accessibility)) {
-      accessibility %||% NA_character_
-    } else {
-      NA_character_
-    },
+    previous_central_question = safe_column_access(
+      normalized_previous,
+      "central_question"
+    ),
+    previous_hook = safe_column_access(normalized_previous, "hook"),
+    previous_problem = safe_column_access(normalized_previous, "problem"),
+    previous_theory = safe_column_access(normalized_previous, "theory"),
+    previous_audience = get_audience_from_previous(normalized_previous),
+    previous_personas = get_personas_from_previous(normalized_previous),
     suggestions = suggestions,
-    timestamp = Sys.time()
+    timestamp = .now()
   )
 
   bid_message(
     "Stage 4 (Anticipate) completed.",
     paste0("Bias mitigations: ", length(names(bias_mitigations)), " defined"),
-    if (!is.null(interaction_principles)) {
-      paste0(
-        "Interaction principles: ",
-        length(names(interaction_principles)),
-        " defined"
-      )
+    if (include_accessibility) {
+      "Accessibility considerations included"
+    } else {
+      "Accessibility considerations not included"
     },
     paste(
       "Key suggestions:",

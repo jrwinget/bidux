@@ -119,7 +119,11 @@ test_that("get_concept_bias_mappings works correctly", {
   custom_mappings <- data.frame(
     concept = c("Cognitive Load Theory", "Visual Hierarchy", "Test Concept"),
     bias_type = c("overload_bias", "attention_bias", "test_bias"),
-    mitigation_strategy = c("Reduce complexity", "Guide attention", "Test strategy")
+    mitigation_strategy = c(
+      "Reduce complexity",
+      "Guide attention",
+      "Test strategy"
+    )
   )
 
   result <- get_concept_bias_mappings(
@@ -129,7 +133,9 @@ test_that("get_concept_bias_mappings works correctly", {
 
   expect_s3_class(result, "data.frame")
   expect_true(nrow(result) >= 2)
-  expect_true(all(result$concept %in% c("Cognitive Load Theory", "Visual Hierarchy")))
+  expect_true(all(
+    result$concept %in% c("Cognitive Load Theory", "Visual Hierarchy")
+  ))
 
   # Test partial matching
   partial_result <- get_concept_bias_mappings(
@@ -152,7 +158,9 @@ test_that("load_layout_mappings works correctly", {
   mappings <- load_layout_mappings()
 
   expect_s3_class(mappings, "data.frame")
-  expect_true(all(c("layout", "primary_concepts", "description") %in% names(mappings)))
+  expect_true(all(
+    c("layout", "primary_concepts", "description") %in% names(mappings)
+  ))
   expect_true(nrow(mappings) > 0)
 
   # Should include standard layouts
@@ -192,7 +200,10 @@ test_that("get_layout_concepts works correctly", {
 
   # Test unknown layout returns defaults
   unknown_concepts <- get_layout_concepts("unknown_layout")
-  expect_equal(unknown_concepts, c("Visual Hierarchy", "Principle of Proximity"))
+  expect_equal(
+    unknown_concepts,
+    c("Visual Hierarchy", "Principle of Proximity")
+  )
 
   # Test NULL/empty input
   null_concepts <- get_layout_concepts(NULL)
@@ -210,7 +221,11 @@ test_that("load_accessibility_guidelines works correctly", {
 
   # Should have some basic accessibility guidelines
   if (nrow(guidelines) > 0) {
-    expect_true(any(grepl("color|contrast", guidelines$guideline, ignore.case = TRUE)))
+    expect_true(any(grepl(
+      "color|contrast",
+      guidelines$guideline,
+      ignore.case = TRUE
+    )))
   }
 
   # Test with custom guidelines
@@ -231,12 +246,16 @@ test_that("get_accessibility_recommendations works correctly", {
   expect_true(length(visual_recs) > 0)
 
   # Test with interactive context
-  interactive_recs <- get_accessibility_recommendations("interactive buttons and forms")
+  interactive_recs <- get_accessibility_recommendations(
+    "interactive buttons and forms"
+  )
   expect_type(interactive_recs, "character")
   expect_true(length(interactive_recs) > 0)
 
   # Test with data visualization context
-  data_viz_recs <- get_accessibility_recommendations("data visualization dashboard")
+  data_viz_recs <- get_accessibility_recommendations(
+    "data visualization dashboard"
+  )
   expect_type(data_viz_recs, "character")
   expect_true(length(data_viz_recs) > 0)
 
@@ -248,11 +267,18 @@ test_that("get_accessibility_recommendations works correctly", {
   # Test with custom guidelines
   custom_guidelines <- data.frame(
     guideline = c("color_contrast", "keyboard_nav", "screen_reader_support"),
-    requirement = c("4.5:1 contrast ratio", "Full keyboard access", "ARIA labels"),
+    requirement = c(
+      "4.5:1 contrast ratio",
+      "Full keyboard access",
+      "ARIA labels"
+    ),
     wcag_level = c("AA", "AA", "AA")
   )
 
-  custom_recs <- get_accessibility_recommendations("visual interface", custom_guidelines)
+  custom_recs <- get_accessibility_recommendations(
+    "visual interface",
+    custom_guidelines
+  )
   expect_type(custom_recs, "character")
   expect_true(length(custom_recs) > 0)
 })
@@ -269,7 +295,9 @@ test_that("mapping functions handle file loading errors gracefully", {
   # Concept bias mappings should return empty structure if file missing
   bias_mappings <- load_concept_bias_mappings()
   expect_s3_class(bias_mappings, "data.frame")
-  expect_true(all(c("concept", "bias_type", "mitigation_strategy") %in% names(bias_mappings)))
+  expect_true(all(
+    c("concept", "bias_type", "mitigation_strategy") %in% names(bias_mappings)
+  ))
 
   # Layout mappings should fall back to defaults
   layout_mappings <- load_layout_mappings()
@@ -315,7 +343,10 @@ test_that("mapping functions provide consistent output formats", {
   expect_false(any(is.factor(layout_mappings$primary_concepts)))
 
   # Suggestion functions should return character vectors
-  theory_suggestion <- suggest_theory_from_mappings("test problem", "test evidence")
+  theory_suggestion <- suggest_theory_from_mappings(
+    "test problem",
+    "test evidence"
+  )
   expect_type(theory_suggestion, "character")
   expect_length(theory_suggestion, 1)
 
@@ -368,10 +399,14 @@ test_that("get_default_theory_mappings returns valid structure", {
   default_mappings <- get_default_theory_mappings()
 
   expect_s3_class(default_mappings, "data.frame")
-  expect_true(all(c("keywords", "theory", "confidence") %in% names(default_mappings)))
+  expect_true(all(
+    c("keywords", "theory", "confidence") %in% names(default_mappings)
+  ))
   expect_true(nrow(default_mappings) >= 6) # Should have at least 6 default mappings
   expect_true(all(is.numeric(default_mappings$confidence)))
-  expect_true(all(default_mappings$confidence > 0 & default_mappings$confidence <= 1))
+  expect_true(all(
+    default_mappings$confidence > 0 & default_mappings$confidence <= 1
+  ))
 
   # Check that we have key theories
   expect_true("Hick's Law" %in% default_mappings$theory)
@@ -384,7 +419,9 @@ test_that("get_default_layout_mappings returns valid structure", {
   default_layouts <- get_default_layout_mappings()
 
   expect_s3_class(default_layouts, "data.frame")
-  expect_true(all(c("layout", "primary_concepts", "description") %in% names(default_layouts)))
+  expect_true(all(
+    c("layout", "primary_concepts", "description") %in% names(default_layouts)
+  ))
   expect_true(nrow(default_layouts) >= 5) # Should have at least 5 default layouts
 
   # Check that we have key layouts
@@ -430,15 +467,21 @@ test_that("mapping functions handle malformed CSV files gracefully", {
   # All loading functions should return valid data.frames even if files are missing/malformed
   theory_result <- load_theory_mappings()
   expect_s3_class(theory_result, "data.frame")
-  expect_true(all(c("keywords", "theory", "confidence") %in% names(theory_result)))
+  expect_true(all(
+    c("keywords", "theory", "confidence") %in% names(theory_result)
+  ))
 
   bias_result <- load_concept_bias_mappings()
   expect_s3_class(bias_result, "data.frame")
-  expect_true(all(c("concept", "bias_type", "mitigation_strategy") %in% names(bias_result)))
+  expect_true(all(
+    c("concept", "bias_type", "mitigation_strategy") %in% names(bias_result)
+  ))
 
   layout_result <- load_layout_mappings()
   expect_s3_class(layout_result, "data.frame")
-  expect_true(all(c("layout", "primary_concepts", "description") %in% names(layout_result)))
+  expect_true(all(
+    c("layout", "primary_concepts", "description") %in% names(layout_result)
+  ))
 })
 
 test_that("mapping integration works end-to-end", {

@@ -10,7 +10,10 @@ test_that("bid_suggest_components returns tibble with correct structure", {
   })
 
   expect_s3_class(suggestions, "tbl_df")
-  expect_true(all(c("package", "component", "description", "relevance") %in% names(suggestions)))
+  expect_true(all(
+    c("package", "component", "description", "relevance") %in%
+      names(suggestions)
+  ))
   expect_true(nrow(suggestions) > 0)
 })
 
@@ -22,7 +25,10 @@ test_that("bid_suggest_components filters by package correctly", {
   )
 
   suppressMessages({
-    bslib_suggestions <- bid_suggest_components(notice_result, package = "bslib")
+    bslib_suggestions <- bid_suggest_components(
+      notice_result,
+      package = "bslib"
+    )
   })
 
   expect_s3_class(bslib_suggestions, "tbl_df")
@@ -31,7 +37,10 @@ test_that("bid_suggest_components filters by package correctly", {
   }
 
   suppressMessages({
-    shiny_suggestions <- bid_suggest_components(notice_result, package = "shiny")
+    shiny_suggestions <- bid_suggest_components(
+      notice_result,
+      package = "shiny"
+    )
   })
 
   expect_s3_class(shiny_suggestions, "tbl_df")
@@ -118,7 +127,7 @@ test_that("bid_suggest_components works with different BID stages", {
   # Test with Structure stage
   structure_result <- bid_structure(
     interpret_result,
-    
+
     concepts = c("Visual Hierarchy", "Cognitive Load Theory")
   )
 
@@ -180,7 +189,7 @@ test_that("bid_suggest_components extracts concepts correctly", {
       notice_with_theory,
       central_question = "How to improve visual organization?"
     ),
-    
+
     concepts = c("Principle of Proximity", "Visual Hierarchy")
   )
 
@@ -219,7 +228,7 @@ test_that("bid_suggest_components handles layout-specific scoring", {
       ),
       central_question = "How to organize content?"
     ),
-    
+
     concepts = "Information Hierarchy"
   )
 
@@ -232,8 +241,16 @@ test_that("bid_suggest_components handles layout-specific scoring", {
 
   # Should include layout-relevant components with higher scores
   sidebar_components <- layout_suggestions[
-    grepl("sidebar|nav|panel", layout_suggestions$description, ignore.case = TRUE) |
-      grepl("sidebar|nav|panel", layout_suggestions$component, ignore.case = TRUE),
+    grepl(
+      "sidebar|nav|panel",
+      layout_suggestions$description,
+      ignore.case = TRUE
+    ) |
+      grepl(
+        "sidebar|nav|panel",
+        layout_suggestions$component,
+        ignore.case = TRUE
+      ),
   ]
 
   if (nrow(sidebar_components) > 0) {
@@ -252,14 +269,26 @@ test_that("bid_suggest_components component database has required structure", {
   })
 
   required_fields <- c(
-    "package", "component", "description", "bid_stage_relevance",
-    "cognitive_concepts", "use_cases", "relevance"
+    "package",
+    "component",
+    "description",
+    "bid_stage_relevance",
+    "cognitive_concepts",
+    "use_cases",
+    "relevance"
   )
 
   expect_true(all(required_fields %in% names(suggestions)))
 
   # Check that packages are from expected list
-  valid_packages <- c("shiny", "bslib", "DT", "plotly", "reactable", "htmlwidgets")
+  valid_packages <- c(
+    "shiny",
+    "bslib",
+    "DT",
+    "plotly",
+    "reactable",
+    "htmlwidgets"
+  )
   if (nrow(suggestions) > 0) {
     expect_true(all(suggestions$package %in% valid_packages))
   }
@@ -282,8 +311,16 @@ test_that("bid_suggest_components handles audience-based context", {
 
   # Should prioritize executive-friendly components
   exec_components <- exec_suggestions[
-    grepl("summary|value|card|executive", exec_suggestions$description, ignore.case = TRUE) |
-      grepl("summary|value|card", exec_suggestions$use_cases, ignore.case = TRUE),
+    grepl(
+      "summary|value|card|executive",
+      exec_suggestions$description,
+      ignore.case = TRUE
+    ) |
+      grepl(
+        "summary|value|card",
+        exec_suggestions$use_cases,
+        ignore.case = TRUE
+      ),
   ]
 
   if (nrow(exec_components) > 0) {

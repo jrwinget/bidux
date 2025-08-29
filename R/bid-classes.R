@@ -285,7 +285,9 @@ format_theory_field <- function(value, metadata) {
     return(NULL)
   }
 
-  if (!is.null(metadata$auto_suggested_theory) && metadata$auto_suggested_theory) {
+  if (
+    !is.null(metadata$auto_suggested_theory) && metadata$auto_suggested_theory
+  ) {
     paste0(value, " ", cli::style_italic("(auto-suggested)"))
   } else {
     value
@@ -647,8 +649,9 @@ summary.bid_result <- function(object, ...) {
     stage_obj <- object[[i]]
     cat("\n", cli::style_bold(paste0(i, ". ", get_stage(stage_obj))), "\n")
 
-    # Print key details without full summary
-    important_cols <- switch(get_stage(stage_obj),
+    # print key details without full summary
+    important_cols <- switch(
+      get_stage(stage_obj),
       "Notice" = c("problem", "theory", "evidence"),
       "Interpret" = c("central_question", "hook"),
       "Structure" = c("layout", "concepts"),

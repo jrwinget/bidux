@@ -25,24 +25,34 @@
 #'
 #' @importFrom cli cli_alert_info
 #' @keywords internal
-structure_suggestions <- function(previous_stage, chosen_layout, concepts = NULL) {
-  # Combine concepts from multiple sources
+structure_suggestions <- function(
+    previous_stage,
+    chosen_layout,
+    concepts = NULL) {
+  # combine concepts from multiple sources
   concepts_final <- unique(c(
-    extract_stage1_theory(previous_stage),                    # from Notice
-    infer_concepts_from_story(previous_stage),                # from Interpret (keywords)
-    concepts                                                  # user-provided
+    extract_stage1_theory(previous_stage), # from Notice
+    infer_concepts_from_story(previous_stage), # from Interpret (keywords)
+    concepts # user-provided
   ))
-  
-  # Remove empty/NA concepts
-  concepts_final <- concepts_final[!is.na(concepts_final) & nchar(trimws(concepts_final)) > 0]
-  
-  # Build suggestion groups with rankings
-  groups <- build_groups_with_suggestions(concepts_final, chosen_layout, previous_stage)
+
+  # remove empty/NA concepts
+  concepts_final <- concepts_final[
+    !is.na(concepts_final) & nchar(trimws(concepts_final)) > 0
+  ]
+
+  # build suggestion groups with rankings
+  groups <- build_groups_with_suggestions(
+    concepts_final,
+    chosen_layout,
+    previous_stage
+  )
   groups <- rank_and_sort_suggestions(groups, previous_stage, chosen_layout)
-  
-  # Show tip about bid_concept() once
-  cli::cli_alert_info('Tip: Learn more about any concept via bid_concept("<concept>").')
-  
+
+  cli::cli_alert_info(
+    'Tip: Learn more about any concept via bid_concept("<concept>").'
+  )
+
   return(groups)
 }
 
@@ -75,41 +85,105 @@ infer_concepts_from_story <- function(previous_stage) {
     safe_column_access(previous_stage, "audience", ""),
     collapse = " "
   )
-  
+
   detected_concepts <- character(0)
   story_lower <- tolower(story_text)
-  
-  # Keyword-based concept detection
+
+  # keyword-based concept detection
   concept_keywords <- list(
-    "Cognitive Load Theory" = c("overload", "overwhelm", "too many", "complex", "confusing", "mental load"),
-    "Progressive Disclosure" = c("step", "gradually", "reveal", "detail", "progressive", "stage", "phase"),
-    "Visual Hierarchy" = c("hierarchy", "priority", "important", "focus", "attention", "prominence"),
-    "Dual-Processing Theory" = c("quick", "glance", "summary", "overview", "detail", "fast", "thorough"),
-    "User Onboarding" = c("first time", "new user", "beginner", "getting started", "initial", "welcome"),
-    "Information Scent" = c("find", "search", "locate", "discover", "navigation", "scent", "wayfinding"),
-    "Principle of Proximity" = c("group", "related", "together", "proximity", "close", "associate")
+    "Cognitive Load Theory" = c(
+      "overload",
+      "overwhelm",
+      "too many",
+      "complex",
+      "confusing",
+      "mental load"
+    ),
+    "Progressive Disclosure" = c(
+      "step",
+      "gradually",
+      "reveal",
+      "detail",
+      "progressive",
+      "stage",
+      "phase"
+    ),
+    "Visual Hierarchy" = c(
+      "hierarchy",
+      "priority",
+      "important",
+      "focus",
+      "attention",
+      "prominence"
+    ),
+    "Dual-Processing Theory" = c(
+      "quick",
+      "glance",
+      "summary",
+      "overview",
+      "detail",
+      "fast",
+      "thorough"
+    ),
+    "User Onboarding" = c(
+      "first time",
+      "new user",
+      "beginner",
+      "getting started",
+      "initial",
+      "welcome"
+    ),
+    "Information Scent" = c(
+      "find",
+      "search",
+      "locate",
+      "discover",
+      "navigation",
+      "scent",
+      "wayfinding"
+    ),
+    "Principle of Proximity" = c(
+      "group",
+      "related",
+      "together",
+      "proximity",
+      "close",
+      "associate"
+    )
   )
-  
+
   for (concept_name in names(concept_keywords)) {
     keywords <- concept_keywords[[concept_name]]
     if (any(sapply(keywords, function(k) grepl(k, story_lower)))) {
       detected_concepts <- c(detected_concepts, concept_name)
     }
   }
-  
-  # Add audience-based concepts
+
+  # add audience-based concepts
   audience_text <- tolower(safe_column_access(previous_stage, "audience", ""))
   data_story <- safe_column_access(previous_stage, "data_story", NULL)
-  if (!is.null(data_story) && is.list(data_story) && "audience" %in% names(data_story)) {
-    audience_text <- paste(audience_text, tolower(as.character(data_story$audience)))
+  if (
+    !is.null(data_story) &&
+      is.list(data_story) &&
+      "audience" %in% names(data_story)
+  ) {
+    audience_text <- paste(
+      audience_text,
+      tolower(as.character(data_story$audience))
+    )
   }
   problem_text <- tolower(safe_column_access(previous_stage, "problem", ""))
-  
+
   combined_audience <- paste(audience_text, problem_text)
-  if (grepl("first.time|first-time|new.*user|beginner|novice|confused easily", combined_audience)) {
+  if (
+    grepl(
+      "first.time|first-time|new.*user|beginner|novice|confused easily",
+      combined_audience
+    )
+  ) {
     detected_concepts <- c(detected_concepts, "User Onboarding")
   }
-  
+
   return(unique(detected_concepts))
 }
 
@@ -120,25 +194,33 @@ infer_concepts_from_story <- function(previous_stage) {
 #' @param previous_stage Previous stage data for context
 #' @return List of concept groups with suggestions
 #' @keywords internal
-build_groups_with_suggestions <- function(concepts_final, chosen_layout, previous_stage) {
-  # Ensure we have at least some core concepts if none provided
+build_groups_with_suggestions <- function(
+  concepts_final,
+  chosen_layout,
+  previous_stage
+) {
+  # ensure at least some core concepts if none provided
   if (length(concepts_final) == 0) {
     concepts_final <- c("Cognitive Load Theory", "Visual Hierarchy")
   }
-  
-  # Always include essential concepts for any structure stage
-  essential_concepts <- c("Cognitive Load Theory", "Progressive Disclosure", "Visual Hierarchy")
+
+  # always include essential concepts for any structure stage
+  essential_concepts <- c(
+    "Cognitive Load Theory",
+    "Progressive Disclosure",
+    "Visual Hierarchy"
+  )
   concepts_final <- unique(c(concepts_final, essential_concepts))
-  
+
   groups <- list()
-  
+
   for (concept in concepts_final) {
     group <- build_concept_group(concept, chosen_layout, previous_stage)
     if (!is.null(group) && length(group$suggestions) > 0) {
       groups <- append(groups, list(group))
     }
   }
-  
+
   return(groups)
 }
 
@@ -150,21 +232,43 @@ build_groups_with_suggestions <- function(concepts_final, chosen_layout, previou
 #' @return List with concept name and suggestions
 #' @keywords internal
 build_concept_group <- function(concept, chosen_layout, previous_stage) {
-  suggestions <- switch(concept,
-    "Cognitive Load Theory" = get_cognitive_load_suggestions(chosen_layout, previous_stage),
-    "Progressive Disclosure" = get_progressive_disclosure_suggestions(chosen_layout, previous_stage),
-    "Visual Hierarchy" = get_visual_hierarchy_suggestions(chosen_layout, previous_stage),
-    "Dual-Processing Theory" = get_dual_processing_suggestions(chosen_layout, previous_stage),
-    "User Onboarding" = get_onboarding_suggestions(chosen_layout, previous_stage),
-    "Information Scent" = get_information_scent_suggestions(chosen_layout, previous_stage),
-    "Principle of Proximity" = get_proximity_suggestions(chosen_layout, previous_stage),
+  suggestions <- switch(
+    concept,
+    "Cognitive Load Theory" = get_cognitive_load_suggestions(
+      chosen_layout,
+      previous_stage
+    ),
+    "Progressive Disclosure" = get_progressive_disclosure_suggestions(
+      chosen_layout,
+      previous_stage
+    ),
+    "Visual Hierarchy" = get_visual_hierarchy_suggestions(
+      chosen_layout,
+      previous_stage
+    ),
+    "Dual-Processing Theory" = get_dual_processing_suggestions(
+      chosen_layout,
+      previous_stage
+    ),
+    "User Onboarding" = get_onboarding_suggestions(
+      chosen_layout,
+      previous_stage
+    ),
+    "Information Scent" = get_information_scent_suggestions(
+      chosen_layout,
+      previous_stage
+    ),
+    "Principle of Proximity" = get_proximity_suggestions(
+      chosen_layout,
+      previous_stage
+    ),
     get_generic_suggestions(concept, chosen_layout, previous_stage)
   )
-  
+
   if (length(suggestions) == 0) {
     return(NULL)
   }
-  
+
   return(list(
     concept = concept,
     suggestions = suggestions
@@ -178,37 +282,52 @@ get_cognitive_load_suggestions <- function(chosen_layout, previous_stage) {
     list(
       title = "Limit initial choices",
       details = "Show only core filters by default; defer advanced options to secondary views or accordions.",
-      components = c("bslib::accordion", "shiny::conditionalPanel", "shiny::updateSelectizeInput"),
+      components = c(
+        "bslib::accordion",
+        "shiny::conditionalPanel",
+        "shiny::updateSelectizeInput"
+      ),
       rationale = "Reduces initial cognitive load for new users while preserving functionality.",
       score = 0.92
     ),
     list(
       title = "Use progressive complexity",
       details = "Start with simple views and allow users to add complexity incrementally.",
-      components = c("shiny::tabsetPanel", "bslib::accordion", "shiny::actionButton"),
+      components = c(
+        "shiny::tabsetPanel",
+        "bslib::accordion",
+        "shiny::actionButton"
+      ),
       rationale = "Prevents overwhelming users with too many options at once.",
       score = 0.88
     ),
     list(
       title = "Provide smart defaults",
       details = "Pre-select commonly used filters and settings to reduce decision fatigue.",
-      components = c("shiny::selectInput", "shiny::checkboxInput", "bslib::input_switch"),
+      components = c(
+        "shiny::selectInput",
+        "shiny::checkboxInput",
+        "bslib::input_switch"
+      ),
       rationale = "Leverages the Default Effect to reduce cognitive burden.",
       score = 0.85
     )
   )
-  
+
   # Layout-specific adjustments
   if (chosen_layout == "breathable") {
     base_suggestions[[1]]$score <- base_suggestions[[1]]$score + 0.05
   }
-  
+
   return(base_suggestions)
 }
 
 #' Generate Progressive Disclosure suggestions
 #' @keywords internal
-get_progressive_disclosure_suggestions <- function(chosen_layout, previous_stage) {
+get_progressive_disclosure_suggestions <- function(
+  chosen_layout,
+  previous_stage
+) {
   base_suggestions <- list(
     list(
       title = "Use collapsible advanced filters",
@@ -220,18 +339,22 @@ get_progressive_disclosure_suggestions <- function(chosen_layout, previous_stage
     list(
       title = "Implement drill-down navigation",
       details = "Allow users to start with summaries and progressively reveal details.",
-      components = c("shiny::actionButton", "DT::datatable", "reactable::reactable"),
+      components = c(
+        "shiny::actionButton",
+        "DT::datatable",
+        "reactable::reactable"
+      ),
       rationale = "Matches user mental models of exploration from general to specific.",
       score = 0.84
     )
   )
-  
+
   # Boost score for tabs layout
   if (chosen_layout == "tabs") {
     base_suggestions[[1]]$score <- base_suggestions[[1]]$score + 0.05
     base_suggestions[[2]]$score <- base_suggestions[[2]]$score + 0.03
   }
-  
+
   # Check telemetry for tab issues
   telemetry_data <- safe_column_access(previous_stage, "telemetry", NULL)
   if (!is.null(telemetry_data) && isTRUE(telemetry_data$nav_dropoff_tabs)) {
@@ -242,7 +365,7 @@ get_progressive_disclosure_suggestions <- function(chosen_layout, previous_stage
       }
     }
   }
-  
+
   return(base_suggestions)
 }
 
@@ -253,7 +376,12 @@ get_visual_hierarchy_suggestions <- function(chosen_layout, previous_stage) {
     list(
       title = "Establish clear information priority",
       details = "Use size, color, and spacing to guide attention to key metrics first.",
-      components = c("bslib::card", "shiny::h1", "shiny::h2", "bslib::value_box"),
+      components = c(
+        "bslib::card",
+        "shiny::h1",
+        "shiny::h2",
+        "bslib::value_box"
+      ),
       rationale = "Helps users quickly identify what matters most in the interface.",
       score = 0.90
     ),
@@ -279,12 +407,12 @@ get_dual_processing_suggestions <- function(chosen_layout, previous_stage) {
       score = 0.89
     )
   )
-  
+
   # Boost for dual_process layout
   if (chosen_layout == "dual_process") {
     base_suggestions[[1]]$score <- base_suggestions[[1]]$score + 0.08
   }
-  
+
   return(base_suggestions)
 }
 
@@ -302,7 +430,11 @@ get_onboarding_suggestions <- function(chosen_layout, previous_stage) {
     list(
       title = "Use progressive onboarding",
       details = "Introduce features gradually rather than overwhelming with tutorials upfront.",
-      components = c("shiny::conditionalPanel", "shiny::observeEvent", "bslib::tooltip"),
+      components = c(
+        "shiny::conditionalPanel",
+        "shiny::observeEvent",
+        "bslib::tooltip"
+      ),
       rationale = "Matches natural learning patterns and reduces abandonment.",
       score = 0.81
     )
@@ -330,17 +462,21 @@ get_proximity_suggestions <- function(chosen_layout, previous_stage) {
     list(
       title = "Group related controls together",
       details = "Place filters and controls near the content they affect.",
-      components = c("bslib::layout_columns", "shiny::wellPanel", "bslib::card"),
+      components = c(
+        "bslib::layout_columns",
+        "shiny::wellPanel",
+        "bslib::card"
+      ),
       rationale = "Spatial proximity indicates functional relationship.",
       score = 0.85
     )
   )
-  
+
   # Boost for grid layout
   if (chosen_layout == "grid") {
     base_suggestions[[1]]$score <- base_suggestions[[1]]$score + 0.05
   }
-  
+
   return(base_suggestions)
 }
 
@@ -350,9 +486,19 @@ get_generic_suggestions <- function(concept, chosen_layout, previous_stage) {
   list(
     list(
       title = paste("Apply", concept, "principles"),
-      details = paste("Consider how", concept, "applies to your", chosen_layout, "layout design."),
+      details = paste(
+        "Consider how",
+        concept,
+        "applies to your",
+        chosen_layout,
+        "layout design."
+      ),
       components = c("bslib::card", "shiny::fluidRow", "bslib::layout_columns"),
-      rationale = paste("Systematic application of", concept, "can improve user experience."),
+      rationale = paste(
+        "Systematic application of",
+        concept,
+        "can improve user experience."
+      ),
       score = 0.70
     )
   )
@@ -370,37 +516,44 @@ rank_and_sort_suggestions <- function(groups, previous_stage, chosen_layout) {
     # Apply context-based scoring adjustments
     for (j in seq_along(groups[[i]]$suggestions)) {
       groups[[i]]$suggestions[[j]] <- adjust_suggestion_score(
-        groups[[i]]$suggestions[[j]], 
-        previous_stage, 
+        groups[[i]]$suggestions[[j]],
+        previous_stage,
         chosen_layout,
         groups[[i]]$concept
       )
     }
-    
+
     # Sort suggestions by score (descending)
     scores <- sapply(groups[[i]]$suggestions, function(s) s$score)
     order_idx <- order(scores, decreasing = TRUE)
     groups[[i]]$suggestions <- groups[[i]]$suggestions[order_idx]
   }
-  
+
   # Sort groups by highest suggestion score in each group
-  group_max_scores <- sapply(groups, function(g) max(sapply(g$suggestions, function(s) s$score)))
+  group_max_scores <- sapply(groups, function(g) {
+    max(sapply(g$suggestions, function(s) s$score))
+  })
   group_order <- order(group_max_scores, decreasing = TRUE)
-  
+
   return(groups[group_order])
 }
 
 #' Apply context-based scoring adjustments
 #' @keywords internal
-adjust_suggestion_score <- function(suggestion, previous_stage, chosen_layout, concept) {
+adjust_suggestion_score <- function(
+  suggestion,
+  previous_stage,
+  chosen_layout,
+  concept
+) {
   score <- suggestion$score
-  
+
   # Boost if concept originated from Stage 1 theory
   stage1_theory <- extract_stage1_theory(previous_stage)
   if (concept %in% stage1_theory) {
     score <- score + 0.05
   }
-  
+
   # Boost for layout-appropriate suggestions
   layout_boosts <- list(
     "breathable" = c("Cognitive Load Theory"),
@@ -408,17 +561,25 @@ adjust_suggestion_score <- function(suggestion, previous_stage, chosen_layout, c
     "dual_process" = c("Dual-Processing Theory"),
     "grid" = c("Visual Hierarchy", "Principle of Proximity")
   )
-  
-  if (chosen_layout %in% names(layout_boosts) && concept %in% layout_boosts[[chosen_layout]]) {
+
+  if (
+    chosen_layout %in%
+      names(layout_boosts) &&
+      concept %in% layout_boosts[[chosen_layout]]
+  ) {
     score <- score + 0.03
   }
-  
+
   # Demote tabs-related suggestions if telemetry shows issues
   telemetry_data <- safe_column_access(previous_stage, "telemetry", NULL)
-  if (!is.null(telemetry_data) && isTRUE(telemetry_data$nav_dropoff_tabs) && grepl("tab", suggestion$details, ignore.case = TRUE)) {
+  if (
+    !is.null(telemetry_data) &&
+      isTRUE(telemetry_data$nav_dropoff_tabs) &&
+      grepl("tab", suggestion$details, ignore.case = TRUE)
+  ) {
     score <- score - 0.08
   }
-  
+
   # Ensure score stays within bounds
   suggestion$score <- max(0, min(1, score))
   return(suggestion)

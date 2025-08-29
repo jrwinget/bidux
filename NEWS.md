@@ -1,11 +1,28 @@
-# bidux 0.3.0 (2025-08-28)
+# bidux 0.3.0 (2025-08-29)
 ==========================
 
 ### BREAKING CHANGES
 
+* **BID stage order updated to: Interpret → Notice → Anticipate → Structure → Validate.** This reflects the most natural workflow while maintaining flexibility for iterative usage.
+
+* **`bid_notice()` no longer accepts `target_audience` parameter.** Audience information should now be managed through the `bid_interpret()` stage using the `data_story` or `user_personas` parameters. The function will warn if the deprecated parameter is provided.
+
+* **`bid_anticipate()` no longer accepts `interaction_principles` parameter.** This parameter has been removed in favor of the new `include_accessibility` parameter (default: TRUE). The function will warn if the deprecated parameter is provided.
+
+* **Field name changes for consistency:**
+  - `previous_question` → `previous_central_question` 
+  - `previous_story_hook` → `previous_hook`
+  - `user_personas` → `personas` (in bid_interpret output)
+
 * **`bid_structure()` no longer accepts a `layout` parameter.** Layout is now automatically selected based on content analysis of previous stages using deterministic heuristics. The function will abort with a helpful error message if the deprecated `layout` parameter is provided.
 
 ### NEW FEATURES
+
+* **Enhanced `bid_validate()` with experiment/telemetry/empowerment flags.** New optional parameters: `include_exp_design` (default: TRUE), `include_telemetry` (default: TRUE), and `include_empower_tools` (default: TRUE) for context-aware suggestions.
+
+* **Accessibility-focused bias mitigation in `bid_anticipate()`.** New `include_accessibility` parameter adds layout-specific accessibility recommendations to bias mitigation strategies.
+
+* **Improved context propagation.** All `previous_problem`, `previous_theory`, `previous_audience`, and `previous_personas` now properly propagate through the entire pipeline to the Validate stage.
 
 * **Automatic layout inference for `bid_structure()`.** Uses sophisticated heuristics to analyze content from previous BID stages (problem, evidence, data story elements) and automatically select the most appropriate layout (breathable, dual_process, grid, card, or tabs).
 
@@ -17,19 +34,67 @@
 
 ### IMPROVEMENTS
 
+* **Field name normalization.** Added `normalize_previous_stage()` helper function to handle legacy field names and ensure consistent data flow between stages.
+
+* **Enhanced helper functions.** Updated utility functions with time stubbing support (`.now()`) and improved safe column access patterns.
+
 * **Comprehensive test coverage.** Added extensive tests for all heuristic branches, suggestion structure validation, CLI message verification, telemetry integration, and error handling for the deprecated `layout` parameter.
 
 ### BUG FIXES
 
 * None.
 
+### MIGRATION GUIDE
+
+To update existing code for bidux 0.3.0:
+
+```r
+# OLD (0.2.x)
+notice <- bid_notice(
+  problem = "Users confused", 
+  evidence = "High error rate",
+  target_audience = "Analysts"
+)
+
+# NEW (0.3.0)
+notice <- bid_notice(
+  problem = "Users confused", 
+  evidence = "High error rate"
+)
+
+interpret <- bid_interpret(
+  previous_stage = notice,
+  data_story = list(
+    audience = "Analysts"  # Move audience here
+  )
+)
+
+# OLD (0.2.x)
+anticipate <- bid_anticipate(
+  previous_stage = structure_result,
+  interaction_principles = list(hover = "Show details on hover")
+)
+
+# NEW (0.3.0)
+anticipate <- bid_anticipate(
+  previous_stage = structure_result,
+  include_accessibility = TRUE  # New accessibility focus
+)
+
+# Field name updates in downstream code:
+# Access previous_central_question instead of previous_question
+# Access previous_hook instead of previous_story_hook
+```
+
 ### DEPRECATED AND DEFUNCT
 
-* None.
+* `target_audience` parameter in `bid_notice()` (deprecated, will be removed in 0.4.0)
+* `interaction_principles` parameter in `bid_anticipate()` (deprecated, will be removed in 0.4.0)
 
 ### DOCUMENTATION FIXES
 
-* None.
+* Updated function documentation to reflect parameter changes and new stage ordering
+* Updated examples to use new recommended workflow: Interpret → Notice → Anticipate → Structure → Validate
 
 # bidux 0.2.0 (2025-08-05)
 ==========================

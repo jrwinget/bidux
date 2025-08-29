@@ -13,8 +13,12 @@ test_that("bid_notice returns a bid_stage object with correct structure", {
 
   # Check required columns
   expected_cols <- c(
-    "stage", "problem", "theory", "evidence",
-    "target_audience", "suggestions", "timestamp"
+    "stage",
+    "problem",
+    "theory",
+    "evidence",
+    "suggestions",
+    "timestamp"
   )
   expect_equal(sort(names(result)), sort(expected_cols))
   expect_equal(result$stage, "Notice")
@@ -53,32 +57,26 @@ test_that("bid_notice auto-suggests theory when not provided", {
   expect_true(metadata$theory_confidence > 0 && metadata$theory_confidence <= 1)
 })
 
-test_that("bid_notice records provided target audience correctly", {
-  result <- bid_notice(
-    problem = "Sales team struggles with complex filter combinations",
-    evidence = "Training sessions revealed confusion with multiple selections",
-    target_audience = "Sales representatives with varying technical skills"
+test_that("bid_notice warns for deprecated target_audience parameter", {
+  expect_warning(
+    result <- bid_notice(
+      problem = "Sales team struggles with complex filter combinations",
+      evidence = "Training sessions revealed confusion with multiple selections",
+      target_audience = "Sales representatives with varying technical skills"
+    ),
+    "target_audience.*deprecated"
   )
-  expect_equal(
-    result$target_audience,
-    "Sales representatives with varying technical skills"
-  )
-
-  # Check metadata
-  metadata <- get_metadata(result)
-  expect_true(metadata$has_target_audience)
+  # target_audience should not be in result columns
+  expect_false("target_audience" %in% names(result))
 })
 
-test_that("bid_notice returns NA for target audience when not provided", {
+test_that("bid_notice works correctly without target_audience", {
   result <- bid_notice(
     problem = "The chart is cluttered and confusing",
     evidence = "Feedback indicates users are disoriented."
   )
-  expect_true(is.na(result$target_audience))
-
-  # Check metadata
-  metadata <- get_metadata(result)
-  expect_false(metadata$has_target_audience)
+  # target_audience should not be in columns at all
+  expect_false("target_audience" %in% names(result))
 })
 
 test_that("bid_notice warns for short problem description", {
@@ -118,13 +116,14 @@ test_that("bid_notice errors with proper validation messages", {
     "'theory' must be a single character string"
   )
 
-  expect_error(
+  # target_audience parameter is now deprecated and ignored with warning
+  expect_warning(
     bid_notice(
       problem = "Valid problem",
       evidence = "Valid evidence",
       target_audience = 101112
     ),
-    "'target_audience' must be a single character string"
+    "target_audience.*deprecated"
   )
 })
 
@@ -224,7 +223,7 @@ test_that("bid_notice metadata contains expected information", {
   expect_true("theory_confidence" %in% names(metadata))
   expect_true("problem_length" %in% names(metadata))
   expect_true("evidence_length" %in% names(metadata))
-  expect_true("has_target_audience" %in% names(metadata))
+  # has_target_audience is no longer in metadata since target_audience was removed
   expect_true("validation_status" %in% names(metadata))
   expect_true("stage_number" %in% names(metadata))
   expect_true("total_stages" %in% names(metadata))
@@ -250,7 +249,7 @@ test_that("bid_notice print method works correctly", {
   expect_output(print(result), "Problem:")
   expect_output(print(result), "Theory:")
   expect_output(print(result), "Evidence:")
-  expect_output(print(result), "Target Audience:")
+  # Target Audience is no longer displayed since it's been removed
 })
 
 test_that("bid_notice summary method works correctly", {
@@ -311,7 +310,11 @@ test_that("bid_notice generates appropriate suggestions", {
 
   # Should generate relevant suggestions
   expect_true(nchar(result$suggestions) > 0)
-  expect_match(result$suggestions, "target audience|design solutions", ignore.case = TRUE)
+  expect_match(
+    result$suggestions,
+    "target audience|design solutions",
+    ignore.case = TRUE
+  )
 
   result2 <- bid_notice(
     problem = "Users struggle with too many choices",
@@ -320,5 +323,9 @@ test_that("bid_notice generates appropriate suggestions", {
 
   # Should generate relevant suggestions
   expect_true(nchar(result2$suggestions) > 0)
-  expect_match(result2$suggestions, "target audience|design solutions", ignore.case = TRUE)
+  expect_match(
+    result2$suggestions,
+    "target audience|design solutions",
+    ignore.case = TRUE
+  )
 })

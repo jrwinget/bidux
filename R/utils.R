@@ -89,7 +89,8 @@ standard_error_msg <- function(
     param_name = NULL,
     expected = NULL,
     actual = NULL) {
-  switch(type,
+  switch(
+    type,
     missing_param = paste0(
       "Required parameter",
       if (!is.null(param_name)) paste0(" '", param_name, "'"),
@@ -147,7 +148,11 @@ validate_required_params <- function(...) {
 #'
 #' @keywords internal
 #' @noRd
-validate_character_param <- function(value, param_name, min_length = 1, allow_null = FALSE) {
+validate_character_param <- function(
+    value,
+    param_name,
+    min_length = 1,
+    allow_null = FALSE) {
   if (is.null(value)) {
     if (allow_null) {
       return(invisible(NULL))
@@ -156,12 +161,18 @@ validate_character_param <- function(value, param_name, min_length = 1, allow_nu
   }
 
   if (!is.character(value) || length(value) != 1) {
-    stop(paste0("'", param_name, "' must be a single character string"), call. = FALSE)
+    stop(
+      paste0("'", param_name, "' must be a single character string"),
+      call. = FALSE
+    )
   }
 
   clean_value <- trimws(value)
   if (nchar(clean_value) < min_length) {
-    stop(paste0("'", param_name, "' cannot be empty or contain only whitespace"), call. = FALSE)
+    stop(
+      paste0("'", param_name, "' cannot be empty or contain only whitespace"),
+      call. = FALSE
+    )
   }
 
   invisible(NULL)
@@ -178,7 +189,11 @@ validate_character_param <- function(value, param_name, min_length = 1, allow_nu
 #'
 #' @keywords internal
 #' @noRd
-validate_list_param <- function(value, param_name, required_names = NULL, allow_null = TRUE) {
+validate_list_param <- function(
+    value,
+    param_name,
+    required_names = NULL,
+    allow_null = TRUE) {
   if (is.null(value)) {
     if (allow_null) {
       return(invisible(NULL))
@@ -193,10 +208,15 @@ validate_list_param <- function(value, param_name, required_names = NULL, allow_
   if (!is.null(required_names)) {
     missing_names <- setdiff(required_names, names(value))
     if (length(missing_names) > 0) {
-      stop(paste0(
-        "'", param_name, "' is missing required elements: ",
-        paste(missing_names, collapse = ", ")
-      ), call. = FALSE)
+      stop(
+        paste0(
+          "'",
+          param_name,
+          "' is missing required elements: ",
+          paste(missing_names, collapse = ", ")
+        ),
+        call. = FALSE
+      )
     }
   }
 
@@ -213,7 +233,10 @@ validate_list_param <- function(value, param_name, required_names = NULL, allow_
 #'
 #' @keywords internal
 #' @noRd
-validate_bid_stage_params <- function(previous_stage, current_stage, additional_params = list()) {
+validate_bid_stage_params <- function(
+    previous_stage,
+    current_stage,
+    additional_params = list()) {
   # validate previous stage
   validate_required_params(previous_stage = previous_stage)
   validate_previous_stage(previous_stage, current_stage)
@@ -444,7 +467,10 @@ safe_column_access <- function(df, column_name, default = NA) {
 #'
 #' @keywords internal
 #' @noRd
-extract_stage_data <- function(previous_stage, columns, default_values = list()) {
+extract_stage_data <- function(
+    previous_stage,
+    columns,
+    default_values = list()) {
   result <- list()
 
   for (col in columns) {
@@ -561,7 +587,10 @@ truncate_text <- function(text, max_length) {
 #'
 #' @keywords internal
 #' @noRd
-generate_stage_suggestions <- function(stage_name, context_data, suggestion_rules = NULL) {
+generate_stage_suggestions <- function(
+    stage_name,
+    context_data,
+    suggestion_rules = NULL) {
   suggestions <- character(0)
 
   # use custom rules if provided, otherwise use defaults
@@ -585,7 +614,9 @@ generate_stage_suggestions <- function(stage_name, context_data, suggestion_rule
   # process each rule
   for (rule in rule_list) {
     # ensure rule is properly structured
-    if (is.list(rule) && !is.null(rule$condition) && !is.null(rule$suggestion)) {
+    if (
+      is.list(rule) && !is.null(rule$condition) && !is.null(rule$suggestion)
+    ) {
       if (evaluate_suggestion_condition(rule$condition, context_data)) {
         suggestions <- c(suggestions, rule$suggestion)
       }
@@ -618,11 +649,15 @@ get_default_suggestion_rules <- function() {
         suggestion = "Consider adding quantitative metrics to strengthen evidence."
       ),
       list(
-        condition = function(ctx) is.null(ctx$target_audience) || is.na(ctx$target_audience),
+        condition = function(ctx) {
+          is.null(ctx$target_audience) || is.na(ctx$target_audience)
+        },
         suggestion = "Define specific target audience to better focus design solutions."
       ),
       list(
-        condition = function(ctx) grepl("too many|overwhelm|choice", tolower(ctx$problem %||% "")),
+        condition = function(ctx) {
+          grepl("too many|overwhelm|choice", tolower(ctx$problem %||% ""))
+        },
         suggestion = "Consider progressive disclosure or categorization to reduce choice complexity."
       ),
       default = "Problem clearly identified. Consider gathering additional quantitative evidence."
@@ -661,7 +696,10 @@ evaluate_suggestion_condition <- function(condition, context_data) {
   }
 
   if (!is.list(context_data) && !is.null(context_data)) {
-    warning("Context data is not a list or NULL, attempting to coerce", call. = FALSE)
+    warning(
+      "Context data is not a list or NULL, attempting to coerce",
+      call. = FALSE
+    )
     context_data <- list(context_data)
   }
 
@@ -669,13 +707,20 @@ evaluate_suggestion_condition <- function(condition, context_data) {
     {
       result <- condition(context_data)
       if (!is.logical(result) || length(result) != 1) {
-        warning("Condition function returned non-logical or multi-value result", call. = FALSE)
+        warning(
+          "Condition function returned non-logical or multi-value result",
+          call. = FALSE
+        )
         return(FALSE)
       }
       return(result)
     },
     error = function(e) {
-      warning("Error evaluating suggestion condition: ", e$message, call. = FALSE)
+      warning(
+        "Error evaluating suggestion condition: ",
+        e$message,
+        call. = FALSE
+      )
       FALSE
     }
   )
@@ -952,31 +997,158 @@ format_accessibility_for_storage <- function(accessibility) {
   }
 }
 
-# Generic helper to get audience from previous stage
+# normalize previous stage to use canonical field names
+normalize_previous_stage <- function(previous_stage) {
+  if (is.null(previous_stage)) {
+    return(NULL)
+  }
+
+  # convert to tibble if needed
+  if (inherits(previous_stage, "bid_stage")) {
+    stage_data <- as.data.frame(previous_stage)
+  } else if (is.data.frame(previous_stage)) {
+    stage_data <- previous_stage
+  } else {
+    return(previous_stage) # return as-is if not recognizable
+  }
+
+  # rename legacy field names to canonical ones
+  if ("previous_question" %in% names(stage_data)) {
+    stage_data$previous_central_question <- stage_data$previous_question
+    stage_data$previous_question <- NULL
+  }
+
+  if ("previous_story_hook" %in% names(stage_data)) {
+    stage_data$previous_hook <- stage_data$previous_story_hook
+    stage_data$previous_story_hook <- NULL
+  }
+
+  # coalesce audience fields if needed
+  if (
+    "audience" %in%
+      names(stage_data) &&
+      (is.na(stage_data$audience[1]) || is.null(stage_data$audience[1]))
+  ) {
+    if (
+      "previous_audience" %in%
+        names(stage_data) &&
+        !is.na(stage_data$previous_audience[1])
+    ) {
+      stage_data$audience[1] <- stage_data$previous_audience[1]
+    }
+  }
+
+  return(tibble::as_tibble(stage_data))
+}
+
+# generic helper to get audience from previous stage
 get_audience_from_previous <- function(previous_stage) {
+  # normalize first
+  normalized_stage <- normalize_previous_stage(previous_stage)
+
+  # defensive check - return early if normalization failed
+  if (is.null(normalized_stage)) {
+    return(NA_character_)
+  }
+
   audience_fields <- c("audience", "target_audience", "previous_audience")
   for (field in audience_fields) {
-    value <- safe_column_access(previous_stage, field)
-    if (!is.na(value) && nchar(trimws(value)) > 0) {
-      return(value)
+    # ensure field variable is properly defined before use
+    if (is.character(field) && nchar(field) > 0) {
+      value <- safe_column_access(normalized_stage, field)
+      if (
+        !is.null(value) &&
+          !is.na(value) &&
+          nchar(trimws(as.character(value))) > 0
+      ) {
+        return(as.character(value))
+      }
     }
   }
   return(NA_character_)
 }
 
-# Generic helper to get personas from previous stage
+# helper function to generate accessibility advice based on layout context
+get_accessibility_advice <- function(layout_context) {
+  if (is.na(layout_context) || is.null(layout_context)) {
+    layout_context <- "general"
+  }
+
+  switch(
+    layout_context,
+    "tabs" = "ensure keyboard navigation between tabs and screen reader announcements",
+    "grid" = "provide proper row/column headers and cell relationships for screen readers",
+    "card" = "ensure cards have descriptive labels and proper focus management",
+    "dual_process" = "maintain accessibility across both summary and detail views",
+    "breathable" = "use sufficient color contrast and focus indicators in spacious layouts",
+    "provide clear focus indicators, sufficient color contrast, and screen reader support"
+  )
+}
+
+# generic helper to get personas from previous stage
 get_personas_from_previous <- function(previous_stage) {
-  persona_fields <- c("user_personas", "previous_personas")
+  # normalize first
+  normalized_stage <- normalize_previous_stage(previous_stage)
+
+  # defensive check - return early if normalization failed
+  if (is.null(normalized_stage)) {
+    return(NA_character_)
+  }
+
+  persona_fields <- c("user_personas", "previous_personas", "personas")
   for (field in persona_fields) {
-    value <- safe_column_access(previous_stage, field)
-    if (!is.na(value) && nchar(trimws(value)) > 0) {
-      return(value)
+    # ensure field variable is properly defined before use
+    if (is.character(field) && nchar(field) > 0) {
+      value <- safe_column_access(normalized_stage, field)
+      if (
+        !is.null(value) &&
+          !is.na(value) &&
+          nchar(trimws(as.character(value))) > 0
+      ) {
+        return(as.character(value))
+      }
     }
   }
   return(NA_character_)
 }
 
-# Generic next steps formatting
+# validate logical parameter value
+#'
+#' @param value Parameter value to validate
+#' @param param_name Name of the parameter for error messages
+#' @param allow_null Whether to allow NULL values
+#'
+#' @keywords internal
+#' @noRd
+validate_logical_param <- function(value, param_name, allow_null = FALSE) {
+  if (is.null(value)) {
+    if (allow_null) {
+      return(invisible(NULL))
+    } else {
+      stop(paste0("Parameter '", param_name, "' cannot be NULL"), call. = FALSE)
+    }
+  }
+
+  if (!is.logical(value) || length(value) != 1) {
+    stop(
+      paste0(
+        "Parameter '",
+        param_name,
+        "' must be a single logical value (TRUE/FALSE)"
+      ),
+      call. = FALSE
+    )
+  }
+
+  invisible(NULL)
+}
+
+# time wrapper for test stubbing
+.now <- function() {
+  Sys.time()
+}
+
+# generic next steps formatting
 format_next_steps <- function(next_steps) {
   if (is.null(next_steps)) {
     return(NA_character_)

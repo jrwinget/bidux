@@ -21,7 +21,7 @@
 #'   \item{stage}{"Structure"}
 #'   \item{layout}{Auto-selected layout type}
 #'   \item{suggestions}{List of concept groups with ranked suggestions}
-#'   \item{concepts_detected}{Vector of all concepts used}
+#'   \item{concepts}{Comma-separated string of all concepts used}
 #'
 #' @details
 #' **Layout Auto-Selection**: Uses deterministic heuristics to analyze content
@@ -71,39 +71,45 @@ bid_structure <- function(
       "i" = "Remove the `layout` argument to use automatic selection."
     ))
   }
-  
-  # Validate required parameters
+
   validate_required_params(previous_stage = previous_stage)
   validate_previous_stage(previous_stage, "Structure")
-  
-  # Auto-select layout using heuristics
+
   chosen_layout <- suggest_layout_from_previous(previous_stage)
-  
-  # Provide transparent feedback about layout choice
+
   cli::cli_alert_info("Auto-selected layout: {chosen_layout}")
   cli::cli_alert_info(layout_rationale(previous_stage, chosen_layout))
 
-  # Generate ranked, concept-grouped suggestions
-  suggestion_groups <- structure_suggestions(previous_stage, chosen_layout, concepts)
-  
-  # Extract all detected concepts
+  # generate ranked, concept-grouped suggestions
+  suggestion_groups <- structure_suggestions(
+    previous_stage,
+    chosen_layout,
+    concepts
+  )
+
   concepts_detected <- sapply(suggestion_groups, function(g) g$concept)
   if (length(concepts_detected) == 0) {
     concepts_detected <- character(0)
   }
 
-  # Prepare result data
+  normalized_previous <- normalize_previous_stage(previous_stage)
+
+  # prepare result data
   result_data <- tibble::tibble(
     stage = "Structure",
     layout = chosen_layout,
     concepts = paste(concepts_detected, collapse = ", "),
-    previous_question = safe_column_access(previous_stage, "central_question"),
-    previous_story_hook = safe_column_access(previous_stage, "hook"),
-    previous_audience = get_audience_from_previous(previous_stage),
-    previous_personas = get_personas_from_previous(previous_stage),
+    previous_central_question = safe_column_access(
+      normalized_previous,
+      "central_question"
+    ),
+    previous_hook = safe_column_access(normalized_previous, "hook"),
+    previous_problem = safe_column_access(normalized_previous, "problem"),
+    previous_theory = safe_column_access(normalized_previous, "theory"),
+    previous_audience = get_audience_from_previous(normalized_previous),
+    previous_personas = get_personas_from_previous(normalized_previous),
     suggestions = suggestion_groups,
-    concepts_detected = concepts_detected,
-    timestamp = Sys.time()
+    timestamp = .now()
   )
 
   metadata <- list(
@@ -112,8 +118,7 @@ bid_structure <- function(
     concepts_count = length(concepts_detected),
     suggestion_groups_count = length(suggestion_groups),
     stage_number = 3,
-    total_stages = 5,
-    concepts_detected = concepts_detected
+    total_stages = 5
   )
 
   result <- bid_stage("Structure", result_data, metadata)
@@ -127,4 +132,3 @@ bid_structure <- function(
 
   return(result)
 }
-

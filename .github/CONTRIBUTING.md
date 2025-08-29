@@ -110,7 +110,7 @@ We follow the tidyverse style conventions:
 
 When contributing features or examples, keep the following in mind:
 
-* **Psychological Accuracy**: Represent concepts and theories correctly.
+* **Scientific Accuracy**: Represent concepts and theories correctly.
 * **Accessibility**: Ensure components and outputs meet WCAG standards.
 * **User Experience**: Strive for clear, intuitive interfaces.
 * **Evidence-Based**: Cite reputable sources when introducing new theories.

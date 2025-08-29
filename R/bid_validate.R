@@ -12,6 +12,12 @@
 #'        collaboration and sharing.
 #' @param next_steps A character vector or string describing recommended next
 #'        steps for implementation and iteration.
+#' @param include_exp_design Logical indicating whether to include experiment
+#'        design suggestions. Default is TRUE.
+#' @param include_telemetry Logical indicating whether to include telemetry
+#'        tracking and monitoring suggestions. Default is TRUE.
+#' @param include_empower_tools Logical indicating whether to include
+#'        context-aware empowerment tool suggestions. Default is TRUE.
 #'
 #' @return A tibble containing the documented information for the "Validate"
 #'         stage.
@@ -60,9 +66,17 @@ bid_validate <- function(
     previous_stage,
     summary_panel = NULL,
     collaboration = NULL,
-    next_steps = NULL) {
+    next_steps = NULL,
+    include_exp_design = TRUE,
+    include_telemetry = TRUE,
+    include_empower_tools = TRUE) {
   validate_required_params(previous_stage = previous_stage)
   validate_previous_stage(previous_stage, "Validate")
+
+  # validate boolean parameters
+  validate_logical_param(include_exp_design, "include_exp_design")
+  validate_logical_param(include_telemetry, "include_telemetry")
+  validate_logical_param(include_empower_tools, "include_empower_tools")
 
   if (is.null(summary_panel)) {
     summary_panel <- generate_summary_panel_suggestion(previous_stage)
@@ -70,7 +84,10 @@ bid_validate <- function(
   }
 
   if (is.null(collaboration)) {
-    collaboration <- generate_collaboration_suggestion(previous_stage)
+    collaboration <- generate_collaboration_suggestion(
+      previous_stage,
+      include_empower_tools
+    )
     cli::cli_alert_info(paste0(
       "Suggested collaboration features: ",
       collaboration
@@ -78,7 +95,11 @@ bid_validate <- function(
   }
 
   if (is.null(next_steps)) {
-    next_steps <- generate_next_steps_suggestion(previous_stage)
+    next_steps <- generate_next_steps_suggestion(
+      previous_stage,
+      include_exp_design,
+      include_telemetry
+    )
     cli::cli_alert_info("Suggested next steps:")
     for (step in next_steps) {
       cli::cli_li(step)
@@ -91,10 +112,15 @@ bid_validate <- function(
     summary_panel,
     collaboration,
     next_steps,
-    previous_stage
+    previous_stage,
+    include_exp_design,
+    include_telemetry,
+    include_empower_tools
   )
 
-  previous_info <- extract_previous_stage_info(previous_stage)
+  # normalize previous stage to ensure field name consistency
+  normalized_previous <- normalize_previous_stage(previous_stage)
+  previous_info <- extract_previous_stage_info(normalized_previous)
 
   result <- tibble::tibble(
     stage = "Validate",
@@ -102,16 +128,18 @@ bid_validate <- function(
     collaboration = collaboration %||% NA_character_,
     next_steps = next_steps_formatted,
     previous_bias = previous_info$bias %||% NA_character_,
-    previous_interaction = previous_info$interaction %||% NA_character_,
+    previous_accessibility = previous_info$accessibility %||% NA_character_,
     previous_layout = previous_info$layout %||% NA_character_,
     previous_concepts = previous_info$concepts %||% NA_character_,
-    previous_accessibility = previous_info$accessibility %||% NA_character_,
     previous_central_question = previous_info$central_question %||%
       NA_character_,
+    previous_hook = previous_info$hook %||% NA_character_,
     previous_problem = previous_info$problem %||% NA_character_,
     previous_theory = previous_info$theory %||% NA_character_,
+    previous_audience = previous_info$audience %||% NA_character_,
+    previous_personas = previous_info$personas %||% NA_character_,
     suggestions = suggestions,
-    timestamp = Sys.time()
+    timestamp = .now()
   )
 
   bid_message(
@@ -181,39 +209,52 @@ generate_summary_panel_suggestion <- function(previous_stage) {
   return(base_suggestion)
 }
 
-generate_collaboration_suggestion <- function(previous_stage) {
-  audience_fields <- c("audience", "target_audience", "previous_audience")
-  audience <- ""
-
-  for (field in audience_fields) {
-    audience_value <- safe_column_access(previous_stage, field, "")
-    if (audience_value != "" && !is.na(audience_value)) {
-      audience <- audience_value
-      break
-    }
-  }
+generate_collaboration_suggestion <- function(
+  previous_stage,
+  include_empower_tools = TRUE
+) {
+  # use the standardized helper function for consistency
+  audience <- get_audience_from_previous(previous_stage)
 
   base_suggestion <- "Enable team sharing and collaborative decision-making features"
 
-  if (audience != "" && !is.na(audience)) {
+  if (!is.na(audience) && nchar(trimws(audience)) > 0) {
     audience_lower <- tolower(audience)
 
+    empowerment_suffix <- if (include_empower_tools) {
+      if (grepl("executive|leadership|manager", audience_lower)) {
+        " with executive empowerment tools like annotated insights and decision history"
+      } else if (grepl("analyst|technical|data", audience_lower)) {
+        " with analyst empowerment features like exploratory chat and methodology explanations"
+      } else if (grepl("team|group|multiple", audience_lower)) {
+        " with team empowerment via shared workspaces and collaborative insights"
+      } else {
+        " with user empowerment through guided explanations and contextual help"
+      }
+    } else {
+      ""
+    }
+
     if (grepl("executive|leadership|manager", audience_lower)) {
-      return(
-        "Executive-focused collaboration with summary sharing and decision tracking"
-      )
+      return(paste0(
+        "Executive-focused collaboration with summary sharing and decision tracking",
+        empowerment_suffix
+      ))
     } else if (grepl("analyst|technical|data", audience_lower)) {
-      return(
-        "Advanced collaboration tools including data export, annotation, and methodology sharing"
-      )
+      return(paste0(
+        "Advanced collaboration tools including data export, annotation, and methodology sharing",
+        empowerment_suffix
+      ))
     } else if (grepl("team|group|multiple", audience_lower)) {
-      return(
-        "Multi-user collaboration with role-based permissions and shared annotations"
-      )
+      return(paste0(
+        "Multi-user collaboration with role-based permissions and shared annotations",
+        empowerment_suffix
+      ))
     } else if (grepl("client|customer|external", audience_lower)) {
-      return(
-        "Client-friendly sharing options with controlled access and presentation modes"
-      )
+      return(paste0(
+        "Client-friendly sharing options with controlled access and presentation modes",
+        empowerment_suffix
+      ))
     }
   }
 
@@ -227,7 +268,11 @@ generate_collaboration_suggestion <- function(previous_stage) {
   return(base_suggestion)
 }
 
-generate_next_steps_suggestion <- function(previous_stage) {
+generate_next_steps_suggestion <- function(
+  previous_stage,
+  include_exp_design = TRUE,
+  include_telemetry = TRUE
+) {
   stage_name <- previous_stage$stage[1]
   next_steps <- character(0)
 
@@ -286,6 +331,26 @@ generate_next_steps_suggestion <- function(previous_stage) {
     )
   }
 
+  # add experiment design recommendations if requested
+  if (include_exp_design) {
+    next_steps <- c(
+      next_steps,
+      "Design A/B tests to validate key design decisions and user pathways",
+      "Conduct usability testing sessions with representative users",
+      "Plan controlled experiments to measure impact of bias mitigations"
+    )
+  }
+
+  # add telemetry and monitoring recommendations if requested
+  if (include_telemetry) {
+    next_steps <- c(
+      next_steps,
+      "Implement telemetry tracking for user interactions and pain points",
+      "Set up monitoring dashboards to track key performance indicators",
+      "Plan post-launch telemetry analysis to validate design improvements"
+    )
+  }
+
   next_steps <- c(
     next_steps,
     "Document successful patterns and lessons learned for future projects",
@@ -300,7 +365,10 @@ generate_validation_suggestions <- function(
     summary_panel,
     collaboration,
     next_steps,
-    previous_stage) {
+    previous_stage,
+    include_exp_design = TRUE,
+    include_telemetry = TRUE,
+    include_empower_tools = TRUE) {
   suggestions <- character(0)
 
   if (!is.null(summary_panel) && nchar(summary_panel) > 0) {
@@ -364,6 +432,36 @@ generate_validation_suggestions <- function(
         "Ensure bias mitigation strategies from Anticipate stage are documented"
       )
     }
+  }
+
+  # add suggestions based on flags
+  if (
+    include_exp_design && !any(grepl("test|experiment", tolower(steps_list)))
+  ) {
+    suggestions <- c(
+      suggestions,
+      "Consider adding experimental design and A/B testing to your validation plan"
+    )
+  }
+
+  if (
+    include_telemetry &&
+      !any(grepl("telemetry|monitor|track", tolower(steps_list)))
+  ) {
+    suggestions <- c(
+      suggestions,
+      "Include telemetry and monitoring in your post-launch validation"
+    )
+  }
+
+  if (
+    include_empower_tools &&
+      !grepl("empower|explain|help", tolower(collaboration %||% ""))
+  ) {
+    suggestions <- c(
+      suggestions,
+      "Consider adding user empowerment tools to enhance collaboration"
+    )
   }
 
   if (length(suggestions) == 0) {
@@ -443,6 +541,11 @@ extract_previous_stage_info <- function(previous_stage) {
       "previous_central_question",
       NA_character_
     )
+    info$hook <- safe_column_access(
+      previous_stage,
+      "previous_hook",
+      NA_character_
+    )
     info$problem <- safe_column_access(
       previous_stage,
       "previous_problem",
@@ -453,10 +556,35 @@ extract_previous_stage_info <- function(previous_stage) {
       "previous_theory",
       NA_character_
     )
+    info$audience <- safe_column_access(
+      previous_stage,
+      "previous_audience",
+      NA_character_
+    )
+    info$personas <- safe_column_access(
+      previous_stage,
+      "previous_personas",
+      NA_character_
+    )
   } else if (stage_name == "Interpret") {
     info$central_question <- safe_column_access(
       previous_stage,
       "central_question",
+      NA_character_
+    )
+    info$hook <- safe_column_access(
+      previous_stage,
+      "hook",
+      NA_character_
+    )
+    info$audience <- safe_column_access(
+      previous_stage,
+      "audience",
+      NA_character_
+    )
+    info$personas <- safe_column_access(
+      previous_stage,
+      "personas",
       NA_character_
     )
 
@@ -469,6 +597,17 @@ extract_previous_stage_info <- function(previous_stage) {
     info$theory <- safe_column_access(
       previous_stage,
       "previous_theory",
+      NA_character_
+    )
+  } else if (stage_name == "Notice") {
+    info$problem <- safe_column_access(
+      previous_stage,
+      "problem",
+      NA_character_
+    )
+    info$theory <- safe_column_access(
+      previous_stage,
+      "theory",
       NA_character_
     )
   }
