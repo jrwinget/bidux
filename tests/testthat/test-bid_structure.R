@@ -175,7 +175,7 @@ test_that("bid_structure returns correct structure with all required fields", {
   expect_equal(result$stage[1], "Structure")
   expect_true("layout" %in% names(result))
   expect_true("suggestions" %in% names(result))
-  expect_true("concepts_detected" %in% names(result))
+  expect_true("concepts" %in% names(result))
   
   # Check layout is valid
   valid_layouts <- c("dual_process", "grid", "card", "tabs", "breathable")
@@ -205,9 +205,9 @@ test_that("bid_structure returns correct structure with all required fields", {
     }
   }
   
-  # Check concepts_detected
-  expect_true(is.character(result$concepts_detected))
-  expect_true(length(result$concepts_detected) > 0)
+  # Check concepts
+  expect_true(is.character(result$concepts))
+  expect_true(nchar(result$concepts[1]) > 0)
 })
 
 # T10: CLI messages - expect messages for auto-selection + hint
@@ -311,7 +311,7 @@ test_that("bid_structure handles edge cases gracefully", {
   )
   
   expect_s3_class(result_custom, "bid_stage")
-  expect_true("Visual Hierarchy" %in% result_custom$concepts_detected)
+  expect_true(grepl("Visual Hierarchy", result_custom$concepts[1]))
 })
 
 test_that("layout heuristics work correctly with different field combinations", {
@@ -346,7 +346,7 @@ test_that("layout heuristics work correctly with different field combinations", 
     result <- bid_structure(nested_stage)
   )
   expect_equal(result$layout[1], "breathable")
-  expect_true("User Onboarding" %in% result$concepts_detected)
+  expect_true(grepl("User Onboarding", result$concepts[1]))
 })
 
 # Test telemetry integration

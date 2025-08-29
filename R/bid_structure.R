@@ -21,7 +21,7 @@
 #'   \item{stage}{"Structure"}
 #'   \item{layout}{Auto-selected layout type}
 #'   \item{suggestions}{List of concept groups with ranked suggestions}
-#'   \item{concepts_detected}{Vector of all concepts used}
+#'   \item{concepts}{Comma-separated string of all concepts used}
 #'
 #' @details
 #' **Layout Auto-Selection**: Uses deterministic heuristics to analyze content
@@ -107,7 +107,6 @@ bid_structure <- function(
     previous_audience = get_audience_from_previous(normalized_previous),
     previous_personas = get_personas_from_previous(normalized_previous),
     suggestions = suggestion_groups,
-    concepts_detected = concepts_detected,
     timestamp = .now()
   )
 
@@ -117,8 +116,7 @@ bid_structure <- function(
     concepts_count = length(concepts_detected),
     suggestion_groups_count = length(suggestion_groups),
     stage_number = 3,
-    total_stages = 5,
-    concepts_detected = concepts_detected
+    total_stages = 5
   )
 
   result <- bid_stage("Structure", result_data, metadata)

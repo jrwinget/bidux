@@ -24,7 +24,7 @@ A bid_stage object containing:
 \item{stage}{"Structure"}
 \item{layout}{Auto-selected layout type}
 \item{suggestions}{List of concept groups with ranked suggestions}
-\item{concepts_detected}{Vector of all concepts used}
+\item{concepts}{Comma-separated string of all concepts used}
 }
 \description{
 This function documents the structure of the dashboard with automatic layout

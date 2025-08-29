@@ -171,7 +171,7 @@ structure_result <- bid_structure(
 )
 
 structure_result |>
-  dplyr::select(layout, concepts_detected, suggestions)
+  dplyr::select(layout, concepts, suggestions)
 ```
 
 The function automatically selects an appropriate layout based on the content from previous stages and provides ranked, actionable suggestions organized by UX concepts. The layout selection is transparent with clear rationale for why a particular layout was chosen.
