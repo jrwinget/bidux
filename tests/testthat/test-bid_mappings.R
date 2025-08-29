@@ -296,7 +296,7 @@ test_that("mapping functions validate input properly", {
 
   # Test layout mappings validation
   expect_error(
-    load_layout_mappings(data.frame(layout = "test")), # missing required columns
+    load_layout_mappings(data.frame()), # missing required columns
     "Custom data must contain columns"
   )
 })

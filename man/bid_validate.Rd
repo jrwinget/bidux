@@ -49,7 +49,6 @@ structure_input <- bid_notice(
 
 structure_result <- bid_structure(
   previous_stage = structure_input,
-  layout         = "dual_process",
   concepts       = c("Principle of Proximity", "Default Effect")
 )
 

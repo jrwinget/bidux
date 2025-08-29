@@ -1,368 +1,377 @@
-test_that("bid_structure returns a bid_stage object with stage 'Structure'", {
-  local_mocked_bindings(
-    bid_concepts = function(search = NULL) {
-      tibble(
-        concept = c("Test Concept", "Visual Hierarchy", "Cognitive Load Theory"),
-        description = c("Test description", "Visual description", "Cognitive description"),
-        category = c("Stage 1", "Stage 2", "Stage 3"),
-        reference = rep(NA_character_, 3),
-        example = rep(NA_character_, 3),
-        implementation_tips = c("Test tip", "Visual tip", "Cognitive tip")
-      )
-    },
-    bid_concept = function(concept_name) {
-      tibble(
-        concept = concept_name,
-        description = "Mocked description",
-        category = "Stage 1",
-        reference = NA_character_,
-        example = NA_character_,
-        implementation_tips = paste("Implementation tip for", concept_name)
-      )
-    }
-  )
+# Test bid_structure refactor - comprehensive test coverage
+# These tests cover all requirements from claude.md including:
+# - Layout heuristics (T1-T7)
+# - Error handling for legacy layout parameter (T8)
+# - Return structure validation (T9)
+# - CLI messages (T10)
+# - Suggestions quality (T11)
 
-  previous_stage <- tibble(
+# T1: Overload → breathable
+test_that("bid_structure selects breathable layout for overload patterns", {
+  previous_stage <- tibble::tibble(
     stage = "Interpret",
-    problem = "The dashboard layout is cluttered.",
-    theory = "Visual Hierarchies",
-    evidence = "User feedback indicates confusion."
+    problem = "Users are overwhelmed by too many options in the interface",
+    evidence = "Cognitive load is causing confusion and errors",
+    central_question = "How to reduce information overload?",
+    timestamp = Sys.time()
   )
-
-  result <- bid_structure(
-    previous_stage,
-    layout = "dual_process",
-    concepts = c("Test Concept")
+  
+  suppressMessages(
+    result <- bid_structure(previous_stage)
   )
-
+  
   expect_s3_class(result, "bid_stage")
   expect_equal(result$stage[1], "Structure")
-  expect_equal(result$layout[1], "dual_process")
-  expect_true("concepts" %in% names(result))
+  expect_equal(result$layout[1], "breathable")
+  expect_true("suggestions" %in% names(result))
+  expect_true(length(result$suggestions) > 0)
 })
 
-test_that("bid_structure warns on invalid layout", {
-  local_mocked_bindings(
-    bid_concepts = function(search = NULL) {
-      tibble(
-        concept = "Test Concept",
-        description = "Dummy description",
-        category = "Stage 1",
-        reference = NA_character_,
-        example = NA_character_
-      )
-    }
-  )
-
-  previous_stage <- tibble(
-    stage = "Notice",
-    problem = "Dashboard elements are not arranged clearly.",
-    theory = "Cognitive Load Theory",
-    evidence = "Mixed user feedback."
-  )
-
-  expect_warning(
-    bid_structure(
-      previous_stage,
-      layout = "invalid_layout",
-      concepts = c("Test Concept")
-    ),
-    regexp = "not recognized as a standard layout type"
-  )
-})
-
-test_that("bid_structure errors when accessibility parameter is not a list", {
-  previous_stage <- tibble(
+# T2: Overview vs detail → dual_process
+test_that("bid_structure selects dual_process layout for overview vs detail patterns", {
+  previous_stage <- tibble::tibble(
     stage = "Interpret",
-    problem = "Layout organization is suboptimal.",
-    theory = "Dual-Processing Theory",
-    evidence = "Users are confused by spacing."
+    problem = "Users need both summary overview and detailed analysis",
+    central_question = "How to provide quick vs thorough access?",
+    hook = "Two modes of interaction needed",
+    context = "Users want to see at a glance but also dig deeper",
+    timestamp = Sys.time()
   )
+  
+  suppressMessages(
+    result <- bid_structure(previous_stage)
+  )
+  
+  expect_s3_class(result, "bid_stage")
+  expect_equal(result$layout[1], "dual_process")
+  expect_true(length(result$suggestions) > 0)
+})
 
+# T3: Grouping → grid
+test_that("bid_structure selects grid layout for grouping patterns", {
+  previous_stage <- tibble::tibble(
+    stage = "Interpret", 
+    problem = "Related metrics need better visual hierarchy",
+    evidence = "Users want to group and compare panels",
+    resolution = "Use proximity to show relationships",
+    timestamp = Sys.time()
+  )
+  
+  suppressMessages(
+    result <- bid_structure(previous_stage)
+  )
+  
+  expect_s3_class(result, "bid_stage")
+  expect_equal(result$layout[1], "grid")
+})
+
+# T4: Chunked items → card
+test_that("bid_structure selects card layout for modular content patterns", {
+  previous_stage <- tibble::tibble(
+    stage = "Interpret",
+    problem = "Dashboard needs modular blocks for different data types",
+    central_question = "How to organize content in chunks?",
+    resolution = "Use cards and tiles for per-item summary",
+    timestamp = Sys.time()
+  )
+  
+  suppressMessages(
+    result <- bid_structure(previous_stage)
+  )
+  
+  expect_s3_class(result, "bid_stage")
+  expect_equal(result$layout[1], "card")
+})
+
+# T5: Sections/categories → tabs
+test_that("bid_structure selects tabs layout for categorical patterns", {
+  previous_stage <- tibble::tibble(
+    stage = "Interpret",
+    problem = "Dashboard needs progressive disclosure across sections",
+    evidence = "Different categories require module separation",
+    context = "Stepwise navigation through different areas",
+    timestamp = Sys.time()
+  )
+  
+  suppressMessages(
+    result <- bid_structure(previous_stage)
+  )
+  
+  expect_s3_class(result, "bid_stage")
+  expect_equal(result$layout[1], "tabs")
+})
+
+# T6: Tabs suppressed by telemetry → pick non-tabs
+test_that("bid_structure avoids tabs when telemetry shows navigation issues", {
+  previous_stage <- tibble::tibble(
+    stage = "Interpret",
+    problem = "Users need progressive disclosure across sections",
+    evidence = "Categories require module separation", 
+    telemetry = list(nav_dropoff_tabs = TRUE),
+    timestamp = Sys.time()
+  )
+  
+  suppressMessages(
+    result <- bid_structure(previous_stage)
+  )
+  
+  expect_s3_class(result, "bid_stage")
+  expect_false(result$layout[1] == "tabs")
+  expect_equal(result$layout[1], "grid")  # Should fallback to grid
+})
+
+# T7: Fallback → breathable
+test_that("bid_structure falls back to breathable for unmatched patterns", {
+  previous_stage <- tibble::tibble(
+    stage = "Interpret",
+    problem = "Generic usability issue",
+    evidence = "Some minor interface problems",
+    central_question = "How to improve the interface?",
+    timestamp = Sys.time()
+  )
+  
+  suppressMessages(
+    result <- bid_structure(previous_stage)
+  )
+  
+  expect_s3_class(result, "bid_stage")
+  expect_equal(result$layout[1], "breathable")
+})
+
+# T8: Helpful error on legacy layout= via ...
+test_that("bid_structure provides helpful error when layout parameter is used", {
+  previous_stage <- tibble::tibble(
+    stage = "Interpret",
+    problem = "Test problem",
+    timestamp = Sys.time()
+  )
+  
   expect_error(
-    bid_structure(
-      previous_stage,
-      layout = "dual_process",
-      accessibility = "not a list"
-    ),
-    regexp = "The accessibility parameter must be a list"
+    bid_structure(previous_stage, layout = "dual_process"),
+    regexp = "layout.*parameter.*was removed.*0\\.2\\.0"
+  )
+  
+  expect_error(
+    bid_structure(previous_stage, concepts = NULL, layout = "grid"),
+    regexp = "Layout is now auto-selected"
   )
 })
 
-test_that("bid_structure auto-detects concepts when not provided", {
-  local_mocked_bindings(
-    bid_concepts = function(search = NULL) {
-      tibble(
-        concept = "Auto Detected Concept",
-        description = "Automatically detected based on problem statement.",
-        category = "Stage 1",
-        reference = NA_character_,
-        example = NA_character_
-      )
-    }
+# T9: Return shape - stage, layout, suggestions structure
+test_that("bid_structure returns correct structure with all required fields", {
+  previous_stage <- tibble::tibble(
+    stage = "Interpret",
+    problem = "Users are overwhelmed by interface complexity",
+    central_question = "How to simplify?",
+    timestamp = Sys.time()
   )
-
-  previous_stage <- tibble(
-    stage = "Notice",
-    problem = "Dashboard elements are scattered across the screen.",
-    theory = "Principle of Proximity",
-    evidence = "User tests show poor grouping."
+  
+  suppressMessages(
+    result <- bid_structure(previous_stage)
   )
-
-  result <- bid_structure(previous_stage, layout = "dual_process")
-
-  expect_s3_class(result, "tbl_df")
+  
+  # Check basic structure
+  expect_s3_class(result, "bid_stage")
   expect_equal(result$stage[1], "Structure")
-  expect_true(length(result$concepts[1]) > 0)
-})
-
-test_that("bid_structure fuzzy matches concept names", {
-  previous_stage <- tibble(
-    stage = "Interpret",
-    central_question = "How can we improve dashboard usability?",
-    hook = "Users struggle with navigation",
-    context = "Dashboard has evolved over time",
-    tension = "Complex structure confuses users",
-    resolution = "Simplify and reorganize",
-    timestamp = Sys.time()
-  )
-
-  suppressMessages(
-    result <- bid_structure(
-      previous_stage,
-      layout = "dual_process",
-      concepts = c(
-        "principal of proximity",
-        "vizual hierarchy" # misspelling
-      )
-    )
-  )
-
-  expect_s3_class(result, "tbl_df")
-  expect_match(result$concepts, "Principle of Proximity", fixed = TRUE)
-  expect_match(result$concepts, "Visual Hierarchy", fixed = TRUE)
-
-  suppressMessages(
-    result <- bid_structure(
-      previous_stage,
-      layout = "dual_process",
-      concepts = c("proximity", "hierarchy", "load") # abbreviated
-    )
-  )
-
-  expect_s3_class(result, "tbl_df")
-  expect_match(result$concepts, "Proximity", fixed = TRUE)
-  expect_match(result$concepts, "Hierarchy", fixed = TRUE)
-  expect_match(result$concepts, "Load", fixed = TRUE)
-
-  suppressMessages(
-    result <- bid_structure(
-      previous_stage,
-      layout = "dual_process",
-      concepts = c(
-        "principle_of_proximity",
-        "visual-hierarchy",
-        "COGNITIVE_LOAD"
-      )
-    )
-  )
-
-  expect_s3_class(result, "tbl_df")
-  expect_match(result$concepts, "Principle of Proximity", fixed = TRUE)
-  expect_match(result$concepts, "Visual Hierarchy", fixed = TRUE)
-  expect_match(result$concepts, "Cognitive Load", fixed = TRUE)
-})
-
-test_that("bid_structure handles NULL concepts with automatic detection", {
-  previous_stage <- tibble(
-    stage = "Interpret",
-    central_question = "How can we make data easier to find?",
-    hook = "Users struggle with information overload",
-    context = "Dashboard has too many charts and options",
-    tension = "Critical metrics are hard to locate",
-    resolution = "Establish clear visual hierarchy",
-    timestamp = Sys.time()
-  )
-
-  suppressMessages(
-    result <- bid_structure(
-      previous_stage,
-      layout = "dual_process",
-      concepts = NULL
-    )
-  )
-
-  expect_s3_class(result, "tbl_df")
-  expect_false(is.na(result$concepts[1]))
-  expect_true(nchar(result$concepts[1]) > 0)
-  expect_match(result$concepts, "Visual|Hierarchy|Cognitive|Load", perl = TRUE)
-
-  minimal_previous_stage <- tibble(
-    stage = "Interpret",
-    central_question = "How to improve?",
-    hook = "Issue found",
-    context = "Basic context",
-    tension = "Problem exists",
-    resolution = "Fix it",
-    timestamp = Sys.time()
-  )
-
-  suppressMessages(
-    result <- bid_structure(
-      minimal_previous_stage,
-      layout = "dual_process",
-      concepts = NULL
-    )
-  )
-
-  expect_s3_class(result, "tbl_df")
-  expect_false(is.na(result$concepts[1]))
-  expect_true(nchar(result$concepts[1]) > 0)
-})
-
-test_that("bid_structure handles NA values in previous_stage", {
-  previous_stage <- tibble(
-    stage = "Interpret",
-    central_question = NA_character_,
-    hook = "Users struggle with navigation", # This has a value
-    context = NA_character_,
-    tension = "Complex structure confuses users",
-    resolution = NA_character_,
-    timestamp = Sys.time()
-  )
-
-  suppressMessages(
-    result <- bid_structure(
-      previous_stage,
-      layout = "dual_process",
-      concepts = c("Visual Hierarchy", "Cognitive Load Theory")
-    )
-  )
-
-  expect_s3_class(result, "tbl_df")
-  expect_true(is.na(result$previous_question[1])) # central_question is NA
-  expect_false(is.na(result$previous_story_hook[1])) # hook has a value, so should NOT be NA
-})
-
-test_that("bid_structure handles edge cases in accessibility parameter", {
-  previous_stage <- tibble(
-    stage = "Interpret",
-    central_question = "Test question",
-    hook = "Test hook",
-    timestamp = Sys.time()
-  )
-
-  suppressMessages(
-    result <- bid_structure(
-      previous_stage,
-      layout = "dual_process",
-      concepts = c("Visual Hierarchy"),
-      accessibility = list() # Empty list should still be stored as JSON
-    )
-  )
-
-  expect_s3_class(result, "tbl_df")
-  # Empty list should be stored as JSON, not NA
-  expect_false(is.na(result$accessibility[1]))
-
-  suppressMessages(
-    result <- bid_structure(
-      previous_stage,
-      layout = "dual_process",
-      concepts = c("Visual Hierarchy"),
-      accessibility = list(
-        color_contrast = "WCAG AA compliant",
-        keyboard_navigation = NA,
-        screen_reader = NA_character_
-      )
-    )
-  )
-
-  expect_s3_class(result, "tbl_df")
-  expect_false(is.na(result$accessibility[1]))
-  expect_match(result$accessibility, "color_contrast", fixed = TRUE)
-
-  expect_warning(
-    result <- bid_structure(
-      previous_stage,
-      layout = "dual_process",
-      concepts = c("Visual Hierarchy"),
-      accessibility = list(
-        color_contrast = "Yes", # too short
-        keyboard_navigation = "No" # too short
-      )
-    ),
-    "invalid or too brief value"
-  )
-
-  expect_s3_class(result, "tbl_df")
-  expect_false(is.na(result$accessibility[1]))
-})
-
-test_that("bid_structure handles various layout values", {
-  previous_stage <- tibble(
-    stage = "Interpret",
-    central_question = "Test question",
-    hook = "Test hook",
-    timestamp = Sys.time()
-  )
-
+  expect_true("layout" %in% names(result))
+  expect_true("suggestions" %in% names(result))
+  expect_true("concepts_detected" %in% names(result))
+  
+  # Check layout is valid
   valid_layouts <- c("dual_process", "grid", "card", "tabs", "breathable")
-
-  for (layout in valid_layouts) {
-    suppressMessages(
-      result <- bid_structure(
-        previous_stage,
-        layout = layout,
-        concepts = c("Visual Hierarchy")
-      )
-    )
-
-    expect_s3_class(result, "tbl_df")
-    expect_equal(result$layout[1], layout)
-    expect_match(result$suggestions, layout, ignore.case = TRUE)
+  expect_true(result$layout[1] %in% valid_layouts)
+  
+  # Check suggestions structure
+  suggestions <- result$suggestions
+  expect_true(is.list(suggestions))
+  expect_true(length(suggestions) > 0)
+  
+  # Each suggestion group should have concept and suggestions
+  for (group in suggestions) {
+    expect_true("concept" %in% names(group))
+    expect_true("suggestions" %in% names(group))
+    expect_true(is.character(group$concept))
+    expect_true(is.list(group$suggestions))
+    
+    # Each individual suggestion should have required fields
+    for (suggestion in group$suggestions) {
+      expect_true("title" %in% names(suggestion))
+      expect_true("details" %in% names(suggestion))
+      expect_true("components" %in% names(suggestion))
+      expect_true("rationale" %in% names(suggestion))
+      expect_true("score" %in% names(suggestion))
+      expect_true(is.numeric(suggestion$score))
+      expect_true(suggestion$score >= 0 && suggestion$score <= 1)
+    }
   }
-
-  suppressMessages(
-    result <- bid_structure(
-      previous_stage,
-      layout = "DUAL_PROCESS", # uppercase
-      concepts = c("Visual Hierarchy")
-    )
-  )
-
-  expect_s3_class(result, "tbl_df")
-  expect_equal(result$layout[1], "dual_process")
+  
+  # Check concepts_detected
+  expect_true(is.character(result$concepts_detected))
+  expect_true(length(result$concepts_detected) > 0)
 })
 
-test_that("bid_structure handles complex accessibility parameter structures", {
-  previous_stage <- tibble(
+# T10: CLI messages - expect messages for auto-selection + hint
+test_that("bid_structure shows appropriate CLI messages", {
+  previous_stage <- tibble::tibble(
     stage = "Interpret",
-    central_question = "Test question",
+    problem = "Dashboard has information overload issues",
     timestamp = Sys.time()
   )
+  
+  # Should show layout selection and rationale messages
+  expect_message(
+    bid_structure(previous_stage),
+    "Auto-selected layout"
+  )
+  
+  expect_message(
+    bid_structure(previous_stage),
+    "Tip.*bid_concept"
+  )
+})
 
-  nested_accessibility <- list(
-    vision = list(
-      color_contrast = "WCAG AA compliant (4.5:1)",
-      text_size = "16px minimum"
+# T11: Suggestions quality smoke test
+test_that("bid_structure generates high-quality suggestions for complex scenario", {
+  # Scenario: overwhelming filters + first-time users (from claude.md)
+  previous_stage <- tibble::tibble(
+    stage = "Interpret",
+    problem = "New users are overwhelmed by too many filter options",
+    evidence = "High abandonment rate among first-time users",
+    central_question = "How to make filtering less overwhelming for beginners?",
+    hook = "First-time users struggle with complex interface",
+    context = "Dashboard has many advanced filtering options",
+    tension = "Power users need advanced filters but newcomers get confused",
+    resolution = "Progressive disclosure with smart defaults",
+    audience = "Mix of first-time and experienced users",
+    timestamp = Sys.time()
+  )
+  
+  suppressMessages(
+    result <- bid_structure(previous_stage)
+  )
+  
+  # Should select breathable layout for overload scenario
+  expect_equal(result$layout[1], "breathable")
+  
+  # Check that we get expected concept groups
+  suggestion_groups <- result$suggestions
+  concept_names <- sapply(suggestion_groups, function(g) g$concept)
+  
+  # Should include these key concepts for this scenario
+  expect_true("Cognitive Load Theory" %in% concept_names)
+  expect_true("Progressive Disclosure" %in% concept_names)
+  expect_true("User Onboarding" %in% concept_names) # due to "first-time users"
+  
+  # Check that suggestions contain relevant component pointers
+  all_suggestions <- unlist(lapply(suggestion_groups, function(g) g$suggestions), recursive = FALSE)
+  all_components <- unlist(lapply(all_suggestions, function(s) s$components))
+  
+  # Should recommend appropriate Shiny/bslib components
+  expect_true(any(grepl("bslib::accordion", all_components)))
+  expect_true(any(grepl("shiny::", all_components)))
+  
+  # Check that suggestions are ranked (highest scores first)
+  for (group in suggestion_groups) {
+    if (length(group$suggestions) > 1) {
+      scores <- sapply(group$suggestions, function(s) s$score)
+      expect_equal(scores, sort(scores, decreasing = TRUE))
+    }
+  }
+  
+  # Verify suggestions have substantive content
+  for (group in suggestion_groups) {
+    for (suggestion in group$suggestions) {
+      expect_true(nchar(suggestion$title) > 5)
+      expect_true(nchar(suggestion$details) > 20)
+      expect_true(nchar(suggestion$rationale) > 15)
+      expect_true(length(suggestion$components) >= 1)
+    }
+  }
+})
+
+# Test edge cases and error handling
+test_that("bid_structure handles edge cases gracefully", {
+  # Minimal previous stage
+  minimal_stage <- tibble::tibble(
+    stage = "Interpret",
+    timestamp = Sys.time()
+  )
+  
+  suppressMessages(
+    result <- bid_structure(minimal_stage)
+  )
+  
+  expect_s3_class(result, "bid_stage")
+  expect_equal(result$layout[1], "breathable")  # Should fallback
+  expect_true(length(result$suggestions) > 0)
+  
+  # Test with custom concepts
+  suppressMessages(
+    result_custom <- bid_structure(minimal_stage, concepts = c("Visual Hierarchy"))
+  )
+  
+  expect_s3_class(result_custom, "bid_stage")
+  expect_true("Visual Hierarchy" %in% result_custom$concepts_detected)
+})
+
+test_that("layout heuristics work correctly with different field combinations", {
+  # Test data story fields
+  story_stage <- tibble::tibble(
+    stage = "Interpret", 
+    data_story = list(list(
+      hook = "Users need quick access to summaries",
+      context = "But also detailed breakdowns when needed", 
+      tension = "Two different modes of interaction",
+      resolution = "Dual mode interface"
+    )),
+    timestamp = Sys.time()
+  )
+  
+  suppressMessages(
+    result <- bid_structure(story_stage)
+  )
+  expect_equal(result$layout[1], "dual_process")
+  
+  # Test nested data_story access
+  nested_stage <- tibble::tibble(
+    stage = "Interpret",
+    problem = "Interface has cluttered design",
+    data_story = list(
+      audience = "First-time users who get confused easily"
     ),
-    motor = list(
-      keyboard_navigation = "Full keyboard support",
-      target_size = "44px minimum touch targets"
-    )
+    timestamp = Sys.time()
   )
-
-  # should warn about structure but not fail
-  expect_warning(
-    result <- bid_structure(
-      previous_stage,
-      layout = "dual_process",
-      concepts = c("Visual Hierarchy"),
-      accessibility = nested_accessibility
-    )
+  
+  suppressMessages(
+    result <- bid_structure(nested_stage)
   )
+  expect_equal(result$layout[1], "breathable")
+  expect_true("User Onboarding" %in% result$concepts_detected)
+})
 
-  expect_s3_class(result, "tbl_df")
-  expect_false(is.na(result$accessibility))
+# Test telemetry integration
+test_that("bid_structure respects telemetry data in scoring", {
+  stage_with_telemetry <- tibble::tibble(
+    stage = "Interpret",
+    problem = "Need progressive disclosure across sections",
+    telemetry = list(nav_dropoff_tabs = TRUE),
+    timestamp = Sys.time()
+  )
+  
+  suppressMessages(
+    result <- bid_structure(stage_with_telemetry)
+  )
+  
+  # Should avoid tabs layout
+  expect_false(result$layout[1] == "tabs")
+  
+  # Tab-related suggestions should have lower scores
+  all_suggestions <- unlist(lapply(result$suggestions, function(g) g$suggestions), recursive = FALSE)
+  tab_suggestions <- all_suggestions[sapply(all_suggestions, function(s) grepl("tab", s$details, ignore.case = TRUE))]
+  
+  if (length(tab_suggestions) > 0) {
+    tab_scores <- sapply(tab_suggestions, function(s) s$score)
+    all_scores <- sapply(all_suggestions, function(s) s$score)
+    expect_true(mean(tab_scores) < mean(all_scores))
+  }
 })

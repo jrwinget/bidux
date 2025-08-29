@@ -118,7 +118,7 @@ test_that("bid_suggest_components works with different BID stages", {
   # Test with Structure stage
   structure_result <- bid_structure(
     interpret_result,
-    layout = "dual_process",
+    
     concepts = c("Visual Hierarchy", "Cognitive Load Theory")
   )
 
@@ -180,7 +180,7 @@ test_that("bid_suggest_components extracts concepts correctly", {
       notice_with_theory,
       central_question = "How to improve visual organization?"
     ),
-    layout = "card_layout",
+    
     concepts = c("Principle of Proximity", "Visual Hierarchy")
   )
 
@@ -219,7 +219,7 @@ test_that("bid_suggest_components handles layout-specific scoring", {
       ),
       central_question = "How to organize content?"
     ),
-    layout = "sidebar_layout",
+    
     concepts = "Information Hierarchy"
   )
 
