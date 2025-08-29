@@ -995,14 +995,38 @@ get_audience_from_previous <- function(previous_stage) {
   # normalize first
   normalized_stage <- normalize_previous_stage(previous_stage)
   
+  # defensive check - return early if normalization failed
+  if (is.null(normalized_stage)) {
+    return(NA_character_)
+  }
+  
   audience_fields <- c("audience", "target_audience", "previous_audience")
   for (field in audience_fields) {
-    value <- safe_column_access(normalized_stage, field)
-    if (!is.na(value) && nchar(trimws(value)) > 0) {
-      return(value)
+    # ensure field variable is properly defined before use
+    if (is.character(field) && nchar(field) > 0) {
+      value <- safe_column_access(normalized_stage, field)
+      if (!is.null(value) && !is.na(value) && nchar(trimws(as.character(value))) > 0) {
+        return(as.character(value))
+      }
     }
   }
   return(NA_character_)
+}
+
+# helper function to generate accessibility advice based on layout context
+get_accessibility_advice <- function(layout_context) {
+  if (is.na(layout_context) || is.null(layout_context)) {
+    layout_context <- "general"
+  }
+  
+  switch(layout_context,
+    "tabs" = "ensure keyboard navigation between tabs and screen reader announcements",
+    "grid" = "provide proper row/column headers and cell relationships for screen readers",
+    "card" = "ensure cards have descriptive labels and proper focus management",
+    "dual_process" = "maintain accessibility across both summary and detail views",
+    "breathable" = "use sufficient color contrast and focus indicators in spacious layouts",
+    "provide clear focus indicators, sufficient color contrast, and screen reader support"
+  )
 }
 
 # generic helper to get personas from previous stage
@@ -1010,14 +1034,46 @@ get_personas_from_previous <- function(previous_stage) {
   # normalize first
   normalized_stage <- normalize_previous_stage(previous_stage)
   
+  # defensive check - return early if normalization failed
+  if (is.null(normalized_stage)) {
+    return(NA_character_)
+  }
+  
   persona_fields <- c("user_personas", "previous_personas", "personas")
   for (field in persona_fields) {
-    value <- safe_column_access(normalized_stage, field)
-    if (!is.na(value) && nchar(trimws(value)) > 0) {
-      return(value)
+    # ensure field variable is properly defined before use
+    if (is.character(field) && nchar(field) > 0) {
+      value <- safe_column_access(normalized_stage, field)
+      if (!is.null(value) && !is.na(value) && nchar(trimws(as.character(value))) > 0) {
+        return(as.character(value))
+      }
     }
   }
   return(NA_character_)
+}
+
+# validate logical parameter value
+#'
+#' @param value Parameter value to validate
+#' @param param_name Name of the parameter for error messages
+#' @param allow_null Whether to allow NULL values
+#'
+#' @keywords internal
+#' @noRd
+validate_logical_param <- function(value, param_name, allow_null = FALSE) {
+  if (is.null(value)) {
+    if (allow_null) {
+      return(invisible(NULL))
+    } else {
+      stop(paste0("Parameter '", param_name, "' cannot be NULL"), call. = FALSE)
+    }
+  }
+  
+  if (!is.logical(value) || length(value) != 1) {
+    stop(paste0("Parameter '", param_name, "' must be a single logical value (TRUE/FALSE)"), call. = FALSE)
+  }
+  
+  invisible(NULL)
 }
 
 # time wrapper for test stubbing

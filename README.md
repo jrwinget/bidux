@@ -77,7 +77,7 @@ process <- bid_interpret(
   bid_validate(
     include_exp_design = FALSE,
     include_telemetry = TRUE,
-    include_empowerment_tools = TRUE
+    include_empower_tools = TRUE
   )
 
 # View suggestions

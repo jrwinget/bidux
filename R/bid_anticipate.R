@@ -370,14 +370,7 @@ bid_anticipate <- function(
     if (include_accessibility && !"accessibility" %in% names(suggested_biases)) {
       # get layout from previous stage to provide context-specific accessibility advice
       layout_context <- if (!is.na(layout)) layout else "general"
-      accessibility_advice <- switch(layout_context,
-        "tabs" = "ensure keyboard navigation between tabs and screen reader announcements",
-        "grid" = "provide proper row/column headers and cell relationships for screen readers",
-        "card" = "ensure cards have descriptive labels and proper focus management",
-        "dual_process" = "maintain accessibility across both summary and detail views",
-        "breathable" = "use sufficient color contrast and focus indicators in spacious layouts",
-        "provide clear focus indicators, sufficient color contrast, and screen reader support"
-      )
+      accessibility_advice <- get_accessibility_advice(layout_context)
       suggested_biases$accessibility <- accessibility_advice
     }
 
@@ -395,14 +388,7 @@ bid_anticipate <- function(
   # add user-provided accessibility mitigations if not auto-suggested
   if (include_accessibility && !is.null(bias_mitigations) && !"accessibility" %in% names(bias_mitigations)) {
     layout_context <- if (!is.na(layout)) layout else "general"
-    accessibility_advice <- switch(layout_context,
-      "tabs" = "ensure keyboard navigation between tabs and screen reader announcements",
-      "grid" = "provide proper row/column headers and cell relationships for screen readers", 
-      "card" = "ensure cards have descriptive labels and proper focus management",
-      "dual_process" = "maintain accessibility across both summary and detail views",
-      "breathable" = "use sufficient color contrast and focus indicators in spacious layouts",
-      "provide clear focus indicators, sufficient color contrast, and screen reader support"
-    )
+    accessibility_advice <- get_accessibility_advice(layout_context)
     bias_mitigations$accessibility <- accessibility_advice
     
     message("Added accessibility mitigation based on layout context.")

@@ -11,7 +11,7 @@ bid_validate(
   next_steps = NULL,
   include_exp_design = TRUE,
   include_telemetry = TRUE,
-  include_empowerment_tools = TRUE
+  include_empower_tools = TRUE
 )
 }
 \arguments{
@@ -33,7 +33,7 @@ design suggestions. Default is TRUE.}
 \item{include_telemetry}{Logical indicating whether to include telemetry
 tracking and monitoring suggestions. Default is TRUE.}
 
-\item{include_empowerment_tools}{Logical indicating whether to include
+\item{include_empower_tools}{Logical indicating whether to include
 context-aware empowerment tool suggestions. Default is TRUE.}
 }
 \value{

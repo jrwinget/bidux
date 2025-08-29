@@ -87,6 +87,63 @@ test_that("bid_validate allows optional parameters", {
   )
 })
 
+test_that("bid_validate validates boolean parameters", {
+  anticipate_result <- bid_anticipate(
+    bid_structure(
+      bid_interpret(
+        bid_notice(
+          problem = "Complex interface", 
+          theory = "Cognitive Load Theory",
+          evidence = "User complaints"
+        ),
+        central_question = "How to simplify?",
+        data_story = list(
+          hook = "Users are confused",
+          context = "Dashboard has evolved over time"
+        )
+      )
+    ),
+    bias_mitigations = list(anchoring = "Provide reference points")
+  )
+  
+  # Test invalid include_exp_design
+  expect_error(
+    bid_validate(
+      previous_stage = anticipate_result,
+      include_exp_design = "not_logical"
+    ),
+    "Parameter 'include_exp_design' must be a single logical value \\(TRUE/FALSE\\)"
+  )
+  
+  # Test invalid include_telemetry
+  expect_error(
+    bid_validate(
+      previous_stage = anticipate_result,
+      include_telemetry = c(TRUE, FALSE)
+    ),
+    "Parameter 'include_telemetry' must be a single logical value \\(TRUE/FALSE\\)"
+  )
+  
+  # Test invalid include_empower_tools  
+  expect_error(
+    bid_validate(
+      previous_stage = anticipate_result,
+      include_empower_tools = 1
+    ),
+    "Parameter 'include_empower_tools' must be a single logical value \\(TRUE/FALSE\\)"
+  )
+  
+  # Test valid boolean values work
+  expect_no_error(
+    bid_validate(
+      previous_stage = anticipate_result,
+      include_exp_design = FALSE,
+      include_telemetry = TRUE,
+      include_empower_tools = FALSE
+    )
+  )
+})
+
 test_that("bid_validate provides contextual suggestions", {
   anticipate_result <- bid_anticipate(
     bid_structure(

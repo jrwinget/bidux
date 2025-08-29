@@ -16,7 +16,7 @@
 #'        design suggestions. Default is TRUE.
 #' @param include_telemetry Logical indicating whether to include telemetry
 #'        tracking and monitoring suggestions. Default is TRUE.
-#' @param include_empowerment_tools Logical indicating whether to include
+#' @param include_empower_tools Logical indicating whether to include
 #'        context-aware empowerment tool suggestions. Default is TRUE.
 #'
 #' @return A tibble containing the documented information for the "Validate"
@@ -69,9 +69,14 @@ bid_validate <- function(
     next_steps = NULL,
     include_exp_design = TRUE,
     include_telemetry = TRUE,
-    include_empowerment_tools = TRUE) {
+    include_empower_tools = TRUE) {
   validate_required_params(previous_stage = previous_stage)
   validate_previous_stage(previous_stage, "Validate")
+  
+  # validate boolean parameters
+  validate_logical_param(include_exp_design, "include_exp_design")
+  validate_logical_param(include_telemetry, "include_telemetry")
+  validate_logical_param(include_empower_tools, "include_empower_tools")
 
   if (is.null(summary_panel)) {
     summary_panel <- generate_summary_panel_suggestion(previous_stage)
@@ -79,7 +84,7 @@ bid_validate <- function(
   }
 
   if (is.null(collaboration)) {
-    collaboration <- generate_collaboration_suggestion(previous_stage, include_empowerment_tools)
+    collaboration <- generate_collaboration_suggestion(previous_stage, include_empower_tools)
     cli::cli_alert_info(paste0(
       "Suggested collaboration features: ",
       collaboration
@@ -103,7 +108,7 @@ bid_validate <- function(
     previous_stage,
     include_exp_design,
     include_telemetry,
-    include_empowerment_tools
+    include_empower_tools
   )
 
   # normalize previous stage to ensure field name consistency  
@@ -196,7 +201,7 @@ generate_summary_panel_suggestion <- function(previous_stage) {
   return(base_suggestion)
 }
 
-generate_collaboration_suggestion <- function(previous_stage, include_empowerment_tools = TRUE) {
+generate_collaboration_suggestion <- function(previous_stage, include_empower_tools = TRUE) {
   audience_fields <- c("audience", "target_audience", "previous_audience")
   audience <- ""
 
@@ -213,7 +218,7 @@ generate_collaboration_suggestion <- function(previous_stage, include_empowermen
   if (audience != "" && !is.na(audience)) {
     audience_lower <- tolower(audience)
 
-    empowerment_suffix <- if (include_empowerment_tools) {
+    empowerment_suffix <- if (include_empower_tools) {
       if (grepl("executive|leadership|manager", audience_lower)) {
         " with executive empowerment tools like annotated insights and decision history"
       } else if (grepl("analyst|technical|data", audience_lower)) {
@@ -356,7 +361,7 @@ generate_validation_suggestions <- function(
     previous_stage,
     include_exp_design = TRUE,
     include_telemetry = TRUE,
-    include_empowerment_tools = TRUE) {
+    include_empower_tools = TRUE) {
   suggestions <- character(0)
 
   if (!is.null(summary_panel) && nchar(summary_panel) > 0) {
@@ -431,7 +436,7 @@ generate_validation_suggestions <- function(
     suggestions <- c(suggestions, "Include telemetry and monitoring in your post-launch validation")
   }
   
-  if (include_empowerment_tools && !grepl("empower|explain|help", tolower(collaboration %||% ""))) {
+  if (include_empower_tools && !grepl("empower|explain|help", tolower(collaboration %||% ""))) {
     suggestions <- c(suggestions, "Consider adding user empowerment tools to enhance collaboration")
   }
 

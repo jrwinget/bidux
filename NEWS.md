@@ -18,7 +18,7 @@
 
 ### NEW FEATURES
 
-* **Enhanced `bid_validate()` with experiment/telemetry/empowerment flags.** New optional parameters: `include_exp_design` (default: TRUE), `include_telemetry` (default: TRUE), and `include_empowerment_tools` (default: TRUE) for context-aware suggestions.
+* **Enhanced `bid_validate()` with experiment/telemetry/empowerment flags.** New optional parameters: `include_exp_design` (default: TRUE), `include_telemetry` (default: TRUE), and `include_empower_tools` (default: TRUE) for context-aware suggestions.
 
 * **Accessibility-focused bias mitigation in `bid_anticipate()`.** New `include_accessibility` parameter adds layout-specific accessibility recommendations to bias mitigation strategies.
 
