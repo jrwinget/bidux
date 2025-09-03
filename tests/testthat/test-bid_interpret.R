@@ -14,15 +14,8 @@ test_that("bid_interpret returns a tibble with stage 'Interpret'", {
     }
   )
 
-  previous_stage <- tibble(
-    stage = "Notice",
-    problem = "Users struggle with complex data",
-    theory = "Cognitive Load Theory",
-    evidence = "Test results indicate delays",
-    target_audience = "Data Analysts"
-  )
-
-  result <- bid_interpret(previous_stage)
+  # Test without previous_stage (new behavior)
+  result <- bid_interpret()
 
   expect_s3_class(result, "bid_stage")
   expect_equal(result$stage[1], "Interpret")
@@ -43,33 +36,16 @@ test_that("bid_interpret uses provided central_question", {
     }
   )
 
-  previous_stage <- tibble::tibble(
-    stage = "Notice",
-    problem = "Users struggle with complex data",
-    theory = "Cognitive Load Theory",
-    evidence = "Test results indicate delays"
-  )
-
+  # Test with just central_question (no previous_stage needed)
   my_question <- "What is causing data complexity issues?"
-  result <- bid_interpret(previous_stage, central_question = my_question)
+  result <- bid_interpret(central_question = my_question)
 
   expect_equal(result$central_question[1], my_question)
 })
 
 test_that("bid_interpret errors when data_story is not a list", {
-  local_mocked_bindings(
-    validate_user_personas = function(personas) invisible(NULL)
-  )
-
-  previous_stage <- tibble::tibble(
-    stage = "Notice",
-    problem = "Users struggle with complex data",
-    theory = "Cognitive Load Theory",
-    evidence = "Test results indicate delays"
-  )
-
   expect_error(
-    bid_interpret(previous_stage, data_story = "not a list"),
+    bid_interpret(data_story = "not a list"),
     regexp = "'data_story' must be a list"
   )
 })
@@ -81,15 +57,8 @@ test_that("bid_interpret errors when personas is invalid", {
     }
   )
 
-  previous_stage <- tibble::tibble(
-    stage = "Notice",
-    problem = "Users struggle with complex data",
-    theory = "Cognitive Load Theory",
-    evidence = "Test results indicate delays"
-  )
-
   expect_error(
-    bid_interpret(previous_stage, user_personas = "not a list"),
+    bid_interpret(user_personas = "not a list"),
     regexp = "Invalid personas provided"
   )
 })
@@ -120,19 +89,8 @@ test_that("bid_interpret auto-suggests central_question when NULL", {
 })
 
 test_that("bid_interpret auto-suggests data_story when NULL", {
-  previous_stage <- tibble::tibble(
-    stage = "Notice",
-    problem = "Dashboard has too many visualizations",
-    theory = "Cognitive Load Theory",
-    evidence = "User testing revealed confusion",
-    target_audience = "Data analysts",
-    suggestions = "Example suggestions",
-    timestamp = Sys.time()
-  )
-
   suppressMessages(
     result <- bid_interpret(
-      previous_stage,
       central_question = "How can we simplify the dashboard?"
     )
   )
@@ -144,7 +102,7 @@ test_that("bid_interpret auto-suggests data_story when NULL", {
   expect_false(is.na(result$resolution[1]))
   expect_match(
     paste(result$hook[1], result$context[1], result$tension[1]),
-    "visualizations|dashboard|confusion",
+    "Dashboard users|maximum value|user experience|insights",
     perl = TRUE
   )
 })
@@ -159,7 +117,6 @@ test_that("bid_interpret handles edge cases in data_story parameter", {
 
   suppressMessages(
     result <- bid_interpret(
-      previous_stage,
       central_question = "Test question",
       data_story = list(
         hook = "Test hook",
@@ -177,7 +134,6 @@ test_that("bid_interpret handles edge cases in data_story parameter", {
 
   suppressMessages(
     result <- bid_interpret(
-      previous_stage,
       central_question = "Test question",
       data_story = list(
         hook = "",
@@ -194,7 +150,6 @@ test_that("bid_interpret handles edge cases in data_story parameter", {
 
   suppressMessages(
     result <- bid_interpret(
-      previous_stage,
       central_question = "Test question",
       data_story = list(
         hook = "Test hook",
@@ -222,7 +177,6 @@ test_that("bid_interpret handles edge cases in personas parameter", {
 
   suppressWarnings(
     result <- bid_interpret(
-      previous_stage,
       central_question = "Test question",
       user_personas = list(
         list(name = "Minimal Persona")
@@ -235,7 +189,6 @@ test_that("bid_interpret handles edge cases in personas parameter", {
 
   suppressWarnings(
     result <- bid_interpret(
-      previous_stage,
       central_question = "Test question",
       user_personas = list()
     )
@@ -246,7 +199,6 @@ test_that("bid_interpret handles edge cases in personas parameter", {
 
   suppressWarnings(
     result <- bid_interpret(
-      previous_stage,
       central_question = "Test question",
       user_personas = list(
         list(
@@ -299,7 +251,6 @@ test_that("bid_interpret validates personas structure correctly", {
 
   expect_error(
     bid_interpret(
-      previous_stage,
       central_question = "Test question",
       user_personas = list(
         list(
@@ -314,7 +265,6 @@ test_that("bid_interpret validates personas structure correctly", {
   # multiple personas with missing recommended fields should warn but not error
   suppressWarnings(
     result <- bid_interpret(
-      previous_stage,
       central_question = "Test question",
       user_personas = list(
         list(name = "Persona 1"),
@@ -326,4 +276,27 @@ test_that("bid_interpret validates personas structure correctly", {
   expect_s3_class(result, "bid_stage")
   expect_match(result$personas, "Persona 1", fixed = TRUE)
   expect_match(result$personas, "Persona 2", fixed = TRUE)
+})
+
+test_that("bid_interpret works with previous_stage for backward compatibility", {
+  previous_stage <- tibble::tibble(
+    stage = "Notice",
+    problem = "Users struggle with complex data",
+    theory = "Cognitive Load Theory",
+    evidence = "Test results indicate delays",
+    target_audience = "Data Analysts",
+    timestamp = Sys.time()
+  )
+  
+  suppressMessages(
+    result <- bid_interpret(
+      previous_stage = previous_stage,
+      central_question = "How can we address the data complexity?"
+    )
+  )
+  
+  expect_s3_class(result, "bid_stage")
+  expect_equal(result$stage[1], "Interpret")
+  expect_equal(result$central_question[1], "How can we address the data complexity?")
+  expect_equal(result$previous_problem[1], "Users struggle with complex data")
 })

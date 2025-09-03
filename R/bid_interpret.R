@@ -2,11 +2,13 @@
 #'
 #' @description
 #' This function documents the interpretation of user needs, capturing the
-#' central question and the data storytelling narrative. It represents stage 2
+#' central question and the data storytelling narrative. It represents stage 1
 #' in the BID framework.
 #'
-#' @param previous_stage A tibble or list output from an earlier BID stage
-#'        function.
+#' @param previous_stage Optional tibble or list output from an earlier BID stage
+#'        function. Since Interpret is now the first stage in the BID framework
+#'        (v0.3.0+), this is typically NULL but can accept previous stage output
+#'        in some iteration scenarios.
 #' @param central_question A character string representing the main question to
 #'        be answered. If NULL, will be suggested based on previous stage
 #'        information.
@@ -74,30 +76,34 @@
 #'
 #' @export
 bid_interpret <- function(
-    previous_stage,
+    previous_stage = NULL,
     central_question = NULL,
     data_story = NULL,
     user_personas = NULL) {
-  # standardized parameter validation
-  validate_bid_stage_params(
-    previous_stage,
-    "Interpret",
-    list(
-      data_story = list(value = data_story, type = "list", allow_null = TRUE),
-      central_question = list(
-        value = central_question,
-        type = "character",
-        allow_null = TRUE
-      )
+  # parameter validation
+  if (!is.null(data_story) && !is.list(data_story)) {
+    cli::cli_abort("'data_story' must be a list")
+  }
+  
+  if (!is.null(central_question) && (!is.character(central_question) || length(central_question) != 1)) {
+    cli::cli_abort("'central_question' must be a single character string")
+  }
+  
+  # standardized parameter validation for previous_stage if provided
+  if (!is.null(previous_stage)) {
+    validate_bid_stage_params(
+      previous_stage,
+      "Interpret",
+      list()
     )
-  )
+  }
 
   if (!is.null(user_personas)) {
     validate_user_personas(user_personas)
   }
 
   if (is.null(central_question)) {
-    if (previous_stage$stage[1] == "Notice") {
+    if (!is.null(previous_stage) && previous_stage$stage[1] == "Notice") {
       stage_data <- extract_stage_data(previous_stage, c("problem", "theory"))
       problem <- stage_data$problem
       theory <- stage_data$theory
@@ -165,11 +171,20 @@ bid_interpret <- function(
         paste0("Suggested central question: ", central_question)
       )
     } else if (
-      previous_stage$stage[1] == "Structure" ||
+      !is.null(previous_stage) && (
+        previous_stage$stage[1] == "Structure" ||
         previous_stage$stage[1] == "Anticipate"
+      )
     ) {
       central_question <- paste0(
         "How can we refine our understanding of user needs for this dashboard?"
+      )
+      cli::cli_alert_info(
+        paste0("Suggested central question: ", central_question)
+      )
+    } else if (is.null(previous_stage)) {
+      central_question <- paste0(
+        "How can we improve the user experience of the dashboard?"
       )
       cli::cli_alert_info(
         paste0("Suggested central question: ", central_question)
@@ -180,7 +195,7 @@ bid_interpret <- function(
   if (is.null(data_story)) {
     data_story <- list()
 
-    if (previous_stage$stage[1] == "Notice") {
+    if (!is.null(previous_stage) && previous_stage$stage[1] == "Notice") {
       stage_data <- extract_stage_data(
         previous_stage,
         c("problem", "theory", "evidence", "target_audience")
@@ -267,8 +282,10 @@ bid_interpret <- function(
         "Suggested data story elements based on previous stage information"
       )
     } else if (
-      previous_stage$stage[1] == "Structure" ||
+      !is.null(previous_stage) && (
+        previous_stage$stage[1] == "Structure" ||
         previous_stage$stage[1] == "Anticipate"
+      )
     ) {
       data_story <- list(
         hook = "We need to revisit our understanding of user needs",
@@ -280,6 +297,15 @@ bid_interpret <- function(
       )
 
       cli::cli_alert_info("Suggested generic data story for iteration cycle")
+    } else if (is.null(previous_stage)) {
+      data_story <- list(
+        hook = "Dashboard users may not be getting maximum value",
+        context = "Current interface could be improved for better user experience",
+        tension = "Users may be missing important insights or spending too much time",
+        resolution = "Redesign interface using behavioral science principles"
+      )
+      
+      cli::cli_alert_info("Suggested generic data story for new dashboard design")
     }
   }
 
@@ -345,7 +371,8 @@ bid_interpret <- function(
       audience <- data_story$audience
     } else if (
       # try to get audience from previous_stage
-      previous_stage$stage[1] == "Notice" &&
+      !is.null(previous_stage) &&
+        previous_stage$stage[1] == "Notice" &&
         "target_audience" %in% names(previous_stage) &&
         !is.na(previous_stage$target_audience[1])
     ) {
@@ -515,7 +542,11 @@ bid_interpret <- function(
   }
 
   # normalize previous stage to ensure field name consistency
-  normalized_previous <- normalize_previous_stage(previous_stage)
+  normalized_previous <- if (!is.null(previous_stage)) {
+    normalize_previous_stage(previous_stage)
+  } else {
+    NULL
+  }
 
   result_data <- tibble::tibble(
     stage = "Interpret",
@@ -539,7 +570,7 @@ bid_interpret <- function(
   )
 
   metadata <- get_stage_metadata(
-    2,
+    1,
     list(
       has_central_question = !is.null(central_question),
       story_completeness = story_completeness,
@@ -556,7 +587,7 @@ bid_interpret <- function(
   result <- bid_stage("Interpret", result_data, metadata)
 
   bid_message(
-    "Stage 2 (Interpret) completed.",
+    "Stage 1 (Interpret) completed.",
     paste0(
       "Central question: ",
       if (nchar(central_question) > 60) {

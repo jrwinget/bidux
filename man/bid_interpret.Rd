@@ -5,15 +5,17 @@
 \title{Document User Interpretation Stage in BID Framework}
 \usage{
 bid_interpret(
-  previous_stage,
+  previous_stage = NULL,
   central_question = NULL,
   data_story = NULL,
   user_personas = NULL
 )
 }
 \arguments{
-\item{previous_stage}{A tibble or list output from an earlier BID stage
-function.}
+\item{previous_stage}{Optional tibble or list output from an earlier BID stage
+function. Since Interpret is now the first stage in the BID framework
+(v0.3.0+), this is typically NULL but can accept previous stage output
+in some iteration scenarios.}
 
 \item{central_question}{A character string representing the main question to
 be answered. If NULL, will be suggested based on previous stage
@@ -33,7 +35,7 @@ stage.
 }
 \description{
 This function documents the interpretation of user needs, capturing the
-central question and the data storytelling narrative. It represents stage 2
+central question and the data storytelling narrative. It represents stage 1
 in the BID framework.
 }
 \examples{
