@@ -2,17 +2,17 @@ test_that("bid_report generates text report with expected content", {
   validate_result <- bid_validate(
     bid_anticipate(
       bid_structure(
-        bid_interpret(
-          bid_notice(
-            problem = "Complex interface",
-            theory = "Cognitive Load Theory",
-            evidence = "User complaints"
+        bid_notice(
+          previous_stage = bid_interpret(
+            central_question = "How to simplify?",
+            data_story = list(
+              hook = "Users are confused",
+              context = "Dashboard has evolved over time"
+            )
           ),
-          central_question = "How to simplify?",
-          data_story = list(
-            hook = "Users are confused",
-            context = "Dashboard has evolved over time"
-          )
+          problem = "Complex interface",
+          theory = "Cognitive Load Theory",
+          evidence = "User complaints"
         ),
 
         concepts = c("Principle of Proximity", "Default Effect")
@@ -45,17 +45,17 @@ test_that("bid_report generates HTML report with correct format", {
   validate_result <- bid_validate(
     bid_anticipate(
       bid_structure(
-        bid_interpret(
-          bid_notice(
-            problem = "Complex interface",
-            theory = "Cognitive Load Theory",
-            evidence = "User complaints"
+        bid_notice(
+          previous_stage = bid_interpret(
+            central_question = "How to simplify?",
+            data_story = list(
+              hook = "Users are confused",
+              context = "Dashboard has evolved over time"
+            )
           ),
-          central_question = "How to simplify?",
-          data_story = list(
-            hook = "Users are confused",
-            context = "Dashboard has evolved over time"
-          )
+          problem = "Complex interface",
+          theory = "Cognitive Load Theory",
+          evidence = "User complaints"
         ),
 
         concepts = c("Principle of Proximity", "Default Effect")
@@ -105,7 +105,12 @@ test_that("bid_report fails with incorrect input", {
     "must be the result"
   )
 
+  interpret_result <- bid_interpret(
+    central_question = "How to test error handling?"
+  )
+  
   notice_result <- bid_notice(
+    previous_stage = interpret_result,
     problem = "Complex interface",
     theory = "Cognitive Load Theory",
     evidence = "User complaints"
@@ -135,12 +140,12 @@ test_that("bid_report includes diagrams when requested", {
   validate_result <- bid_validate(
     bid_anticipate(
       bid_structure(
-        bid_interpret(
-          bid_notice(
-            problem = "Test problem",
-            evidence = "Test evidence"
+        bid_notice(
+          previous_stage = bid_interpret(
+            central_question = "Test question"
           ),
-          central_question = "Test question"
+          problem = "Test problem",
+          evidence = "Test evidence"
         ),
       ),
       bias_mitigations = list(anchoring = "Test")
@@ -172,12 +177,12 @@ test_that("bid_report handles different formats", {
   validate_result <- bid_validate(
     bid_anticipate(
       bid_structure(
-        bid_interpret(
-          bid_notice(
-            problem = "Test problem",
-            evidence = "Test evidence"
+        bid_notice(
+          previous_stage = bid_interpret(
+            central_question = "Test question"
           ),
-          central_question = "Test question"
+          problem = "Test problem",
+          evidence = "Test evidence"
         ),
       ),
       bias_mitigations = list(anchoring = "Test")

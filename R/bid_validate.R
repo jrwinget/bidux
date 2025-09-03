@@ -519,6 +519,11 @@ extract_previous_stage_info <- function(previous_stage) {
       "concepts",
       NA_character_
     )
+    info$bias <- safe_column_access(
+      previous_stage,
+      "previous_bias",
+      NA_character_
+    )
     info$accessibility <- safe_column_access(
       previous_stage,
       "accessibility",

@@ -15,7 +15,7 @@ test_that("bid_interpret returns a tibble with stage 'Interpret'", {
   )
 
   # Test without previous_stage (new behavior)
-  result <- bid_interpret()
+  result <- bid_interpret(central_question = "How can we improve the test scenario?")
 
   expect_s3_class(result, "bid_stage")
   expect_equal(result$stage[1], "Interpret")
@@ -58,7 +58,10 @@ test_that("bid_interpret errors when personas is invalid", {
   )
 
   expect_error(
-    bid_interpret(user_personas = "not a list"),
+    bid_interpret(
+      central_question = "Test question",
+      user_personas = "not a list"
+    ),
     regexp = "Invalid personas provided"
   )
 })
@@ -232,7 +235,10 @@ test_that("bid_interpret handles NA values in previous_stage", {
   )
 
   suppressMessages(
-    result <- bid_interpret(previous_stage)
+    result <- bid_interpret(
+      previous_stage = previous_stage,
+      central_question = "How can we handle missing data?"
+    )
   )
 
   expect_s3_class(result, "bid_stage")

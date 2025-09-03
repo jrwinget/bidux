@@ -33,22 +33,20 @@ structured bid_stage object with enhanced metadata and external mapping
 support.
 }
 \examples{
-# Auto-suggested theory
-notice_result <- bid_interpret(
+interpret_result <- bid_interpret(
   central_question = "How can we improve user task completion?",
   data_story = list(
     hook = "Users are struggling with complex interfaces",
     resolution = "Simplify key interactions"
   )
-) |>
-  bid_notice(
-    previous_stage = interpret_result,
-    problem = "Users struggling with complex dropdowns and too many options",
-    evidence = "User testing shows 65\% abandonment rate on filter selection"
-  )
+)
 
-# Access underlying data
-summary(notice_result)
+# Auto-suggested theory
+bid_notice(
+  previous_stage = interpret_result,
+  problem = "Users struggling with complex dropdowns and too many options",
+  evidence = "User testing shows 65\% abandonment rate on filter selection"
+)
 
 # With explicit theory
 bid_notice(

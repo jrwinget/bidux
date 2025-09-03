@@ -109,6 +109,7 @@ bid_structure <- function(
     previous_theory = safe_column_access(normalized_previous, "theory"),
     previous_audience = get_audience_from_previous(normalized_previous),
     previous_personas = get_personas_from_previous(normalized_previous),
+    previous_bias = safe_column_access(normalized_previous, "bias_mitigations"),
     suggestions = suggestion_groups,
     timestamp = .now()
   )

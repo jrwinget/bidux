@@ -178,7 +178,12 @@ test_that("bid_suggest_components handles edge cases", {
   expect_s3_class(minimal_suggestions, "tbl_df")
 
   # Test with empty package filter that has no matches
+  interpret_result <- bid_interpret(
+    central_question = "How can we help users with test data?"
+  )
+  
   notice_result <- bid_notice(
+    previous_stage = interpret_result,
     problem = "Test problem",
     evidence = "Test evidence"
   )
@@ -195,7 +200,12 @@ test_that("bid_suggest_components handles edge cases", {
 
 test_that("bid_suggest_components extracts concepts correctly", {
   # Test concept extraction from theory field
+  interpret_result <- bid_interpret(
+    central_question = "How can we improve visual hierarchy?"
+  )
+  
   notice_with_theory <- bid_notice(
+    previous_stage = interpret_result,
     problem = "Users need better visual hierarchy",
     theory = "Visual Hierarchies",
     evidence = "User testing"
@@ -227,7 +237,12 @@ test_that("bid_suggest_components extracts concepts correctly", {
 })
 
 test_that("bid_suggest_components provides appropriate user feedback", {
+  interpret_result <- bid_interpret(
+    central_question = "How can we improve user feedback?"
+  )
+  
   notice_result <- bid_notice(
+    previous_stage = interpret_result,
     problem = "Test problem",
     evidence = "Test evidence"
   )
@@ -245,13 +260,15 @@ test_that("bid_suggest_components provides appropriate user feedback", {
 })
 
 test_that("bid_suggest_components handles layout-specific scoring", {
+  interpret_result <- bid_interpret(
+    central_question = "How to organize content?"
+  )
+  
   structure_result <- bid_structure(
-    bid_interpret(
-      bid_notice(
-        problem = "Need better organization",
-        evidence = "User feedback"
-      ),
-      central_question = "How to organize content?"
+    bid_notice(
+      previous_stage = interpret_result,
+      problem = "Need better organization",
+      evidence = "User feedback"
     ),
 
     concepts = "Information Hierarchy"
@@ -284,7 +301,12 @@ test_that("bid_suggest_components handles layout-specific scoring", {
 })
 
 test_that("bid_suggest_components component database has required structure", {
+  interpret_result <- bid_interpret(
+    central_question = "How can we test the database?"
+  )
+  
   notice_result <- bid_notice(
+    previous_stage = interpret_result,
     problem = "Test problem",
     evidence = "Test evidence"
   )

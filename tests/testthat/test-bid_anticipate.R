@@ -1,17 +1,21 @@
 test_that("bid_anticipate works with valid inputs", {
+  interpret_result <- bid_interpret(
+    central_question = "How to simplify?",
+    data_story = list(
+      hook = "Users are confused",
+      context = "Dashboard has evolved over time"
+    )
+  )
+  
+  notice_result <- bid_notice(
+    previous_stage = interpret_result,
+    problem = "Complex interface",
+    theory = "Cognitive Load Theory",
+    evidence = "User complaints"
+  )
+  
   structure_result <- bid_structure(
-    bid_interpret(
-      bid_notice(
-        problem = "Complex interface",
-        theory = "Cognitive Load Theory",
-        evidence = "User complaints"
-      ),
-      central_question = "How to simplify?",
-      data_story = list(
-        hook = "Users are confused",
-        context = "Dashboard has evolved over time"
-      )
-    ),
+    notice_result,
 
     concepts = c("Principle of Proximity", "Default Effect")
   )
@@ -36,19 +40,23 @@ test_that("bid_anticipate works with valid inputs", {
 })
 
 test_that("bid_anticipate fails with missing parameters", {
+  interpret_result <- bid_interpret(
+    central_question = "How to simplify?",
+    data_story = list(
+      hook = "Users are confused",
+      context = "Dashboard has evolved over time"
+    )
+  )
+  
+  notice_result <- bid_notice(
+    previous_stage = interpret_result,
+    problem = "Complex interface",
+    theory = "Cognitive Load Theory",
+    evidence = "User complaints"
+  )
+  
   structure_result <- bid_structure(
-    bid_interpret(
-      bid_notice(
-        problem = "Complex interface",
-        theory = "Cognitive Load Theory",
-        evidence = "User complaints"
-      ),
-      central_question = "How to simplify?",
-      data_story = list(
-        hook = "Users are confused",
-        context = "Dashboard has evolved over time"
-      )
-    ),
+    notice_result,
 
     concepts = c("Principle of Proximity", "Default Effect")
   )
@@ -67,19 +75,23 @@ test_that("bid_anticipate fails with missing parameters", {
 })
 
 test_that("bid_anticipate suggests missing common biases", {
+  interpret_result <- bid_interpret(
+    central_question = "How to simplify?",
+    data_story = list(
+      hook = "Users are confused",
+      context = "Dashboard has evolved over time"
+    )
+  )
+  
+  notice_result <- bid_notice(
+    previous_stage = interpret_result,
+    problem = "Complex interface",
+    theory = "Cognitive Load Theory",
+    evidence = "User complaints"
+  )
+  
   structure_result <- bid_structure(
-    bid_interpret(
-      bid_notice(
-        problem = "Complex interface",
-        theory = "Cognitive Load Theory",
-        evidence = "User complaints"
-      ),
-      central_question = "How to simplify?",
-      data_story = list(
-        hook = "Users are confused",
-        context = "Dashboard has evolved over time"
-      )
-    ),
+    notice_result,
 
     concepts = c("Principle of Proximity", "Default Effect")
   )
@@ -98,19 +110,23 @@ test_that("bid_anticipate suggests missing common biases", {
 })
 
 test_that("bid_anticipate auto-suggests bias_mitigations when NULL", {
+  interpret_result <- bid_interpret(
+    central_question = "How to simplify?",
+    data_story = list(
+      hook = "Users are confused",
+      context = "Dashboard has evolved over time"
+    )
+  )
+  
+  notice_result <- bid_notice(
+    previous_stage = interpret_result,
+    problem = "Complex interface",
+    theory = "Cognitive Load Theory",
+    evidence = "User complaints"
+  )
+  
   structure_result <- bid_structure(
-    bid_interpret(
-      bid_notice(
-        problem = "Complex interface",
-        theory = "Cognitive Load Theory",
-        evidence = "User complaints"
-      ),
-      central_question = "How to simplify?",
-      data_story = list(
-        hook = "Users are confused",
-        context = "Dashboard has evolved over time"
-      )
-    ),
+    notice_result,
 
     concepts = c("Principle of Proximity", "Default Effect")
   )
@@ -136,19 +152,23 @@ test_that("bid_anticipate auto-suggests bias_mitigations when NULL", {
 })
 
 test_that("bid_anticipate auto-suggests interaction_principles when NULL", {
+  interpret_result <- bid_interpret(
+    central_question = "How to simplify?",
+    data_story = list(
+      hook = "Users are confused",
+      context = "Dashboard has evolved over time"
+    )
+  )
+  
+  notice_result <- bid_notice(
+    previous_stage = interpret_result,
+    problem = "Complex interface",
+    theory = "Cognitive Load Theory",
+    evidence = "User complaints"
+  )
+  
   structure_result <- bid_structure(
-    bid_interpret(
-      bid_notice(
-        problem = "Complex interface",
-        theory = "Cognitive Load Theory",
-        evidence = "User complaints"
-      ),
-      central_question = "How to simplify?",
-      data_story = list(
-        hook = "Users are confused",
-        context = "Dashboard has evolved over time"
-      )
-    ),
+    notice_result,
 
     concepts = c("Principle of Proximity", "Default Effect")
   )

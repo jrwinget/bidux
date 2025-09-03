@@ -882,8 +882,13 @@ create_unused_input_notice <- function(input_info, total_sessions) {
     )
   }
 
-  # create notice stage with auto-suggested theory
+  # create interpret stage first, then notice stage with auto-suggested theory
+  interpret <- bid_interpret(
+    central_question = "How can we improve user interaction with unused inputs?"
+  )
+  
   notice <- bid_notice(
+    previous_stage = interpret,
     problem = problem,
     evidence = evidence
   )
@@ -935,7 +940,13 @@ create_delay_notice <- function(delay_info, total_sessions, threshold) {
 
   evidence <- paste(evidence_parts, collapse = ", and ")
 
+  # create interpret stage first, then notice stage
+  interpret <- bid_interpret(
+    central_question = "How can we reduce user interaction delays?"
+  )
+  
   notice <- bid_notice(
+    previous_stage = interpret,
     problem = problem,
     evidence = evidence
   )
@@ -972,10 +983,15 @@ create_error_notice <- function(error_info, total_sessions) {
     )
   }
 
+  # create interpret stage first, then notice stage
+  interpret <- bid_interpret(
+    central_question = "How can we reduce user errors and confusion?"
+  )
+  
   notice <- bid_notice(
+    previous_stage = interpret,
     problem = problem,
-    evidence = evidence_parts,
-    target_audience = NULL
+    evidence = evidence_parts
   )
 
   return(notice)
@@ -1009,7 +1025,13 @@ create_navigation_notice <- function(nav_info, total_sessions) {
     )
   }
 
+  # create interpret stage first, then notice stage
+  interpret <- bid_interpret(
+    central_question = "How can we improve user navigation flow?"
+  )
+  
   notice <- bid_notice(
+    previous_stage = interpret,
     problem = problem,
     evidence = evidence
   )
@@ -1035,7 +1057,13 @@ create_confusion_notice <- function(confusion_info, total_sessions) {
     confusion_info$avg_time_window
   )
 
+  # create interpret stage first, then notice stage
+  interpret <- bid_interpret(
+    central_question = "How can we improve user navigation flow?"
+  )
+  
   notice <- bid_notice(
+    previous_stage = interpret,
     problem = problem,
     evidence = evidence
   )
