@@ -376,15 +376,15 @@ test_that("bid_validate handles NA values in previous_stage fields", {
 })
 
 test_that("bid_validate handles next_steps edge cases", {
-  anticipate_result <- tibble(
-    stage = "Anticipate",
-    bias_mitigations = "test: value",
+  structure_result <- tibble(
+    stage = "Structure",
+    components_overview = "test components",
     timestamp = Sys.time()
   )
 
   # Test with short steps - should work without warning
   result <- bid_validate(
-    previous_stage = anticipate_result,
+    previous_stage = structure_result,
     summary_panel = "Test summary",
     collaboration = "Test collaboration",
     next_steps = c("OK", "Good", "Review dashboard", "Implement changes")
@@ -403,7 +403,7 @@ test_that("bid_validate handles next_steps edge cases", {
   )
 
   result <- bid_validate(
-    previous_stage = anticipate_result,
+    previous_stage = structure_result,
     summary_panel = "Test summary",
     collaboration = "Test collaboration",
     next_steps = c("Step 1", long_step, "Step 3")
@@ -415,7 +415,7 @@ test_that("bid_validate handles next_steps edge cases", {
   # Test with empty steps - should auto-suggest
   suppressMessages(
     result <- bid_validate(
-      previous_stage = anticipate_result,
+      previous_stage = structure_result,
       summary_panel = "Test summary",
       collaboration = "Test collaboration",
       next_steps = c("", "  ", "")

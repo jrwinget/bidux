@@ -491,14 +491,13 @@ test_that("telemetry helper functions work correctly", {
 test_that("notice creator functions generate valid bid_stage objects", {
   # Mock bid_notice if needed
   local_mocked_bindings(
-    bid_notice = function(problem, evidence, target_audience = NULL) {
+    bid_notice = function(previous_stage, problem, theory = NULL, evidence = NULL, ...) {
       # Create a minimal bid_stage object
       data <- tibble::tibble(
         stage = "Notice",
         problem = problem,
-        theory = "Cognitive Load Theory",
+        theory = theory %||% "Cognitive Load Theory",
         evidence = evidence,
-        target_audience = target_audience %||% NA_character_,
         suggestions = "Test suggestion",
         timestamp = Sys.time()
       )
