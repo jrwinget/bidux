@@ -67,7 +67,8 @@ bid_concepts <- function(search = NULL, fuzzy_match = TRUE, max_distance = 2) {
 #' including implementation recommendations based on the concept's stage.
 #'
 #' @param concept_name A character string with the exact or partial concept name
-#' @param add_recommendations Logical indicating whether to add stage-specific recommendations
+#' @param add_recommendations Logical indicating whether to add stage-specific
+#'        recommendations
 #'
 #' @return A tibble with detailed concept information
 #' @export

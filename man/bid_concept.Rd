@@ -9,7 +9,8 @@ bid_concept(concept_name, add_recommendations = TRUE)
 \arguments{
 \item{concept_name}{A character string with the exact or partial concept name}
 
-\item{add_recommendations}{Logical indicating whether to add stage-specific recommendations}
+\item{add_recommendations}{Logical indicating whether to add stage-specific
+recommendations}
 }
 \value{
 A tibble with detailed concept information

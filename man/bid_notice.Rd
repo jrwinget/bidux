@@ -8,8 +8,7 @@ bid_notice(previous_stage, problem, theory = NULL, evidence = NULL, ...)
 }
 \arguments{
 \item{previous_stage}{A tibble or list output from the previous BID stage
-function (typically bid_interpret). Required as Notice is now stage 2
-in the BID framework (v0.3.0+).}
+function (typically bid_interpret).}
 
 \item{problem}{A character string describing the observed user problem.}
 
@@ -20,8 +19,8 @@ theory mappings.}
 \item{evidence}{A character string describing evidence supporting the
 problem.}
 
-\item{...}{Additional parameters. Deprecated parameters like 'target_audience'
-will generate warnings if provided.}
+\item{...}{Additional parameters. Deprecated parameters (e.g.,
+'target_audience') will generate warnings if provided.}
 }
 \value{
 A bid_stage object containing the documented information for the
@@ -34,34 +33,25 @@ structured bid_stage object with enhanced metadata and external mapping
 support.
 }
 \examples{
-# First complete the Interpret stage
-interpret_result <- bid_interpret(
+# Auto-suggested theory
+notice_result <- bid_interpret(
   central_question = "How can we improve user task completion?",
   data_story = list(
     hook = "Users are struggling with complex interfaces",
     resolution = "Simplify key interactions"
   )
-)
-
-# Basic usage with auto-suggested theory
-notice_result <- bid_notice(
-  previous_stage = interpret_result,
-  problem = "Users struggling with complex dropdowns and too many options",
-  evidence = "User testing shows 65\% abandonment rate on filter selection"
-)
-
-# Print shows human-friendly summary
-print(notice_result)
+) |>
+  bid_notice(
+    previous_stage = interpret_result,
+    problem = "Users struggling with complex dropdowns and too many options",
+    evidence = "User testing shows 65\% abandonment rate on filter selection"
+  )
 
 # Access underlying data
 summary(notice_result)
 
-# Check stage and metadata
-get_stage(notice_result)
-get_metadata(notice_result)
-
-# with explicit theory
-notice_explicit <- bid_notice(
+# With explicit theory
+bid_notice(
   previous_stage = interpret_result,
   problem = "Mobile interface is difficult to navigate",
   theory = "Fitts's Law",

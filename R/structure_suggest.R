@@ -49,7 +49,8 @@ suggest_layout_from_previous <- function(previous_stage) {
     collapse = " "
   )
 
-  # Heuristic 1: Dual-process for overview vs detail patterns (check first since it's more specific)
+  # Heuristic 1: Dual-process for overview vs detail patterns
+  # (check first since it's more specific)
   if (
     grepl(
       "summary vs detail|overview and detail|quick vs deep|fast vs thorough|two modes|at a glance|quick access.*summaries|detailed breakdowns|two different modes|dual mode|quick access to summaries.*detailed breakdowns|summaries.*detailed breakdowns",

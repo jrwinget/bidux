@@ -19,38 +19,25 @@
 #'         stage.
 #'
 #' @examples
-#' structure_info <- bid_structure(
-#'   bid_interpret(
-#'     bid_notice(
-#'       "Issue with dropdown menus",
-#'       evidence = "User testing indicated delays"
-#'     ),
-#'     central_question = "How can we improve selection efficiency?",
-#'     data_story = list(
-#'       hook = "Too many options",
-#'       context = "Excessive choices",
-#'       tension = "User frustration",
-#'       resolution = "Simplify menu"
-#'     )
-#'   ),
-#'   concepts = c("principle_of_proximity", "default_effect")
-#' )
-#'
-#' # Basic usage
-#' bid_anticipate(
-#'   previous_stage = structure_info,
-#'   bias_mitigations = list(
-#'     anchoring = "Use context-aware references",
-#'     framing = "Toggle between positive and negative framing"
+#' structure_info <- bid_interpret(
+#'   central_question = "How can we improve selection efficiency?",
+#'   data_story = list(
+#'     hook = "Too many options",
+#'     context = "Excessive choices",
+#'     tension = "User frustration",
+#'     resolution = "Simplify menu"
 #'   )
-#' )
+#' ) |>
+#'   bid_notice(
+#'     "Issue with dropdown menus",
+#'     evidence = "User testing indicated delays"
+#'   ) |>
+#'   bid_structure()
 #'
 #' # Let the function suggest bias mitigations based on previous stages
-#' bid_anticipate(
-#'   previous_stage = structure_info
-#' )
+#' bid_anticipate(previous_stage = structure_info)
 #'
-#' # with accessibility included (default)
+#' # with accessibility included (default) and custom bias mitigations
 #' bid_anticipate(
 #'   previous_stage = structure_info,
 #'   bias_mitigations = list(

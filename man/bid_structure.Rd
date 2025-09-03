@@ -34,7 +34,8 @@ using deterministic heuristics. Returns structured recommendations with
 specific component pointers and implementation rationales.
 }
 \details{
-\strong{Layout Auto-Selection}: Uses deterministic heuristics to analyze content
+\strong{Layout Auto-Selection}: For backwards compatibility with versions < 0.3.0;
+to be removed in 0.4.0. Uses deterministic heuristics to analyze content
 from previous stages and select the most appropriate layout:
 \itemize{
 \item \strong{breathable}: For information overload/confusion patterns
@@ -50,22 +51,22 @@ implementation details, and rationale. Suggestions are scored based on
 relevance, layout appropriateness, and contextual factors.
 }
 \examples{
-interpret <- bid_notice(
-  problem = "Users struggle with information overload",
-  evidence = "Survey results indicate delays"
+notice_result <- bid_interpret(
+  central_question = "How can we simplify data presentation?",
+  data_story = list(
+    hook = "Data is too complex",
+    context = "Overloaded with charts",
+    tension = "Confusing layout",
+    resolution = "Introduce clear grouping"
+  )
 ) |>
-  bid_interpret(
-    central_question = "How can we simplify data presentation?",
-    data_story = list(
-      hook = "Data is too complex",
-      context = "Overloaded with charts",
-      tension = "Confusing layout",
-      resolution = "Introduce clear grouping"
-    )
+  bid_notice(
+    problem = "Users struggle with information overload",
+    evidence = "Survey results indicate delays"
   )
 
 # Auto-selected layout with concept-grouped suggestions
-structure_result <- bid_structure(previous_stage = interpret)
+structure_result <- bid_structure(previous_stage = notice_result)
 print(structure_result$layout)  # Auto-selected layout
 print(structure_result$suggestions)  # Ranked suggestions by concept
 
