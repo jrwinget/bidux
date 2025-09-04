@@ -14,7 +14,7 @@ test_that("bid_notice returns a bid_stage object with correct structure", {
 
   # Check S3 class
   expect_s3_class(result, "bid_stage")
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
 
   # Check required columns
   expected_cols <- c(

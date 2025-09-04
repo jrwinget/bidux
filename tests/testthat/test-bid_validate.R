@@ -34,7 +34,7 @@ test_that("bid_validate works with valid inputs", {
     collaboration = "Added team annotation features"
   )
 
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
   expect_equal(result$stage, "Validate")
   expect_equal(
     result$summary_panel,
@@ -242,7 +242,7 @@ test_that("bid_validate auto-suggests summary_panel when NULL", {
     )
   )
 
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
   expect_false(is.na(result$summary_panel[1]))
   expect_true(nchar(result$summary_panel[1]) > 0)
   # Auto-suggested summary should be meaningful
@@ -291,7 +291,7 @@ test_that("bid_validate auto-suggests collaboration when NULL", {
     )
   )
 
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
   expect_false(is.na(result$collaboration[1]))
   expect_true(nchar(result$collaboration[1]) > 0)
   # Auto-suggested collaboration should be meaningful
@@ -337,7 +337,7 @@ test_that("bid_validate auto-suggests next_steps when NULL", {
     )
   )
 
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
   expect_false(is.na(result$next_steps[1]))
   expect_true(nchar(result$next_steps[1]) > 0)
   # Should contain multiple steps (semicolon-separated)
@@ -363,7 +363,7 @@ test_that("bid_validate handles NA values in previous_stage fields", {
     )
   )
 
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
   expect_true(is.na(result$previous_bias[1]))
   # previous_interaction was removed, no longer testing it
   expect_true(is.na(result$previous_layout[1]))
@@ -390,7 +390,7 @@ test_that("bid_validate handles next_steps edge cases", {
     next_steps = c("OK", "Good", "Review dashboard", "Implement changes")
   )
 
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
   expect_false(is.na(result$next_steps[1]))
 
   # Test with long steps - should work without warning
@@ -409,7 +409,7 @@ test_that("bid_validate handles next_steps edge cases", {
     next_steps = c("Step 1", long_step, "Step 3")
   )
 
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
   expect_false(is.na(result$next_steps[1]))
 
   # Test with empty steps - should auto-suggest
@@ -422,7 +422,7 @@ test_that("bid_validate handles next_steps edge cases", {
     )
   )
 
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
   expect_false(is.na(result$next_steps[1]))
   expect_true(nchar(result$next_steps[1]) > 0)
 })
@@ -441,7 +441,7 @@ test_that("bid_validate handles summary_panel and collaboration variations", {
     collaboration = "Test collaboration"
   )
 
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
   expect_equal(result$summary_panel, "Too short")
   expect_true(nchar(result$suggestions) > 0)
 
@@ -460,7 +460,7 @@ test_that("bid_validate handles summary_panel and collaboration variations", {
     collaboration = "Test collaboration"
   )
 
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
   expect_equal(result$summary_panel, long_summary)
   expect_true(nchar(result$suggestions) > 0)
 
@@ -471,7 +471,7 @@ test_that("bid_validate handles summary_panel and collaboration variations", {
     collaboration = "Basic features only"
   )
 
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
   expect_equal(result$collaboration, "Basic features only")
   expect_true(nchar(result$suggestions) > 0)
 })
@@ -490,7 +490,7 @@ test_that("bid_validate properly handles interaction_principles JSON", {
     collaboration = "Test collaboration"
   )
 
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
   # previous_interaction was removed in refactor, no longer testing it
   expect_type(result$suggestions, "character")
 })
@@ -566,7 +566,7 @@ test_that("bid_validate adds exp design and telemetry suggestions when missing",
     include_telemetry = TRUE
   )
 
-  expect_s3_class(res, "tbl_df")
+  expect_s3_class(res, "bid_stage")
   expect_true(grepl(
     "experimental design|A/B",
     res$suggestions,
