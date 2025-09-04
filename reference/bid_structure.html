@@ -7,7 +7,7 @@ specific component pointers and implementation rationales."><meta property="og:d
 selection and generates ranked, concept-grouped actionable UI/UX suggestions.
 Layout is intelligently chosen based on content analysis of previous stages
 using deterministic heuristics. Returns structured recommendations with
-specific component pointers and implementation rationales."><meta property="og:image" content="https://jrwinget.github.io/bidux/logo.png"></head><body>
+specific component pointers and implementation rationales."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -15,7 +15,7 @@ specific component pointers and implementation rationales."><meta property="og:i
 
     <a class="navbar-brand me-2" href="../index.html">bidux</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,7 +41,8 @@ specific component pointers and implementation rationales."><meta property="og:i
 </nav><div class="container template-reference-topic">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>Document Dashboard Structure Stage in BID Framework</h1>
+
+      <h1>Document Dashboard Structure Stage in BID Framework</h1>
 
       <div class="d-none name"><code>bid_structure.Rd</code></div>
     </div>
@@ -99,7 +100,8 @@ function will abort with a helpful error message.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p><strong>Layout Auto-Selection</strong>: Uses deterministic heuristics to analyze content
+    <p><strong>Layout Auto-Selection</strong>: For backwards compatibility with versions &lt; 0.3.0;
+to be removed in 0.4.0. Uses deterministic heuristics to analyze content
 from previous stages and select the most appropriate layout:</p><ul><li><p><strong>breathable</strong>: For information overload/confusion patterns</p></li>
 <li><p><strong>dual_process</strong>: For overview vs detail needs</p></li>
 <li><p><strong>grid</strong>: For grouping/comparison requirements</p></li>
@@ -113,34 +115,35 @@ relevance, layout appropriateness, and contextual factors.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">interpret</span> <span class="op">&lt;-</span> <span class="fu"><a href="bid_notice.html">bid_notice</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  problem <span class="op">=</span> <span class="st">"Users struggle with information overload"</span>,</span></span>
-<span class="r-in"><span>  evidence <span class="op">=</span> <span class="st">"Survey results indicate delays"</span></span></span>
-<span class="r-in"><span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    central_question <span class="op">=</span> <span class="st">"How can we simplify data presentation?"</span>,</span></span>
-<span class="r-in"><span>    data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>      hook <span class="op">=</span> <span class="st">"Data is too complex"</span>,</span></span>
-<span class="r-in"><span>      context <span class="op">=</span> <span class="st">"Overloaded with charts"</span>,</span></span>
-<span class="r-in"><span>      tension <span class="op">=</span> <span class="st">"Confusing layout"</span>,</span></span>
-<span class="r-in"><span>      resolution <span class="op">=</span> <span class="st">"Introduce clear grouping"</span></span></span>
-<span class="r-in"><span>    <span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">notice_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  central_question <span class="op">=</span> <span class="st">"How can we simplify data presentation?"</span>,</span></span>
+<span class="r-in"><span>  data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    hook <span class="op">=</span> <span class="st">"Data is too complex"</span>,</span></span>
+<span class="r-in"><span>    context <span class="op">=</span> <span class="st">"Overloaded with charts"</span>,</span></span>
+<span class="r-in"><span>    tension <span class="op">=</span> <span class="st">"Confusing layout"</span>,</span></span>
+<span class="r-in"><span>    resolution <span class="op">=</span> <span class="st">"Introduce clear grouping"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Auto-suggested theory: Processing Fluency (confidence: 70%)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Stage 1 (Notice) completed. (20% complete)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Problem: Users struggle with information overload</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Theory: Processing Fluency (auto-suggested)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Evidence: Survey results indicate delays</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Theory confidence: 70%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Next: Use bid_interpret() for Stage 2 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Stage 2 (Interpret) completed.</span>
+<span class="r-in"><span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="bid_notice.html">bid_notice</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    problem <span class="op">=</span> <span class="st">"Users struggle with information overload"</span>,</span></span>
+<span class="r-in"><span>    evidence <span class="op">=</span> <span class="st">"Survey results indicate delays"</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Stage 1 (Interpret) completed.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Central question: How can we simplify data presentation?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Your data story has all key elements. Focus on making each component compelling and relevant.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Your central question is appropriately scoped.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - No user personas defined </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Auto-suggested theory: Processing Fluency (confidence: 70%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Stage 2 (Notice) completed. (40% complete)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Problem: Users struggle with information overload</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Theory: Processing Fluency (auto-suggested)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Evidence: Survey results indicate delays</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Theory confidence: 70%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Next: Use bid_anticipate() for Stage 3 </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Auto-selected layout with concept-grouped suggestions</span></span></span>
-<span class="r-in"><span><span class="va">structure_result</span> <span class="op">&lt;-</span> <span class="fu">bid_structure</span><span class="op">(</span>previous_stage <span class="op">=</span> <span class="va">interpret</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">structure_result</span> <span class="op">&lt;-</span> <span class="fu">bid_structure</span><span class="op">(</span>previous_stage <span class="op">=</span> <span class="va">notice_result</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Unusual stage progression: Notice -&gt; Structure</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Auto-selected layout: breathable</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Detected information overload patterns; choosing 'breathable' to reduce cognitive load.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Tip: Learn more about any concept via bid_concept("&lt;concept&gt;").</span>
@@ -294,28 +297,49 @@ relevance, layout appropriateness, and contextual factors.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[4]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[4]]$concept</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Principle of Proximity"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Processing Fluency"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[4]]$suggestions</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[4]]$suggestions[[1]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[4]]$suggestions[[1]]$title</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Group related controls together"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Apply Processing Fluency principles"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[4]]$suggestions[[1]]$details</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Place filters and controls near the content they affect."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Consider how Processing Fluency applies to your breathable layout design."</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[4]]$suggestions[[1]]$components</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "bslib::layout_columns" "shiny::wellPanel"      "bslib::card"          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "bslib::card"           "shiny::fluidRow"       "bslib::layout_columns"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[4]]$suggestions[[1]]$rationale</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Spatial proximity indicates functional relationship."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Systematic application of Processing Fluency can improve user experience."</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[4]]$suggestions[[1]]$score</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.85</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.75</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">structure_result</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB; font-weight: bold;">=== BID Framework:</span> <span style="font-weight: bold;">Structure</span> <span style="font-weight: bold;">Stage Summary ===</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Metadata:</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    layout_type : breathable </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    auto_selected_layout : Yes </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    concepts_count : 4 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    suggestion_groups_count : 4 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    stage_number : 3 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    total_stages : 5 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Stage Data:</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    stage : Structure </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    layout : breathable </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    concepts : Cognitive Load Theory, Visual Hierarchy, Progressive Disclosure, Processing F... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    previous_problem : Users struggle with information overload </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    previous_theory : Processing Fluency </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    suggestions : list(concept = "Cognitive Load Theory", suggestions = list(list(title = "Limi... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-09-04 01:31:12 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
