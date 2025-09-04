@@ -54,7 +54,7 @@ structure_info <- bid_interpret(
 bid_anticipate(previous_stage = structure_info)
 
 # with accessibility included (default) and custom bias mitigations
-bid_anticipate(
+anticipate_result <- bid_anticipate(
   previous_stage = structure_info,
   bias_mitigations = list(
     anchoring = "Use context-aware references",
@@ -62,5 +62,7 @@ bid_anticipate(
   ),
   include_accessibility = TRUE
 )
+
+summary(anticipate_result)
 
 }

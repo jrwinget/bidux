@@ -37,12 +37,14 @@
 #' )
 #'
 #' # With explicit theory
-#' bid_notice(
+#' notice_result <- bid_notice(
 #'   previous_stage = interpret_result,
 #'   problem = "Mobile interface is difficult to navigate",
 #'   theory = "Fitts's Law",
 #'   evidence = "Mobile users report frustration with small touch targets"
 #' )
+#' 
+#' summary(notice_result)
 #'
 #' @export
 bid_notice <- function(

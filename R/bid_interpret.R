@@ -58,6 +58,8 @@
 #'     )
 #'   )
 #' )
+#' 
+#' summary(interpret_personas)
 #'
 #' @export
 bid_interpret <- function(

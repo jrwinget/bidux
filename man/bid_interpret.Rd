@@ -75,4 +75,6 @@ interpret_personas <- bid_interpret(
   )
 )
 
+summary(interpret_personas)
+
 }

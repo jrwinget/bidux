@@ -112,7 +112,8 @@ bid_validate <- function(
   normalized_previous <- normalize_previous_stage(previous_stage)
   previous_info <- extract_previous_stage_info(normalized_previous)
 
-  result <- tibble::tibble(
+  # create result tibble
+  result_data <- tibble::tibble(
     stage = "Validate",
     summary_panel = summary_panel %||% NA_character_,
     collaboration = collaboration %||% NA_character_,
@@ -131,6 +132,22 @@ bid_validate <- function(
     suggestions = suggestions,
     timestamp = .now()
   )
+
+  # create comprehensive metadata using standardized helper
+  metadata <- get_stage_metadata(
+    5,
+    list(
+      has_summary_panel = !is.null(summary_panel),
+      has_collaboration = !is.null(collaboration),
+      next_steps_count = length(parse_next_steps(next_steps_formatted)),
+      include_exp_design = include_exp_design,
+      include_telemetry = include_telemetry,
+      include_empower_tools = include_empower_tools
+    )
+  )
+
+  # create and validate bid_stage object
+  result <- bid_stage("Validate", result_data, metadata)
 
   bid_message(
     "Stage 5 (Validate) completed.",

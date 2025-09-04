@@ -38,7 +38,7 @@
 #' bid_anticipate(previous_stage = structure_info)
 #'
 #' # with accessibility included (default) and custom bias mitigations
-#' bid_anticipate(
+#' anticipate_result <- bid_anticipate(
 #'   previous_stage = structure_info,
 #'   bias_mitigations = list(
 #'     anchoring = "Use context-aware references",
@@ -46,6 +46,8 @@
 #'   ),
 #'   include_accessibility = TRUE
 #' )
+#' 
+#' summary(anticipate_result)
 #'
 #' @export
 bid_anticipate <- function(
@@ -450,7 +452,8 @@ bid_anticipate <- function(
   # normalize previous stage to ensure field name consistency
   normalized_previous <- normalize_previous_stage(previous_stage)
 
-  result <- tibble::tibble(
+  # create result tibble
+  result_data <- tibble::tibble(
     stage = "Anticipate",
     bias_mitigations = paste(
       names(bias_mitigations),
@@ -485,6 +488,21 @@ bid_anticipate <- function(
     suggestions = suggestions,
     timestamp = .now()
   )
+
+  # create comprehensive metadata using standardized helper
+  metadata <- get_stage_metadata(
+    4,
+    list(
+      bias_count = length(names(bias_mitigations)),
+      include_accessibility = include_accessibility,
+      layout = layout,
+      concepts_count = length(concepts),
+      auto_generated_biases = is.null(bias_mitigations)
+    )
+  )
+
+  # create and validate bid_stage object
+  result <- bid_stage("Anticipate", result_data, metadata)
 
   bid_message(
     "Stage 4 (Anticipate) completed.",
