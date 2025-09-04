@@ -1,49 +1,54 @@
 #' Document User Notice Stage in BID Framework
 #'
 #' @description
-#' This function documents the initial observation and problem identification
-#' stage. It represents stage 1 in the BID framework and now returns a
+#' This function documents the observation and problem identification
+#' stage. It represents stage 2 in the BID framework and now returns a
 #' structured bid_stage object with enhanced metadata and external mapping
 #' support.
 #'
+#' @param previous_stage A tibble or list output from the previous BID stage
+#'        function (typically bid_interpret).
 #' @param problem A character string describing the observed user problem.
 #' @param theory A character string describing the behavioral theory that might
 #'        explain the problem. If NULL, will be auto-suggested using external
 #'        theory mappings.
 #' @param evidence A character string describing evidence supporting the
 #'        problem.
-#' @param ... Additional parameters. Deprecated parameters like 'target_audience'
-#'        will generate warnings if provided.
+#' @param ... Additional parameters. Deprecated parameters (e.g.,
+#'        'target_audience') will generate warnings if provided.
 #'
 #' @return A bid_stage object containing the documented information for the
 #'         "Notice" stage with enhanced metadata and validation.
 #'
 #' @examples
-#' # Basic usage with auto-suggested theory
-#' notice_result <- bid_notice(
+#' interpret_result <- bid_interpret(
+#'   central_question = "How can we improve user task completion?",
+#'   data_story = list(
+#'     hook = "Users are struggling with complex interfaces",
+#'     resolution = "Simplify key interactions"
+#'   )
+#' )
+#'
+#' # Auto-suggested theory
+#' bid_notice(
+#'   previous_stage = interpret_result,
 #'   problem = "Users struggling with complex dropdowns and too many options",
 #'   evidence = "User testing shows 65% abandonment rate on filter selection"
 #' )
 #'
-#' # Print shows human-friendly summary
-#' print(notice_result)
-#'
-#' # Access underlying data
-#' summary(notice_result)
-#'
-#' # Check stage and metadata
-#' get_stage(notice_result)
-#' get_metadata(notice_result)
-#'
-#' # with explicit theory
-#' notice_explicit <- bid_notice(
+#' # With explicit theory
+#' notice_result <- bid_notice(
+#'   previous_stage = interpret_result,
 #'   problem = "Mobile interface is difficult to navigate",
 #'   theory = "Fitts's Law",
 #'   evidence = "Mobile users report frustration with small touch targets"
 #' )
+#' 
+#' summary(notice_result)
 #'
 #' @export
 bid_notice <- function(
+    previous_stage,
     problem,
     theory = NULL,
     evidence = NULL,
@@ -72,6 +77,11 @@ bid_notice <- function(
   }
 
   # standardized parameter validation
+  validate_bid_stage_params(
+    previous_stage,
+    "Notice",
+    list()
+  )
   validate_character_param(problem, "problem", min_length = 1)
   validate_character_param(evidence, "evidence", min_length = 1)
   validate_character_param(theory, "theory", allow_null = TRUE)
@@ -148,7 +158,7 @@ bid_notice <- function(
 
   # create comprehensive metadata using standardized helper
   metadata <- get_stage_metadata(
-    1,
+    2,
     list(
       auto_suggested_theory = auto_suggested_theory,
       theory_confidence = theory_confidence,
@@ -163,7 +173,7 @@ bid_notice <- function(
 
   # enhanced user feedback with progress tracking
   bid_message(
-    "Stage 1 (Notice) completed. (20% complete)",
+    "Stage 2 (Notice) completed. (40% complete)",
     paste0("Problem: ", truncate_text(problem_clean, 60)),
     paste0(
       "Theory: ",
@@ -174,7 +184,7 @@ bid_notice <- function(
     if (auto_suggested_theory) {
       paste0("Theory confidence: ", round(theory_confidence * 100), "%")
     },
-    "Next: Use bid_interpret() for Stage 2"
+    "Next: Use bid_anticipate() for Stage 3"
   )
 
   return(result)

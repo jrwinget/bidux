@@ -2,14 +2,19 @@ library(testthat)
 library(tibble)
 
 test_that("bid_notice returns a bid_stage object with correct structure", {
+  interpret_stage <- bid_interpret(
+    central_question = "How can we improve dashboard navigation?"
+  )
+  
   result <- bid_notice(
+    previous_stage = interpret_stage,
     problem = "Users struggle to navigate cluttered dashboards",
     evidence = "User testing showed increased time to locate key metrics."
   )
 
   # Check S3 class
   expect_s3_class(result, "bid_stage")
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
 
   # Check required columns
   expected_cols <- c(
@@ -29,7 +34,12 @@ test_that("bid_notice returns a bid_stage object with correct structure", {
 })
 
 test_that("bid_notice respects provided theory and doesn't auto-suggest", {
+  interpret_stage <- bid_interpret(
+    central_question = "How can we improve user experience?"
+  )
+  
   result <- bid_notice(
+    previous_stage = interpret_stage,
     problem = "Simple dashboard issue",
     evidence = "Users are confused by the interface layout",
     theory = "Custom Theory"
@@ -42,7 +52,12 @@ test_that("bid_notice respects provided theory and doesn't auto-suggest", {
 })
 
 test_that("bid_notice auto-suggests theory when not provided", {
+  interpret_stage <- bid_interpret(
+    central_question = "How can we reduce user overwhelm?"
+  )
+  
   result <- bid_notice(
+    previous_stage = interpret_stage,
     problem = "Users are overwhelmed with too many options in the dropdown",
     evidence = "User testing shows confusion"
   )
@@ -58,8 +73,13 @@ test_that("bid_notice auto-suggests theory when not provided", {
 })
 
 test_that("bid_notice warns for deprecated target_audience parameter", {
+  interpret_stage <- bid_interpret(
+    central_question = "How can we improve sales team efficiency?"
+  )
+  
   expect_warning(
     result <- bid_notice(
+      previous_stage = interpret_stage,
       problem = "Sales team struggles with complex filter combinations",
       evidence = "Training sessions revealed confusion with multiple selections",
       target_audience = "Sales representatives with varying technical skills"
@@ -71,7 +91,12 @@ test_that("bid_notice warns for deprecated target_audience parameter", {
 })
 
 test_that("bid_notice works correctly without target_audience", {
+  interpret_stage <- bid_interpret(
+    central_question = "How can we clarify chart design?"
+  )
+  
   result <- bid_notice(
+    previous_stage = interpret_stage,
     problem = "The chart is cluttered and confusing",
     evidence = "Feedback indicates users are disoriented."
   )
@@ -81,34 +106,56 @@ test_that("bid_notice works correctly without target_audience", {
 
 test_that("bid_notice warns for short problem description", {
   expect_warning(
-    bid_notice(problem = "Short", evidence = "Sufficient evidence provided."),
+    {
+      interpret_stage <- bid_interpret(central_question = "Test question?")
+      bid_notice(
+        previous_stage = interpret_stage,
+        problem = "Short", 
+        evidence = "Sufficient evidence provided."
+      )
+    },
     "Problem description is very short"
   )
 })
 
 test_that("bid_notice warns for short evidence description", {
   expect_warning(
-    bid_notice(
-      problem = "A sufficiently detailed problem description",
-      evidence = "Short"
-    ),
+    {
+      interpret_stage <- bid_interpret(central_question = "Test question?")
+      bid_notice(
+        previous_stage = interpret_stage,
+        problem = "A sufficiently detailed problem description",
+        evidence = "Short"
+      )
+    },
     "Evidence description is very short"
   )
 })
 
 test_that("bid_notice errors with proper validation messages", {
+  interpret_stage <- bid_interpret(central_question = "Test question?")
+  
   expect_error(
-    bid_notice(problem = 123, evidence = "Valid evidence"),
+    bid_notice(
+      previous_stage = interpret_stage,
+      problem = 123, 
+      evidence = "Valid evidence"
+    ),
     "'problem' must be a single character string"
   )
 
   expect_error(
-    bid_notice(problem = "Valid problem", evidence = 456),
+    bid_notice(
+      previous_stage = interpret_stage,
+      problem = "Valid problem", 
+      evidence = 456
+    ),
     "'evidence' must be a single character string"
   )
 
   expect_error(
     bid_notice(
+      previous_stage = interpret_stage,
       problem = "Valid problem",
       evidence = "Valid evidence",
       theory = 789
@@ -119,6 +166,7 @@ test_that("bid_notice errors with proper validation messages", {
   # target_audience parameter is now deprecated and ignored with warning
   expect_warning(
     bid_notice(
+      previous_stage = interpret_stage,
       problem = "Valid problem",
       evidence = "Valid evidence",
       target_audience = 101112
@@ -128,7 +176,12 @@ test_that("bid_notice errors with proper validation messages", {
 })
 
 test_that("bid_notice returns timestamp as a POSIXct object", {
+  interpret_stage <- bid_interpret(
+    central_question = "How can we improve user experience?"
+  )
+  
   result <- bid_notice(
+    previous_stage = interpret_stage,
     problem = "A sufficiently detailed problem description.",
     evidence = "Evidence with enough detail for proper matching of theories."
   )
@@ -136,13 +189,19 @@ test_that("bid_notice returns timestamp as a POSIXct object", {
 })
 
 test_that("bid_notice suggests appropriate theory based on problem description", {
+  interpret_stage <- bid_interpret(
+    central_question = "How can we reduce user overwhelm?"
+  )
+  
   result1 <- bid_notice(
+    previous_stage = interpret_stage,
     problem = "Users are overwhelmed with too many options in the dropdown",
     evidence = "User testing shows confusion"
   )
   expect_match(result1$theory, "Hick's Law", ignore.case = TRUE)
 
   result2 <- bid_notice(
+    previous_stage = interpret_stage,
     problem = "Dashboard layout is cluttered and disorganized",
     evidence = "Users can't find important metrics"
   )
@@ -155,28 +214,50 @@ test_that("bid_notice suggests appropriate theory based on problem description",
 })
 
 test_that("bid_notice handles empty strings and validates properly", {
+  interpret_stage <- bid_interpret(central_question = "Test question?")
+  
   expect_error(
-    bid_notice(problem = "", evidence = "Valid evidence"),
+    bid_notice(
+      previous_stage = interpret_stage,
+      problem = "", 
+      evidence = "Valid evidence"
+    ),
     "'problem' cannot be empty or contain only whitespace"
   )
 
   expect_error(
-    bid_notice(problem = "   ", evidence = "Valid evidence"),
+    bid_notice(
+      previous_stage = interpret_stage,
+      problem = "   ", 
+      evidence = "Valid evidence"
+    ),
     "'problem' cannot be empty or contain only whitespace"
   )
 
   expect_error(
-    bid_notice(problem = "Valid problem", evidence = ""),
+    bid_notice(
+      previous_stage = interpret_stage,
+      problem = "Valid problem", 
+      evidence = ""
+    ),
     "'evidence' cannot be empty or contain only whitespace"
   )
 
   expect_error(
-    bid_notice(problem = NULL, evidence = "Valid evidence"),
+    bid_notice(
+      previous_stage = interpret_stage,
+      problem = NULL, 
+      evidence = "Valid evidence"
+    ),
     "'problem' cannot be NULL"
   )
 
   expect_error(
-    bid_notice(problem = "Valid problem", evidence = NULL),
+    bid_notice(
+      previous_stage = interpret_stage,
+      problem = "Valid problem", 
+      evidence = NULL
+    ),
     "'evidence' cannot be NULL"
   )
 })
@@ -192,7 +273,12 @@ test_that("bid_notice handles edge cases in optional parameters", {
     collapse = ""
   )
 
+  interpret_stage <- bid_interpret(
+    central_question = "How can we improve user experience?"
+  )
+  
   result <- bid_notice(
+    previous_stage = interpret_stage,
     problem = long_problem,
     evidence = long_evidence
   )
@@ -202,6 +288,7 @@ test_that("bid_notice handles edge cases in optional parameters", {
   expect_equal(result$evidence, long_evidence)
 
   result <- bid_notice(
+    previous_stage = interpret_stage,
     problem = "UI is confusing",
     evidence = "Users report difficulties",
     theory = "My Custom Theory Framework"
@@ -211,7 +298,12 @@ test_that("bid_notice handles edge cases in optional parameters", {
 })
 
 test_that("bid_notice metadata contains expected information", {
+  interpret_stage <- bid_interpret(
+    central_question = "How can we simplify complex dashboards?"
+  )
+  
   result <- bid_notice(
+    previous_stage = interpret_stage,
     problem = "Complex dashboard with many options",
     evidence = "User feedback indicates confusion and task abandonment"
   )
@@ -230,17 +322,24 @@ test_that("bid_notice metadata contains expected information", {
   expect_true("custom_mappings_used" %in% names(metadata))
 
   # Check values
-  expect_equal(metadata$stage_number, 1)
+  expect_equal(metadata$stage_number, 2)
   expect_equal(metadata$total_stages, 5)
   expect_equal(metadata$validation_status, "completed")
   expect_false(metadata$custom_mappings_used)
 })
 
 test_that("bid_notice print method works correctly", {
-  result <- bid_notice(
-    problem = "Users struggle with complex data visualization",
-    evidence = "User testing revealed high task completion times",
-    target_audience = "Data analysts"
+  interpret_stage <- bid_interpret(
+    central_question = "How can we improve data visualization?"
+  )
+  
+  suppressWarnings(
+    result <- bid_notice(
+      previous_stage = interpret_stage,
+      problem = "Users struggle with complex data visualization",
+      evidence = "User testing revealed high task completion times",
+      target_audience = "Data analysts"
+    )
   )
 
   # Test that print method executes without error
@@ -253,7 +352,12 @@ test_that("bid_notice print method works correctly", {
 })
 
 test_that("bid_notice summary method works correctly", {
+  interpret_stage <- bid_interpret(
+    central_question = "How can we reduce interface complexity?"
+  )
+  
   result <- bid_notice(
+    previous_stage = interpret_stage,
     problem = "Complex interface overwhelms users",
     evidence = "Analytics show high bounce rates"
   )
@@ -265,7 +369,12 @@ test_that("bid_notice summary method works correctly", {
 })
 
 test_that("bid_notice as_tibble method works correctly", {
+  interpret_stage <- bid_interpret(
+    central_question = "How can we address interface complexity?"
+  )
+  
   result <- bid_notice(
+    previous_stage = interpret_stage,
     problem = "Interface complexity issue",
     evidence = "User research indicates problems"
   )
@@ -283,8 +392,13 @@ test_that("bid_notice as_tibble method works correctly", {
 })
 
 test_that("bid_notice theory confidence scoring works", {
+  interpret_stage <- bid_interpret(
+    central_question = "How can we reduce user overwhelm?"
+  )
+  
   # Test high-confidence match
   result1 <- bid_notice(
+    previous_stage = interpret_stage,
     problem = "Too many dropdown options overwhelm users",
     evidence = "Users abandon tasks when faced with many choices"
   )
@@ -294,6 +408,7 @@ test_that("bid_notice theory confidence scoring works", {
 
   # Test lower confidence scenario
   result2 <- bid_notice(
+    previous_stage = interpret_stage,
     problem = "General usability issues",
     evidence = "Some user complaints"
   )
@@ -303,7 +418,12 @@ test_that("bid_notice theory confidence scoring works", {
 })
 
 test_that("bid_notice generates appropriate suggestions", {
+  interpret_stage <- bid_interpret(
+    central_question = "How can we improve mobile interface usability?"
+  )
+  
   result <- bid_notice(
+    previous_stage = interpret_stage,
     problem = "Mobile interface is difficult to use",
     evidence = "Touch targets are too small"
   )
@@ -317,6 +437,7 @@ test_that("bid_notice generates appropriate suggestions", {
   )
 
   result2 <- bid_notice(
+    previous_stage = interpret_stage,
     problem = "Users struggle with too many choices",
     evidence = "Decision time is very long"
   )
@@ -327,5 +448,15 @@ test_that("bid_notice generates appropriate suggestions", {
     result2$suggestions,
     "target audience|design solutions",
     ignore.case = TRUE
+  )
+})
+
+test_that("bid_notice requires previous_stage parameter", {
+  expect_error(
+    bid_notice(
+      problem = "Users struggle with navigation",
+      evidence = "User testing shows confusion"
+    ),
+    "previous_stage"
   )
 })

@@ -237,8 +237,10 @@ validate_bid_stage_params <- function(
     previous_stage,
     current_stage,
     additional_params = list()) {
-  # validate previous stage
-  validate_required_params(previous_stage = previous_stage)
+  # validate previous stage (not required for Interpret stage which is first)
+  if (current_stage != "Interpret") {
+    validate_required_params(previous_stage = previous_stage)
+  }
   validate_previous_stage(previous_stage, current_stage)
 
   # validate additional parameters
@@ -277,12 +279,12 @@ validate_bid_stage_params <- function(
 #' @keywords internal
 #' @noRd
 validate_previous_stage <- function(previous_stage = NULL, current_stage) {
-  # Define the five valid stage names and their immediate predecessor
+  # Define the five valid stage names in the correct order (v0.3.0+)
   valid_stages <- c(
-    "Notice",
     "Interpret",
-    "Structure",
+    "Notice",
     "Anticipate",
+    "Structure", 
     "Validate"
   )
   stage_order <- valid_stages
@@ -301,12 +303,12 @@ validate_previous_stage <- function(previous_stage = NULL, current_stage) {
   }
 
   # 2) If previous_stage is NULL:
-  #    - Only allow silently if current_stage == "Notice"
+  #    - Only allow silently if current_stage == "Interpret" (first stage in v0.3.0+)
   if (is.null(previous_stage)) {
-    if (current_stage == "Notice") {
+    if (current_stage == "Interpret") {
       return(invisible(NULL))
     } else {
-      # Not Notice but no previous provided → issue warning about unusual progression
+      # Not Interpret but no previous provided → issue warning about unusual progression
       warning(
         paste0(
           "Unusual stage progression: (none) -> ",
@@ -348,7 +350,7 @@ validate_previous_stage <- function(previous_stage = NULL, current_stage) {
   idx_current <- match(current_stage, stage_order)
   idx_prev <- match(prev_stage_name, stage_order)
 
-  # If current_stage is "Notice", any non-NULL previous is unusual
+  # If current_stage is "Interpret" (first stage), any non-NULL previous is unusual
   if (idx_current == 1) {
     warning(
       paste0(

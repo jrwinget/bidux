@@ -5,19 +5,21 @@
 \title{Document User Interpretation Stage in BID Framework}
 \usage{
 bid_interpret(
-  previous_stage,
-  central_question = NULL,
+  previous_stage = NULL,
+  central_question,
   data_story = NULL,
   user_personas = NULL
 )
 }
 \arguments{
-\item{previous_stage}{A tibble or list output from an earlier BID stage
-function.}
+\item{previous_stage}{Optional tibble or list output from an earlier BID
+stage function. Since Interpret is the first stage in the BID
+framework, this is typically NULL but can accept previous stage output
+in some iteration scenarios.}
 
-\item{central_question}{A character string representing the main question to
-be answered. If NULL, will be suggested based on previous stage
-information.}
+\item{central_question}{Required. A character string representing the main
+question to be answered. If NULL, will be suggested based on previous
+stage information.}
 
 \item{data_story}{A list containing elements such as \code{hook},
 \code{context}, \code{tension}, \code{resolution}, and optionally
@@ -33,38 +35,23 @@ stage.
 }
 \description{
 This function documents the interpretation of user needs, capturing the
-central question and the data storytelling narrative. It represents stage 2
+central question and the data storytelling narrative. It represents stage 1
 in the BID framework.
 }
 \examples{
-notice <- bid_notice(
-  problem = "Users struggle with complex data",
-  evidence = "Test results indicate delays"
-)
-
 # Basic usage
-bid_interpret(
-  previous_stage = notice,
+interpret_result <- bid_interpret(
   central_question = "What drives the decline in user engagement?",
   data_story = list(
     hook = "Declining trend in engagement",
     context = "Previous high engagement levels",
     tension = "Unexpected drop",
-    resolution = "Investigate new UI changes",
-    audience = "Marketing team",
-    metrics = c("Daily Active Users", "Session Duration"),
-    visual_approach = "Comparison charts showing before/after UI change"
+    resolution = "Investigate new UI changes"
   )
 )
 
-# Let the function suggest content based on previous stage
-bid_interpret(
-  previous_stage = notice
-)
-
 # With user personas
-bid_interpret(
-  previous_stage = notice,
+interpret_personas <- bid_interpret(
   central_question = "How can we improve data discovery?",
   data_story = list(
     hook = "Users are missing key insights",
@@ -87,5 +74,7 @@ bid_interpret(
     )
   )
 )
+
+summary(interpret_personas)
 
 }

@@ -56,14 +56,14 @@ test_that("validate_required_params works correctly", {
 
 # validate_previous_stage tests
 test_that("validate_previous_stage works correctly", {
-  # Fresh start: only allowed if current_stage == "Notice"
-  expect_silent(validate_previous_stage(NULL, "Notice"))
+  # Fresh start: only allowed if current_stage == "Interpret" (first stage in v0.3.0+)
+  expect_silent(validate_previous_stage(NULL, "Interpret"))
 
-  # Immediate predecessor steps (linear order) → no warning
-  expect_silent(validate_previous_stage("Notice", "Interpret"))
-  expect_silent(validate_previous_stage("Interpret", "Structure"))
-  expect_silent(validate_previous_stage("Structure", "Anticipate"))
-  expect_silent(validate_previous_stage("Anticipate", "Validate"))
+  # Immediate predecessor steps (new linear order) → no warning
+  expect_silent(validate_previous_stage("Interpret", "Notice"))
+  expect_silent(validate_previous_stage("Notice", "Anticipate"))
+  expect_silent(validate_previous_stage("Anticipate", "Structure"))
+  expect_silent(validate_previous_stage("Structure", "Validate"))
 
   # Invalid current stage → error with "Invalid stage: X. Must be one of: …"
   expect_error(
@@ -79,18 +79,18 @@ test_that("validate_previous_stage works correctly", {
 
   # Unusual progression (skipping an immediate predecessor) → warning
   expect_warning(
-    validate_previous_stage("Notice", "Structure"),
-    "Unusual stage progression: Notice -> Structure"
+    validate_previous_stage("Interpret", "Structure"),
+    "Unusual stage progression: Interpret -> Structure"
   )
   expect_warning(
-    validate_previous_stage("Interpret", "Validate"),
-    "Unusual stage progression: Interpret -> Validate"
+    validate_previous_stage("Notice", "Validate"),
+    "Unusual stage progression: Notice -> Validate"
   )
 
-  # If current_stage=="Notice" but previous_stage non-NULL → warning
+  # If current_stage=="Interpret" but previous_stage non-NULL → warning (since it's first stage)
   expect_warning(
-    validate_previous_stage("Interpret", "Notice"),
-    "Unusual stage progression: Interpret -> Notice"
+    validate_previous_stage("Notice", "Interpret"),
+    "Unusual stage progression: Notice -> Interpret"
   )
 })
 
@@ -159,8 +159,10 @@ test_that("utility functions integrate with bid_stage system", {
   expect_equal(truncated_problem, "Test problem that...")
 
   # validate_previous_stage from a bid_stage object
-  expect_silent(validate_previous_stage(NULL, get_stage(stage_obj)))
-  expect_silent(validate_previous_stage(get_stage(stage_obj), "Interpret"))
+  # Since stage_obj is "Notice", NULL should cause warning (first stage is now Interpret)
+  expect_warning(validate_previous_stage(NULL, get_stage(stage_obj)))
+  # "Notice" -> "Interpret" should cause warning (wrong direction)
+  expect_warning(validate_previous_stage(get_stage(stage_obj), "Interpret"))
 })
 
 # Utility error messages are helpful

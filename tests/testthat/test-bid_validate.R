@@ -1,34 +1,40 @@
 test_that("bid_validate works with valid inputs", {
+  # New workflow: Interpret -> Notice -> Anticipate -> Structure  
+  interpret_result <- bid_interpret(
+    central_question = "How to simplify?",
+    data_story = list(
+      hook = "Users are confused",
+      context = "Dashboard has evolved over time"
+    )
+  )
+  
+  notice_result <- bid_notice(
+    previous_stage = interpret_result,
+    problem = "Complex interface",
+    theory = "Cognitive Load Theory",
+    evidence = "User complaints"
+  )
+  
   anticipate_result <- bid_anticipate(
-    bid_structure(
-      bid_interpret(
-        bid_notice(
-          problem = "Complex interface",
-          theory = "Cognitive Load Theory",
-          evidence = "User complaints"
-        ),
-        central_question = "How to simplify?",
-        data_story = list(
-          hook = "Users are confused",
-          context = "Dashboard has evolved over time"
-        )
-      ),
-
-      concepts = c("Principle of Proximity", "Default Effect")
-    ),
+    previous_stage = notice_result,
     bias_mitigations = list(
       anchoring = "Provide reference points",
       framing = "Use consistent positive framing"
     )
   )
+  
+  structure_result <- bid_structure(
+    previous_stage = anticipate_result,
+    concepts = c("Principle of Proximity", "Default Effect")
+  )
 
   result <- bid_validate(
-    previous_stage = anticipate_result,
+    previous_stage = structure_result,
     summary_panel = "Dashboard simplified for quicker insights",
     collaboration = "Added team annotation features"
   )
 
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
   expect_equal(result$stage, "Validate")
   expect_equal(
     result$summary_panel,
@@ -47,33 +53,39 @@ test_that("bid_validate fails with missing previous_stage", {
 })
 
 test_that("bid_validate allows optional parameters", {
+  # New workflow: Interpret -> Notice -> Anticipate -> Structure
+  interpret_result <- bid_interpret(
+    central_question = "How to simplify?",
+    data_story = list(
+      hook = "Users are confused",
+      context = "Dashboard has evolved over time"
+    )
+  )
+  
+  notice_result <- bid_notice(
+    previous_stage = interpret_result,
+    problem = "Complex interface",
+    theory = "Cognitive Load Theory", 
+    evidence = "User complaints"
+  )
+  
   anticipate_result <- bid_anticipate(
-    bid_structure(
-      bid_interpret(
-        bid_notice(
-          problem = "Complex interface",
-          theory = "Cognitive Load Theory",
-          evidence = "User complaints"
-        ),
-        central_question = "How to simplify?",
-        data_story = list(
-          hook = "Users are confused",
-          context = "Dashboard has evolved over time"
-        )
-      ),
-
-      concepts = c("Principle of Proximity", "Default Effect")
-    ),
+    previous_stage = notice_result,
     bias_mitigations = list(
       anchoring = "Provide reference points",
       framing = "Use consistent positive framing"
     )
   )
+  
+  structure_result <- bid_structure(
+    previous_stage = anticipate_result,
+    concepts = c("Principle of Proximity", "Default Effect")
+  )
 
   # Should not error when only summary_panel is provided
   expect_no_error(
     bid_validate(
-      previous_stage = anticipate_result,
+      previous_stage = structure_result,
       summary_panel = "Test"
     )
   )
@@ -81,35 +93,42 @@ test_that("bid_validate allows optional parameters", {
   # Should not error when only collaboration is provided
   expect_no_error(
     bid_validate(
-      previous_stage = anticipate_result,
+      previous_stage = structure_result,
       collaboration = "Test"
     )
   )
 })
 
 test_that("bid_validate validates boolean parameters", {
+  # New workflow: Interpret -> Notice -> Anticipate -> Structure
+  interpret_result <- bid_interpret(
+    central_question = "How to simplify?",
+    data_story = list(
+      hook = "Users are confused",
+      context = "Dashboard has evolved over time"
+    )
+  )
+  
+  notice_result <- bid_notice(
+    previous_stage = interpret_result,
+    problem = "Complex interface",
+    theory = "Cognitive Load Theory",
+    evidence = "User complaints"
+  )
+  
   anticipate_result <- bid_anticipate(
-    bid_structure(
-      bid_interpret(
-        bid_notice(
-          problem = "Complex interface",
-          theory = "Cognitive Load Theory",
-          evidence = "User complaints"
-        ),
-        central_question = "How to simplify?",
-        data_story = list(
-          hook = "Users are confused",
-          context = "Dashboard has evolved over time"
-        )
-      )
-    ),
+    previous_stage = notice_result,
     bias_mitigations = list(anchoring = "Provide reference points")
+  )
+  
+  structure_result <- bid_structure(
+    previous_stage = anticipate_result
   )
 
   # Test invalid include_exp_design
   expect_error(
     bid_validate(
-      previous_stage = anticipate_result,
+      previous_stage = structure_result,
       include_exp_design = "not_logical"
     ),
     "Parameter 'include_exp_design' must be a single logical value \\(TRUE/FALSE\\)"
@@ -118,7 +137,7 @@ test_that("bid_validate validates boolean parameters", {
   # Test invalid include_telemetry
   expect_error(
     bid_validate(
-      previous_stage = anticipate_result,
+      previous_stage = structure_result,
       include_telemetry = c(TRUE, FALSE)
     ),
     "Parameter 'include_telemetry' must be a single logical value \\(TRUE/FALSE\\)"
@@ -127,7 +146,7 @@ test_that("bid_validate validates boolean parameters", {
   # Test invalid include_empower_tools
   expect_error(
     bid_validate(
-      previous_stage = anticipate_result,
+      previous_stage = structure_result,
       include_empower_tools = 1
     ),
     "Parameter 'include_empower_tools' must be a single logical value \\(TRUE/FALSE\\)"
@@ -136,7 +155,7 @@ test_that("bid_validate validates boolean parameters", {
   # Test valid boolean values work
   expect_no_error(
     bid_validate(
-      previous_stage = anticipate_result,
+      previous_stage = structure_result,
       include_exp_design = FALSE,
       include_telemetry = TRUE,
       include_empower_tools = FALSE
@@ -145,31 +164,37 @@ test_that("bid_validate validates boolean parameters", {
 })
 
 test_that("bid_validate provides contextual suggestions", {
+  # New workflow: Interpret -> Notice -> Anticipate -> Structure
+  interpret_result <- bid_interpret(
+    central_question = "How to simplify?",
+    data_story = list(
+      hook = "Users are confused",
+      context = "Dashboard has evolved over time"
+    )
+  )
+  
+  notice_result <- bid_notice(
+    previous_stage = interpret_result,
+    problem = "Complex interface",
+    theory = "Cognitive Load Theory",
+    evidence = "User complaints"
+  )
+  
   anticipate_result <- bid_anticipate(
-    bid_structure(
-      bid_interpret(
-        bid_notice(
-          problem = "Complex interface",
-          theory = "Cognitive Load Theory",
-          evidence = "User complaints"
-        ),
-        central_question = "How to simplify?",
-        data_story = list(
-          hook = "Users are confused",
-          context = "Dashboard has evolved over time"
-        )
-      ),
-
-      concepts = c("Principle of Proximity", "Default Effect")
-    ),
+    previous_stage = notice_result,
     bias_mitigations = list(
       anchoring = "Provide reference points",
       framing = "Use consistent positive framing"
     )
   )
+  
+  structure_result <- bid_structure(
+    previous_stage = anticipate_result,
+    concepts = c("Principle of Proximity", "Default Effect")
+  )
 
   result <- bid_validate(
-    previous_stage = anticipate_result,
+    previous_stage = structure_result,
     summary_panel = "Dashboard improved",
     collaboration = "Added team features"
   )
@@ -180,38 +205,44 @@ test_that("bid_validate provides contextual suggestions", {
 })
 
 test_that("bid_validate auto-suggests summary_panel when NULL", {
+  # New workflow: Interpret -> Notice -> Anticipate -> Structure
+  interpret_result <- bid_interpret(
+    central_question = "How to simplify?",
+    data_story = list(
+      hook = "Users are confused",
+      context = "Dashboard has evolved over time"
+    )
+  )
+  
+  notice_result <- bid_notice(
+    previous_stage = interpret_result,
+    problem = "Complex interface",
+    theory = "Cognitive Load Theory",
+    evidence = "User complaints"
+  )
+  
   anticipate_result <- bid_anticipate(
-    bid_structure(
-      bid_interpret(
-        bid_notice(
-          problem = "Complex interface",
-          theory = "Cognitive Load Theory",
-          evidence = "User complaints"
-        ),
-        central_question = "How to simplify?",
-        data_story = list(
-          hook = "Users are confused",
-          context = "Dashboard has evolved over time"
-        )
-      ),
-
-      concepts = c("Principle of Proximity", "Default Effect")
-    ),
+    previous_stage = notice_result,
     bias_mitigations = list(
       anchoring = "Provide reference points",
       framing = "Use consistent positive framing"
     )
   )
+  
+  structure_result <- bid_structure(
+    previous_stage = anticipate_result,
+    concepts = c("Principle of Proximity", "Default Effect")
+  )
 
   suppressMessages(
     result <- bid_validate(
-      previous_stage = anticipate_result,
+      previous_stage = structure_result,
       summary_panel = NULL,
       collaboration = "Added team annotation features"
     )
   )
 
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
   expect_false(is.na(result$summary_panel[1]))
   expect_true(nchar(result$summary_panel[1]) > 0)
   # Auto-suggested summary should be meaningful
@@ -219,23 +250,24 @@ test_that("bid_validate auto-suggests summary_panel when NULL", {
 })
 
 test_that("bid_validate auto-suggests collaboration when NULL", {
+  # New workflow: Interpret -> Notice -> Anticipate -> Structure
+  interpret_result <- bid_interpret(
+    central_question = "How to simplify?",
+    data_story = list(
+      hook = "Users are confused",
+      context = "Dashboard has evolved over time"
+    )
+  )
+  
+  notice_result <- bid_notice(
+    previous_stage = interpret_result,
+    problem = "Complex interface",
+    theory = "Cognitive Load Theory",
+    evidence = "User complaints"
+  )
+  
   anticipate_result <- bid_anticipate(
-    bid_structure(
-      bid_interpret(
-        bid_notice(
-          problem = "Complex interface",
-          theory = "Cognitive Load Theory",
-          evidence = "User complaints"
-        ),
-        central_question = "How to simplify?",
-        data_story = list(
-          hook = "Users are confused",
-          context = "Dashboard has evolved over time"
-        )
-      ),
-
-      concepts = c("Principle of Proximity", "Default Effect")
-    ),
+    previous_stage = notice_result,
     bias_mitigations = list(
       anchoring = "Provide reference points",
       framing = "Use consistent positive framing"
@@ -245,16 +277,21 @@ test_that("bid_validate auto-suggests collaboration when NULL", {
       feedback = "Visual feedback for selected items"
     )
   )
+  
+  structure_result <- bid_structure(
+    previous_stage = anticipate_result,
+    concepts = c("Principle of Proximity", "Default Effect")
+  )
 
   suppressMessages(
     result <- bid_validate(
-      previous_stage = anticipate_result,
+      previous_stage = structure_result,
       summary_panel = "Test summary",
       collaboration = NULL
     )
   )
 
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
   expect_false(is.na(result$collaboration[1]))
   expect_true(nchar(result$collaboration[1]) > 0)
   # Auto-suggested collaboration should be meaningful
@@ -262,39 +299,45 @@ test_that("bid_validate auto-suggests collaboration when NULL", {
 })
 
 test_that("bid_validate auto-suggests next_steps when NULL", {
+  # New workflow: Interpret -> Notice -> Anticipate -> Structure
+  interpret_result <- bid_interpret(
+    central_question = "How to simplify?",
+    data_story = list(
+      hook = "Users are confused",
+      context = "Dashboard has evolved over time"
+    )
+  )
+  
+  notice_result <- bid_notice(
+    previous_stage = interpret_result,
+    problem = "Complex interface",
+    theory = "Cognitive Load Theory",
+    evidence = "User complaints"
+  )
+  
   anticipate_result <- bid_anticipate(
-    bid_structure(
-      bid_interpret(
-        bid_notice(
-          problem = "Complex interface",
-          theory = "Cognitive Load Theory",
-          evidence = "User complaints"
-        ),
-        central_question = "How to simplify?",
-        data_story = list(
-          hook = "Users are confused",
-          context = "Dashboard has evolved over time"
-        )
-      ),
-
-      concepts = c("Principle of Proximity", "Default Effect")
-    ),
+    previous_stage = notice_result,
     bias_mitigations = list(
       anchoring = "Provide reference points",
       framing = "Use consistent positive framing"
     )
   )
+  
+  structure_result <- bid_structure(
+    previous_stage = anticipate_result,
+    concepts = c("Principle of Proximity", "Default Effect")
+  )
 
   suppressMessages(
     result <- bid_validate(
-      previous_stage = anticipate_result,
+      previous_stage = structure_result,
       summary_panel = "Test summary",
       collaboration = "Test collaboration",
       next_steps = NULL
     )
   )
 
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
   expect_false(is.na(result$next_steps[1]))
   expect_true(nchar(result$next_steps[1]) > 0)
   # Should contain multiple steps (semicolon-separated)
@@ -320,7 +363,7 @@ test_that("bid_validate handles NA values in previous_stage fields", {
     )
   )
 
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
   expect_true(is.na(result$previous_bias[1]))
   # previous_interaction was removed, no longer testing it
   expect_true(is.na(result$previous_layout[1]))
@@ -333,21 +376,21 @@ test_that("bid_validate handles NA values in previous_stage fields", {
 })
 
 test_that("bid_validate handles next_steps edge cases", {
-  anticipate_result <- tibble(
-    stage = "Anticipate",
-    bias_mitigations = "test: value",
+  structure_result <- tibble(
+    stage = "Structure",
+    components_overview = "test components",
     timestamp = Sys.time()
   )
 
   # Test with short steps - should work without warning
   result <- bid_validate(
-    previous_stage = anticipate_result,
+    previous_stage = structure_result,
     summary_panel = "Test summary",
     collaboration = "Test collaboration",
     next_steps = c("OK", "Good", "Review dashboard", "Implement changes")
   )
 
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
   expect_false(is.na(result$next_steps[1]))
 
   # Test with long steps - should work without warning
@@ -360,26 +403,26 @@ test_that("bid_validate handles next_steps edge cases", {
   )
 
   result <- bid_validate(
-    previous_stage = anticipate_result,
+    previous_stage = structure_result,
     summary_panel = "Test summary",
     collaboration = "Test collaboration",
     next_steps = c("Step 1", long_step, "Step 3")
   )
 
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
   expect_false(is.na(result$next_steps[1]))
 
   # Test with empty steps - should auto-suggest
   suppressMessages(
     result <- bid_validate(
-      previous_stage = anticipate_result,
+      previous_stage = structure_result,
       summary_panel = "Test summary",
       collaboration = "Test collaboration",
       next_steps = c("", "  ", "")
     )
   )
 
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
   expect_false(is.na(result$next_steps[1]))
   expect_true(nchar(result$next_steps[1]) > 0)
 })
@@ -398,7 +441,7 @@ test_that("bid_validate handles summary_panel and collaboration variations", {
     collaboration = "Test collaboration"
   )
 
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
   expect_equal(result$summary_panel, "Too short")
   expect_true(nchar(result$suggestions) > 0)
 
@@ -417,7 +460,7 @@ test_that("bid_validate handles summary_panel and collaboration variations", {
     collaboration = "Test collaboration"
   )
 
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
   expect_equal(result$summary_panel, long_summary)
   expect_true(nchar(result$suggestions) > 0)
 
@@ -428,7 +471,7 @@ test_that("bid_validate handles summary_panel and collaboration variations", {
     collaboration = "Basic features only"
   )
 
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
   expect_equal(result$collaboration, "Basic features only")
   expect_true(nchar(result$suggestions) > 0)
 })
@@ -447,7 +490,7 @@ test_that("bid_validate properly handles interaction_principles JSON", {
     collaboration = "Test collaboration"
   )
 
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "bid_stage")
   # previous_interaction was removed in refactor, no longer testing it
   expect_type(result$suggestions, "character")
 })
@@ -523,7 +566,7 @@ test_that("bid_validate adds exp design and telemetry suggestions when missing",
     include_telemetry = TRUE
   )
 
-  expect_s3_class(res, "tbl_df")
+  expect_s3_class(res, "bid_stage")
   expect_true(grepl(
     "experimental design|A/B",
     res$suggestions,

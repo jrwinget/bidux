@@ -1,5 +1,10 @@
 test_that("bid_suggest_components returns tibble with correct structure", {
+  interpret_result <- bid_interpret(
+    central_question = "How can we help users with complex data?"
+  )
+  
   notice_result <- bid_notice(
+    previous_stage = interpret_result,
     problem = "Users struggle with complex data",
     theory = "Cognitive Load Theory",
     evidence = "User complaints"
@@ -18,7 +23,12 @@ test_that("bid_suggest_components returns tibble with correct structure", {
 })
 
 test_that("bid_suggest_components filters by package correctly", {
+  interpret_result <- bid_interpret(
+    central_question = "How can we help users with complex data?"
+  )
+  
   notice_result <- bid_notice(
+    previous_stage = interpret_result,
     problem = "Users struggle with complex data",
     theory = "Cognitive Load Theory",
     evidence = "User complaints"
@@ -65,7 +75,12 @@ test_that("bid_suggest_components handles invalid inputs", {
     "bid_stage must contain a 'stage' column"
   )
 
+  interpret_result <- bid_interpret(
+    central_question = "What is the test question?"
+  )
+  
   notice_result <- bid_notice(
+    previous_stage = interpret_result,
     problem = "Test problem",
     evidence = "Test evidence"
   )
@@ -77,7 +92,12 @@ test_that("bid_suggest_components handles invalid inputs", {
 })
 
 test_that("bid_suggest_components calculates relevance scores correctly", {
+  interpret_result <- bid_interpret(
+    central_question = "How can we help users with complex data?"
+  )
+  
   notice_result <- bid_notice(
+    previous_stage = interpret_result,
     problem = "Users struggle with complex data",
     theory = "Cognitive Load Theory",
     evidence = "User complaints"
@@ -98,7 +118,12 @@ test_that("bid_suggest_components calculates relevance scores correctly", {
 
 test_that("bid_suggest_components works with different BID stages", {
   # Test with Notice stage
+  interpret_result <- bid_interpret(
+    central_question = "How to simplify the interface?"
+  )
+  
   notice_result <- bid_notice(
+    previous_stage = interpret_result,
     problem = "Complex interface",
     theory = "Cognitive Load Theory",
     evidence = "User feedback"
@@ -110,8 +135,8 @@ test_that("bid_suggest_components works with different BID stages", {
   expect_s3_class(notice_suggestions, "tbl_df")
 
   # Test with Interpret stage
-  interpret_result <- bid_interpret(
-    notice_result,
+  interpret_result2 <- bid_interpret(
+    previous_stage = notice_result,
     central_question = "How to simplify the interface?",
     data_story = list(
       hook = "Users are confused",
@@ -120,7 +145,7 @@ test_that("bid_suggest_components works with different BID stages", {
   )
 
   suppressMessages({
-    interpret_suggestions <- bid_suggest_components(interpret_result)
+    interpret_suggestions <- bid_suggest_components(interpret_result2)
   })
   expect_s3_class(interpret_suggestions, "tbl_df")
 
@@ -153,7 +178,12 @@ test_that("bid_suggest_components handles edge cases", {
   expect_s3_class(minimal_suggestions, "tbl_df")
 
   # Test with empty package filter that has no matches
+  interpret_result <- bid_interpret(
+    central_question = "How can we help users with test data?"
+  )
+  
   notice_result <- bid_notice(
+    previous_stage = interpret_result,
     problem = "Test problem",
     evidence = "Test evidence"
   )
@@ -170,7 +200,12 @@ test_that("bid_suggest_components handles edge cases", {
 
 test_that("bid_suggest_components extracts concepts correctly", {
   # Test concept extraction from theory field
+  interpret_result <- bid_interpret(
+    central_question = "How can we improve visual hierarchy?"
+  )
+  
   notice_with_theory <- bid_notice(
+    previous_stage = interpret_result,
     problem = "Users need better visual hierarchy",
     theory = "Visual Hierarchies",
     evidence = "User testing"
@@ -202,7 +237,12 @@ test_that("bid_suggest_components extracts concepts correctly", {
 })
 
 test_that("bid_suggest_components provides appropriate user feedback", {
+  interpret_result <- bid_interpret(
+    central_question = "How can we improve user feedback?"
+  )
+  
   notice_result <- bid_notice(
+    previous_stage = interpret_result,
     problem = "Test problem",
     evidence = "Test evidence"
   )
@@ -220,13 +260,15 @@ test_that("bid_suggest_components provides appropriate user feedback", {
 })
 
 test_that("bid_suggest_components handles layout-specific scoring", {
+  interpret_result <- bid_interpret(
+    central_question = "How to organize content?"
+  )
+  
   structure_result <- bid_structure(
-    bid_interpret(
-      bid_notice(
-        problem = "Need better organization",
-        evidence = "User feedback"
-      ),
-      central_question = "How to organize content?"
+    bid_notice(
+      previous_stage = interpret_result,
+      problem = "Need better organization",
+      evidence = "User feedback"
     ),
 
     concepts = "Information Hierarchy"
@@ -259,7 +301,12 @@ test_that("bid_suggest_components handles layout-specific scoring", {
 })
 
 test_that("bid_suggest_components component database has required structure", {
+  interpret_result <- bid_interpret(
+    central_question = "How can we test the database?"
+  )
+  
   notice_result <- bid_notice(
+    previous_stage = interpret_result,
     problem = "Test problem",
     evidence = "Test evidence"
   )
@@ -295,7 +342,12 @@ test_that("bid_suggest_components component database has required structure", {
 })
 
 test_that("bid_suggest_components handles audience-based context", {
+  interpret_result <- bid_interpret(
+    central_question = "How can executive dashboard be simplified?"
+  )
+  
   notice_with_audience <- bid_notice(
+    previous_stage = interpret_result,
     problem = "Executive dashboard needs simplification",
     theory = "Cognitive Load Theory",
     evidence = "Executive feedback",

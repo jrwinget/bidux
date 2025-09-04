@@ -4,9 +4,12 @@
 \alias{bid_notice}
 \title{Document User Notice Stage in BID Framework}
 \usage{
-bid_notice(problem, theory = NULL, evidence = NULL, ...)
+bid_notice(previous_stage, problem, theory = NULL, evidence = NULL, ...)
 }
 \arguments{
+\item{previous_stage}{A tibble or list output from the previous BID stage
+function (typically bid_interpret).}
+
 \item{problem}{A character string describing the observed user problem.}
 
 \item{theory}{A character string describing the behavioral theory that might
@@ -16,41 +19,43 @@ theory mappings.}
 \item{evidence}{A character string describing evidence supporting the
 problem.}
 
-\item{...}{Additional parameters. Deprecated parameters like 'target_audience'
-will generate warnings if provided.}
+\item{...}{Additional parameters. Deprecated parameters (e.g.,
+'target_audience') will generate warnings if provided.}
 }
 \value{
 A bid_stage object containing the documented information for the
 "Notice" stage with enhanced metadata and validation.
 }
 \description{
-This function documents the initial observation and problem identification
-stage. It represents stage 1 in the BID framework and now returns a
+This function documents the observation and problem identification
+stage. It represents stage 2 in the BID framework and now returns a
 structured bid_stage object with enhanced metadata and external mapping
 support.
 }
 \examples{
-# Basic usage with auto-suggested theory
-notice_result <- bid_notice(
+interpret_result <- bid_interpret(
+  central_question = "How can we improve user task completion?",
+  data_story = list(
+    hook = "Users are struggling with complex interfaces",
+    resolution = "Simplify key interactions"
+  )
+)
+
+# Auto-suggested theory
+bid_notice(
+  previous_stage = interpret_result,
   problem = "Users struggling with complex dropdowns and too many options",
   evidence = "User testing shows 65\% abandonment rate on filter selection"
 )
 
-# Print shows human-friendly summary
-print(notice_result)
-
-# Access underlying data
-summary(notice_result)
-
-# Check stage and metadata
-get_stage(notice_result)
-get_metadata(notice_result)
-
-# with explicit theory
-notice_explicit <- bid_notice(
+# With explicit theory
+notice_result <- bid_notice(
+  previous_stage = interpret_result,
   problem = "Mobile interface is difficult to navigate",
   theory = "Fitts's Law",
   evidence = "Mobile users report frustration with small touch targets"
 )
+
+summary(notice_result)
 
 }

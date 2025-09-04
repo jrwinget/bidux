@@ -23,43 +23,33 @@
 #'         stage.
 #'
 #' @examples
-#' structure_input <- bid_notice(
-#'   problem  = "Issue with dropdown menus",
-#'   evidence = "User testing indicated delays"
-#' ) |>
-#'   bid_interpret(
-#'     central_question = "How can we improve selection efficiency?",
+#' validate_result <- bid_interpret(
+#'     central_question = "How can we improve delivery efficiency?",
 #'     data_story = list(
-#'       hook = "Too many options",
-#'       context = "Excessive choices",
+#'       hook = "Too many delays",
+#'       context = "Excessive shipments",
 #'       tension = "User frustration",
-#'       resolution = "Simplify menu"
+#'       resolution = "Increase delivery channels"
 #'     )
+#'   ) |>
+#'   bid_notice(
+#'     problem  = "Issue with dropdown menus",
+#'     evidence = "User testing indicated delays"
+#'   ) |>
+#'   bid_anticipate(
+#'     bias_mitigations = list(
+#'       anchoring = "Provide reference points",
+#'       framing = "Use gain-framed messaging"
+#'     )
+#'   ) |>
+#'   bid_structure() |>
+#'   bid_validate(
+#'    include_exp_design = FALSE,
+#'    include_telemetry = TRUE,
+#'    include_empower_tools = TRUE
 #'   )
 #'
-#' structure_result <- bid_structure(
-#'   previous_stage = structure_input,
-#'   concepts       = c("Principle of Proximity", "Default Effect")
-#' )
-#'
-#' anticipate <- bid_anticipate(
-#'   previous_stage = structure_result,
-#'   bias_mitigations = list(
-#'     anchoring = "Provide reference points",
-#'     framing   = "Use gain-framed messaging"
-#'   )
-#' )
-#'
-#' bid_validate(
-#'   previous_stage = anticipate,
-#'   summary_panel = "Clear summary of key insights with action items",
-#'   collaboration = "Team annotation and sharing features",
-#'   next_steps = c(
-#'     "Conduct user testing with target audience",
-#'     "Implement accessibility improvements",
-#'     "Add mobile responsiveness"
-#'   )
-#' )
+#' summary(validate_result)
 #'
 #' @export
 bid_validate <- function(
@@ -122,7 +112,8 @@ bid_validate <- function(
   normalized_previous <- normalize_previous_stage(previous_stage)
   previous_info <- extract_previous_stage_info(normalized_previous)
 
-  result <- tibble::tibble(
+  # create result tibble
+  result_data <- tibble::tibble(
     stage = "Validate",
     summary_panel = summary_panel %||% NA_character_,
     collaboration = collaboration %||% NA_character_,
@@ -141,6 +132,22 @@ bid_validate <- function(
     suggestions = suggestions,
     timestamp = .now()
   )
+
+  # create comprehensive metadata using standardized helper
+  metadata <- get_stage_metadata(
+    5,
+    list(
+      has_summary_panel = !is.null(summary_panel),
+      has_collaboration = !is.null(collaboration),
+      next_steps_count = length(parse_next_steps(next_steps_formatted)),
+      include_exp_design = include_exp_design,
+      include_telemetry = include_telemetry,
+      include_empower_tools = include_empower_tools
+    )
+  )
+
+  # create and validate bid_stage object
+  result <- bid_stage("Validate", result_data, metadata)
 
   bid_message(
     "Stage 5 (Validate) completed.",
@@ -527,6 +534,11 @@ extract_previous_stage_info <- function(previous_stage) {
     info$concepts <- safe_column_access(
       previous_stage,
       "concepts",
+      NA_character_
+    )
+    info$bias <- safe_column_access(
+      previous_stage,
+      "previous_bias",
       NA_character_
     )
     info$accessibility <- safe_column_access(
