@@ -70,12 +70,6 @@ bid_interpret <- function(
     cli::cli_abort("'data_story' must be a list")
   }
 
-  if (
-    !is.null(central_question) &&
-      (!is.character(central_question) || length(central_question) != 1)
-  ) {
-    cli::cli_abort("'central_question' must be a single character string")
-  }
 
   # standardized parameter validation for previous_stage if provided
   if (!is.null(previous_stage)) {
