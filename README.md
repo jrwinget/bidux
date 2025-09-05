@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# bidux <a href="https://github.com/jrwinget/bid-framework"><img src="man/figures/hex_bidux.png" align="right" height="138" /></a>
+# bidux <a href="https://github.com/jrwinget/bid-framework"><img src="man/figures/logo.png" align="right" height="138" /></a>
 
 <!-- badges: start -->
 
@@ -15,122 +15,200 @@ coverage](https://codecov.io/gh/jrwinget/bidux/graph/badge.svg)](https://app.cod
 Size](https://img.shields.io/github/languages/code-size/jrwinget/bidux)](https://github.com/jrwinget/bidux)
 <!-- badges: end -->
 
-## 📖 Overview
+## Overview
 
-`{bidux}` brings the Behavioral Insight Design (BID) framework into your
-Shiny development workflow. Follow five staged functions (Interpret,
-Notice, Anticipate, Structure, Validate) to systematically apply
-behavioral science to UI/UX design and build more intuitive dashboards.
+The `{bidux}` package helps Shiny developers create more effective
+dashboards using the **Behavioral Insight Design (BID) Framework**. If
+you’ve ever wondered why users struggle with your carefully crafted
+dashboards, or why your beautifully visualized data doesn’t drive the
+decisions you expected, this package is for you.
 
-## 🚀 Key Features
+**The core insight**: Technical excellence ≠ User success. Even the most
+sophisticated analysis can fail if users can’t quickly understand and
+act on it.
 
-- **Interpret** user needs (`bid_interpret()`)
-- **Notice** friction points (`bid_notice()`)
-- **Anticipate** behavior & biases (`bid_anticipate()`)
-- **Structure** dashboard layouts (`bid_structure()`)
-- **Validate** & empower users (`bid_validate()`)
-- **Telemetry Integration**: ingest real usage data to auto-detect UX
-  issues (`bid_ingest_telemetry()`)
-- **Component Suggestions**: get tailored UI component ideas for
-  `{bslib}`, `{shiny}`, `{reactable}`, `{echarts4r}`, and more
-- **Reporting**: generate HTML, Markdown, or text reports of your BID
-  process
+The BID framework bridges this gap by integrating behavioral science, UX
+best practices, and data storytelling techniques into a systematic
+5-stage process:
 
-## 📥 Installation
+1.  **Interpret** the User’s Need - Like defining your research question
+    and understanding your data
+2.  **Notice** the Problem - Like identifying data quality issues or
+    analytical bottlenecks  
+3.  **Anticipate** User Behavior - Like checking for statistical biases
+    that could skew results
+4.  **Structure** the Dashboard - Like choosing the right visualization
+    or model architecture
+5.  **Validate** & Empower the User - Like testing your model and
+    ensuring stakeholders can act on results
 
-Install from CRAN:
+## Installation
+
+You can install the released version of bidux from
+[CRAN](https://CRAN.R-project.org) with:
 
 ``` r
 install.packages("bidux")
 ```
 
-Or the development version:
+And the development version from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("pak")
 pak::pak("jrwinget/bidux")
 ```
 
-## ✅ Quick Start
+## Usage
 
 ``` r
-library(shiny)
 library(bidux)
 
-# Document a simple BID pipeline
+# Document a complete BID process
 process <- bid_interpret(
-    central_question = "Which metrics drive decisions?",
-    data_story = list(
-      hook = "Key metrics hidden",
-      resolution = "Surface top metrics up front"
-    )
-  ) |>
+  central_question = "How are our marketing campaigns performing across different channels?",
+  data_story = list(
+    hook = "Recent campaign performance varies significantly across channels",
+    context = "We've invested in 6 different marketing channels over the past quarter",
+    tension = "ROI metrics show inconsistent results, with some channels underperforming",
+    resolution = "Identify top-performing channels and key performance drivers"
+  )
+) |>
   bid_notice(
-    problem = "Users struggle to find key metrics",
-    evidence = "70% of users spent >30s searching"
+    problem = "Users are overwhelmed by too many filter options and struggle to find relevant insights",
+    evidence = "User testing shows 65% of first-time users fail to complete their intended task within 2 minutes"
   ) |>
   bid_anticipate(
-    bias_mitigations = list(anchoring = "Contextual defaults")
+    bias_mitigations = list(
+      anchoring = "Include previous period performance as reference points",
+      framing = "Provide toggle between ROI improvement vs. ROI gap views"
+    )
   ) |>
   bid_structure() |>
   bid_validate(
-    include_exp_design = FALSE,
-    include_telemetry = TRUE,
-    include_empower_tools = TRUE
+    summary_panel = "Executive summary highlighting top and bottom performers, key trends, and recommended actions",
+    next_steps = c(
+      "Review performance of bottom 2 channels",
+      "Increase budget for top-performing channel",
+      "Schedule team meeting to discuss optimization strategy"
+    )
   )
 
-# View suggestions
+# View implementation suggestions for specific packages
 bid_suggest_components(process, package = "bslib")
+bid_suggest_components(process, package = "reactable") 
 
-# Generate an HTML report
+# Generate comprehensive reports
 bid_report(process, format = "html")
+bid_report(process, format = "markdown")
 ```
 
-## 📊 Telemetry Integration
+## Data-Driven UX with Telemetry
 
-Leverage real user behavior to pinpoint UX friction with
-[`{shiny.telemetry}`](https://github.com/Appsilon/shiny.telemetry) data:
+**New in 0.3.1**: Enhanced telemetry workflow transforms real user
+behavior data into actionable BID insights.
 
 ``` r
-# Ingest telemetry from SQLite or JSON
-issues <- bid_ingest_telemetry(
-  "telemetry.sqlite",
-  format = "sqlite"
+# Modern approach: analyze telemetry data
+issues <- bid_telemetry("telemetry.sqlite")
+print(issues)  # Shows organized issue summary with severity levels
+
+# Focus on critical issues using tidy workflows
+critical_issues <- issues |>
+  filter(severity == "critical") |>
+  arrange(desc(user_impact))
+
+# Convert high-priority issues to BID Notice stages
+notices <- bid_notices(
+  issues = critical_issues,
+  previous_stage = interpret_result
 )
 
-# Inspect detected issues
-str(issues)
+# Use telemetry flags to inform structure decisions
+flags <- bid_flags(issues)
+structure_result <- bid_structure(
+  previous_stage = anticipate_result,
+  telemetry_flags = flags  # Influences layout selection
+)
 ```
 
-`bid_ingest_telemetry()` automatically flags five friction indicators:
+The `bid_telemetry()` function automatically identifies five key
+friction indicators:
 
-1.  **Unused Inputs**: controls rarely interacted with
-2.  **Delayed Interactions**: long time-to-first-action
-3.  **Frequent Errors**: recurring error patterns
-4.  **Navigation Drop-offs**: seldom-visited tabs/pages
-5.  **Confusion Patterns**: rapid repeated changes
+- **Unused Inputs**: UI controls rarely interacted with
+- **Delayed Interactions**: Long time-to-first-action patterns  
+- **Frequent Errors**: Recurring error patterns that disrupt workflows
+- **Navigation Drop-offs**: Pages or tabs users rarely visit
+- **Confusion Patterns**: Rapid repeated changes indicating user
+  uncertainty
 
-Use these insights to fuel the **Notice** stage and drive data-informed
-UI improvements. See the full example and thresholds customization in
-the See the package vignette 'Telemetry Integration' for a full example
-(accessible via `vignette("telemetry-integration", package="bidux")`).
+Legacy `bid_ingest_telemetry()` function maintains full backward
+compatibility while providing enhanced functionality through hybrid
+objects.
 
-## 📚 Vignettes
+## Key Features
 
-Explore detailed guides:
+### Behavioral Science Integration
 
-- `vignette("introduction-to-bid")`: BID framework overview
-- `vignette("getting-started")`: Quick start guide
-- `vignette("concepts-reference")`: Comprehensive concept dictionary
-- `vignette("telemetry-integration")`: Integrating telemetry with BIDUX
+- **Bias Mitigation**: Address anchoring, framing, confirmation bias,
+  and choice overload
+- **Cognitive Load Management**: Implement progressive disclosure and
+  visual hierarchy
+- **Peak-End Rule**: Structure experiences for positive, actionable
+  endings
 
-## 🤝 Contributing
+### Implementation Support
 
-We welcome all contributions! Please see [Contributing
-Guide](https://github.com/jrwinget/bidux/blob/main/.github/CONTRIBUTING.md)
-for guidelines, issue templates, and code style.
+- **Component Suggestions**: Get tailored recommendations for `{bslib}`,
+  `{reactable}`, `{echarts4r}`, and more
+- **Layout Selection**: Automatic layout recommendations based on
+  content and telemetry flags
+- **Concept Dictionary**: Access 50+ behavioral science concepts with
+  implementation tips
 
-## 📜 License & Code of Conduct
+### Real User Data Integration
 
-This project is MIT licensed. By contributing, you agree to our [Code of
-Conduct](https://github.com/jrwinget/bidux/blob/main/.github/CODE_OF_CONDUCT.md).
+- **Telemetry Analysis**: Transform usage patterns into design insights
+- **Evidence-Based Design**: Ground design decisions in actual user
+  behavior
+- **Iterative Improvement**: Track UX improvements with before/after
+  telemetry comparison
+
+## Learning More
+
+The BID framework is based on established behavioral science and UX
+design principles. Explore the concept dictionary:
+
+``` r
+# Browse all available concepts
+bid_concepts() |> 
+  select(concept, category, description)
+
+# Get detailed information about specific concepts  
+bid_concept("Processing Fluency")
+bid_concept("Hick's Law")
+
+# Search for concepts by keyword
+bid_concepts("cognitive") |>
+  select(concept, implementation_tips)
+```
+
+## Getting Help
+
+- Browse the documentation: `help(package = "bidux")`
+- Read the vignettes:
+  - `vignette("introduction-to-bid")`: Framework overview and core
+    principles
+  - `vignette("getting-started")`: Complete walkthrough with examples
+  - `vignette("concepts-reference")`: Behavioral science concepts with
+    practical implementation
+  - `vignette("telemetry-integration")`: Data-driven UX improvement
+    workflows
+- Visit the BID framework repository:
+  <https://github.com/jrwinget/bid-framework>
+
+## Code of Conduct
+
+Please note that the bidux project is released with a [Contributor Code
+of
+Conduct](https://contributor-covenant.org/version/2/1/CODE_OF_CONDUCT.html).
+By contributing to this project, you agree to abide by its terms.
