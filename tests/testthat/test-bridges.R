@@ -145,10 +145,10 @@ test_that("bid_notices respects filter parameter", {
   
   interpret_stage <- bid_interpret(central_question = "Test filtering?")
   
-  # test with filter
+  # test with filter (use NSE expression syntax)
   filtered_notices <- bid_notices(
     issues = issues_data,
-    filter = function(x) x$severity == "high",
+    filter = severity == "high",
     previous_stage = interpret_stage
   )
   

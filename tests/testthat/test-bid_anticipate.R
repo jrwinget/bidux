@@ -467,15 +467,22 @@ test_that("bid_anticipate handles custom layout warnings", {
   custom_layouts <- c("custom_layout", "non_standard", "undefined_layout")
   
   for (layout in custom_layouts) {
-    interpret_stage <- bid_interpret(central_question = "Test question")
-    notice_result <- bid_notice(interpret_stage, problem = "Test problem", theory = "Test Theory", evidence = "Test evidence")
+    # Create a previous stage with custom layout
+    notice_result <- tibble(
+      stage = "Notice",
+      problem = "Test problem",
+      theory = "Test Theory", 
+      evidence = "Test evidence",
+      layout = layout,
+      timestamp = Sys.time()
+    )
     
     expect_warning(
       result <- bid_anticipate(
         previous_stage = notice_result,
         bias_mitigations = list(anchoring = "Test")
       ),
-      paste0("Layout '", layout, "'.*not recognized")
+      "Layout.*not recognized"
     )
     
     expect_s3_class(result, "bid_stage")
@@ -645,7 +652,7 @@ test_that("bid_anticipate handles accessibility extraction from previous stages"
   
   suppressMessages(
     result1 <- bid_anticipate(
-      previous_stage = notice_result,
+      previous_stage = structure_result1,
       bias_mitigations = list(anchoring = "Test"),
       include_accessibility = TRUE
     )
@@ -663,7 +670,7 @@ test_that("bid_anticipate handles accessibility extraction from previous stages"
   
   suppressMessages(
     result2 <- bid_anticipate(
-      previous_stage = notice_result2,
+      previous_stage = structure_result2,
       bias_mitigations = list(anchoring = "Test"),
       include_accessibility = TRUE
     )

@@ -70,8 +70,20 @@ notices <- bid_notices(critical, previous_stage = interpret_result)
 
 ### BUG FIXES
 
+* **Fixed concept-based bias mitigation generation.** `bid_anticipate()` now correctly generates concept-specific biases (e.g., "attention bias" and "belief perseverance" for Visual Hierarchy) instead of falling back to generic biases.
+
+* **Improved stage flow validation.** Updated validation logic to support the flexible BID workflow where inner stages (Notice, Anticipate, Structure) can occur in any order, while maintaining proper validation for entry and exit points.
+
+* **Enhanced previous_stage handling.** Fixed validation errors when passing data.frame objects to BID functions by improving stage name extraction logic.
+
 * Fixed stage progression validation warnings in tests by correcting test sequences to follow proper BID framework order
 * Updated suggestion pattern matching in tests after DRY refactor consolidation
+
+### DEPRECATIONS
+
+* **Layout auto-selection is deprecated.** The layout selection feature in `bid_structure()` will be removed in bidux 0.4.0 to reduce complexity and focus on concept-based suggestions. Existing code continues to work with deprecation warnings.
+
+* **Layout-specific bias mitigations are deprecated.** The layout-dependent bias mappings in `bid_anticipate()` will be removed in bidux 0.4.0 in favor of concept-driven bias mitigations. Existing code continues to work with deprecation warnings.
 
 # bidux 0.3.0 (2025-08-29)
 ==========================

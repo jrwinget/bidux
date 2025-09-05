@@ -1477,12 +1477,27 @@ bid_notice_issue <- function(issue, previous_stage = NULL, override = list()) {
   }
   
   # extract values from issue, allowing overrides
-  problem <- override$problem %||% issue$problem[1] %||% "Telemetry issue identified"
-  evidence <- override$evidence %||% issue$evidence[1] %||% paste(
-    "Issue affects", issue$affected_sessions[1], "sessions",
-    paste0("(", round(issue$impact_rate[1] * 100, 1), "% impact)")
-  )
-  theory <- override$theory %||% issue$theory[1] %||% NULL
+  problem <- override$problem %||% 
+    (if ("problem" %in% names(issue)) issue$problem[1] else NULL) %||% 
+    "Telemetry issue identified"
+  
+  # Build evidence string safely
+  evidence_parts <- c()
+  if ("affected_sessions" %in% names(issue) && !is.na(issue$affected_sessions[1])) {
+    evidence_parts <- c(evidence_parts, paste("Issue affects", issue$affected_sessions[1], "sessions"))
+  }
+  if ("impact_rate" %in% names(issue) && !is.na(issue$impact_rate[1])) {
+    evidence_parts <- c(evidence_parts, paste0("(", round(issue$impact_rate[1] * 100, 1), "% impact)"))
+  }
+  
+  default_evidence <- if (length(evidence_parts) > 0) paste(evidence_parts, collapse = " ") else "Telemetry issue detected"
+  evidence <- override$evidence %||% 
+    (if ("evidence" %in% names(issue)) issue$evidence[1] else NULL) %||% 
+    default_evidence
+    
+  theory <- override$theory %||% 
+    (if ("theory" %in% names(issue)) issue$theory[1] else NULL) %||% 
+    NULL
   
   # create interpret stage if none provided
   if (is.null(previous_stage)) {
@@ -1534,7 +1549,8 @@ bid_notices <- function(issues, filter = NULL, previous_stage = NULL, max_issues
   # apply filter if provided
   if (!is.null(substitute(filter))) {
     filter_expr <- substitute(filter)
-    filtered_issues <- issues[eval(filter_expr, issues), ]
+    filter_result <- eval(filter_expr, issues)
+    filtered_issues <- issues[filter_result, ]
   } else {
     filtered_issues <- issues
   }
@@ -1550,7 +1566,13 @@ bid_notices <- function(issues, filter = NULL, previous_stage = NULL, max_issues
     # sort by severity then impact rate for prioritization
     severity_order <- c("critical" = 4, "high" = 3, "medium" = 2, "low" = 1)
     filtered_issues$severity_rank <- severity_order[filtered_issues$severity]
-    filtered_issues <- filtered_issues[order(-filtered_issues$severity_rank, -filtered_issues$impact_rate), ]
+    
+    # Handle impact_rate safely (may not exist or be non-numeric)
+    if ("impact_rate" %in% names(filtered_issues) && is.numeric(filtered_issues$impact_rate)) {
+      filtered_issues <- filtered_issues[order(-filtered_issues$severity_rank, -filtered_issues$impact_rate), ]
+    } else {
+      filtered_issues <- filtered_issues[order(-filtered_issues$severity_rank), ]
+    }
     filtered_issues <- filtered_issues[1:max_issues, ]
   }
   
@@ -1632,7 +1654,13 @@ bid_pipeline <- function(issues, previous_stage, max = 3, ...) {
   # sort by priority (severity then impact)
   severity_order <- c("critical" = 4, "high" = 3, "medium" = 2, "low" = 1)
   issues$severity_rank <- severity_order[issues$severity]
-  priority_issues <- issues[order(-issues$severity_rank, -issues$impact_rate), ]
+  
+  # Handle impact_rate safely (may not exist or be non-numeric)
+  if ("impact_rate" %in% names(issues) && is.numeric(issues$impact_rate)) {
+    priority_issues <- issues[order(-issues$severity_rank, -issues$impact_rate), ]
+  } else {
+    priority_issues <- issues[order(-issues$severity_rank), ]
+  }
   
   # use bid_notices with max limit
   bid_notices(priority_issues, previous_stage = previous_stage, max_issues = max, ...)

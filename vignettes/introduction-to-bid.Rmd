@@ -1,8 +1,8 @@
 ---
-title: "introduction-to-bid"
+title: "Introduction to the BID Framework"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{introduction-to-bid}
+  %\VignetteIndexEntry{Introduction to the BID Framework}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

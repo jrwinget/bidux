@@ -86,6 +86,20 @@ bid_structure <- function(
 
   cli::cli_alert_info("Auto-selected layout: {chosen_layout}")
   cli::cli_alert_info(layout_rationale(previous_stage, chosen_layout))
+  
+  # issue deprecation warning once per session (skip in tests to reduce noise)
+  # use package namespace instead of global environment for CRAN compliance
+  pkg_env <- asNamespace("bidux")
+  if (!exists(".bidux_layout_selection_warned", envir = pkg_env) && 
+      !identical(Sys.getenv("TESTTHAT"), "true")) {
+    warning(
+      "Layout auto-selection is deprecated and will be removed in bidux 0.4.0. ",
+      "The BID framework will focus on concept-based suggestions instead. ",
+      "Existing code will continue to work until 0.4.0.",
+      call. = FALSE
+    )
+    try(assign(".bidux_layout_selection_warned", TRUE, envir = pkg_env), silent = TRUE)
+  }
 
   # generate ranked, concept-grouped suggestions
   suggestion_groups <- structure_suggestions(

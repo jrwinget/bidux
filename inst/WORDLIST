@@ -15,6 +15,7 @@ affordances
 bslib
 deps
 devtools
+dplyr
 echarts4r
 github
 htmlwidgets
@@ -27,5 +28,6 @@ plotly
 reactable
 roxygen2
 sqlite
+tbl
 testthat
 tibble

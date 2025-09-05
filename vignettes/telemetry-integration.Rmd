@@ -1,8 +1,8 @@
 ---
-title: "Integrating shiny.telemetry with BIDUX"
+title: "Integrating shiny.telemetry with bidux"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Integrating shiny.telemetry with BIDUX}
+  %\VignetteIndexEntry{Integrating shiny.telemetry with bidux}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -18,9 +18,9 @@ knitr::opts_chunk$set(
 
 The `{bidux}` package provides powerful tools to analyze real user behavior data from `{shiny.telemetry}` and automatically identify UX friction points. This creates a powerful feedback loop where actual usage patterns drive design improvements through the BID framework.
 
-**New in v0.3.1:** Enhanced telemetry workflow with hybrid objects and streamlined API for better integration with tidy data workflows.
+**New in 0.3.1:** Enhanced telemetry workflow with hybrid objects and streamlined API for better integration with tidy data workflows.
 
-### Modern Telemetry API (v0.3.1+)
+### Modern Telemetry API (0.3.1+)
 
 The new `bid_telemetry()` function provides a clean, tidy approach to telemetry analysis:
 
@@ -33,7 +33,7 @@ issues <- bid_telemetry("telemetry.sqlite")
 print(issues)  # Shows organized issue summary
 
 # Triage critical issues
-critical <- issues |> 
+critical <- issues |>
   filter(severity == "critical") |>
   slice_head(n = 3)
 
@@ -242,7 +242,7 @@ issues <- bid_ingest_telemetry(
 )
 ```
 
-## Bridge Functions and Sugar Syntax (v0.3.1+)
+## Bridge Functions and Sugar Syntax (0.3.1+)
 
 The new API provides convenient bridge functions to connect telemetry issues with BID stages:
 
@@ -250,7 +250,7 @@ The new API provides convenient bridge functions to connect telemetry issues wit
 
 ```{r bridge_individual, eval=FALSE}
 # Process a single high-priority issue
-priority_issue <- issues |> 
+priority_issue <- issues |>
   filter(severity == "critical") |>
   slice_head(n = 1)
 
@@ -274,7 +274,7 @@ notice_sugar <- bid_address(
 
 ```{r bridge_batch, eval=FALSE}
 # Process multiple issues at once
-high_priority <- issues |> 
+high_priority <- issues |>
   filter(severity %in% c("critical", "high"))
 
 # Convert all to Notice stages
@@ -363,7 +363,7 @@ validate_result <- bid_validate(
 
 ## Example: Complete Analysis
 
-Here's a full example analyzing a dashboard with multiple issues using the new v0.3.1 API:
+Here's a full example analyzing a dashboard with multiple issues using the new 0.3.1 API:
 
 ```{r complete_example, eval=FALSE}
 # 1. Modern telemetry ingestion
@@ -387,18 +387,18 @@ if (nrow(critical_issues) > 0) {
     central_question = "How can we address the most critical UX issue?",
     data_story = list(
       hook = "Critical issues identified from user behavior data",
-      context = "Telemetry reveals specific friction points", 
+      context = "Telemetry reveals specific friction points",
       tension = "Users struggling with core functionality",
       resolution = "Data-driven improvements to user experience"
     )
   )
-  
+
   # Use bridge function to convert issue to Notice
   notice_stage <- bid_notice_issue(
     issue = top_issue,
     previous_stage = interpret_stage
   )
-  
+
   improvement_plan <- notice_stage |>
     bid_anticipate(
       bias_mitigations = list(

@@ -56,7 +56,7 @@ test_that("validate_required_params works correctly", {
 
 # validate_previous_stage tests
 test_that("validate_previous_stage works correctly", {
-  # Fresh start: only allowed if current_stage == "Interpret" (first stage in v0.3.0+)
+  # Fresh start: only allowed if current_stage == "Interpret" (first stage in 0.3.0+)
   expect_silent(validate_previous_stage(NULL, "Interpret"))
 
   # Immediate predecessor steps (new linear order) → no warning
@@ -77,20 +77,21 @@ test_that("validate_previous_stage works correctly", {
     "Invalid stage: NotAStage\\. Must be one of:"
   )
 
-  # Unusual progression (skipping an immediate predecessor) → warning
+  # Discouraged but valid progressions under flexible BID workflow
   expect_warning(
     validate_previous_stage("Interpret", "Structure"),
-    "Unusual stage progression: Interpret -> Structure"
-  )
-  expect_warning(
-    validate_previous_stage("Notice", "Validate"),
-    "Unusual stage progression: Notice -> Validate"
+    "Discouraged stage progression.*Interpret.*Structure"
   )
 
-  # If current_stage=="Interpret" but previous_stage non-NULL → warning (since it's first stage)
+  # Notice -> Validate is now valid in flexible workflow
+  expect_no_warning(
+    validate_previous_stage("Notice", "Validate")
+  )
+
+  # Interpret only accepts Validate (iterative) - Notice -> Interpret is invalid
   expect_warning(
     validate_previous_stage("Notice", "Interpret"),
-    "Unusual stage progression: Notice -> Interpret"
+    "Invalid stage progression.*Notice.*Interpret"
   )
 })
 
