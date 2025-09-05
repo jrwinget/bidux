@@ -16,7 +16,55 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-The `bid_ingest_telemetry()` function enables you to analyze real user behavior data from `{shiny.telemetry}` and automatically identify UX friction points. This creates a powerful feedback loop where actual usage patterns drive design improvements through the BID framework.
+The `{bidux}` package provides powerful tools to analyze real user behavior data from `{shiny.telemetry}` and automatically identify UX friction points. This creates a powerful feedback loop where actual usage patterns drive design improvements through the BID framework.
+
+**New in v0.3.1:** Enhanced telemetry workflow with hybrid objects and streamlined API for better integration with tidy data workflows.
+
+### Modern Telemetry API (v0.3.1+)
+
+The new `bid_telemetry()` function provides a clean, tidy approach to telemetry analysis:
+
+```{r modern_api, eval=FALSE}
+library(bidux)
+library(dplyr)
+
+# Modern approach: get tidy issues tibble
+issues <- bid_telemetry("telemetry.sqlite")
+print(issues)  # Shows organized issue summary
+
+# Triage critical issues
+critical <- issues |> 
+  filter(severity == "critical") |>
+  slice_head(n = 3)
+
+# Convert to Notice stages with bridge functions
+notices <- bid_notices(
+  issues = critical,
+  previous_stage = interpret_result
+)
+
+# Extract telemetry flags for layout optimization
+flags <- bid_flags(issues)
+structure_result <- bid_structure(
+  previous_stage = anticipate_result,
+  telemetry_flags = flags
+)
+```
+
+### Legacy Compatibility
+
+The `bid_ingest_telemetry()` function now returns a hybrid object that maintains full backward compatibility:
+
+```{r legacy_compat, eval=FALSE}
+# Legacy approach still works exactly as before
+legacy_notices <- bid_ingest_telemetry("telemetry.sqlite")
+length(legacy_notices)  # Behaves like list of Notice stages
+legacy_notices[[1]]     # Access individual Notice objects
+
+# But now also provides enhanced functionality
+as_tibble(legacy_notices)  # Get tidy issues view
+bid_flags(legacy_notices)  # Extract global telemetry flags
+```
 
 ## Prerequisites
 
@@ -194,6 +242,73 @@ issues <- bid_ingest_telemetry(
 )
 ```
 
+## Bridge Functions and Sugar Syntax (v0.3.1+)
+
+The new API provides convenient bridge functions to connect telemetry issues with BID stages:
+
+### Individual Issue Handling
+
+```{r bridge_individual, eval=FALSE}
+# Process a single high-priority issue
+priority_issue <- issues |> 
+  filter(severity == "critical") |>
+  slice_head(n = 1)
+
+# Create Notice directly from issue
+notice_result <- bid_notice_issue(
+  issue = priority_issue,
+  previous_stage = interpret_result,
+  override = list(
+    problem = "Custom problem description if needed"
+  )
+)
+
+# Sugar function for quick addressing
+notice_sugar <- bid_address(
+  issue = priority_issue,
+  previous_stage = interpret_result
+)
+```
+
+### Batch Processing
+
+```{r bridge_batch, eval=FALSE}
+# Process multiple issues at once
+high_priority <- issues |> 
+  filter(severity %in% c("critical", "high"))
+
+# Convert all to Notice stages
+notice_list <- bid_notices(
+  issues = high_priority,
+  previous_stage = interpret_result,
+  filter = function(x) x$severity == "critical"  # Additional filtering
+)
+
+# Pipeline approach - process first N issues
+pipeline_notices <- bid_pipeline(
+  issues = high_priority,
+  previous_stage = interpret_result,
+  max = 3  # Limit to 3 most critical issues
+)
+```
+
+### Telemetry-Informed Structure Selection
+
+```{r telemetry_structure, eval=FALSE}
+# Extract global flags from telemetry data
+flags <- bid_flags(issues)
+#> List includes: has_navigation_issues, high_error_rate, user_confusion_patterns
+
+# Use flags to inform layout selection
+structure_result <- bid_structure(
+  previous_stage = anticipate_result,
+  telemetry_flags = flags  # Influences layout choice and suggestion scoring
+)
+
+# The layout selection will avoid problematic patterns based on your data
+# e.g., if flags$has_navigation_issues == TRUE, tabs layout gets lower priority
+```
+
 ## Integrating with BID Workflow
 
 Use the identified issues to drive your BID process:
@@ -248,44 +363,50 @@ validate_result <- bid_validate(
 
 ## Example: Complete Analysis
 
-Here's a full example analyzing a dashboard with multiple issues:
+Here's a full example analyzing a dashboard with multiple issues using the new v0.3.1 API:
 
 ```{r complete_example, eval=FALSE}
-# 1. Ingest telemetry
-issues <- bid_ingest_telemetry("telemetry.sqlite")
+# 1. Modern telemetry ingestion
+issues <- bid_telemetry("telemetry.sqlite")
 
-# 2. Prioritize issues by impact
-critical_issues <- list(
-  unused_inputs = names(issues)[grepl("unused_input", names(issues))],
-  errors = names(issues)[grepl("error", names(issues))],
-  delays = "delayed_interaction" %in% names(issues)
-)
+# 2. Triage issues using tidy workflow
+print(issues)  # Review issue summary
 
-# 3. Create a comprehensive improvement plan
-if (length(critical_issues$unused_inputs) > 0) {
-  # Address unused inputs following the updated BID workflow
-  unused_issue <- issues[[critical_issues$unused_inputs[1]]]
+# Focus on critical issues
+critical_issues <- issues |>
+  filter(severity == "critical") |>
+  arrange(desc(user_impact))
 
-  improvement_plan <- bid_interpret(
-    central_question = "Which filters actually help users find insights?",
+# 3. Create a comprehensive improvement plan using bridge functions
+if (nrow(critical_issues) > 0) {
+  # Address top critical issue
+  top_issue <- critical_issues |> slice_head(n = 1)
+
+  # Start BID workflow
+  interpret_stage <- bid_interpret(
+    central_question = "How can we address the most critical UX issue?",
     data_story = list(
-      hook = "Several filters are never used by users",
-      context = "Dashboard has 5 filter controls",
-      tension = "Too many options create choice overload",
-      resolution = "Show only relevant filters based on user tasks"
+      hook = "Critical issues identified from user behavior data",
+      context = "Telemetry reveals specific friction points", 
+      tension = "Users struggling with core functionality",
+      resolution = "Data-driven improvements to user experience"
     )
-  ) |>
-    bid_notice(
-      problem = unused_issue$problem,
-      evidence = unused_issue$evidence
-    ) |>
+  )
+  
+  # Use bridge function to convert issue to Notice
+  notice_stage <- bid_notice_issue(
+    issue = top_issue,
+    previous_stage = interpret_stage
+  )
+  
+  improvement_plan <- notice_stage |>
     bid_anticipate(
       bias_mitigations = list(
         choice_overload = "Hide advanced filters until needed",
         default_effect = "Pre-select most common filter values"
       )
     ) |>
-    bid_structure() |>
+    bid_structure(telemetry_flags = bid_flags(issues)) |>
     bid_validate(
       summary_panel = "Simplified filtering with progressive disclosure",
       next_steps = c(

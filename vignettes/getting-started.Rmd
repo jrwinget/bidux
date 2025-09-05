@@ -279,6 +279,50 @@ Future versions of `{bidux}` will include:
 - A UI component library implementing BID principles
 - Testing and validation tools for dashboard evaluation
 
+## Integrating Telemetry Data (New in v0.3.1)
+
+If you have telemetry data from user interactions, `{bidux}` can help transform it into actionable BID insights:
+
+```{r telemetry_workflow}
+# Modern telemetry workflow (v0.3.1+)
+# Process telemetry data into organized issues
+issues <- bid_telemetry("path/to/telemetry.sqlite")
+
+# Triage and review issues
+print(issues)  # Shows organized issue summary
+
+# Convert high-priority issues to Notice stages
+critical_issues <- issues |> 
+  dplyr::filter(severity == "critical") |>
+  dplyr::slice_head(n = 3)
+
+notices <- bid_notices(
+  issues = critical_issues,
+  previous_stage = interpret_result
+)
+
+# Extract telemetry flags for structure optimization
+flags <- bid_flags(issues)
+
+# Use flags to inform layout selection
+structure_result <- bid_structure(
+  previous_stage = anticipate_result,
+  telemetry_flags = flags
+)
+```
+
+The hybrid object returned by `bid_ingest_telemetry()` maintains backward compatibility while providing enhanced functionality:
+
+```{r legacy_compatibility}
+# Legacy approach still works
+legacy_notices <- bid_ingest_telemetry("path/to/telemetry.sqlite")
+length(legacy_notices)  # Behaves like list of Notice stages
+
+# But now also provides enhanced features
+as_tibble(legacy_notices)  # Tidy issues view
+bid_flags(legacy_notices)  # Extract global flags
+```
+
 Visit [github.com/jrwinget/bidux](https://github.com/jrwinget/bidux) for updates and to contribute to the package development. We welcome feedback and suggestions to help make the BID framework even more effective for Shiny developers.
 
 Remember that good dashboard design is an iterative process that benefits from continuous user feedback. The BID framework provides structure to this process while ensuring common principles are incorporated throughout your development workflow.

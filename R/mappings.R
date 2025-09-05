@@ -167,6 +167,57 @@ suggest_theory_from_mappings <- function(
   return(best_match %||% "Cognitive Load Theory")
 }
 
+#' Suggest theory from text with confidence scoring and messaging
+#' 
+#' @description
+#' Internal helper that wraps suggest_theory_from_mappings with additional
+#' confidence scoring and user messaging. Factored out for reuse across
+#' different BID functions.
+#' 
+#' @param problem_text Clean problem description text
+#' @param evidence_text Clean evidence description text  
+#' @param mappings Optional custom theory mappings
+#' @param show_message Whether to display auto-suggestion message (default TRUE)
+#' @return List with theory, confidence, and auto_suggested flag
+#' @keywords internal
+.suggest_theory_from_text <- function(problem_text, evidence_text = NULL, 
+                                     mappings = NULL, show_message = TRUE) {
+  # get theory suggestion
+  theory <- suggest_theory_from_mappings(
+    problem_text,
+    evidence_text,
+    mappings = mappings
+  )
+  
+  # calculate confidence score
+  theory_confidence <- 1.0
+  auto_suggested_theory <- TRUE
+  
+  # get confidence score from mappings
+  default_mappings <- load_theory_mappings()
+  matching_row <- default_mappings[default_mappings$theory == theory, ]
+  if (nrow(matching_row) > 0) {
+    theory_confidence <- matching_row$confidence[1]
+  }
+  
+  # display message if requested
+  if (show_message) {
+    cat(paste0(
+      "Auto-suggested theory: ",
+      theory,
+      " (confidence: ",
+      round(theory_confidence * 100),
+      "%)\n"
+    ))
+  }
+  
+  list(
+    theory = theory,
+    confidence = theory_confidence,
+    auto_suggested = auto_suggested_theory
+  )
+}
+
 #' Load concept-bias mappings
 #'
 #' @param custom_mappings Optional custom mappings data frame

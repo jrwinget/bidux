@@ -11,6 +11,7 @@ bid_validate(
   next_steps = NULL,
   include_exp_design = TRUE,
   include_telemetry = TRUE,
+  telemetry_refs = NULL,
   include_empower_tools = TRUE
 )
 }
@@ -32,6 +33,11 @@ design suggestions. Default is TRUE.}
 
 \item{include_telemetry}{Logical indicating whether to include telemetry
 tracking and monitoring suggestions. Default is TRUE.}
+
+\item{telemetry_refs}{Optional character vector or named list specifying
+specific telemetry reference points to include in validation steps.
+If provided, these will be integrated into the telemetry tracking
+recommendations with provenance information.}
 
 \item{include_empower_tools}{Logical indicating whether to include
 context-aware empowerment tool suggestions. Default is TRUE.}

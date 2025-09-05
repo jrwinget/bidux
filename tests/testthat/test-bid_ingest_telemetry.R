@@ -433,7 +433,7 @@ test_that("bid_ingest_telemetry handles malformed telemetry data", {
 
     expect_error(
       bid_ingest_telemetry(temp_db),
-      "Error reading SQLite database"
+      "database|SQLite|file|not valid"
     )
 
     unlink(temp_db)

@@ -14,18 +14,17 @@ test_that("bid_anticipate works with valid inputs", {
     evidence = "User complaints"
   )
   
-  structure_result <- bid_structure(
-    notice_result,
-
-    concepts = c("Principle of Proximity", "Default Effect")
-  )
-
   result <- bid_anticipate(
-    previous_stage = structure_result,
+    previous_stage = notice_result,
     bias_mitigations = list(
       anchoring = "Provide reference points",
       framing = "Use consistent positive framing"
     )
+  )
+
+  structure_result <- bid_structure(
+    result,
+    concepts = c("Principle of Proximity", "Default Effect")
   )
 
   expect_s3_class(result, "bid_stage")
@@ -35,7 +34,8 @@ test_that("bid_anticipate works with valid inputs", {
     result$bias_mitigations,
     "framing: Use consistent positive framing"
   )
-  expect_equal(result$previous_layout, "breathable")
+  # anticipate stage comes before structure, so no previous_layout expected
+  expect_true(is.na(result$previous_layout) || result$previous_layout == "")
   expect_true(!is.na(result$suggestions))
 })
 
@@ -55,17 +55,16 @@ test_that("bid_anticipate fails with missing parameters", {
     evidence = "User complaints"
   )
   
-  structure_result <- bid_structure(
-    notice_result,
-
-    concepts = c("Principle of Proximity", "Default Effect")
-  )
-
   # This should NOT throw an error since bias_mitigations is optional
   suppressMessages({
-    result <- bid_anticipate(previous_stage = structure_result)
+    anticipate_result <- bid_anticipate(previous_stage = notice_result)
   })
-  expect_s3_class(result, "bid_stage")
+  
+  structure_result <- bid_structure(
+    anticipate_result,
+    concepts = c("Principle of Proximity", "Default Effect")
+  )
+  expect_s3_class(anticipate_result, "bid_stage")
 
   # This SHOULD throw an error since previous_stage is required
   expect_error(
@@ -90,20 +89,19 @@ test_that("bid_anticipate suggests missing common biases", {
     evidence = "User complaints"
   )
   
-  structure_result <- bid_structure(
-    notice_result,
-
-    concepts = c("Principle of Proximity", "Default Effect")
+  anticipate_result <- bid_anticipate(
+    previous_stage = notice_result,
+    bias_mitigations = list(anchoring = "Provide reference points")
   )
 
-  result <- bid_anticipate(
-    previous_stage = structure_result,
-    bias_mitigations = list(anchoring = "Provide reference points")
+  structure_result <- bid_structure(
+    anticipate_result,
+    concepts = c("Principle of Proximity", "Default Effect")
   )
 
   # should suggest other biases in suggestions (checking for any of confirmation, framing, or common)
   expect_match(
-    result$suggestions,
+    anticipate_result$suggestions,
     "confirmation|framing|Consider",
     ignore.case = TRUE
   )
@@ -125,29 +123,27 @@ test_that("bid_anticipate auto-suggests bias_mitigations when NULL", {
     evidence = "User complaints"
   )
   
-  structure_result <- bid_structure(
-    notice_result,
-
-    concepts = c("Principle of Proximity", "Default Effect")
-  )
-
   suppressMessages(
-    result <- bid_anticipate(
-      previous_stage = structure_result,
+    anticipate_result <- bid_anticipate(
+      previous_stage = notice_result,
       bias_mitigations = NULL
     )
   )
 
-  expect_s3_class(result, "bid_stage")
-  expect_false(is.na(result$bias_mitigations[1]))
-  expect_true(nchar(result$bias_mitigations[1]) > 0)
+  structure_result <- bid_structure(
+    anticipate_result,
+    concepts = c("Principle of Proximity", "Default Effect")
+  )
 
-  # should suggest common bias mitigations (updated for 0.2.0 auto-suggestions)
+  expect_s3_class(anticipate_result, "bid_stage")
+  expect_false(is.na(anticipate_result$bias_mitigations[1]))
+  expect_true(nchar(anticipate_result$bias_mitigations[1]) > 0)
+
+  # should suggest common bias mitigations (updated for 0.3.1 auto-suggestions)
   expect_match(
-    result$bias_mitigations,
-    "attention bias|belief perseverance|cognitive load|association bias|choice architecture",
-    ignore.case = TRUE,
-    perl = TRUE
+    anticipate_result$bias_mitigations,
+    "anchoring|framing|confirmation bias|accessibility",
+    ignore.case = TRUE
   )
 })
 
@@ -167,49 +163,44 @@ test_that("bid_anticipate auto-suggests interaction_principles when NULL", {
     evidence = "User complaints"
   )
   
-  structure_result <- bid_structure(
-    notice_result,
-
-    concepts = c("Principle of Proximity", "Default Effect")
-  )
-
   suppressMessages(
-    result <- bid_anticipate(
-      previous_stage = structure_result,
+    anticipate_result <- bid_anticipate(
+      previous_stage = notice_result,
       bias_mitigations = list(anchoring = "Test"),
       include_accessibility = TRUE
     )
   )
 
-  expect_s3_class(result, "bid_stage")
+  structure_result <- bid_structure(
+    anticipate_result,
+    concepts = c("Principle of Proximity", "Default Effect")
+  )
+
+  expect_s3_class(anticipate_result, "bid_stage")
   # interaction_principles is no longer in the result
-  expect_false("interaction_principles" %in% names(result))
+  expect_false("interaction_principles" %in% names(anticipate_result))
 
   # accessibility should be included and not NA
-  expect_true("accessibility" %in% names(result))
-  expect_false(is.na(result$accessibility[1]))
+  expect_true("accessibility" %in% names(anticipate_result))
+  expect_false(is.na(anticipate_result$accessibility[1]))
 })
 
 test_that("bid_anticipate handles different layout types appropriately", {
   layouts <- c("dual_process", "grid", "card", "tabs", "breathable")
 
   for (layout in layouts) {
-    structure_result <- tibble(
-      stage = "Structure",
-      layout = layout,
-      concepts = "Visual Hierarchy",
-      timestamp = Sys.time()
-    )
+    interpret_stage <- bid_interpret(central_question = "Test question")
+    notice_result <- bid_notice(interpret_stage, problem = "Test problem", theory = "Test Theory", evidence = "Test evidence")
 
     suppressMessages(
       result <- bid_anticipate(
-        previous_stage = structure_result,
+        previous_stage = notice_result,
         bias_mitigations = NULL
       )
     )
 
     expect_s3_class(result, "bid_stage")
-    expect_equal(result$previous_layout, layout)
+    expect_true(is.na(result$previous_layout) || result$previous_layout == "")
 
     # Check that the result includes some relevant content instead of specific layout names
     expect_true(nchar(result$suggestions[1]) > 0)
@@ -217,17 +208,17 @@ test_that("bid_anticipate handles different layout types appropriately", {
 })
 
 test_that("bid_anticipate handles NA values in previous_stage fields", {
-  structure_result <- tibble(
-    stage = "Structure",
-    layout = NA_character_,
-    concepts = NA_character_,
-    accessibility = NA_character_,
+  notice_result <- tibble(
+    stage = "Notice",
+    problem = "Test problem",
+    theory = "Test Theory", 
+    evidence = "Test evidence",
     timestamp = Sys.time()
   )
 
   suppressMessages(
     result <- bid_anticipate(
-      previous_stage = structure_result,
+      previous_stage = notice_result,
       bias_mitigations = list(
         anchoring = "Provide reference points",
         framing = "Use consistent positive framing"
@@ -247,16 +238,16 @@ test_that("bid_anticipate handles NA values in previous_stage fields", {
 })
 
 test_that("bid_anticipate handles edge cases in bias_mitigations parameter", {
-  structure_result <- tibble(
-    stage = "Structure",
+  notice_result <- tibble(
+    stage = "Notice",
 
-    concepts = "Visual Hierarchy",
+    problem = "Test problem", theory = "Test Theory", evidence = "Test evidence",
     timestamp = Sys.time()
   )
 
   expect_warning(
     result <- bid_anticipate(
-      previous_stage = structure_result,
+      previous_stage = notice_result,
       bias_mitigations = list(
         anchoring = "",
         framing = NA
@@ -267,7 +258,7 @@ test_that("bid_anticipate handles edge cases in bias_mitigations parameter", {
 
   expect_warning(
     result <- bid_anticipate(
-      previous_stage = structure_result,
+      previous_stage = notice_result,
       bias_mitigations = list(
         "Provide reference points",
         "Use consistent positive framing"
@@ -278,7 +269,7 @@ test_that("bid_anticipate handles edge cases in bias_mitigations parameter", {
 
   suppressMessages(
     result <- bid_anticipate(
-      previous_stage = structure_result,
+      previous_stage = notice_result,
       bias_mitigations = list(
         anchoring = 123,
         framing = TRUE
@@ -292,16 +283,16 @@ test_that("bid_anticipate handles edge cases in bias_mitigations parameter", {
 })
 
 test_that("bid_anticipate handles edge cases in interaction_principles param", {
-  structure_result <- tibble(
-    stage = "Structure",
+  notice_result <- tibble(
+    stage = "Notice",
 
-    concepts = "Visual Hierarchy",
+    problem = "Test problem", theory = "Test Theory", evidence = "Test evidence",
     timestamp = Sys.time()
   )
 
   expect_warning(
     result <- bid_anticipate(
-      previous_stage = structure_result,
+      previous_stage = notice_result,
       bias_mitigations = list(anchoring = "Test"),
       interaction_principles = list(
         "This has empty name",
@@ -316,7 +307,7 @@ test_that("bid_anticipate handles edge cases in interaction_principles param", {
 
   # Test that accessibility is included by default
   result2 <- bid_anticipate(
-    previous_stage = structure_result,
+    previous_stage = notice_result,
     bias_mitigations = list(anchoring = "Test")
   )
 
@@ -326,11 +317,8 @@ test_that("bid_anticipate handles edge cases in interaction_principles param", {
 })
 
 test_that("bid_anticipate warns for deprecated interaction_principles and includes accessibility", {
-  structure_result <- tibble(
-    stage = "Structure",
-    concepts = "Visual Hierarchy",
-    timestamp = Sys.time()
-  )
+  interpret_stage <- bid_interpret(central_question = "Test question")
+  notice_result <- bid_notice(interpret_stage, problem = "Test problem", theory = "Test Theory", evidence = "Test evidence")
 
   json_interaction <- list(
     hover = "Show details on hover",
@@ -339,7 +327,7 @@ test_that("bid_anticipate warns for deprecated interaction_principles and includ
 
   expect_warning(
     result <- bid_anticipate(
-      previous_stage = structure_result,
+      previous_stage = notice_result,
       bias_mitigations = list(anchoring = "Test"),
       interaction_principles = json_interaction
     ),
@@ -354,17 +342,16 @@ test_that("bid_anticipate warns for deprecated interaction_principles and includ
 })
 
 test_that("bid_anticipate handles include_accessibility parameter properly", {
-  structure_result <- tibble(
-    stage = "Structure",
-    layout = "grid",
-    concepts = "Visual Hierarchy",
+  notice_result <- tibble(
+    stage = "Notice",
+    problem = "Test problem", theory = "Test Theory", evidence = "Test evidence",
     timestamp = Sys.time()
   )
   
   # Test with include_accessibility = FALSE
   suppressMessages(
     result_no_access <- bid_anticipate(
-      previous_stage = structure_result,
+      previous_stage = notice_result,
       bias_mitigations = list(anchoring = "Test"),
       include_accessibility = FALSE
     )
@@ -376,7 +363,7 @@ test_that("bid_anticipate handles include_accessibility parameter properly", {
   # Test with include_accessibility = TRUE (default)
   suppressMessages(
     result_with_access <- bid_anticipate(
-      previous_stage = structure_result,
+      previous_stage = notice_result,
       bias_mitigations = list(anchoring = "Test"),
       include_accessibility = TRUE
     )
@@ -388,7 +375,7 @@ test_that("bid_anticipate handles include_accessibility parameter properly", {
   # Test with invalid include_accessibility parameter
   suppressWarnings(
     result_invalid <- bid_anticipate(
-      previous_stage = structure_result,
+      previous_stage = notice_result,
       bias_mitigations = list(anchoring = "Test"),
       include_accessibility = "invalid"
     )
@@ -410,16 +397,16 @@ test_that("bid_anticipate generates bias mitigations based on concepts", {
   )
   
   for (case in concepts) {
-    structure_result <- tibble(
-      stage = "Structure",
-      layout = "grid",
+    notice_result <- tibble(
+      stage = "Notice",
+      problem = "Test problem", theory = "Test Theory", evidence = "Test evidence",
       concepts = case$concepts,
       timestamp = Sys.time()
     )
     
     suppressMessages(
       result <- bid_anticipate(
-        previous_stage = structure_result,
+        previous_stage = notice_result,
         bias_mitigations = NULL
       )
     )
@@ -449,8 +436,8 @@ test_that("bid_anticipate generates layout-specific bias mitigations", {
   )
   
   for (case in layouts) {
-    structure_result <- tibble(
-      stage = "Structure",
+    notice_result <- tibble(
+      stage = "Notice",
       layout = case$layout,
       concepts = "General Concept",
       timestamp = Sys.time()
@@ -458,7 +445,7 @@ test_that("bid_anticipate generates layout-specific bias mitigations", {
     
     suppressMessages(
       result <- bid_anticipate(
-        previous_stage = structure_result,
+        previous_stage = notice_result,
         bias_mitigations = NULL
       )
     )
@@ -480,16 +467,12 @@ test_that("bid_anticipate handles custom layout warnings", {
   custom_layouts <- c("custom_layout", "non_standard", "undefined_layout")
   
   for (layout in custom_layouts) {
-    structure_result <- tibble(
-      stage = "Structure",
-      layout = layout,
-      concepts = "Visual Hierarchy",
-      timestamp = Sys.time()
-    )
+    interpret_stage <- bid_interpret(central_question = "Test question")
+    notice_result <- bid_notice(interpret_stage, problem = "Test problem", theory = "Test Theory", evidence = "Test evidence")
     
     expect_warning(
       result <- bid_anticipate(
-        previous_stage = structure_result,
+        previous_stage = notice_result,
         bias_mitigations = list(anchoring = "Test")
       ),
       paste0("Layout '", layout, "'.*not recognized")
@@ -519,42 +502,43 @@ test_that("bid_anticipate extracts previous stage information correctly", {
     evidence = "Test evidence"
   )
   
-  structure_result <- bid_structure(
-    previous_stage = notice_result,
-    concepts = c("Visual Hierarchy", "Proximity")
-  )
-  
   suppressMessages(
-    result <- bid_anticipate(
-      previous_stage = structure_result,
+    anticipate_result <- bid_anticipate(
+      previous_stage = notice_result,
       bias_mitigations = list(anchoring = "Test reference points")
     )
   )
   
-  expect_s3_class(result, "bid_stage") 
-  expect_false(is.na(result$previous_layout[1]))
-  expect_false(is.na(result$previous_concepts[1]))
+  structure_result <- bid_structure(
+    previous_stage = anticipate_result,
+    concepts = c("Visual Hierarchy", "Proximity")
+  )
+  
+  expect_s3_class(anticipate_result, "bid_stage") 
+  # anticipate comes before structure, so these should be NA or empty
+  expect_true(is.na(anticipate_result$previous_layout[1]) || anticipate_result$previous_layout[1] == "")
+  expect_true(is.na(anticipate_result$previous_concepts[1]) || anticipate_result$previous_concepts[1] == "")
   
   # These fields come from the normalized previous stage extraction
-  expect_true(is.character(result$previous_central_question[1]) || is.na(result$previous_central_question[1]))
-  expect_true(is.character(result$previous_hook[1]) || is.na(result$previous_hook[1]))
-  expect_true(is.character(result$previous_problem[1]) || is.na(result$previous_problem[1]))
-  expect_true(is.character(result$previous_theory[1]) || is.na(result$previous_theory[1]))
-  expect_true(is.character(result$previous_audience[1]) || is.na(result$previous_audience[1]))
-  expect_true(is.character(result$previous_personas[1]) || is.na(result$previous_personas[1]))
+  expect_true(is.character(anticipate_result$previous_central_question[1]) || is.na(anticipate_result$previous_central_question[1]))
+  expect_true(is.character(anticipate_result$previous_hook[1]) || is.na(anticipate_result$previous_hook[1]))
+  expect_true(is.character(anticipate_result$previous_problem[1]) || is.na(anticipate_result$previous_problem[1]))
+  expect_true(is.character(anticipate_result$previous_theory[1]) || is.na(anticipate_result$previous_theory[1]))
+  expect_true(is.character(anticipate_result$previous_audience[1]) || is.na(anticipate_result$previous_audience[1]))
+  expect_true(is.character(anticipate_result$previous_personas[1]) || is.na(anticipate_result$previous_personas[1]))
 })
 
 test_that("bid_anticipate creates proper bid_stage object with metadata", {
-  structure_result <- tibble(
-    stage = "Structure",
+  notice_result <- tibble(
+    stage = "Notice",
     layout = "card",
-    concepts = "Visual Hierarchy",
+    problem = "Test problem", theory = "Test Theory", evidence = "Test evidence",
     timestamp = Sys.time()
   )
   
   suppressMessages(
     result <- bid_anticipate(
-      previous_stage = structure_result,
+      previous_stage = notice_result,
       bias_mitigations = list(
         anchoring = "Provide reference points",
         framing = "Use positive messaging"
@@ -571,7 +555,7 @@ test_that("bid_anticipate creates proper bid_stage object with metadata", {
   metadata <- attr(result, "metadata")
   expect_type(metadata, "list")
   expect_true("stage_number" %in% names(metadata))
-  expect_equal(metadata$stage_number, 4)
+  expect_equal(metadata$stage_number, 3)
   expect_true("bias_count" %in% names(metadata))
   expect_true(metadata$bias_count >= 2)
   expect_true("include_accessibility" %in% names(metadata))
@@ -580,17 +564,16 @@ test_that("bid_anticipate creates proper bid_stage object with metadata", {
 })
 
 test_that("bid_anticipate handles bias_mitigations validation edge cases", {
-  structure_result <- tibble(
-    stage = "Structure",
-    layout = "grid",
-    concepts = "Visual Hierarchy",
+  notice_result <- tibble(
+    stage = "Notice",
+    problem = "Test problem", theory = "Test Theory", evidence = "Test evidence",
     timestamp = Sys.time()
   )
   
   # Test with numeric values in bias_mitigations  
   suppressMessages(
     result1 <- bid_anticipate(
-      previous_stage = structure_result,
+      previous_stage = notice_result,
       bias_mitigations = list(
         anchoring = 123,
         framing = 456.78
@@ -601,7 +584,7 @@ test_that("bid_anticipate handles bias_mitigations validation edge cases", {
   # Test with mixed valid and invalid entries
   expect_warning(
     result2 <- bid_anticipate(
-      previous_stage = structure_result,
+      previous_stage = notice_result,
       bias_mitigations = list(
         "valid_name" = "Valid description",
         "" # empty name
@@ -613,7 +596,7 @@ test_that("bid_anticipate handles bias_mitigations validation edge cases", {
   # Test with completely empty list
   suppressMessages(
     result3 <- bid_anticipate(
-      previous_stage = structure_result,
+      previous_stage = notice_result,
       bias_mitigations = list()
     )
   )
@@ -623,8 +606,8 @@ test_that("bid_anticipate handles bias_mitigations validation edge cases", {
 })
 
 test_that("bid_anticipate suggestions include missing bias recommendations", {
-  structure_result <- tibble(
-    stage = "Structure",
+  notice_result <- tibble(
+    stage = "Notice",
     layout = "dual_process",
     concepts = "Visual Hierarchy, Proximity",
     timestamp = Sys.time()
@@ -633,7 +616,7 @@ test_that("bid_anticipate suggestions include missing bias recommendations", {
   # Provide only one bias mitigation to trigger suggestions for missing ones
   suppressMessages(
     result <- bid_anticipate(
-      previous_stage = structure_result,
+      previous_stage = notice_result,
       bias_mitigations = list(anchoring = "Use reference points")
     )
   )
@@ -654,16 +637,15 @@ test_that("bid_anticipate suggestions include missing bias recommendations", {
 test_that("bid_anticipate handles accessibility extraction from previous stages", {
   # Test with previous_accessibility field
   structure_result1 <- tibble(
-    stage = "Structure",
-    layout = "grid",
-    concepts = "Visual Hierarchy",
+    stage = "Notice",
+    problem = "Test problem", theory = "Test Theory", evidence = "Test evidence",
     previous_accessibility = "WCAG guidelines applied",
     timestamp = Sys.time()
   )
   
   suppressMessages(
     result1 <- bid_anticipate(
-      previous_stage = structure_result1,
+      previous_stage = notice_result,
       bias_mitigations = list(anchoring = "Test"),
       include_accessibility = TRUE
     )
@@ -673,16 +655,15 @@ test_that("bid_anticipate handles accessibility extraction from previous stages"
   
   # Test with accessibility field (direct)
   structure_result2 <- tibble(
-    stage = "Structure", 
-    layout = "grid",
-    concepts = "Visual Hierarchy",
+    stage = "Notice", 
+    problem = "Test problem", theory = "Test Theory", evidence = "Test evidence",
     accessibility = "Color contrast verified",
     timestamp = Sys.time()
   )
   
   suppressMessages(
     result2 <- bid_anticipate(
-      previous_stage = structure_result2,
+      previous_stage = notice_result2,
       bias_mitigations = list(anchoring = "Test"),
       include_accessibility = TRUE
     )

@@ -593,94 +593,27 @@ generate_stage_suggestions <- function(
     stage_name,
     context_data,
     suggestion_rules = NULL) {
-  suggestions <- character(0)
-
-  # use custom rules if provided, otherwise use defaults
-  rules <- suggestion_rules %||% get_default_suggestion_rules()
-  stage_rules <- rules[[stage_name]]
-
-  if (is.null(stage_rules)) {
-    return("Consider following BID framework best practices for this stage.")
-  }
-
-  # apply rules based on context
-  # ensure stage_rules is a proper list structure
-  if (!is.list(stage_rules)) {
-    return("Consider following BID framework best practices for this stage.")
-  }
-
-  # separate default from rules
-  default_suggestion <- stage_rules$default
-  rule_list <- stage_rules[names(stage_rules) != "default"]
-
-  # process each rule
-  for (rule in rule_list) {
-    # ensure rule is properly structured
-    if (
-      is.list(rule) && !is.null(rule$condition) && !is.null(rule$suggestion)
-    ) {
-      if (evaluate_suggestion_condition(rule$condition, context_data)) {
-        suggestions <- c(suggestions, rule$suggestion)
-      }
-    }
-  }
-
-  # add default suggestions if none match
-  if (length(suggestions) == 0 && !is.null(default_suggestion)) {
-    suggestions <- default_suggestion
-  }
-
-  return(paste(suggestions, collapse = " "))
-}
-
-#' Get default suggestion rules for all stages
-#'
-#' @return List of suggestion rules by stage
-#'
-#' @keywords internal
-#' @noRd
-get_default_suggestion_rules <- function() {
-  list(
-    Notice = list(
-      list(
-        condition = function(ctx) nchar(ctx$problem %||% "") < 10,
-        suggestion = "Consider providing more detail in problem description."
-      ),
-      list(
-        condition = function(ctx) nchar(ctx$evidence %||% "") < 10,
-        suggestion = "Consider adding quantitative metrics to strengthen evidence."
-      ),
-      list(
-        condition = function(ctx) {
-          is.null(ctx$target_audience) || is.na(ctx$target_audience)
-        },
-        suggestion = "Define specific target audience to better focus design solutions."
-      ),
-      list(
-        condition = function(ctx) {
-          grepl("too many|overwhelm|choice", tolower(ctx$problem %||% ""))
-        },
-        suggestion = "Consider progressive disclosure or categorization to reduce choice complexity."
-      ),
-      default = "Problem clearly identified. Consider gathering additional quantitative evidence."
-    ),
-    Interpret = list(
-      list(
-        condition = function(ctx) (ctx$story_completeness %||% 0) < 0.5,
-        suggestion = "Your data story is incomplete. Consider adding missing narrative elements."
-      ),
-      list(
-        condition = function(ctx) (ctx$personas_count %||% 0) == 0,
-        suggestion = "Consider defining specific user personas to better target your design."
-      ),
-      list(
-        condition = function(ctx) nchar(ctx$central_question %||% "") > 100,
-        suggestion = "Consider simplifying your central question for more focus."
-      ),
-      default = "Focus on making each story component compelling and relevant."
-    )
+  
+  # use consolidated rules from suggest_rules.R
+  applicable_suggestions <- apply_suggestion_rules(
+    stage_name,
+    context_data,
+    suggestion_rules
   )
+  
+  # if no suggestions matched, use fallback
+  if (length(applicable_suggestions) == 0) {
+    return(get_fallback_suggestion(stage_name))
+  }
+  
+  # limit to top 3 suggestions to avoid overwhelming users
+  if (length(applicable_suggestions) > 3) {
+    applicable_suggestions <- applicable_suggestions[1:3]
+  }
+  
+  return(paste(applicable_suggestions, collapse = " "))
 }
+
 
 #' Evaluate suggestion condition against context data
 #'
@@ -1183,4 +1116,61 @@ parse_next_steps <- function(next_steps_formatted) {
   } else {
     return(next_steps_formatted)
   }
+}
+
+# session-level migration notice for stage numbering change (0.3.1)
+.show_stage_numbering_notice <- function() {
+  # use a simple environment variable to track if notice was shown this session
+  notice_var <- "BIDUX_STAGE_NUMBERING_NOTICE_SHOWN"
+  
+  if (is.null(getOption(notice_var))) {
+    cli::cli_inform(c(
+      "i" = "Stage numbering has been corrected in bidux 0.3.1:",
+      " " = "Anticipate is now Stage 3, Structure is now Stage 4",
+      " " = "This change improves logical workflow progression",
+      " " = "All existing code remains backward compatible"
+    ))
+    
+    # set option to prevent showing again this session
+    options(structure(list(TRUE), names = notice_var))
+  }
+  
+  invisible(NULL)
+}
+
+# format telemetry references for validation steps
+.format_telemetry_refs_for_validation <- function(telemetry_refs) {
+  if (is.null(telemetry_refs) || length(telemetry_refs) == 0) {
+    return(character(0))
+  }
+  
+  # handle different input formats
+  if (is.character(telemetry_refs)) {
+    # simple character vector
+    refs_text <- paste(telemetry_refs, collapse = ", ")
+    return(paste0("Track specific metrics identified in telemetry analysis: ", refs_text))
+    
+  } else if (is.list(telemetry_refs)) {
+    # named list with more structured references
+    formatted_refs <- character(0)
+    
+    for (ref_name in names(telemetry_refs)) {
+      ref_value <- telemetry_refs[[ref_name]]
+      if (!is.null(ref_value) && nchar(as.character(ref_value)) > 0) {
+        formatted_refs <- c(
+          formatted_refs,
+          paste0("Monitor ", ref_name, ": ", as.character(ref_value))
+        )
+      }
+    }
+    
+    if (length(formatted_refs) > 0) {
+      return(c(
+        "Validate telemetry-identified issues with specific tracking:",
+        formatted_refs
+      ))
+    }
+  }
+  
+  return(character(0))
 }

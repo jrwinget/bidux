@@ -27,16 +27,23 @@ confusion (default: 10)
 confusion (default: 5)}
 }
 \value{
-A list containing bid_stage objects for each identified issue in the
-"Notice" stage. Each element is named by issue type (e.g.,
-"unused_input_region", "delayed_interaction", etc.)
+A hybrid object of class c("bid_issues", "list") containing bid_stage objects
+for each identified issue in the "Notice" stage. The object includes:
+\item{Legacy list}{Named list of bid_stage objects (e.g., "unused_input_region", "delayed_interaction")}
+\item{issues_tbl}{Attached tidy tibble with issue metadata}
+\item{flags}{Global telemetry flags as named list}
+\item{created_at}{Timestamp when object was created}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{    Use as_tibble() to access the tidy issues data, bid_flags() to extract flags,
+    and legacy list access for backward compatibility.
+}\if{html}{\out{</div>}}
 }
 \description{
 This function ingests telemetry data from shiny.telemetry output (SQLite or
 JSON) and automatically identifies potential UX issues, translating them into
-BID framework Notice stages. It analyzes user behavior patterns to detect
-friction points such as unused inputs, delayed interactions, frequent errors,
-and navigation drop-offs.
+BID framework Notice stages. It returns a hybrid object that is backward-compatible
+as a list of Notice stages while also providing enhanced functionality with
+tidy tibble access and flags extraction.
 }
 \examples{
 \dontrun{

@@ -432,7 +432,7 @@ test_that("bid_notice generates appropriate suggestions", {
   expect_true(nchar(result$suggestions) > 0)
   expect_match(
     result$suggestions,
-    "target audience|design solutions",
+    "problem description|evidence|quantitative|theory",
     ignore.case = TRUE
   )
 
@@ -446,7 +446,7 @@ test_that("bid_notice generates appropriate suggestions", {
   expect_true(nchar(result2$suggestions) > 0)
   expect_match(
     result2$suggestions,
-    "target audience|design solutions",
+    "problem description|evidence|quantitative|theory",
     ignore.case = TRUE
   )
 })

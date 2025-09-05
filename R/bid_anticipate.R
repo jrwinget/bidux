@@ -491,21 +491,25 @@ bid_anticipate <- function(
 
   # create comprehensive metadata using standardized helper
   metadata <- get_stage_metadata(
-    4,
+    3,
     list(
       bias_count = length(names(bias_mitigations)),
       include_accessibility = include_accessibility,
       layout = layout,
       concepts_count = length(concepts),
-      auto_generated_biases = is.null(bias_mitigations)
+      auto_generated_biases = is.null(bias_mitigations),
+      stage_number_previous = 4  # migration support for 0.3.1
     )
   )
 
   # create and validate bid_stage object
   result <- bid_stage("Anticipate", result_data, metadata)
 
+  # add session-level migration notice (once per session)
+  .show_stage_numbering_notice()
+  
   bid_message(
-    "Stage 4 (Anticipate) completed.",
+    "Stage 3 (Anticipate) completed.",
     paste0("Bias mitigations: ", length(names(bias_mitigations)), " defined"),
     if (include_accessibility) {
       "Accessibility considerations included"

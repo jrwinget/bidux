@@ -4,12 +4,15 @@
 \alias{suggest_layout_from_previous}
 \title{Suggest layout based on previous stage content using heuristics}
 \usage{
-suggest_layout_from_previous(previous_stage)
+suggest_layout_from_previous(previous_stage, telemetry_flags = NULL)
 }
 \arguments{
 \item{previous_stage}{A tibble or list output from an earlier BID stage
 function containing stage data with potential fields like problem,
 evidence, central_question, data_story, etc.}
+
+\item{telemetry_flags}{Optional named list of telemetry flags from bid_flags()
+Used to adjust layout recommendations based on observed behavior patterns}
 }
 \value{
 Character string indicating the suggested layout type
