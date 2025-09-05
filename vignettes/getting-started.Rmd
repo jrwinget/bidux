@@ -17,24 +17,30 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-The `{bidux}` package helps Shiny developers create more effective dashboards using the **Behavior Insight Design (BID) Framework**. This framework integrates behavioral science, UX best practices, and data storytelling techniques to guide the development of dashboards that are easier to understand, more engaging, and more effective at supporting user decisions.
+The `{bidux}` package helps Shiny developers create more effective dashboards using the **Behavioral Insight Design (BID) Framework**. If you've ever wondered why users struggle with your carefully crafted dashboards, or why your beautifully visualized data doesn't drive the decisions you expected, this package is for you.
+
+**The core insight**: Technical excellence ≠ User success. Even the most sophisticated analysis can fail if users can't quickly understand and act on it.
+
+The BID framework bridges this gap by integrating behavioral science, UX best practices, and data storytelling techniques into a systematic 5-stage process. Think of it as applying the same rigor you use for data validation to user experience design.
 
 ```{r setup}
 library(bidux)
 library(dplyr)
 ```
 
-## The BID Framework
+## The BID Framework: A Data-Driven Approach to UX
 
-The BID framework consists of 5 sequential stages:
+The BID framework consists of 5 sequential stages that mirror how you might approach a data analysis project:
 
-1. **Interpret** the User's Need - Understand the core questions and insights needed
-2. **Notice** the Problem - Identify friction points and user struggles
-3. **Anticipate** User Behavior - Consider cognitive biases that influence perception
-4. **Structure** the Dashboard - Organize information for intuitive comprehension
-5. **Validate** & Empower the User - Provide clear takeaways and collaborative features
+1. **Interpret** the User's Need - Like defining your research question and understanding your data
+2. **Notice** the Problem - Like identifying data quality issues or analytical bottlenecks
+3. **Anticipate** User Behavior - Like checking for statistical biases that could skew results
+4. **Structure** the Dashboard - Like choosing the right visualization or model architecture
+5. **Validate** & Empower the User - Like testing your model and ensuring stakeholders can act on results
 
-This sequential process forms a structured approach to dashboard design, with each stage building on the insights from previous stages.
+**Key insight for data professionals**: Just as you wouldn't skip exploratory data analysis before modeling, don't skip understanding user cognition before building interfaces.
+
+Each stage builds on insights from previous stages, creating a systematic approach to dashboard design that's both evidence-based and user-centered.
 
 ## Exploring the Concept Dictionary
 
@@ -43,11 +49,11 @@ The BID framework is built on established science and design principles. To expl
 ```{r concepts}
 # List all concepts
 all_concepts <- bid_concepts()
-head(dplyr::select(all_concepts, concept, category, description), 3)
+head(select(all_concepts, concept, category, description), 3)
 
 # Search for specific concepts
 bid_concepts("cognitive") |>
-  dplyr::select(concept, description, implementation_tips)
+  select(concept, description, implementation_tips)
 ```
 
 For detailed information about a specific concept, use `bid_concept()`:
@@ -55,7 +61,7 @@ For detailed information about a specific concept, use `bid_concept()`:
 ```{r concept_detail}
 # Get information about a specific concept
 bid_concept("Processing Fluency") |>
-  dplyr::select(concept, description, implementation_tips)
+  select(concept, description, implementation_tips)
 ```
 
 The `bid_concept()` function supports case-insensitive and partial matching:
@@ -63,11 +69,11 @@ The `bid_concept()` function supports case-insensitive and partial matching:
 ```{r concept_matching}
 # Case-insensitive matching
 bid_concept("hick's law") |>
-  dplyr::select(concept, description)
+  select(concept, description)
 
 # Partial matching
 bid_concept("proximity") |>
-  dplyr::select(concept, description)
+  select(concept, description)
 ```
 
 You can also explore concepts that are new to the BID framework:
@@ -75,7 +81,7 @@ You can also explore concepts that are new to the BID framework:
 ```{r new_concepts}
 # Explore new concepts from user-centric design
 bid_concepts("visual hierarchy|breathable|gherkin") |>
-  dplyr::select(concept, description)
+  select(concept, description)
 ```
 
 ## Documenting a Dashboard Project with BID
@@ -116,7 +122,7 @@ interpret_result <- bid_interpret(
 )
 
 interpret_result |>
-  dplyr::select(central_question, hook, tension, resolution)
+  select(central_question, hook, tension, resolution)
 ```
 
 The function evaluates our data story elements and provides suggestions for improvement (in the `suggestions` column). We've also added user personas to better target our design.
@@ -134,7 +140,7 @@ notice_result <- bid_notice(
 )
 
 notice_result |>
-  dplyr::select(problem, theory, evidence)
+  select(problem, theory, evidence)
 ```
 
 Notice that the function automatically selected an appropriate theory based on our problem description. It also provides suggestions for addressing cognitive load which you can access from the `suggestions` column.
@@ -155,7 +161,7 @@ anticipate_result <- bid_anticipate(
 )
 
 anticipate_result |>
-  dplyr::select(bias_mitigations)
+  select(bias_mitigations)
 ```
 
 The function evaluates our bias mitigation strategies, providing implementation suggestions.
@@ -166,12 +172,10 @@ Now determine the layout and key design principles to implement:
 
 ```{r structure}
 # Document the dashboard structure
-structure_result <- bid_structure(
-  previous_stage = anticipate_result
-)
+structure_result <- bid_structure(previous_stage = anticipate_result)
 
 structure_result |>
-  dplyr::select(layout, concepts, suggestions)
+  select(layout, concepts, suggestions)
 ```
 
 The function automatically selects an appropriate layout based on the content from previous stages and provides ranked, actionable suggestions organized by UX concepts. The layout selection is transparent with clear rationale for why a particular layout was chosen.
@@ -195,7 +199,7 @@ validate_result <- bid_validate(
 )
 
 validate_result |>
-  dplyr::select(summary_panel, collaboration, next_steps)
+  select(summary_panel, collaboration, next_steps)
 ```
 
 The validate function acknowledges our implementation of the Peak-End Rule through next steps and provides suggestions for refining our approach.
@@ -207,12 +211,12 @@ Once you've documented your dashboard with the BID framework, you can generate c
 ```{r suggestions}
 # Get {bslib} component suggestions
 bid_suggest_components(structure_result, package = "bslib") |>
-  dplyr::select(component, description) |>
+  select(component, description) |>
   head(2)
 
 # Get {reactable} suggestions for showing data
 bid_suggest_components(structure_result, package = "reactable") |>
-  dplyr::select(component, description) |>
+  select(component, description) |>
   head(2)
 
 # Get suggestions from all supported packages
@@ -230,10 +234,7 @@ report <- bid_report(validate_result)
 cat(report)
 
 # Generate an HTML report
-html_report <- bid_report(
-  validate_result,
-  format = "html"
-)
+html_report <- bid_report(validate_result, format = "html")
 
 # Generate a markdown report
 md_report <- bid_report(validate_result, format = "markdown")
@@ -293,8 +294,8 @@ print(issues)  # Shows organized issue summary
 
 # Convert high-priority issues to Notice stages
 critical_issues <- issues |>
-  dplyr::filter(severity == "critical") |>
-  dplyr::slice_head(n = 3)
+  filter(severity == "critical") |>
+  slice_head(n = 3)
 
 notices <- bid_notices(
   issues = critical_issues,

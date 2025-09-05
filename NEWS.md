@@ -230,7 +230,7 @@ anticipate <- bid_anticipate(
 ==========================
 
 * Initial CRAN submission.
-* Complete implementation of the Behavior Insight Design (BID) framework with 5 sequential stages: Notice, Interpret, Structure, Anticipate, and Validate.
+* Complete implementation of the Behavioral Insight Design (BID) framework with 5 sequential stages: Notice, Interpret, Structure, Anticipate, and Validate.
 * Added initial concept dictionary with 41+ behavioral science principles.
 * Added UI component suggestions for major R packages: `{shiny}`, `{bslib}`, `{DT}`, `{plotly}`, `{reactable}`, `{htmlwidgets}`.
 * Added multi-format reporting capabilities (text, HTML, markdown) with `bid_report()`.

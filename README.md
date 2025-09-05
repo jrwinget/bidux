@@ -17,7 +17,7 @@ Size](https://img.shields.io/github/languages/code-size/jrwinget/bidux)](https:/
 
 ## 📖 Overview
 
-`{bidux}` brings the Behavior Insight Design (BID) framework into your
+`{bidux}` brings the Behavioral Insight Design (BID) framework into your
 Shiny development workflow. Follow five staged functions (Interpret,
 Notice, Anticipate, Structure, Validate) to systematically apply
 behavioral science to UI/UX design and build more intuitive dashboards.

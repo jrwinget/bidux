@@ -1,3 +1,4 @@
+50k
 CLI
 CMD
 Codecov
@@ -27,6 +28,7 @@ pkgdown
 plotly
 reactable
 roxygen2
+SaaS
 sqlite
 tbl
 testthat

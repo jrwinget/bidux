@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-The Behavior Insight Design (BID) framework guides developers in integrating behavioral science into UI/UX design. It helps in understanding behavioral tendencies, psychological principles, and common biases that affect user interactions.
+The Behavioral Insight Design (BID) framework guides developers in integrating behavioral science into UI/UX design. It helps in understanding behavioral tendencies, psychological principles, and common biases that affect user interactions.
 
 The five stages of the BID framework are:
 1. **Interpret the User's Need**: Clarify the core question and build a data narrative.

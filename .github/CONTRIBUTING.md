@@ -84,7 +84,7 @@ We rely on clear examples and comprehensive docs. To propose improvements:
 We follow the tidyverse style conventions:
 
 * Use **snake\_case** for function and variable names.
-* Avoid the magrittr pipe (`%>%`); prefer the native pipe (`|>`).
+* Avoid the magrittr pipe (`|>`); prefer the native pipe (`|>`).
 * Adhere to the [tidyverse style guide](https://style.tidyverse.org/).
 * Run `styler::style_pkg()` and `lintr::lint_package()` to catch formatting issues.
 

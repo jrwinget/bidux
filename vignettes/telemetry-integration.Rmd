@@ -16,7 +16,11 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-The `{bidux}` package provides powerful tools to analyze real user behavior data from `{shiny.telemetry}` and automatically identify UX friction points. This creates a powerful feedback loop where actual usage patterns drive design improvements through the BID framework.
+The `{bidux}` package provides powerful tools to analyze real user behavior data from `{shiny.telemetry}` and automatically identify UX friction points. Think of it as A/B testing for UX design—you can measure the impact of design changes on user behavior with the same rigor you apply to data analysis.
+
+**The power of telemetry + BID**: Instead of guessing what users struggle with, you can systematically identify friction points from real usage data, then apply behavioral science principles to fix them.
+
+This creates a powerful feedback loop where actual usage patterns drive design improvements through the BID framework.
 
 **New in 0.3.1:** Enhanced telemetry workflow with hybrid objects and streamlined API for better integration with tidy data workflows.
 
@@ -152,6 +156,7 @@ issues$unused_input_region
 ```
 
 This suggests the region filter might be:
+
 - Hidden or hard to find
 - Not relevant to users' tasks
 - Confusing or intimidating
@@ -169,6 +174,7 @@ issues$delayed_interaction
 ```
 
 This indicates users might be:
+
 - Overwhelmed by the initial view
 - Unsure where to start
 - Looking for information that's not readily apparent
@@ -186,6 +192,7 @@ issues$error_1
 ```
 
 This reveals:
+
 - Reliability issues with specific features
 - Input validation problems
 - Performance bottlenecks
@@ -203,6 +210,7 @@ issues$navigation_settings_tab
 ```
 
 Low visit rates suggest:
+
 - Poor information scent
 - Hidden or unclear navigation
 - Irrelevant content
@@ -220,6 +228,7 @@ issues$confusion_date_range
 ```
 
 This suggests:
+
 - Unclear feedback when values change
 - Unexpected behavior
 - Poor affordances
@@ -361,9 +370,268 @@ validate_result <- bid_validate(
 )
 ```
 
-## Example: Complete Analysis
+## Real-World Example: E-commerce Dashboard Optimization
 
-Here's a full example analyzing a dashboard with multiple issues using the new 0.3.1 API:
+Let's walk through a complete example of using telemetry data to improve an e-commerce dashboard. This shows how to go from raw user behavior data to concrete UX improvements.
+
+### The Scenario
+
+You've built an e-commerce analytics dashboard for business stakeholders. After 3 months in production, users are complaining it's "hard to use" but can't be specific about what's wrong.
+
+### Step 1: Diagnose with Telemetry Data
+
+```{r telemetry-diagnosis, eval=FALSE}
+# Analyze 3 months of user behavior data
+issues <- bid_telemetry("ecommerce_dashboard_telemetry.sqlite")
+
+# Review the systematic analysis
+print(issues)
+#> # BID Telemetry Issues: 8 issues identified
+#> # Severity breakdown: 2 critical, 3 high, 2 medium, 1 low
+#> #
+#> # Critical Issues:
+#> # 1. delayed_interaction: Users take 47 seconds before first interaction
+#> # 2. unused_input_advanced_filters: Only 3% of users interact with advanced filter panel
+#> #
+#> # High Priority Issues:
+#> # 3. error_data_loading: 23% of sessions encounter "Data query failed" error
+#> # 4. navigation_settings_tab: Only 8% visit settings, 85% of those sessions end there
+#> # 5. confusion_date_range: Rapid repeated changes suggest user confusion
+
+# Examine the most critical issue in detail
+critical_issue <- issues |>
+  filter(severity == "critical") |>
+  slice_head(n = 1)
+
+print(critical_issue$evidence)
+#> "Median time to first input is 47 seconds, and 12% of sessions had no interactions at all.
+#>  This suggests users are overwhelmed by the initial interface or unclear about where to start."
+```
+
+### Step 2: Apply BID Framework Systematically
+
+```{r ecommerce-bid-analysis, eval=FALSE}
+# Start with interpretation of the business context
+interpret_stage <- bid_interpret(
+  central_question = "How can we make e-commerce insights more accessible to busy stakeholders?",
+  data_story = list(
+    hook = "Business teams struggle to get quick insights from our analytics dashboard",
+    context = "Stakeholders have 10-15 minutes between meetings to check performance",
+    tension = "Current interface requires 47+ seconds just to orient and start using",
+    resolution = "Provide immediate value with progressive disclosure for deeper analysis"
+  ),
+  user_personas = list(
+    list(
+      name = "Marketing Manager",
+      goals = "Quick campaign performance insights",
+      pain_points = "Too much information, unclear where to start",
+      technical_level = "Intermediate"
+    ),
+    list(
+      name = "Executive",
+      goals = "High-level business health check",
+      pain_points = "Gets lost in technical details",
+      technical_level = "Basic"
+    )
+  )
+)
+
+# Convert telemetry issues to BID Notice stages using bridge functions
+notice_stages <- bid_notices(
+  issues = critical_issue,
+  previous_stage = interpret_stage
+)
+
+# Apply behavioral science to anticipate user behavior
+anticipate_stage <- bid_anticipate(
+  previous_stage = notice_stages[[1]],
+  bias_mitigations = list(
+    choice_overload = "Reduce initial options, use progressive disclosure",
+    attention_bias = "Use visual hierarchy to guide user focus",
+    anchoring = "Lead with most important business metric"
+  )
+)
+
+# Use telemetry flags to inform structure decisions
+flags <- bid_flags(issues)
+structure_stage <- bid_structure(
+  previous_stage = anticipate_stage,
+  telemetry_flags = flags  # This influences layout selection
+)
+
+# Define success criteria and validation approach
+validate_stage <- bid_validate(
+  previous_stage = structure_stage,
+  summary_panel = "Executive summary with key insights and trend indicators",
+  collaboration = "Enable stakeholders to share insights and add context",
+  next_steps = c(
+    "Implement simplified landing page with key metrics",
+    "Add progressive disclosure for detailed analytics",
+    "Create role-based views for different user types",
+    "Set up telemetry tracking to measure improvement"
+  )
+)
+```
+
+### Step 3: Implement Evidence-Based Improvements
+
+```{r ecommerce-improvements, eval=FALSE}
+# Before: Information overload (what telemetry revealed users struggled with)
+ui_before <- dashboardPage(
+  dashboardHeader(title = "E-commerce Analytics"),
+  dashboardSidebar(
+    # 15+ filter options immediately visible
+    selectInput("date_range", "Date Range", choices = date_options),
+    selectInput("product_category", "Category", choices = categories, multiple = TRUE),
+    selectInput("channel", "Sales Channel", choices = channels, multiple = TRUE),
+    selectInput("region", "Region", choices = regions, multiple = TRUE),
+    selectInput("customer_segment", "Customer Type", choices = segments, multiple = TRUE),
+    # ... 10 more filters
+    actionButton("apply_filters", "Apply Filters")
+  ),
+  dashboardBody(
+    # 12 value boxes competing for attention
+    fluidRow(
+      valueBoxOutput("revenue"), valueBoxOutput("orders"),
+      valueBoxOutput("aov"), valueBoxOutput("conversion"),
+      valueBoxOutput("traffic"), valueBoxOutput("bounce_rate"),
+      # ... 6 more value boxes
+    ),
+    # Multiple complex charts
+    fluidRow(
+      plotOutput("revenue_trend"), plotOutput("category_performance"),
+      plotOutput("channel_analysis"), plotOutput("customer_segments")
+    )
+  )
+)
+
+# After: BID-informed design addressing telemetry insights
+ui_after <- page_fillable(
+  theme = bs_theme(version = 5, preset = "bootstrap"),
+
+  # Address delayed interaction issue: Immediate value on landing
+  layout_columns(
+    col_widths = c(8, 4),
+
+    # Primary business health (addresses anchoring bias)
+    card(
+      card_header("🎯 Business Performance", class = "bg-primary text-white"),
+      layout_columns(
+        col_widths = c(6, 6),
+        value_box(
+          "Revenue Today",
+          "$47.2K",
+          "vs. $43.1K yesterday (+9.5%)",
+          showcase = bs_icon("graph-up"),
+          theme = "success"
+        ),
+        div(
+          h5("Key Insights", style = "margin-bottom: 15px;"),
+          tags$ul(
+            tags$li("Mobile traffic up 15%"),
+            tags$li("Electronics category leading"),
+            tags$li("⚠️ Cart abandonment rate increased")
+          ),
+          actionButton("investigate_abandonment", "Investigate",
+                      class = "btn btn-warning btn-sm")
+        )
+      )
+    ),
+
+    # Quick actions (addresses choice overload)
+    card(
+      card_header("⚡ Quick Actions"),
+      div(
+        actionButton(
+          "todays_performance",
+          "Today's Performance",
+          class = "btn btn-primary btn-block mb-2"
+        ),
+        actionButton(
+          "weekly_trends",
+          "Weekly Trends",
+          class = "btn btn-secondary btn-block mb-2"
+        ),
+        actionButton(
+          "campaign_results",
+          "Campaign Results",
+          class = "btn btn-info btn-block mb-2"
+        ),
+        hr(),
+        p(
+          "Need something specific?",
+          style = "font-size: 0.9em; color: #666;"
+        ),
+        actionButton(
+          "show_filters",
+          "Custom Analysis",
+          class = "btn btn-outline-secondary btn-sm"
+        )
+      )
+    )
+  ),
+
+  # Advanced options hidden by default (progressive disclosure)
+  conditionalPanel(
+    condition = "input.show_filters",
+    card(
+      card_header("🔍 Custom Analysis"),
+      p("Filter and explore your data:", style = "margin-bottom: 15px;"),
+      layout_columns(
+        col_widths = c(3, 3, 3, 3),
+        selectInput(
+          "time_period",
+          "Time Period",
+          choices = c("Today", "This Week", "This Month"),
+          selected = "Today"
+        ),
+        selectInput(
+          "focus_area",
+          "Focus Area",
+          choices = c("Revenue", "Traffic", "Conversions", "Customers")
+        ),
+        selectInput(
+          "comparison",
+          "Compare To",
+          choices = c("Previous Period", "Same Period Last Year", "Target")
+        ),
+        actionButton("apply_custom", "Analyze", class = "btn btn-primary")
+      )
+    )
+  ),
+
+  # Results area appears based on user choices
+  div(id = "results_area", style = "margin-top: 20px;")
+)
+```
+
+### Step 4: Measure the Impact
+
+```{r measure-impact, eval=FALSE}
+# After implementing changes, collect new telemetry data
+issues_after <- bid_telemetry(
+  "ecommerce_dashboard_telemetry_after_changes.sqlite"
+)
+
+# Compare before/after metrics
+improvement_metrics <- tibble(
+  metric = c(
+    "Time to first interaction",
+    "Session abandonment rate",
+    "User satisfaction score",
+    "Task completion rate"
+  ),
+  before = c("47 seconds", "12%", "6.2/10", "68%"),
+  after = c("8 seconds", "3%", "8.1/10", "87%"),
+  improvement = c("-83%", "-75%", "+31%", "+28%")
+)
+
+print(improvement_metrics)
+```
+
+## Example: Complete Analysis Using 0.3.1 API
+
+Here's the complete workflow using the streamlined modern API:
 
 ```{r complete_example, eval=FALSE}
 # 1. Modern telemetry ingestion

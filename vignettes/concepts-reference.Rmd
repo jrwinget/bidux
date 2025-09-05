@@ -25,7 +25,7 @@ library(echarts4r)
 
 # BID Framework Concepts: Practical Implementation
 
-The Behavior Insight Design (BID) framework integrates behavioral science into UI/UX design for Shiny dashboards. This guide focuses on practical implementation of key concepts using modern packages like {bslib}, {reactable}, and {echarts4r}.
+The Behavioral Insight Design (BID) framework integrates behavioral science into UI/UX design for Shiny dashboards. This guide focuses on practical implementation of key concepts using modern packages like {bslib}, {reactable}, and {echarts4r}.
 
 ## Framework Overview
 
