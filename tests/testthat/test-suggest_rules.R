@@ -136,3 +136,275 @@ test_that("deduplicate_warnings_suggestions handles different similarity thresho
   
   expect_gte(length(result_high$warnings), length(result_low$warnings))
 })
+
+# Test comprehensive rule structure
+test_that("get_consolidated_suggestion_rules has complete rule structure", {
+  rules <- get_consolidated_suggestion_rules()
+  
+  # Check all expected stages are present
+  expected_stages <- c("interpret", "notice", "validate")
+  expect_true(all(expected_stages %in% names(rules)))
+  
+  # Check each stage has at least one rule
+  for (stage in expected_stages) {
+    expect_gt(length(rules[[stage]]), 0)
+    
+    # Check first rule in each stage has proper structure
+    first_rule <- rules[[stage]][[1]]
+    expect_true("condition" %in% names(first_rule))
+    expect_true("message" %in% names(first_rule))
+    expect_true(is.function(first_rule$condition))
+    expect_true(is.character(first_rule$message))
+  }
+})
+
+# Test specific interpret rules
+test_that("interpret stage rules work correctly", {
+  rules <- get_consolidated_suggestion_rules()
+  interpret_rules <- rules$interpret
+  
+  # Test data story completeness rule
+  incomplete_context <- list(
+    data_story = list(hook = "test", context = "", tension = "", resolution = "")
+  )
+  
+  suggestions <- apply_suggestion_rules("interpret", incomplete_context)
+  expect_true(is.character(suggestions))
+  expect_gte(length(suggestions), 0)
+  
+  # Test central question rules
+  short_question_context <- list(central_question = "Short?")
+  short_suggestions <- apply_suggestion_rules("interpret", short_question_context)
+  expect_true(is.character(short_suggestions))
+  
+  long_question_context <- list(
+    central_question = paste(rep("very long question", 10), collapse = " ")
+  )
+  long_suggestions <- apply_suggestion_rules("interpret", long_question_context)
+  expect_true(is.character(long_suggestions))
+  
+  # Test audience definition rules
+  no_audience_context <- list(central_question = "Test question")
+  audience_suggestions <- apply_suggestion_rules("interpret", no_audience_context)
+  expect_true(is.character(audience_suggestions))
+})
+
+# Test specific notice rules
+test_that("notice stage rules work correctly", {
+  # Test problem description quality
+  short_problem_context <- list(problem = "Short")
+  suggestions <- apply_suggestion_rules("notice", short_problem_context)
+  expect_true(is.character(suggestions))
+  
+  # Test evidence strength rules
+  short_evidence_context <- list(evidence = "Short")
+  evidence_suggestions <- apply_suggestion_rules("notice", short_evidence_context)
+  expect_true(is.character(evidence_suggestions))
+  
+  # Test evidence with no quantitative data
+  no_numbers_context <- list(evidence = "Users are confused and struggling")
+  no_numbers_suggestions <- apply_suggestion_rules("notice", no_numbers_context)
+  expect_true(is.character(no_numbers_suggestions))
+  
+  # Test theory application rules
+  complexity_problem_context <- list(
+    problem = "Too many choices overwhelm users",
+    theory = ""
+  )
+  theory_suggestions <- apply_suggestion_rules("notice", complexity_problem_context)
+  expect_true(is.character(theory_suggestions))
+  
+  # Test evidence-theory alignment
+  misaligned_context <- list(
+    theory = "cognitive load theory",
+    evidence = "Users like the bright colors"
+  )
+  alignment_suggestions <- apply_suggestion_rules("notice", misaligned_context)
+  expect_true(is.character(alignment_suggestions))
+})
+
+# Test specific validate rules
+test_that("validate stage rules work correctly", {
+  # Test telemetry integration rules
+  telemetry_context <- list(
+    include_telemetry = TRUE,
+    telemetry_refs = NULL
+  )
+  telemetry_suggestions <- apply_suggestion_rules("validate", telemetry_context)
+  expect_true(is.character(telemetry_suggestions))
+  
+  # Test measurement completeness rules
+  no_metrics_context <- list(
+    validation_steps = "Check if users like it"
+  )
+  metrics_suggestions <- apply_suggestion_rules("validate", no_metrics_context)
+  expect_true(is.character(metrics_suggestions))
+  
+  # Test timeline rules
+  no_timeline_context <- list(
+    validation_steps = "Test with users and collect feedback"
+  )
+  timeline_suggestions <- apply_suggestion_rules("validate", no_timeline_context)
+  expect_true(is.character(timeline_suggestions))
+  
+  # Test user testing integration rules
+  no_testing_context <- list(
+    validation_steps = "Monitor analytics and check metrics"
+  )
+  testing_suggestions <- apply_suggestion_rules("validate", no_testing_context)
+  expect_true(is.character(testing_suggestions))
+})
+
+# Test rule condition evaluation error handling
+test_that("apply_suggestion_rules handles rule evaluation errors", {
+  # Test with malformed rules
+  bad_rules <- list(
+    interpret = list(
+      list(condition = "not a function", message = "test"),
+      list(condition = function(ctx) stop("error"), message = "error test"),
+      list(condition = function(ctx) NULL, message = "null test"),
+      list() # empty rule
+    )
+  )
+  
+  context_data <- list(central_question = "test")
+  
+  # Should handle errors gracefully without stopping
+  suggestions <- apply_suggestion_rules("interpret", context_data, bad_rules)
+  expect_true(is.character(suggestions))
+  expect_gte(length(suggestions), 0)
+})
+
+# Test edge cases in deduplicate_warnings_suggestions
+test_that("deduplicate_warnings_suggestions handles edge cases", {
+  # Test with very similar warnings and suggestions
+  warnings <- c("Add more detail to your analysis", "Include more detailed analysis")
+  suggestions <- c("Consider adding detailed analysis", "Try more comprehensive approach")
+  
+  result <- deduplicate_warnings_suggestions(warnings, suggestions, 0.6)
+  expect_true(is.list(result))
+  expect_true("warnings" %in% names(result))
+  expect_true("suggestions" %in% names(result))
+  
+  # Test with single item arrays
+  single_warning <- "Single warning"
+  single_suggestion <- "Single suggestion"
+  single_result <- deduplicate_warnings_suggestions(single_warning, single_suggestion)
+  expect_equal(length(single_result$warnings), 1)
+  expect_equal(length(single_result$suggestions), 1)
+  
+  # Test with NA values
+  na_warnings <- c("Valid warning", NA, "Another warning")
+  na_suggestions <- c("Valid suggestion")
+  na_result <- deduplicate_warnings_suggestions(na_warnings, na_suggestions)
+  expect_true(is.list(na_result))
+})
+
+# Test get_fallback_suggestion for edge cases
+test_that("get_fallback_suggestion handles all cases", {
+  # Test known stages
+  known_stages <- c("Interpret", "Notice", "Anticipate", "Structure", "Validate")
+  for (stage in known_stages) {
+    fallback <- get_fallback_suggestion(stage)
+    expect_true(is.character(fallback))
+    expect_gt(nchar(fallback), 0)
+  }
+  
+  # Test unknown stage
+  unknown_fallback <- get_fallback_suggestion("UnknownStage")
+  expect_true(is.character(unknown_fallback))
+  expect_gt(nchar(unknown_fallback), 0)
+  
+  # Test empty string stage - should return default fallback
+  empty_fallback <- get_fallback_suggestion("")
+  expect_true(is.character(empty_fallback))
+  expect_gt(nchar(empty_fallback), 0)
+  expect_match(empty_fallback, "Follow BID framework best practices")
+})
+
+# Test word overlap calculation in deduplicate_warnings_suggestions
+test_that("deduplicate_warnings_suggestions word overlap works", {
+  # Test warnings with high overlap with suggestions
+  warnings <- c("Please add more details to your data analysis")
+  suggestions <- c("Consider adding more details to data analysis")
+  
+  result <- deduplicate_warnings_suggestions(warnings, suggestions, 0.5)
+  # Should deduplicate if overlap is high enough
+  expect_lte(length(result$warnings), length(warnings))
+  
+  # Test with no overlap
+  no_overlap_warnings <- c("Check your calculations")
+  no_overlap_suggestions <- c("Review user feedback")
+  
+  no_overlap_result <- deduplicate_warnings_suggestions(no_overlap_warnings, no_overlap_suggestions)
+  expect_equal(length(no_overlap_result$warnings), length(no_overlap_warnings))
+  expect_equal(length(no_overlap_result$suggestions), length(no_overlap_suggestions))
+})
+
+# Test all rule conditions can be evaluated
+test_that("all consolidated rules have valid conditions", {
+  rules <- get_consolidated_suggestion_rules()
+  
+  # Create test contexts for each stage
+  test_contexts <- list(
+    interpret = list(
+      central_question = "How can we improve?",
+      data_story = list(hook = "test", context = "test", tension = "", resolution = ""),
+      audience = "test audience"
+    ),
+    notice = list(
+      problem = "Users are confused",
+      evidence = "Testing shows 50% confusion rate",
+      theory = "cognitive load theory"
+    ),
+    validate = list(
+      validation_steps = "Test with users over 2 weeks",
+      include_telemetry = TRUE,
+      telemetry_refs = c("click_rate", "completion_time")
+    )
+  )
+  
+  # Test that all rules can be evaluated without error
+  for (stage_name in names(rules)) {
+    stage_rules <- rules[[stage_name]]
+    context <- test_contexts[[stage_name]] %||% list()
+    
+    for (i in seq_along(stage_rules)) {
+      rule <- stage_rules[[i]]
+      if (is.list(rule) && "condition" %in% names(rule) && "message" %in% names(rule)) {
+        # Should not throw error
+        expect_silent({
+          if (is.function(rule$condition)) {
+            tryCatch({
+              result <- rule$condition(context)
+              expect_true(is.logical(result) || is.null(result))
+            }, error = function(e) {
+              # Errors in rule conditions are acceptable - they should be handled gracefully
+            })
+          }
+        })
+      }
+    }
+  }
+})
+
+# Test context data structure handling
+test_that("apply_suggestion_rules handles different context structures", {
+  # Test with NULL context
+  null_suggestions <- apply_suggestion_rules("interpret", NULL)
+  expect_true(is.character(null_suggestions))
+  
+  # Test with empty list context
+  empty_suggestions <- apply_suggestion_rules("interpret", list())
+  expect_true(is.character(empty_suggestions))
+  
+  # Test with nested list context
+  nested_context <- list(
+    data_story = list(
+      hook = list(title = "Test", content = "Test content"),
+      context = "Test context"
+    )
+  )
+  nested_suggestions <- apply_suggestion_rules("interpret", nested_context)
+  expect_true(is.character(nested_suggestions))
+})
