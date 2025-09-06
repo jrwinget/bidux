@@ -38,10 +38,13 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/concepts-reference.html">BID Framework Concepts: Practical Implementation</a></li>
+<li><a class="dropdown-item" href="../articles/advanced-workflows.html">Advanced BID Workflows: Power User Techniques</a></li>
+    <li><a class="dropdown-item" href="../articles/behavioral-science-primer.html">Behavioral Science for Data Scientists: Why Your Dashboard Users Think Differently Than You Do</a></li>
+    <li><a class="dropdown-item" href="../articles/concepts-reference.html">BID Framework Concepts: Practical Implementation</a></li>
     <li><a class="dropdown-item" href="../articles/getting-started.html">Getting Started with bidux</a></li>
-    <li><a class="dropdown-item" href="../articles/introduction-to-bid.html">introduction-to-bid</a></li>
-    <li><a class="dropdown-item" href="../articles/telemetry-integration.html">Integrating shiny.telemetry with BIDUX</a></li>
+    <li><a class="dropdown-item" href="../articles/introduction-to-bid.html">Introduction to the BID Framework</a></li>
+    <li><a class="dropdown-item" href="../articles/practical-examples.html">Practical Examples: Before and After Dashboard Transformations</a></li>
+    <li><a class="dropdown-item" href="../articles/telemetry-integration.html">Integrating shiny.telemetry with bidux</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -62,8 +65,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>Getting Started with bidux</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Getting Started with bidux</h1>
             
       
 
@@ -76,39 +78,49 @@
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
 <p>The <a href="https://jrwinget.github.io/bidux/">bidux</a> package helps Shiny developers create more
-effective dashboards using the <strong>Behavior Insight Design (BID)
-Framework</strong>. This framework integrates behavioral science, UX
-best practices, and data storytelling techniques to guide the
-development of dashboards that are easier to understand, more engaging,
-and more effective at supporting user decisions.</p>
+effective dashboards using the <strong>Behavioral Insight Design (BID)
+Framework</strong>. If you’ve ever wondered why users struggle with your
+carefully crafted dashboards, or why your beautifully visualized data
+doesn’t drive the decisions you expected, this package is for you.</p>
+<p><strong>The core insight</strong>: Technical excellence ≠ User
+success. Even the most sophisticated analysis can fail if users can’t
+quickly understand and act on it.</p>
+<p>The BID framework bridges this gap by integrating behavioral science,
+UX best practices, and data storytelling techniques into a systematic
+5-stage process. Think of it as applying the same rigor you use for data
+validation to user experience design.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://jrwinget.github.io/bidux/">bidux</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="the-bid-framework">The BID Framework<a class="anchor" aria-label="anchor" href="#the-bid-framework"></a>
+<h2 id="the-bid-framework-a-data-driven-approach-to-ux">The BID Framework: A Data-Driven Approach to UX<a class="anchor" aria-label="anchor" href="#the-bid-framework-a-data-driven-approach-to-ux"></a>
 </h2>
-<p>The BID framework consists of 5 sequential stages:</p>
+<p>The BID framework consists of 5 sequential stages that mirror how you
+might approach a data analysis project:</p>
 <ol style="list-style-type: decimal">
 <li>
-<strong>Interpret</strong> the User’s Need - Understand the core
-questions and insights needed</li>
+<strong>Interpret</strong> the User’s Need - Like defining your
+research question and understanding your data</li>
 <li>
-<strong>Notice</strong> the Problem - Identify friction points and
-user struggles</li>
+<strong>Notice</strong> the Problem - Like identifying data quality
+issues or analytical bottlenecks</li>
 <li>
-<strong>Anticipate</strong> User Behavior - Consider cognitive
-biases that influence perception</li>
+<strong>Anticipate</strong> User Behavior - Like checking for
+statistical biases that could skew results</li>
 <li>
-<strong>Structure</strong> the Dashboard - Organize information for
-intuitive comprehension</li>
+<strong>Structure</strong> the Dashboard - Like choosing the right
+visualization or model architecture</li>
 <li>
-<strong>Validate</strong> &amp; Empower the User - Provide clear
-takeaways and collaborative features</li>
+<strong>Validate</strong> &amp; Empower the User - Like testing your
+model and ensuring stakeholders can act on results</li>
 </ol>
-<p>This sequential process forms a structured approach to dashboard
-design, with each stage building on the insights from previous
-stages.</p>
+<p><strong>Key insight for data professionals</strong>: Just as you
+wouldn’t skip exploratory data analysis before modeling, don’t skip
+understanding user cognition before building interfaces.</p>
+<p>Each stage builds on insights from previous stages, creating a
+systematic approach to dashboard design that’s both evidence-based and
+user-centered.</p>
 </div>
 <div class="section level2">
 <h2 id="exploring-the-concept-dictionary">Exploring the Concept Dictionary<a class="anchor" aria-label="anchor" href="#exploring-the-concept-dictionary"></a>
@@ -119,32 +131,32 @@ to list all available concepts, or search for specific terms:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># List all concepts</span></span>
 <span><span class="va">all_concepts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_concepts.html">bid_concepts</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">all_concepts</span>, <span class="va">concept</span>, <span class="va">category</span>, <span class="va">description</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">all_concepts</span>, <span class="va">concept</span>, <span class="va">category</span>, <span class="va">description</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Search for specific concepts</span></span>
 <span><span class="fu"><a href="../reference/bid_concepts.html">bid_concepts</a></span><span class="op">(</span><span class="st">"cognitive"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">concept</span>, <span class="va">description</span>, <span class="va">implementation_tips</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">concept</span>, <span class="va">description</span>, <span class="va">implementation_tips</span><span class="op">)</span></span></code></pre></div>
 <p>For detailed information about a specific concept, use
 <code><a href="../reference/bid_concept.html">bid_concept()</a></code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get information about a specific concept</span></span>
 <span><span class="fu"><a href="../reference/bid_concept.html">bid_concept</a></span><span class="op">(</span><span class="st">"Processing Fluency"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">concept</span>, <span class="va">description</span>, <span class="va">implementation_tips</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">concept</span>, <span class="va">description</span>, <span class="va">implementation_tips</span><span class="op">)</span></span></code></pre></div>
 <p>The <code><a href="../reference/bid_concept.html">bid_concept()</a></code> function supports case-insensitive and
 partial matching:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Case-insensitive matching</span></span>
 <span><span class="fu"><a href="../reference/bid_concept.html">bid_concept</a></span><span class="op">(</span><span class="st">"hick's law"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">concept</span>, <span class="va">description</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">concept</span>, <span class="va">description</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Partial matching</span></span>
 <span><span class="fu"><a href="../reference/bid_concept.html">bid_concept</a></span><span class="op">(</span><span class="st">"proximity"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">concept</span>, <span class="va">description</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">concept</span>, <span class="va">description</span><span class="op">)</span></span></code></pre></div>
 <p>You can also explore concepts that are new to the BID framework:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Explore new concepts from user-centric design</span></span>
 <span><span class="fu"><a href="../reference/bid_concepts.html">bid_concepts</a></span><span class="op">(</span><span class="st">"visual hierarchy|breathable|gherkin"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">concept</span>, <span class="va">description</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">concept</span>, <span class="va">description</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="documenting-a-dashboard-project-with-bid">Documenting a Dashboard Project with BID<a class="anchor" aria-label="anchor" href="#documenting-a-dashboard-project-with-bid"></a>
@@ -186,7 +198,7 @@ answer and structure the data story:</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">interpret_result</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">central_question</span>, <span class="va">hook</span>, <span class="va">tension</span>, <span class="va">resolution</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">central_question</span>, <span class="va">hook</span>, <span class="va">tension</span>, <span class="va">resolution</span><span class="op">)</span></span></code></pre></div>
 <p>The function evaluates our data story elements and provides
 suggestions for improvement (in the <code>suggestions</code> column).
 We’ve also added user personas to better target our design.</p>
@@ -205,7 +217,7 @@ dashboard or interface:</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">notice_result</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">problem</span>, <span class="va">theory</span>, <span class="va">evidence</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">problem</span>, <span class="va">theory</span>, <span class="va">evidence</span><span class="op">)</span></span></code></pre></div>
 <p>Notice that the function automatically selected an appropriate theory
 based on our problem description. It also provides suggestions for
 addressing cognitive load which you can access from the
@@ -228,7 +240,7 @@ interpret your dashboard:</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">anticipate_result</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">bias_mitigations</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">bias_mitigations</span><span class="op">)</span></span></code></pre></div>
 <p>The function evaluates our bias mitigation strategies, providing
 implementation suggestions.</p>
 </div>
@@ -238,12 +250,10 @@ implementation suggestions.</p>
 <p>Now determine the layout and key design principles to implement:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Document the dashboard structure</span></span>
-<span><span class="va">structure_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_structure.html">bid_structure</a></span><span class="op">(</span></span>
-<span>  previous_stage <span class="op">=</span> <span class="va">anticipate_result</span></span>
-<span><span class="op">)</span></span>
+<span><span class="va">structure_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_structure.html">bid_structure</a></span><span class="op">(</span>previous_stage <span class="op">=</span> <span class="va">anticipate_result</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">structure_result</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">layout</span>, <span class="va">concepts</span>, <span class="va">suggestions</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">layout</span>, <span class="va">concepts</span>, <span class="va">suggestions</span><span class="op">)</span></span></code></pre></div>
 <p>The function automatically selects an appropriate layout based on the
 content from previous stages and provides ranked, actionable suggestions
 organized by UX concepts. The layout selection is transparent with clear
@@ -269,7 +279,7 @@ and the ability to collaborate:</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">validate_result</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">summary_panel</span>, <span class="va">collaboration</span>, <span class="va">next_steps</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">summary_panel</span>, <span class="va">collaboration</span>, <span class="va">next_steps</span><span class="op">)</span></span></code></pre></div>
 <p>The validate function acknowledges our implementation of the Peak-End
 Rule through next steps and provides suggestions for refining our
 approach.</p>
@@ -284,12 +294,12 @@ common R packages:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get {bslib} component suggestions</span></span>
 <span><span class="fu"><a href="../reference/bid_suggest_components.html">bid_suggest_components</a></span><span class="op">(</span><span class="va">structure_result</span>, package <span class="op">=</span> <span class="st">"bslib"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">component</span>, <span class="va">description</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">component</span>, <span class="va">description</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Get {reactable} suggestions for showing data</span></span>
 <span><span class="fu"><a href="../reference/bid_suggest_components.html">bid_suggest_components</a></span><span class="op">(</span><span class="va">structure_result</span>, package <span class="op">=</span> <span class="st">"reactable"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">component</span>, <span class="va">description</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">component</span>, <span class="va">description</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Get suggestions from all supported packages</span></span>
@@ -307,10 +317,7 @@ process:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">report</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Generate an HTML report</span></span>
-<span><span class="va">html_report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_report.html">bid_report</a></span><span class="op">(</span></span>
-<span>  <span class="va">validate_result</span>,</span>
-<span>  format <span class="op">=</span> <span class="st">"html"</span></span>
-<span><span class="op">)</span></span>
+<span><span class="va">html_report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_report.html">bid_report</a></span><span class="op">(</span><span class="va">validate_result</span>, format <span class="op">=</span> <span class="st">"html"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Generate a markdown report</span></span>
 <span><span class="va">md_report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_report.html">bid_report</a></span><span class="op">(</span><span class="va">validate_result</span>, format <span class="op">=</span> <span class="st">"markdown"</span><span class="op">)</span></span></code></pre></div>
@@ -380,6 +387,50 @@ intuitive, engaging, and effective for your users.</p>
 <li>A UI component library implementing BID principles</li>
 <li>Testing and validation tools for dashboard evaluation</li>
 </ul>
+</div>
+<div class="section level2">
+<h2 id="integrating-telemetry-data-new-in-0-3-1">Integrating Telemetry Data (New in 0.3.1)<a class="anchor" aria-label="anchor" href="#integrating-telemetry-data-new-in-0-3-1"></a>
+</h2>
+<p>If you have telemetry data from user interactions,
+<a href="https://jrwinget.github.io/bidux/">bidux</a> can help transform it into actionable BID
+insights:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Modern telemetry workflow (0.3.1+)</span></span>
+<span><span class="co"># Process telemetry data into organized issues</span></span>
+<span><span class="va">issues</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_telemetry.html">bid_telemetry</a></span><span class="op">(</span><span class="st">"path/to/telemetry.sqlite"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Triage and review issues</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span>  <span class="co"># Shows organized issue summary</span></span>
+<span></span>
+<span><span class="co"># Convert high-priority issues to Notice stages</span></span>
+<span><span class="va">critical_issues</span> <span class="op">&lt;-</span> <span class="va">issues</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">severity</span> <span class="op">==</span> <span class="st">"critical"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_head</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">notices</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_notices.html">bid_notices</a></span><span class="op">(</span></span>
+<span>  issues <span class="op">=</span> <span class="va">critical_issues</span>,</span>
+<span>  previous_stage <span class="op">=</span> <span class="va">interpret_result</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Extract telemetry flags for structure optimization</span></span>
+<span><span class="va">flags</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_flags.html">bid_flags</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Use flags to inform layout selection</span></span>
+<span><span class="va">structure_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_structure.html">bid_structure</a></span><span class="op">(</span></span>
+<span>  previous_stage <span class="op">=</span> <span class="va">anticipate_result</span>,</span>
+<span>  telemetry_flags <span class="op">=</span> <span class="va">flags</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>The hybrid object returned by <code><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry()</a></code>
+maintains backward compatibility while providing enhanced
+functionality:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Legacy approach still works</span></span>
+<span><span class="va">legacy_notices</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry</a></span><span class="op">(</span><span class="st">"path/to/telemetry.sqlite"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">legacy_notices</span><span class="op">)</span>  <span class="co"># Behaves like list of Notice stages</span></span>
+<span></span>
+<span><span class="co"># But now also provides enhanced features</span></span>
+<span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="va">legacy_notices</span><span class="op">)</span>  <span class="co"># Tidy issues view</span></span>
+<span><span class="fu"><a href="../reference/bid_flags.html">bid_flags</a></span><span class="op">(</span><span class="va">legacy_notices</span><span class="op">)</span>  <span class="co"># Extract global flags</span></span></code></pre></div>
 <p>Visit <a href="https://github.com/jrwinget/bidux" class="external-link">github.com/jrwinget/bidux</a>
 for updates and to contribute to the package development. We welcome
 feedback and suggestions to help make the BID framework even more

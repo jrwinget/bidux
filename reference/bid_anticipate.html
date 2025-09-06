@@ -3,7 +3,7 @@
 mitigation strategies related to anchoring, framing, confirmation bias, etc.
 It also supports adding interaction hints and visual feedback elements."><meta property="og:description" content="This function documents the anticipated user behavior by listing bias
 mitigation strategies related to anchoring, framing, confirmation bias, etc.
-It also supports adding interaction hints and visual feedback elements."></head><body>
+It also supports adding interaction hints and visual feedback elements."><meta property="og:image" content="https://jrwinget.github.io/bidux/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -22,10 +22,13 @@ It also supports adding interaction hints and visual feedback elements."></head>
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/concepts-reference.html">BID Framework Concepts: Practical Implementation</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/advanced-workflows.html">Advanced BID Workflows: Power User Techniques</a></li>
+    <li><a class="dropdown-item" href="../articles/behavioral-science-primer.html">Behavioral Science for Data Scientists: Why Your Dashboard Users Think Differently Than You Do</a></li>
+    <li><a class="dropdown-item" href="../articles/concepts-reference.html">BID Framework Concepts: Practical Implementation</a></li>
     <li><a class="dropdown-item" href="../articles/getting-started.html">Getting Started with bidux</a></li>
-    <li><a class="dropdown-item" href="../articles/introduction-to-bid.html">introduction-to-bid</a></li>
-    <li><a class="dropdown-item" href="../articles/telemetry-integration.html">Integrating shiny.telemetry with BIDUX</a></li>
+    <li><a class="dropdown-item" href="../articles/introduction-to-bid.html">Introduction to the BID Framework</a></li>
+    <li><a class="dropdown-item" href="../articles/practical-examples.html">Practical Examples: Before and After Dashboard Transformations</a></li>
+    <li><a class="dropdown-item" href="../articles/telemetry-integration.html">Integrating shiny.telemetry with bidux</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -37,8 +40,7 @@ It also supports adding interaction hints and visual feedback elements."></head>
 </nav><div class="container template-reference-topic">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>Document User Behavior Anticipation Stage in BID Framework</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Document User Behavior Anticipation Stage in BID Framework</h1>
 
       <div class="d-none name"><code>bid_anticipate.Rd</code></div>
     </div>
@@ -92,25 +94,26 @@ stage.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">structure_info</span> <span class="op">&lt;-</span> <span class="fu"><a href="bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">interpret_stage</span> <span class="op">&lt;-</span> <span class="fu"><a href="bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  central_question <span class="op">=</span> <span class="st">"How can we improve selection efficiency?"</span>,</span></span>
 <span class="r-in"><span>  data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    hook <span class="op">=</span> <span class="st">"Too many options"</span>,</span></span>
-<span class="r-in"><span>    context <span class="op">=</span> <span class="st">"Excessive choices"</span>,</span></span>
+<span class="r-in"><span>    context <span class="op">=</span> <span class="st">"Excessive choices"</span>, </span></span>
 <span class="r-in"><span>    tension <span class="op">=</span> <span class="st">"User frustration"</span>,</span></span>
 <span class="r-in"><span>    resolution <span class="op">=</span> <span class="st">"Simplify menu"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="bid_notice.html">bid_notice</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="st">"Issue with dropdown menus"</span>,</span></span>
-<span class="r-in"><span>    evidence <span class="op">=</span> <span class="st">"User testing indicated delays"</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="bid_structure.html">bid_structure</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Stage 1 (Interpret) completed.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Central question: How can we improve selection efficiency?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Your data story has all key elements. Focus on making each component compelling and relevant.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Your central question is appropriately scoped.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - No user personas defined </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">notice_stage</span> <span class="op">&lt;-</span> <span class="fu"><a href="bid_notice.html">bid_notice</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  previous_stage <span class="op">=</span> <span class="va">interpret_stage</span>,</span></span>
+<span class="r-in"><span>  problem <span class="op">=</span> <span class="st">"Issue with dropdown menus"</span>,</span></span>
+<span class="r-in"><span>  evidence <span class="op">=</span> <span class="st">"User testing indicated delays"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Auto-suggested theory: Hick's Law (confidence: 90%)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Stage 2 (Notice) completed. (40% complete)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Problem: Issue with dropdown menus</span>
@@ -118,29 +121,35 @@ stage.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Evidence: User testing indicated delays</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Theory confidence: 90%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Next: Use bid_anticipate() for Stage 3 </span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Unusual stage progression: Notice -&gt; Structure</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">structure_info</span> <span class="op">&lt;-</span> <span class="fu"><a href="bid_structure.html">bid_structure</a></span><span class="op">(</span>previous_stage <span class="op">=</span> <span class="va">notice_stage</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Auto-selected layout: breathable</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Selected 'breathable' as safe default to ensure clean, uncluttered layout.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Layout auto-selection is deprecated and will be removed in bidux 0.4.0. The BID framework will focus on concept-based suggestions instead. Existing code will continue to work until 0.4.0.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Tip: Learn more about any concept via bid_concept("&lt;concept&gt;").</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Stage 3 (Structure) completed.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Stage numbering has been corrected in bidux 0.3.1:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   Anticipate is now Stage 3, Structure is now Stage 4</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   This change improves logical workflow progression</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   All existing code remains backward compatible</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Stage 4 (Structure) completed.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Auto-selected layout: breathable</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Concept groups generated: 4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Total concepts: 4 </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Let the function suggest bias mitigations based on previous stages</span></span></span>
 <span class="r-in"><span><span class="fu">bid_anticipate</span><span class="op">(</span>previous_stage <span class="op">=</span> <span class="va">structure_info</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Unusual stage progression: Structure -&gt; Anticipate</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Layout-specific bias mitigations are deprecated and will be removed in bidux 0.4.0. Consider using concept-based bias mitigations instead.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Automatically suggested bias mitigations: attention bias, belief perseverance, cognitive load, accessibility.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Concept 'attention bias' not found</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Cognitive Load Theory</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Accessibility Contrast</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Stage 4 (Anticipate) completed.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Stage 3 (Anticipate) completed.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Bias mitigations: 4 defined</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Accessibility considerations included</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Key suggestions: attention bias mitigation: Consider how this bias affects user decisions., belief perseverance mitigation: Proactively show content that might disprove initial assumptions., cognitive load mitigation: Use tabs or collapsible sections to organize complex information. </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB; font-weight: bold;">BID Framework</span> - <span style="font-weight: bold;">Anticipate</span> Stage</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-09-04 01:31:11 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Progress: 80 % (4/5) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-09-06 16:58:17 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Progress: 60 % (3/5) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Bias Mitigations:</span> 4 strategies defined </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -157,12 +166,11 @@ stage.</p>
 <span class="r-in"><span>  <span class="op">)</span>,</span></span>
 <span class="r-in"><span>  include_accessibility <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Unusual stage progression: Structure -&gt; Anticipate</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Added accessibility mitigation based on layout context.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Anchoring Effect</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Framing &amp; Loss Aversion</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Accessibility Contrast</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Stage 4 (Anticipate) completed.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Stage 3 (Anticipate) completed.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Bias mitigations: 3 defined</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Accessibility considerations included</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Key suggestions: anchoring mitigation: Always show reference points like previous period, budget, or industry average., framing mitigation: Toggle between progress (65% complete) and gap (35% remaining) framing., accessibility mitigation: Test color combinations with WebAIM's contrast checker to meet WCAG standards. </span>
@@ -171,7 +179,7 @@ stage.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB; font-weight: bold;">=== BID Framework:</span> <span style="font-weight: bold;">Anticipate</span> <span style="font-weight: bold;">Stage Summary ===</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Metadata:</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    stage_number : 4 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    stage_number : 3 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    total_stages : 5 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    validation_status : completed </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    bias_count : 3 </span>
@@ -179,6 +187,7 @@ stage.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    layout : breathable </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    concepts_count : 4 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    auto_generated_biases : No </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    stage_number_previous : 4 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Stage Data:</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    stage : Anticipate </span>
@@ -188,7 +197,7 @@ stage.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    previous_concepts : Cognitive Load Theory, Visual Hierarchy, Progressive Disclosure, Hick's Law </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    suggestions : anchoring mitigation: Always show reference points like previous period, budg... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-09-04 01:31:11 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-09-06 16:58:17 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

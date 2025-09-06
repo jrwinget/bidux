@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Behavior Insight Design: A Toolkit for Integrating Behavioral Science in UI/UX Design • bidux</title>
+<title>Behavioral Insight Design: A Toolkit for Integrating Behavioral Science in UI/UX Design • bidux</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -15,9 +15,10 @@
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Behavior Insight Design: A Toolkit for Integrating Behavioral Science in UI/UX Design">
-<meta name="description" content="Provides a framework and toolkit to guide shiny developers in implementing the Behavior Insight Design (BID) framework. The package offers functions for documenting each of the five stages (Notice, Interpret, Structure, Anticipate, and Validate), along with a comprehensive concept dictionary.">
-<meta property="og:description" content="Provides a framework and toolkit to guide shiny developers in implementing the Behavior Insight Design (BID) framework. The package offers functions for documenting each of the five stages (Notice, Interpret, Structure, Anticipate, and Validate), along with a comprehensive concept dictionary.">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Behavioral Insight Design: A Toolkit for Integrating Behavioral Science in UI/UX Design">
+<meta name="description" content="Provides a framework and toolkit to guide shiny developers in implementing the Behavioral Insight Design (BID) framework. The package offers functions for documenting each of the five stages (Notice, Interpret, Structure, Anticipate, and Validate), along with a comprehensive concept dictionary.">
+<meta property="og:description" content="Provides a framework and toolkit to guide shiny developers in implementing the Behavioral Insight Design (BID) framework. The package offers functions for documenting each of the five stages (Notice, Interpret, Structure, Anticipate, and Validate), along with a comprehensive concept dictionary.">
+<meta property="og:image" content="https://jrwinget.github.io/bidux/logo.png">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -40,10 +41,13 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/concepts-reference.html">BID Framework Concepts: Practical Implementation</a></li>
+<li><a class="dropdown-item" href="articles/advanced-workflows.html">Advanced BID Workflows: Power User Techniques</a></li>
+    <li><a class="dropdown-item" href="articles/behavioral-science-primer.html">Behavioral Science for Data Scientists: Why Your Dashboard Users Think Differently Than You Do</a></li>
+    <li><a class="dropdown-item" href="articles/concepts-reference.html">BID Framework Concepts: Practical Implementation</a></li>
     <li><a class="dropdown-item" href="articles/getting-started.html">Getting Started with bidux</a></li>
-    <li><a class="dropdown-item" href="articles/introduction-to-bid.html">introduction-to-bid</a></li>
-    <li><a class="dropdown-item" href="articles/telemetry-integration.html">Integrating shiny.telemetry with BIDUX</a></li>
+    <li><a class="dropdown-item" href="articles/introduction-to-bid.html">Introduction to the BID Framework</a></li>
+    <li><a class="dropdown-item" href="articles/practical-examples.html">Practical Examples: Before and After Dashboard Transformations</a></li>
+    <li><a class="dropdown-item" href="articles/telemetry-integration.html">Integrating shiny.telemetry with bidux</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
@@ -60,136 +64,211 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="bidux-">bidux <a href="https://github.com/jrwinget/bid-framework" class="external-link"><img src="reference/figures/hex_bidux.png" align="right" height="138"></a>
+<div class="page-header">
+<img src="logo.png" class="logo" alt=""><h1 id="bidux-">bidux 
 <a class="anchor" aria-label="anchor" href="#bidux-"></a>
-</h1></div>
+</h1>
+</div>
 <!-- badges: start -->
 
 <div class="section level2">
-<h2 id="id_-overview">📖 Overview<a class="anchor" aria-label="anchor" href="#id_-overview"></a>
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p><a href="https://jrwinget.github.io/bidux/">bidux</a> brings the Behavior Insight Design (BID) framework into your Shiny development workflow. Follow five staged functions (Interpret, Notice, Anticipate, Structure, Validate) to systematically apply behavioral science to UI/UX design and build more intuitive dashboards.</p>
+<p>The <a href="https://jrwinget.github.io/bidux/">bidux</a> package helps Shiny developers create more effective dashboards using the <strong>Behavioral Insight Design (BID) Framework</strong>. If you’ve ever wondered why users struggle with your carefully crafted dashboards, or why your beautifully visualized data doesn’t drive the decisions you expected, this package is for you.</p>
+<p><strong>The core insight</strong>: Technical excellence ≠ User success. Even the most sophisticated analysis can fail if users can’t quickly understand and act on it.</p>
+<p>The BID framework bridges this gap by integrating behavioral science, UX best practices, and data storytelling techniques into a systematic 5-stage process:</p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>Interpret</strong> the User’s Need - Like defining your research question and understanding your data</li>
+<li>
+<strong>Notice</strong> the Problem - Like identifying data quality issues or analytical bottlenecks</li>
+<li>
+<strong>Anticipate</strong> User Behavior - Like checking for statistical biases that could skew results</li>
+<li>
+<strong>Structure</strong> the Dashboard - Like choosing the right visualization or model architecture</li>
+<li>
+<strong>Validate</strong> &amp; Empower the User - Like testing your model and ensuring stakeholders can act on results</li>
+</ol>
 </div>
 <div class="section level2">
-<h2 id="id_-key-features">🚀 Key Features<a class="anchor" aria-label="anchor" href="#id_-key-features"></a>
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<ul>
-<li>
-<strong>Interpret</strong> user needs (<code><a href="reference/bid_interpret.html">bid_interpret()</a></code>)</li>
-<li>
-<strong>Notice</strong> friction points (<code><a href="reference/bid_notice.html">bid_notice()</a></code>)</li>
-<li>
-<strong>Anticipate</strong> behavior &amp; biases (<code><a href="reference/bid_anticipate.html">bid_anticipate()</a></code>)</li>
-<li>
-<strong>Structure</strong> dashboard layouts (<code><a href="reference/bid_structure.html">bid_structure()</a></code>)</li>
-<li>
-<strong>Validate</strong> &amp; empower users (<code><a href="reference/bid_validate.html">bid_validate()</a></code>)</li>
-<li>
-<strong>Telemetry Integration</strong>: ingest real usage data to auto-detect UX issues (<code><a href="reference/bid_ingest_telemetry.html">bid_ingest_telemetry()</a></code>)</li>
-<li>
-<strong>Component Suggestions</strong>: get tailored UI component ideas for <a href="https://rstudio.github.io/bslib/" class="external-link">bslib</a>, <a href="https://shiny.posit.co/" class="external-link">shiny</a>, <a href="https://glin.github.io/reactable/" class="external-link">reactable</a>, <a href="https://echarts4r.john-coene.com/" class="external-link">echarts4r</a>, and more</li>
-<li>
-<strong>Reporting</strong>: generate HTML, Markdown, or text reports of your BID process</li>
-</ul>
-</div>
-<div class="section level2">
-<h2 id="id_-installation">📥 Installation<a class="anchor" aria-label="anchor" href="#id_-installation"></a>
-</h2>
-<p>Install from CRAN:</p>
+<p>You can install the released version of bidux from <a href="https://CRAN.R-project.org" class="external-link">CRAN</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"bidux"</span><span class="op">)</span></span></code></pre></div>
-<p>Or the development version:</p>
+<p>And the development version from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"jrwinget/bidux"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="id_-quick-start">✅ Quick Start<a class="anchor" aria-label="anchor" href="#id_-quick-start"></a>
+<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://shiny.posit.co/" class="external-link">shiny</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://jrwinget.github.io/bidux/">bidux</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://jrwinget.github.io/bidux/">bidux</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Document a simple BID pipeline</span></span>
+<span><span class="co"># Document a complete BID process</span></span>
 <span><span class="va">process</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span>
-<span>    central_question <span class="op">=</span> <span class="st">"Which metrics drive decisions?"</span>,</span>
-<span>    data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>      hook <span class="op">=</span> <span class="st">"Key metrics hidden"</span>,</span>
-<span>      resolution <span class="op">=</span> <span class="st">"Surface top metrics up front"</span></span>
-<span>    <span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  central_question <span class="op">=</span> <span class="st">"How are our marketing campaigns performing across different channels?"</span>,</span>
+<span>  data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    hook <span class="op">=</span> <span class="st">"Recent campaign performance varies significantly across channels"</span>,</span>
+<span>    context <span class="op">=</span> <span class="st">"We've invested in 6 different marketing channels over the past quarter"</span>,</span>
+<span>    tension <span class="op">=</span> <span class="st">"ROI metrics show inconsistent results, with some channels underperforming"</span>,</span>
+<span>    resolution <span class="op">=</span> <span class="st">"Identify top-performing channels and key performance drivers"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/bid_notice.html">bid_notice</a></span><span class="op">(</span></span>
-<span>    problem <span class="op">=</span> <span class="st">"Users struggle to find key metrics"</span>,</span>
-<span>    evidence <span class="op">=</span> <span class="st">"70% of users spent &gt;30s searching"</span></span>
+<span>    problem <span class="op">=</span> <span class="st">"Users are overwhelmed by too many filter options and struggle to find relevant insights"</span>,</span>
+<span>    evidence <span class="op">=</span> <span class="st">"User testing shows 65% of first-time users fail to complete their intended task within 2 minutes"</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/bid_anticipate.html">bid_anticipate</a></span><span class="op">(</span></span>
-<span>    bias_mitigations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>anchoring <span class="op">=</span> <span class="st">"Contextual defaults"</span><span class="op">)</span></span>
+<span>    bias_mitigations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      anchoring <span class="op">=</span> <span class="st">"Include previous period performance as reference points"</span>,</span>
+<span>      framing <span class="op">=</span> <span class="st">"Provide toggle between ROI improvement vs. ROI gap views"</span></span>
+<span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/bid_structure.html">bid_structure</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/bid_validate.html">bid_validate</a></span><span class="op">(</span></span>
-<span>    include_exp_design <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>    include_telemetry <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>    include_empower_tools <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>    summary_panel <span class="op">=</span> <span class="st">"Executive summary highlighting top and bottom performers, key trends, and recommended actions"</span>,</span>
+<span>    next_steps <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>      <span class="st">"Review performance of bottom 2 channels"</span>,</span>
+<span>      <span class="st">"Increase budget for top-performing channel"</span>,</span>
+<span>      <span class="st">"Schedule team meeting to discuss optimization strategy"</span></span>
+<span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
-<span><span class="co"># View suggestions</span></span>
+<span><span class="co"># View implementation suggestions for specific packages</span></span>
 <span><span class="fu"><a href="reference/bid_suggest_components.html">bid_suggest_components</a></span><span class="op">(</span><span class="va">process</span>, package <span class="op">=</span> <span class="st">"bslib"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/bid_suggest_components.html">bid_suggest_components</a></span><span class="op">(</span><span class="va">process</span>, package <span class="op">=</span> <span class="st">"reactable"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Generate an HTML report</span></span>
-<span><span class="fu"><a href="reference/bid_report.html">bid_report</a></span><span class="op">(</span><span class="va">process</span>, format <span class="op">=</span> <span class="st">"html"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># Generate comprehensive reports</span></span>
+<span><span class="fu"><a href="reference/bid_report.html">bid_report</a></span><span class="op">(</span><span class="va">process</span>, format <span class="op">=</span> <span class="st">"html"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/bid_report.html">bid_report</a></span><span class="op">(</span><span class="va">process</span>, format <span class="op">=</span> <span class="st">"markdown"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="id_-telemetry-integration">📊 Telemetry Integration<a class="anchor" aria-label="anchor" href="#id_-telemetry-integration"></a>
+<h2 id="data-driven-ux-with-telemetry">Data-Driven UX with Telemetry<a class="anchor" aria-label="anchor" href="#data-driven-ux-with-telemetry"></a>
 </h2>
-<p>Leverage real user behavior to pinpoint UX friction with <a href="https://github.com/Appsilon/shiny.telemetry" class="external-link"><code>{shiny.telemetry}</code></a> data:</p>
+<p><strong>New in 0.3.1</strong>: Enhanced telemetry workflow transforms real user behavior data into actionable BID insights.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Ingest telemetry from SQLite or JSON</span></span>
-<span><span class="va">issues</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_ingest_telemetry.html">bid_ingest_telemetry</a></span><span class="op">(</span></span>
-<span>  <span class="st">"telemetry.sqlite"</span>,</span>
-<span>  format <span class="op">=</span> <span class="st">"sqlite"</span></span>
+<code class="sourceCode R"><span><span class="co"># Modern approach: analyze telemetry data</span></span>
+<span><span class="va">issues</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_telemetry.html">bid_telemetry</a></span><span class="op">(</span><span class="st">"telemetry.sqlite"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span>  <span class="co"># Shows organized issue summary with severity levels</span></span>
+<span></span>
+<span><span class="co"># Focus on critical issues using tidy workflows</span></span>
+<span><span class="va">critical_issues</span> <span class="op">&lt;-</span> <span class="va">issues</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">severity</span> <span class="op">==</span> <span class="st">"critical"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">arrange</span><span class="op">(</span><span class="fu">desc</span><span class="op">(</span><span class="va">user_impact</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Convert high-priority issues to BID Notice stages</span></span>
+<span><span class="va">notices</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_notices.html">bid_notices</a></span><span class="op">(</span></span>
+<span>  issues <span class="op">=</span> <span class="va">critical_issues</span>,</span>
+<span>  previous_stage <span class="op">=</span> <span class="va">interpret_result</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Inspect detected issues</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span></span></code></pre></div>
-<p><code><a href="reference/bid_ingest_telemetry.html">bid_ingest_telemetry()</a></code> automatically flags five friction indicators:</p>
-<ol style="list-style-type: decimal">
-<li>
-<strong>Unused Inputs</strong>: controls rarely interacted with</li>
-<li>
-<strong>Delayed Interactions</strong>: long time-to-first-action</li>
-<li>
-<strong>Frequent Errors</strong>: recurring error patterns</li>
-<li>
-<strong>Navigation Drop-offs</strong>: seldom-visited tabs/pages</li>
-<li>
-<strong>Confusion Patterns</strong>: rapid repeated changes</li>
-</ol>
-<p>Use these insights to fuel the <strong>Notice</strong> stage and drive data-informed UI improvements. See the full example and thresholds customization in the See the package vignette ‘Telemetry Integration’ for a full example (accessible via <code><a href="articles/telemetry-integration.html">vignette("telemetry-integration", package="bidux")</a></code>).</p>
-</div>
-<div class="section level2">
-<h2 id="id_-vignettes">📚 Vignettes<a class="anchor" aria-label="anchor" href="#id_-vignettes"></a>
-</h2>
-<p>Explore detailed guides:</p>
+<span><span class="co"># Use telemetry flags to inform structure decisions</span></span>
+<span><span class="va">flags</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_flags.html">bid_flags</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span></span>
+<span><span class="va">structure_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_structure.html">bid_structure</a></span><span class="op">(</span></span>
+<span>  previous_stage <span class="op">=</span> <span class="va">anticipate_result</span>,</span>
+<span>  telemetry_flags <span class="op">=</span> <span class="va">flags</span>  <span class="co"># Influences layout selection</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>The <code><a href="reference/bid_telemetry.html">bid_telemetry()</a></code> function automatically identifies five key friction indicators:</p>
 <ul>
 <li>
-<code><a href="articles/introduction-to-bid.html">vignette("introduction-to-bid")</a></code>: BID framework overview</li>
+<strong>Unused Inputs</strong>: UI controls rarely interacted with</li>
 <li>
-<code><a href="articles/getting-started.html">vignette("getting-started")</a></code>: Quick start guide</li>
+<strong>Delayed Interactions</strong>: Long time-to-first-action patterns</li>
 <li>
-<code><a href="articles/concepts-reference.html">vignette("concepts-reference")</a></code>: Comprehensive concept dictionary</li>
+<strong>Frequent Errors</strong>: Recurring error patterns that disrupt workflows</li>
 <li>
-<code><a href="articles/telemetry-integration.html">vignette("telemetry-integration")</a></code>: Integrating telemetry with BIDUX</li>
+<strong>Navigation Drop-offs</strong>: Pages or tabs users rarely visit</li>
+<li>
+<strong>Confusion Patterns</strong>: Rapid repeated changes indicating user uncertainty</li>
+</ul>
+<p>Legacy <code><a href="reference/bid_ingest_telemetry.html">bid_ingest_telemetry()</a></code> function maintains full backward compatibility while providing enhanced functionality through hybrid objects.</p>
+</div>
+<div class="section level2">
+<h2 id="key-features">Key Features<a class="anchor" aria-label="anchor" href="#key-features"></a>
+</h2>
+<div class="section level3">
+<h3 id="behavioral-science-integration">Behavioral Science Integration<a class="anchor" aria-label="anchor" href="#behavioral-science-integration"></a>
+</h3>
+<ul>
+<li>
+<strong>Bias Mitigation</strong>: Address anchoring, framing, confirmation bias, and choice overload</li>
+<li>
+<strong>Cognitive Load Management</strong>: Implement progressive disclosure and visual hierarchy</li>
+<li>
+<strong>Peak-End Rule</strong>: Structure experiences for positive, actionable endings</li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="implementation-support">Implementation Support<a class="anchor" aria-label="anchor" href="#implementation-support"></a>
+</h3>
+<ul>
+<li>
+<strong>Component Suggestions</strong>: Get tailored recommendations for <a href="https://rstudio.github.io/bslib/" class="external-link">bslib</a>, <a href="https://glin.github.io/reactable/" class="external-link">reactable</a>, <a href="https://echarts4r.john-coene.com/" class="external-link">echarts4r</a>, and more</li>
+<li>
+<strong>Layout Selection</strong>: Automatic layout recommendations based on content and telemetry flags</li>
+<li>
+<strong>Concept Dictionary</strong>: Access 50+ behavioral science concepts with implementation tips</li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="real-user-data-integration">Real User Data Integration<a class="anchor" aria-label="anchor" href="#real-user-data-integration"></a>
+</h3>
+<ul>
+<li>
+<strong>Telemetry Analysis</strong>: Transform usage patterns into design insights</li>
+<li>
+<strong>Evidence-Based Design</strong>: Ground design decisions in actual user behavior</li>
+<li>
+<strong>Iterative Improvement</strong>: Track UX improvements with before/after telemetry comparison</li>
+</ul>
+</div>
+</div>
+<div class="section level2">
+<h2 id="learning-more">Learning More<a class="anchor" aria-label="anchor" href="#learning-more"></a>
+</h2>
+<p>The BID framework is based on established behavioral science and UX design principles. Explore the concept dictionary:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Browse all available concepts</span></span>
+<span><span class="fu"><a href="reference/bid_concepts.html">bid_concepts</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">concept</span>, <span class="va">category</span>, <span class="va">description</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Get detailed information about specific concepts</span></span>
+<span><span class="fu"><a href="reference/bid_concept.html">bid_concept</a></span><span class="op">(</span><span class="st">"Processing Fluency"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/bid_concept.html">bid_concept</a></span><span class="op">(</span><span class="st">"Hick's Law"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Search for concepts by keyword</span></span>
+<span><span class="fu"><a href="reference/bid_concepts.html">bid_concepts</a></span><span class="op">(</span><span class="st">"cognitive"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">concept</span>, <span class="va">implementation_tips</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="getting-help">Getting Help<a class="anchor" aria-label="anchor" href="#getting-help"></a>
+</h2>
+<ul>
+<li>Browse the documentation: <code><a href="https://jrwinget.github.io/bidux/reference">help(package = "bidux")</a></code>
+</li>
+<li>Read the vignettes:
+<ul>
+<li>
+<code><a href="articles/introduction-to-bid.html">vignette("introduction-to-bid")</a></code>: Framework overview and core principles</li>
+<li>
+<code><a href="articles/getting-started.html">vignette("getting-started")</a></code>: Complete walk-through with examples</li>
+<li>
+<code><a href="articles/concepts-reference.html">vignette("concepts-reference")</a></code>: Behavioral science concepts with practical implementation</li>
+<li>
+<code><a href="articles/telemetry-integration.html">vignette("telemetry-integration")</a></code>: Data-driven UX improvement workflows</li>
+</ul>
+</li>
+<li>Visit the BID framework repository: <a href="https://github.com/jrwinget/bid-framework" class="external-link uri">https://github.com/jrwinget/bid-framework</a>
+</li>
 </ul>
 </div>
 <div class="section level2">
-<h2 id="id_-contributing">🤝 Contributing<a class="anchor" aria-label="anchor" href="#id_-contributing"></a>
+<h2 id="code-of-conduct">Code of Conduct<a class="anchor" aria-label="anchor" href="#code-of-conduct"></a>
 </h2>
-<p>We welcome all contributions! Please see <a href="https://github.com/jrwinget/bidux/blob/main/.github/CONTRIBUTING.md" class="external-link">Contributing Guide</a> for guidelines, issue templates, and code style.</p>
-</div>
-<div class="section level2">
-<h2 id="id_-license--code-of-conduct">📜 License &amp; Code of Conduct<a class="anchor" aria-label="anchor" href="#id_-license--code-of-conduct"></a>
-</h2>
-<p>This project is MIT licensed. By contributing, you agree to our <a href="https://github.com/jrwinget/bidux/blob/main/.github/CODE_OF_CONDUCT.md" class="external-link">Code of Conduct</a>.</p>
+<p>Please note that the bidux project is released with a <a href="https://contributor-covenant.org/version/2/1/CODE_OF_CONDUCT.html" class="external-link">Contributor Code of Conduct</a>. By contributing to this project, you agree to abide by its terms.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">

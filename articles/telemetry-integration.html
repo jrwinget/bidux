@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Integrating shiny.telemetry with BIDUX • bidux</title>
+<title>Integrating shiny.telemetry with bidux • bidux</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
@@ -15,7 +15,7 @@
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Integrating shiny.telemetry with BIDUX">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Integrating shiny.telemetry with bidux">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -38,10 +38,13 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/concepts-reference.html">BID Framework Concepts: Practical Implementation</a></li>
+<li><a class="dropdown-item" href="../articles/advanced-workflows.html">Advanced BID Workflows: Power User Techniques</a></li>
+    <li><a class="dropdown-item" href="../articles/behavioral-science-primer.html">Behavioral Science for Data Scientists: Why Your Dashboard Users Think Differently Than You Do</a></li>
+    <li><a class="dropdown-item" href="../articles/concepts-reference.html">BID Framework Concepts: Practical Implementation</a></li>
     <li><a class="dropdown-item" href="../articles/getting-started.html">Getting Started with bidux</a></li>
-    <li><a class="dropdown-item" href="../articles/introduction-to-bid.html">introduction-to-bid</a></li>
-    <li><a class="dropdown-item" href="../articles/telemetry-integration.html">Integrating shiny.telemetry with BIDUX</a></li>
+    <li><a class="dropdown-item" href="../articles/introduction-to-bid.html">Introduction to the BID Framework</a></li>
+    <li><a class="dropdown-item" href="../articles/practical-examples.html">Practical Examples: Before and After Dashboard Transformations</a></li>
+    <li><a class="dropdown-item" href="../articles/telemetry-integration.html">Integrating shiny.telemetry with bidux</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -62,8 +65,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>Integrating shiny.telemetry with BIDUX</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Integrating shiny.telemetry with bidux</h1>
             
       
 
@@ -75,18 +77,73 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>The <code><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry()</a></code> function enables you to
-analyze real user behavior data from <a href="https://appsilon.github.io/shiny.telemetry/" class="external-link">shiny.telemetry</a> and
-automatically identify UX friction points. This creates a powerful
-feedback loop where actual usage patterns drive design improvements
-through the BID framework.</p>
+<p>The <a href="https://jrwinget.github.io/bidux/">bidux</a> package provides powerful tools to analyze
+real user behavior data from <a href="https://appsilon.github.io/shiny.telemetry/" class="external-link">shiny.telemetry</a> and
+automatically identify UX friction points. Think of it as A/B testing
+for UX design—you can measure the impact of design changes on user
+behavior with the same rigor you apply to data analysis.</p>
+<p><strong>The power of telemetry + BID</strong>: Instead of guessing
+what users struggle with, you can systematically identify friction
+points from real usage data, then apply behavioral science principles to
+fix them.</p>
+<p>This creates a powerful feedback loop where actual usage patterns
+drive design improvements through the BID framework.</p>
+<p><strong>New in 0.3.1:</strong> Enhanced telemetry workflow with
+hybrid objects and streamlined API for better integration with tidy data
+workflows.</p>
+<div class="section level3">
+<h3 id="modern-telemetry-api-0-3-1">Modern Telemetry API (0.3.1+)<a class="anchor" aria-label="anchor" href="#modern-telemetry-api-0-3-1"></a>
+</h3>
+<p>The new <code><a href="../reference/bid_telemetry.html">bid_telemetry()</a></code> function provides a clean, tidy
+approach to telemetry analysis:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://jrwinget.github.io/bidux/">bidux</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Modern approach: get tidy issues tibble</span></span>
+<span><span class="va">issues</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_telemetry.html">bid_telemetry</a></span><span class="op">(</span><span class="st">"telemetry.sqlite"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span>  <span class="co"># Shows organized issue summary</span></span>
+<span></span>
+<span><span class="co"># Triage critical issues</span></span>
+<span><span class="va">critical</span> <span class="op">&lt;-</span> <span class="va">issues</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">severity</span> <span class="op">==</span> <span class="st">"critical"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_head</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Convert to Notice stages with bridge functions</span></span>
+<span><span class="va">notices</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_notices.html">bid_notices</a></span><span class="op">(</span></span>
+<span>  issues <span class="op">=</span> <span class="va">critical</span>,</span>
+<span>  previous_stage <span class="op">=</span> <span class="va">interpret_result</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Extract telemetry flags for layout optimization</span></span>
+<span><span class="va">flags</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_flags.html">bid_flags</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span></span>
+<span><span class="va">structure_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_structure.html">bid_structure</a></span><span class="op">(</span></span>
+<span>  previous_stage <span class="op">=</span> <span class="va">anticipate_result</span>,</span>
+<span>  telemetry_flags <span class="op">=</span> <span class="va">flags</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="legacy-compatibility">Legacy Compatibility<a class="anchor" aria-label="anchor" href="#legacy-compatibility"></a>
+</h3>
+<p>The <code><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry()</a></code> function now returns a hybrid
+object that maintains full backward compatibility:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Legacy approach still works exactly as before</span></span>
+<span><span class="va">legacy_notices</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry</a></span><span class="op">(</span><span class="st">"telemetry.sqlite"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">legacy_notices</span><span class="op">)</span>  <span class="co"># Behaves like list of Notice stages</span></span>
+<span><span class="va">legacy_notices</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>     <span class="co"># Access individual Notice objects</span></span>
+<span></span>
+<span><span class="co"># But now also provides enhanced functionality</span></span>
+<span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="va">legacy_notices</span><span class="op">)</span>  <span class="co"># Get tidy issues view</span></span>
+<span><span class="fu"><a href="../reference/bid_flags.html">bid_flags</a></span><span class="op">(</span><span class="va">legacy_notices</span><span class="op">)</span>  <span class="co"># Extract global telemetry flags</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="prerequisites">Prerequisites<a class="anchor" aria-label="anchor" href="#prerequisites"></a>
 </h2>
 <p>First, ensure you have <a href="https://appsilon.github.io/shiny.telemetry/" class="external-link">shiny.telemetry</a> set up in your
 Shiny application:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://shiny.posit.co/" class="external-link">shiny</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://appsilon.github.io/shiny.telemetry/" class="external-link">shiny.telemetry</a></span><span class="op">)</span></span>
 <span></span>
@@ -136,7 +193,7 @@ Shiny application:</p>
 </h2>
 <p>After collecting telemetry data from your users, use
 <code><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry()</a></code> to identify UX issues:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://jrwinget.github.io/bidux/">bidux</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Analyze telemetry from SQLite database (default)</span></span>
@@ -157,75 +214,94 @@ Shiny application:</p>
 <h3 id="unused-or-under-used-inputs">1. Unused or Under-used Inputs<a class="anchor" aria-label="anchor" href="#unused-or-under-used-inputs"></a>
 </h3>
 <p>Identifies UI controls that users rarely or never interact with:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Example: Region filter is never used</span></span>
 <span><span class="va">issues</span><span class="op">$</span><span class="va">unused_input_region</span></span>
 <span><span class="co">#&gt; BID Framework - Notice Stage</span></span>
 <span><span class="co">#&gt; Problem: Users are not interacting with the 'region' input control</span></span>
 <span><span class="co">#&gt; Theory: Hick's Law (auto-suggested)</span></span>
 <span><span class="co">#&gt; Evidence: Telemetry shows 0 out of 847 sessions where 'region' was changed</span></span></code></pre></div>
-<p>This suggests the region filter might be: - Hidden or hard to find -
-Not relevant to users’ tasks - Confusing or intimidating</p>
+<p>This suggests the region filter might be:</p>
+<ul>
+<li>Hidden or hard to find</li>
+<li>Not relevant to users’ tasks</li>
+<li>Confusing or intimidating</li>
+</ul>
 </div>
 <div class="section level3">
 <h3 id="delayed-first-interactions">2. Delayed First Interactions<a class="anchor" aria-label="anchor" href="#delayed-first-interactions"></a>
 </h3>
 <p>Detects when users take too long to start using the dashboard:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">issues</span><span class="op">$</span><span class="va">delayed_interaction</span></span>
 <span><span class="co">#&gt; BID Framework - Notice Stage</span></span>
 <span><span class="co">#&gt; Problem: Users take a long time before making their first interaction with the dashboard</span></span>
 <span><span class="co">#&gt; Theory: Information Scent (auto-suggested)</span></span>
 <span><span class="co">#&gt; Evidence: Median time to first input is 45 seconds, and 10% of sessions had no interactions at all</span></span></code></pre></div>
-<p>This indicates users might be: - Overwhelmed by the initial view -
-Unsure where to start - Looking for information that’s not readily
-apparent</p>
+<p>This indicates users might be:</p>
+<ul>
+<li>Overwhelmed by the initial view</li>
+<li>Unsure where to start</li>
+<li>Looking for information that’s not readily apparent</li>
+</ul>
 </div>
 <div class="section level3">
 <h3 id="frequent-errors">3. Frequent Errors<a class="anchor" aria-label="anchor" href="#frequent-errors"></a>
 </h3>
 <p>Identifies systematic errors that disrupt user experience:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">issues</span><span class="op">$</span><span class="va">error_1</span></span>
 <span><span class="co">#&gt; BID Framework - Notice Stage</span></span>
 <span><span class="co">#&gt; Problem: Users encounter errors when using the dashboard</span></span>
 <span><span class="co">#&gt; Theory: Norman's Gulf of Evaluation (auto-suggested)</span></span>
 <span><span class="co">#&gt; Evidence: Error 'Data query failed' occurred 127 times in 15.0% of sessions (in output 'overview_plot'), often after changing 'date_range'</span></span></code></pre></div>
-<p>This reveals: - Reliability issues with specific features - Input
-validation problems - Performance bottlenecks</p>
+<p>This reveals:</p>
+<ul>
+<li>Reliability issues with specific features</li>
+<li>Input validation problems</li>
+<li>Performance bottlenecks</li>
+</ul>
 </div>
 <div class="section level3">
 <h3 id="navigation-drop-offs">4. Navigation Drop-offs<a class="anchor" aria-label="anchor" href="#navigation-drop-offs"></a>
 </h3>
 <p>Finds pages or tabs that users rarely visit:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">issues</span><span class="op">$</span><span class="va">navigation_settings_tab</span></span>
 <span><span class="co">#&gt; BID Framework - Notice Stage</span></span>
 <span><span class="co">#&gt; Problem: The 'settings_tab' page/tab is rarely visited by users</span></span>
 <span><span class="co">#&gt; Theory: Information Architecture (auto-suggested)</span></span>
 <span><span class="co">#&gt; Evidence: Only 42 sessions (5.0%) visited 'settings_tab', and 90% of those sessions ended there</span></span></code></pre></div>
-<p>Low visit rates suggest: - Poor information scent - Hidden or unclear
-navigation - Irrelevant content</p>
+<p>Low visit rates suggest:</p>
+<ul>
+<li>Poor information scent</li>
+<li>Hidden or unclear navigation</li>
+<li>Irrelevant content</li>
+</ul>
 </div>
 <div class="section level3">
 <h3 id="confusion-patterns">5. Confusion Patterns<a class="anchor" aria-label="anchor" href="#confusion-patterns"></a>
 </h3>
 <p>Detects rapid repeated changes indicating user confusion:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">issues</span><span class="op">$</span><span class="va">confusion_date_range</span></span>
 <span><span class="co">#&gt; BID Framework - Notice Stage</span></span>
 <span><span class="co">#&gt; Problem: Users show signs of confusion when interacting with 'date_range'</span></span>
 <span><span class="co">#&gt; Theory: Feedback Loops (auto-suggested)</span></span>
 <span><span class="co">#&gt; Evidence: 8 sessions showed rapid repeated changes (avg 6 changes in 7.5 seconds), suggesting users are unsure about the input's behavior</span></span></code></pre></div>
-<p>This suggests: - Unclear feedback when values change - Unexpected
-behavior - Poor affordances</p>
+<p>This suggests:</p>
+<ul>
+<li>Unclear feedback when values change</li>
+<li>Unexpected behavior</li>
+<li>Poor affordances</li>
+</ul>
 </div>
 </div>
 <div class="section level2">
 <h2 id="customizing-analysis-thresholds">Customizing Analysis Thresholds<a class="anchor" aria-label="anchor" href="#customizing-analysis-thresholds"></a>
 </h2>
 <p>You can adjust the sensitivity of the analysis:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">issues</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry</a></span><span class="op">(</span></span>
 <span>  <span class="st">"telemetry.sqlite"</span>,</span>
 <span>  thresholds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -239,10 +315,79 @@ behavior - Poor affordances</p>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
+<h2 id="bridge-functions-and-sugar-syntax-0-3-1">Bridge Functions and Sugar Syntax (0.3.1+)<a class="anchor" aria-label="anchor" href="#bridge-functions-and-sugar-syntax-0-3-1"></a>
+</h2>
+<p>The new API provides convenient bridge functions to connect telemetry
+issues with BID stages:</p>
+<div class="section level3">
+<h3 id="individual-issue-handling">Individual Issue Handling<a class="anchor" aria-label="anchor" href="#individual-issue-handling"></a>
+</h3>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Process a single high-priority issue</span></span>
+<span><span class="va">priority_issue</span> <span class="op">&lt;-</span> <span class="va">issues</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">severity</span> <span class="op">==</span> <span class="st">"critical"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_head</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Create Notice directly from issue</span></span>
+<span><span class="va">notice_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_notice_issue.html">bid_notice_issue</a></span><span class="op">(</span></span>
+<span>  issue <span class="op">=</span> <span class="va">priority_issue</span>,</span>
+<span>  previous_stage <span class="op">=</span> <span class="va">interpret_result</span>,</span>
+<span>  override <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    problem <span class="op">=</span> <span class="st">"Custom problem description if needed"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Sugar function for quick addressing</span></span>
+<span><span class="va">notice_sugar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_address.html">bid_address</a></span><span class="op">(</span></span>
+<span>  issue <span class="op">=</span> <span class="va">priority_issue</span>,</span>
+<span>  previous_stage <span class="op">=</span> <span class="va">interpret_result</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="batch-processing">Batch Processing<a class="anchor" aria-label="anchor" href="#batch-processing"></a>
+</h3>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Process multiple issues at once</span></span>
+<span><span class="va">high_priority</span> <span class="op">&lt;-</span> <span class="va">issues</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">severity</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"critical"</span>, <span class="st">"high"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Convert all to Notice stages</span></span>
+<span><span class="va">notice_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_notices.html">bid_notices</a></span><span class="op">(</span></span>
+<span>  issues <span class="op">=</span> <span class="va">high_priority</span>,</span>
+<span>  previous_stage <span class="op">=</span> <span class="va">interpret_result</span>,</span>
+<span>  filter <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span><span class="op">$</span><span class="va">severity</span> <span class="op">==</span> <span class="st">"critical"</span>  <span class="co"># Additional filtering</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Pipeline approach - process first N issues</span></span>
+<span><span class="va">pipeline_notices</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_pipeline.html">bid_pipeline</a></span><span class="op">(</span></span>
+<span>  issues <span class="op">=</span> <span class="va">high_priority</span>,</span>
+<span>  previous_stage <span class="op">=</span> <span class="va">interpret_result</span>,</span>
+<span>  max <span class="op">=</span> <span class="fl">3</span>  <span class="co"># Limit to 3 most critical issues</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="telemetry-informed-structure-selection">Telemetry-Informed Structure Selection<a class="anchor" aria-label="anchor" href="#telemetry-informed-structure-selection"></a>
+</h3>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Extract global flags from telemetry data</span></span>
+<span><span class="va">flags</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_flags.html">bid_flags</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span></span>
+<span><span class="co">#&gt; List includes: has_navigation_issues, high_error_rate, user_confusion_patterns</span></span>
+<span></span>
+<span><span class="co"># Use flags to inform layout selection</span></span>
+<span><span class="va">structure_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_structure.html">bid_structure</a></span><span class="op">(</span></span>
+<span>  previous_stage <span class="op">=</span> <span class="va">anticipate_result</span>,</span>
+<span>  telemetry_flags <span class="op">=</span> <span class="va">flags</span>  <span class="co"># Influences layout choice and suggestion scoring</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># The layout selection will avoid problematic patterns based on your data</span></span>
+<span><span class="co"># e.g., if flags$has_navigation_issues == TRUE, tabs layout gets lower priority</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
 <h2 id="integrating-with-bid-workflow">Integrating with BID Workflow<a class="anchor" aria-label="anchor" href="#integrating-with-bid-workflow"></a>
 </h2>
 <p>Use the identified issues to drive your BID process:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Take the most critical issue</span></span>
 <span><span class="va">critical_issue</span> <span class="op">&lt;-</span> <span class="va">issues</span><span class="op">$</span><span class="va">error_1</span></span>
 <span></span>
@@ -290,45 +435,316 @@ behavior - Poor affordances</p>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="example-complete-analysis">Example: Complete Analysis<a class="anchor" aria-label="anchor" href="#example-complete-analysis"></a>
+<h2 id="real-world-example-e-commerce-dashboard-optimization">Real-World Example: E-commerce Dashboard Optimization<a class="anchor" aria-label="anchor" href="#real-world-example-e-commerce-dashboard-optimization"></a>
 </h2>
-<p>Here’s a full example analyzing a dashboard with multiple issues:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># 1. Ingest telemetry</span></span>
-<span><span class="va">issues</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry</a></span><span class="op">(</span><span class="st">"telemetry.sqlite"</span><span class="op">)</span></span>
+<p>Let’s walk through a complete example of using telemetry data to
+improve an e-commerce dashboard. This shows how to go from raw user
+behavior data to concrete UX improvements.</p>
+<div class="section level3">
+<h3 id="the-scenario">The Scenario<a class="anchor" aria-label="anchor" href="#the-scenario"></a>
+</h3>
+<p>You’ve built an e-commerce analytics dashboard for business
+stakeholders. After 3 months in production, users are complaining it’s
+“hard to use” but can’t be specific about what’s wrong.</p>
+</div>
+<div class="section level3">
+<h3 id="step-1-diagnose-with-telemetry-data">Step 1: Diagnose with Telemetry Data<a class="anchor" aria-label="anchor" href="#step-1-diagnose-with-telemetry-data"></a>
+</h3>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Analyze 3 months of user behavior data</span></span>
+<span><span class="va">issues</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_telemetry.html">bid_telemetry</a></span><span class="op">(</span><span class="st">"ecommerce_dashboard_telemetry.sqlite"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 2. Prioritize issues by impact</span></span>
-<span><span class="va">critical_issues</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  unused_inputs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"unused_input"</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span><span class="op">)</span><span class="op">]</span>,</span>
-<span>  errors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"error"</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span><span class="op">)</span><span class="op">]</span>,</span>
-<span>  delays <span class="op">=</span> <span class="st">"delayed_interaction"</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span></span>
+<span><span class="co"># Review the systematic analysis</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # BID Telemetry Issues: 8 issues identified</span></span>
+<span><span class="co">#&gt; # Severity breakdown: 2 critical, 3 high, 2 medium, 1 low</span></span>
+<span><span class="co">#&gt; #</span></span>
+<span><span class="co">#&gt; # Critical Issues:</span></span>
+<span><span class="co">#&gt; # 1. delayed_interaction: Users take 47 seconds before first interaction</span></span>
+<span><span class="co">#&gt; # 2. unused_input_advanced_filters: Only 3% of users interact with advanced filter panel</span></span>
+<span><span class="co">#&gt; #</span></span>
+<span><span class="co">#&gt; # High Priority Issues:</span></span>
+<span><span class="co">#&gt; # 3. error_data_loading: 23% of sessions encounter "Data query failed" error</span></span>
+<span><span class="co">#&gt; # 4. navigation_settings_tab: Only 8% visit settings, 85% of those sessions end there</span></span>
+<span><span class="co">#&gt; # 5. confusion_date_range: Rapid repeated changes suggest user confusion</span></span>
+<span></span>
+<span><span class="co"># Examine the most critical issue in detail</span></span>
+<span><span class="va">critical_issue</span> <span class="op">&lt;-</span> <span class="va">issues</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">severity</span> <span class="op">==</span> <span class="st">"critical"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_head</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">critical_issue</span><span class="op">$</span><span class="va">evidence</span><span class="op">)</span></span>
+<span><span class="co">#&gt; "Median time to first input is 47 seconds, and 12% of sessions had no interactions at all.</span></span>
+<span><span class="co">#&gt;  This suggests users are overwhelmed by the initial interface or unclear about where to start."</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="step-2-apply-bid-framework-systematically">Step 2: Apply BID Framework Systematically<a class="anchor" aria-label="anchor" href="#step-2-apply-bid-framework-systematically"></a>
+</h3>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Start with interpretation of the business context</span></span>
+<span><span class="va">interpret_stage</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span>
+<span>  central_question <span class="op">=</span> <span class="st">"How can we make e-commerce insights more accessible to busy stakeholders?"</span>,</span>
+<span>  data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    hook <span class="op">=</span> <span class="st">"Business teams struggle to get quick insights from our analytics dashboard"</span>,</span>
+<span>    context <span class="op">=</span> <span class="st">"Stakeholders have 10-15 minutes between meetings to check performance"</span>,</span>
+<span>    tension <span class="op">=</span> <span class="st">"Current interface requires 47+ seconds just to orient and start using"</span>,</span>
+<span>    resolution <span class="op">=</span> <span class="st">"Provide immediate value with progressive disclosure for deeper analysis"</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  user_personas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      name <span class="op">=</span> <span class="st">"Marketing Manager"</span>,</span>
+<span>      goals <span class="op">=</span> <span class="st">"Quick campaign performance insights"</span>,</span>
+<span>      pain_points <span class="op">=</span> <span class="st">"Too much information, unclear where to start"</span>,</span>
+<span>      technical_level <span class="op">=</span> <span class="st">"Intermediate"</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      name <span class="op">=</span> <span class="st">"Executive"</span>,</span>
+<span>      goals <span class="op">=</span> <span class="st">"High-level business health check"</span>,</span>
+<span>      pain_points <span class="op">=</span> <span class="st">"Gets lost in technical details"</span>,</span>
+<span>      technical_level <span class="op">=</span> <span class="st">"Basic"</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 3. Create a comprehensive improvement plan</span></span>
-<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">critical_issues</span><span class="op">$</span><span class="va">unused_inputs</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="co"># Address unused inputs following the updated BID workflow</span></span>
-<span>  <span class="va">unused_issue</span> <span class="op">&lt;-</span> <span class="va">issues</span><span class="op">[[</span><span class="va">critical_issues</span><span class="op">$</span><span class="va">unused_inputs</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="co"># Convert telemetry issues to BID Notice stages using bridge functions</span></span>
+<span><span class="va">notice_stages</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_notices.html">bid_notices</a></span><span class="op">(</span></span>
+<span>  issues <span class="op">=</span> <span class="va">critical_issue</span>,</span>
+<span>  previous_stage <span class="op">=</span> <span class="va">interpret_stage</span></span>
+<span><span class="op">)</span></span>
 <span></span>
-<span>  <span class="va">improvement_plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span>
-<span>    central_question <span class="op">=</span> <span class="st">"Which filters actually help users find insights?"</span>,</span>
-<span>    data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>      hook <span class="op">=</span> <span class="st">"Several filters are never used by users"</span>,</span>
-<span>      context <span class="op">=</span> <span class="st">"Dashboard has 5 filter controls"</span>,</span>
-<span>      tension <span class="op">=</span> <span class="st">"Too many options create choice overload"</span>,</span>
-<span>      resolution <span class="op">=</span> <span class="st">"Show only relevant filters based on user tasks"</span></span>
+<span><span class="co"># Apply behavioral science to anticipate user behavior</span></span>
+<span><span class="va">anticipate_stage</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_anticipate.html">bid_anticipate</a></span><span class="op">(</span></span>
+<span>  previous_stage <span class="op">=</span> <span class="va">notice_stages</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  bias_mitigations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    choice_overload <span class="op">=</span> <span class="st">"Reduce initial options, use progressive disclosure"</span>,</span>
+<span>    attention_bias <span class="op">=</span> <span class="st">"Use visual hierarchy to guide user focus"</span>,</span>
+<span>    anchoring <span class="op">=</span> <span class="st">"Lead with most important business metric"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Use telemetry flags to inform structure decisions</span></span>
+<span><span class="va">flags</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_flags.html">bid_flags</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span></span>
+<span><span class="va">structure_stage</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_structure.html">bid_structure</a></span><span class="op">(</span></span>
+<span>  previous_stage <span class="op">=</span> <span class="va">anticipate_stage</span>,</span>
+<span>  telemetry_flags <span class="op">=</span> <span class="va">flags</span>  <span class="co"># This influences layout selection</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Define success criteria and validation approach</span></span>
+<span><span class="va">validate_stage</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_validate.html">bid_validate</a></span><span class="op">(</span></span>
+<span>  previous_stage <span class="op">=</span> <span class="va">structure_stage</span>,</span>
+<span>  summary_panel <span class="op">=</span> <span class="st">"Executive summary with key insights and trend indicators"</span>,</span>
+<span>  collaboration <span class="op">=</span> <span class="st">"Enable stakeholders to share insights and add context"</span>,</span>
+<span>  next_steps <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">"Implement simplified landing page with key metrics"</span>,</span>
+<span>    <span class="st">"Add progressive disclosure for detailed analytics"</span>,</span>
+<span>    <span class="st">"Create role-based views for different user types"</span>,</span>
+<span>    <span class="st">"Set up telemetry tracking to measure improvement"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="step-3-implement-evidence-based-improvements">Step 3: Implement Evidence-Based Improvements<a class="anchor" aria-label="anchor" href="#step-3-implement-evidence-based-improvements"></a>
+</h3>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Before: Information overload (what telemetry revealed users struggled with)</span></span>
+<span><span class="va">ui_before</span> <span class="op">&lt;-</span> <span class="fu">dashboardPage</span><span class="op">(</span></span>
+<span>  <span class="fu">dashboardHeader</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"E-commerce Analytics"</span><span class="op">)</span>,</span>
+<span>  <span class="fu">dashboardSidebar</span><span class="op">(</span></span>
+<span>    <span class="co"># 15+ filter options immediately visible</span></span>
+<span>    <span class="fu">selectInput</span><span class="op">(</span><span class="st">"date_range"</span>, <span class="st">"Date Range"</span>, choices <span class="op">=</span> <span class="va">date_options</span><span class="op">)</span>,</span>
+<span>    <span class="fu">selectInput</span><span class="op">(</span><span class="st">"product_category"</span>, <span class="st">"Category"</span>, choices <span class="op">=</span> <span class="va">categories</span>, multiple <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>    <span class="fu">selectInput</span><span class="op">(</span><span class="st">"channel"</span>, <span class="st">"Sales Channel"</span>, choices <span class="op">=</span> <span class="va">channels</span>, multiple <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>    <span class="fu">selectInput</span><span class="op">(</span><span class="st">"region"</span>, <span class="st">"Region"</span>, choices <span class="op">=</span> <span class="va">regions</span>, multiple <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>    <span class="fu">selectInput</span><span class="op">(</span><span class="st">"customer_segment"</span>, <span class="st">"Customer Type"</span>, choices <span class="op">=</span> <span class="va">segments</span>, multiple <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>    <span class="co"># ... 10 more filters</span></span>
+<span>    <span class="fu">actionButton</span><span class="op">(</span><span class="st">"apply_filters"</span>, <span class="st">"Apply Filters"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  <span class="fu">dashboardBody</span><span class="op">(</span></span>
+<span>    <span class="co"># 12 value boxes competing for attention</span></span>
+<span>    <span class="fu">fluidRow</span><span class="op">(</span></span>
+<span>      <span class="fu">valueBoxOutput</span><span class="op">(</span><span class="st">"revenue"</span><span class="op">)</span>, <span class="fu">valueBoxOutput</span><span class="op">(</span><span class="st">"orders"</span><span class="op">)</span>,</span>
+<span>      <span class="fu">valueBoxOutput</span><span class="op">(</span><span class="st">"aov"</span><span class="op">)</span>, <span class="fu">valueBoxOutput</span><span class="op">(</span><span class="st">"conversion"</span><span class="op">)</span>,</span>
+<span>      <span class="fu">valueBoxOutput</span><span class="op">(</span><span class="st">"traffic"</span><span class="op">)</span>, <span class="fu">valueBoxOutput</span><span class="op">(</span><span class="st">"bounce_rate"</span><span class="op">)</span>,</span>
+<span>      <span class="co"># ... 6 more value boxes</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="co"># Multiple complex charts</span></span>
+<span>    <span class="fu">fluidRow</span><span class="op">(</span></span>
+<span>      <span class="fu">plotOutput</span><span class="op">(</span><span class="st">"revenue_trend"</span><span class="op">)</span>, <span class="fu">plotOutput</span><span class="op">(</span><span class="st">"category_performance"</span><span class="op">)</span>,</span>
+<span>      <span class="fu">plotOutput</span><span class="op">(</span><span class="st">"channel_analysis"</span><span class="op">)</span>, <span class="fu">plotOutput</span><span class="op">(</span><span class="st">"customer_segments"</span><span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="../reference/bid_notice.html">bid_notice</a></span><span class="op">(</span></span>
-<span>      problem <span class="op">=</span> <span class="va">unused_issue</span><span class="op">$</span><span class="va">problem</span>,</span>
-<span>      evidence <span class="op">=</span> <span class="va">unused_issue</span><span class="op">$</span><span class="va">evidence</span></span>
-<span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># After: BID-informed design addressing telemetry insights</span></span>
+<span><span class="va">ui_after</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rstudio.github.io/bslib/reference/page_fillable.html" class="external-link">page_fillable</a></span><span class="op">(</span></span>
+<span>  theme <span class="op">=</span> <span class="fu"><a href="https://rstudio.github.io/bslib/reference/bs_theme.html" class="external-link">bs_theme</a></span><span class="op">(</span>version <span class="op">=</span> <span class="fl">5</span>, preset <span class="op">=</span> <span class="st">"bootstrap"</span><span class="op">)</span>,</span>
+<span></span>
+<span>  <span class="co"># Address delayed interaction issue: Immediate value on landing</span></span>
+<span>  <span class="fu"><a href="https://rstudio.github.io/bslib/reference/layout_columns.html" class="external-link">layout_columns</a></span><span class="op">(</span></span>
+<span>    col_widths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">4</span><span class="op">)</span>,</span>
+<span></span>
+<span>    <span class="co"># Primary business health (addresses anchoring bias)</span></span>
+<span>    <span class="fu"><a href="https://rstudio.github.io/bslib/reference/card.html" class="external-link">card</a></span><span class="op">(</span></span>
+<span>      <span class="fu"><a href="https://rstudio.github.io/bslib/reference/card_body.html" class="external-link">card_header</a></span><span class="op">(</span><span class="st">"🎯 Business Performance"</span>, class <span class="op">=</span> <span class="st">"bg-primary text-white"</span><span class="op">)</span>,</span>
+<span>      <span class="fu"><a href="https://rstudio.github.io/bslib/reference/layout_columns.html" class="external-link">layout_columns</a></span><span class="op">(</span></span>
+<span>        col_widths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">6</span><span class="op">)</span>,</span>
+<span>        <span class="fu"><a href="https://rstudio.github.io/bslib/reference/value_box.html" class="external-link">value_box</a></span><span class="op">(</span></span>
+<span>          <span class="st">"Revenue Today"</span>,</span>
+<span>          <span class="st">"$47.2K"</span>,</span>
+<span>          <span class="st">"vs. $43.1K yesterday (+9.5%)"</span>,</span>
+<span>          showcase <span class="op">=</span> <span class="fu">bs_icon</span><span class="op">(</span><span class="st">"graph-up"</span><span class="op">)</span>,</span>
+<span>          theme <span class="op">=</span> <span class="st">"success"</span></span>
+<span>        <span class="op">)</span>,</span>
+<span>        <span class="fu">div</span><span class="op">(</span></span>
+<span>          <span class="fu">h5</span><span class="op">(</span><span class="st">"Key Insights"</span>, style <span class="op">=</span> <span class="st">"margin-bottom: 15px;"</span><span class="op">)</span>,</span>
+<span>          <span class="va">tags</span><span class="op">$</span><span class="fu">ul</span><span class="op">(</span></span>
+<span>            <span class="va">tags</span><span class="op">$</span><span class="fu">li</span><span class="op">(</span><span class="st">"Mobile traffic up 15%"</span><span class="op">)</span>,</span>
+<span>            <span class="va">tags</span><span class="op">$</span><span class="fu">li</span><span class="op">(</span><span class="st">"Electronics category leading"</span><span class="op">)</span>,</span>
+<span>            <span class="va">tags</span><span class="op">$</span><span class="fu">li</span><span class="op">(</span><span class="st">"⚠️ Cart abandonment rate increased"</span><span class="op">)</span></span>
+<span>          <span class="op">)</span>,</span>
+<span>          <span class="fu">actionButton</span><span class="op">(</span><span class="st">"investigate_abandonment"</span>, <span class="st">"Investigate"</span>,</span>
+<span>                      class <span class="op">=</span> <span class="st">"btn btn-warning btn-sm"</span><span class="op">)</span></span>
+<span>        <span class="op">)</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span></span>
+<span>    <span class="co"># Quick actions (addresses choice overload)</span></span>
+<span>    <span class="fu"><a href="https://rstudio.github.io/bslib/reference/card.html" class="external-link">card</a></span><span class="op">(</span></span>
+<span>      <span class="fu"><a href="https://rstudio.github.io/bslib/reference/card_body.html" class="external-link">card_header</a></span><span class="op">(</span><span class="st">"⚡ Quick Actions"</span><span class="op">)</span>,</span>
+<span>      <span class="fu">div</span><span class="op">(</span></span>
+<span>        <span class="fu">actionButton</span><span class="op">(</span></span>
+<span>          <span class="st">"todays_performance"</span>,</span>
+<span>          <span class="st">"Today's Performance"</span>,</span>
+<span>          class <span class="op">=</span> <span class="st">"btn btn-primary btn-block mb-2"</span></span>
+<span>        <span class="op">)</span>,</span>
+<span>        <span class="fu">actionButton</span><span class="op">(</span></span>
+<span>          <span class="st">"weekly_trends"</span>,</span>
+<span>          <span class="st">"Weekly Trends"</span>,</span>
+<span>          class <span class="op">=</span> <span class="st">"btn btn-secondary btn-block mb-2"</span></span>
+<span>        <span class="op">)</span>,</span>
+<span>        <span class="fu">actionButton</span><span class="op">(</span></span>
+<span>          <span class="st">"campaign_results"</span>,</span>
+<span>          <span class="st">"Campaign Results"</span>,</span>
+<span>          class <span class="op">=</span> <span class="st">"btn btn-info btn-block mb-2"</span></span>
+<span>        <span class="op">)</span>,</span>
+<span>        <span class="fu">hr</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>        <span class="fu">p</span><span class="op">(</span></span>
+<span>          <span class="st">"Need something specific?"</span>,</span>
+<span>          style <span class="op">=</span> <span class="st">"font-size: 0.9em; color: #666;"</span></span>
+<span>        <span class="op">)</span>,</span>
+<span>        <span class="fu">actionButton</span><span class="op">(</span></span>
+<span>          <span class="st">"show_filters"</span>,</span>
+<span>          <span class="st">"Custom Analysis"</span>,</span>
+<span>          class <span class="op">=</span> <span class="st">"btn btn-outline-secondary btn-sm"</span></span>
+<span>        <span class="op">)</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span></span>
+<span>  <span class="co"># Advanced options hidden by default (progressive disclosure)</span></span>
+<span>  <span class="fu">conditionalPanel</span><span class="op">(</span></span>
+<span>    condition <span class="op">=</span> <span class="st">"input.show_filters"</span>,</span>
+<span>    <span class="fu"><a href="https://rstudio.github.io/bslib/reference/card.html" class="external-link">card</a></span><span class="op">(</span></span>
+<span>      <span class="fu"><a href="https://rstudio.github.io/bslib/reference/card_body.html" class="external-link">card_header</a></span><span class="op">(</span><span class="st">"🔍 Custom Analysis"</span><span class="op">)</span>,</span>
+<span>      <span class="fu">p</span><span class="op">(</span><span class="st">"Filter and explore your data:"</span>, style <span class="op">=</span> <span class="st">"margin-bottom: 15px;"</span><span class="op">)</span>,</span>
+<span>      <span class="fu"><a href="https://rstudio.github.io/bslib/reference/layout_columns.html" class="external-link">layout_columns</a></span><span class="op">(</span></span>
+<span>        col_widths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>,</span>
+<span>        <span class="fu">selectInput</span><span class="op">(</span></span>
+<span>          <span class="st">"time_period"</span>,</span>
+<span>          <span class="st">"Time Period"</span>,</span>
+<span>          choices <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Today"</span>, <span class="st">"This Week"</span>, <span class="st">"This Month"</span><span class="op">)</span>,</span>
+<span>          selected <span class="op">=</span> <span class="st">"Today"</span></span>
+<span>        <span class="op">)</span>,</span>
+<span>        <span class="fu">selectInput</span><span class="op">(</span></span>
+<span>          <span class="st">"focus_area"</span>,</span>
+<span>          <span class="st">"Focus Area"</span>,</span>
+<span>          choices <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Revenue"</span>, <span class="st">"Traffic"</span>, <span class="st">"Conversions"</span>, <span class="st">"Customers"</span><span class="op">)</span></span>
+<span>        <span class="op">)</span>,</span>
+<span>        <span class="fu">selectInput</span><span class="op">(</span></span>
+<span>          <span class="st">"comparison"</span>,</span>
+<span>          <span class="st">"Compare To"</span>,</span>
+<span>          choices <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Previous Period"</span>, <span class="st">"Same Period Last Year"</span>, <span class="st">"Target"</span><span class="op">)</span></span>
+<span>        <span class="op">)</span>,</span>
+<span>        <span class="fu">actionButton</span><span class="op">(</span><span class="st">"apply_custom"</span>, <span class="st">"Analyze"</span>, class <span class="op">=</span> <span class="st">"btn btn-primary"</span><span class="op">)</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span></span>
+<span>  <span class="co"># Results area appears based on user choices</span></span>
+<span>  <span class="fu">div</span><span class="op">(</span>id <span class="op">=</span> <span class="st">"results_area"</span>, style <span class="op">=</span> <span class="st">"margin-top: 20px;"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="step-4-measure-the-impact">Step 4: Measure the Impact<a class="anchor" aria-label="anchor" href="#step-4-measure-the-impact"></a>
+</h3>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># After implementing changes, collect new telemetry data</span></span>
+<span><span class="va">issues_after</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_telemetry.html">bid_telemetry</a></span><span class="op">(</span></span>
+<span>  <span class="st">"ecommerce_dashboard_telemetry_after_changes.sqlite"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Compare before/after metrics</span></span>
+<span><span class="va">improvement_metrics</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span>  metric <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">"Time to first interaction"</span>,</span>
+<span>    <span class="st">"Session abandonment rate"</span>,</span>
+<span>    <span class="st">"User satisfaction score"</span>,</span>
+<span>    <span class="st">"Task completion rate"</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  before <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"47 seconds"</span>, <span class="st">"12%"</span>, <span class="st">"6.2/10"</span>, <span class="st">"68%"</span><span class="op">)</span>,</span>
+<span>  after <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"8 seconds"</span>, <span class="st">"3%"</span>, <span class="st">"8.1/10"</span>, <span class="st">"87%"</span><span class="op">)</span>,</span>
+<span>  improvement <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"-83%"</span>, <span class="st">"-75%"</span>, <span class="st">"+31%"</span>, <span class="st">"+28%"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">improvement_metrics</span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="example-complete-analysis-using-0-3-1-api">Example: Complete Analysis Using 0.3.1 API<a class="anchor" aria-label="anchor" href="#example-complete-analysis-using-0-3-1-api"></a>
+</h2>
+<p>Here’s the complete workflow using the streamlined modern API:</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># 1. Modern telemetry ingestion</span></span>
+<span><span class="va">issues</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_telemetry.html">bid_telemetry</a></span><span class="op">(</span><span class="st">"telemetry.sqlite"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 2. Triage issues using tidy workflow</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span>  <span class="co"># Review issue summary</span></span>
+<span></span>
+<span><span class="co"># Focus on critical issues</span></span>
+<span><span class="va">critical_issues</span> <span class="op">&lt;-</span> <span class="va">issues</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">severity</span> <span class="op">==</span> <span class="st">"critical"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">user_impact</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 3. Create a comprehensive improvement plan using bridge functions</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">critical_issues</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># Address top critical issue</span></span>
+<span>  <span class="va">top_issue</span> <span class="op">&lt;-</span> <span class="va">critical_issues</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_head</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="co"># Start BID workflow</span></span>
+<span>  <span class="va">interpret_stage</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span>
+<span>    central_question <span class="op">=</span> <span class="st">"How can we address the most critical UX issue?"</span>,</span>
+<span>    data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      hook <span class="op">=</span> <span class="st">"Critical issues identified from user behavior data"</span>,</span>
+<span>      context <span class="op">=</span> <span class="st">"Telemetry reveals specific friction points"</span>,</span>
+<span>      tension <span class="op">=</span> <span class="st">"Users struggling with core functionality"</span>,</span>
+<span>      resolution <span class="op">=</span> <span class="st">"Data-driven improvements to user experience"</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span>  <span class="co"># Use bridge function to convert issue to Notice</span></span>
+<span>  <span class="va">notice_stage</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_notice_issue.html">bid_notice_issue</a></span><span class="op">(</span></span>
+<span>    issue <span class="op">=</span> <span class="va">top_issue</span>,</span>
+<span>    previous_stage <span class="op">=</span> <span class="va">interpret_stage</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span>  <span class="va">improvement_plan</span> <span class="op">&lt;-</span> <span class="va">notice_stage</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/bid_anticipate.html">bid_anticipate</a></span><span class="op">(</span></span>
 <span>      bias_mitigations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>        choice_overload <span class="op">=</span> <span class="st">"Hide advanced filters until needed"</span>,</span>
 <span>        default_effect <span class="op">=</span> <span class="st">"Pre-select most common filter values"</span></span>
 <span>      <span class="op">)</span></span>
 <span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="../reference/bid_structure.html">bid_structure</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/bid_structure.html">bid_structure</a></span><span class="op">(</span>telemetry_flags <span class="op">=</span> <span class="fu"><a href="../reference/bid_flags.html">bid_flags</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/bid_validate.html">bid_validate</a></span><span class="op">(</span></span>
 <span>      summary_panel <span class="op">=</span> <span class="st">"Simplified filtering with progressive disclosure"</span>,</span>
 <span>      next_steps <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
@@ -357,7 +773,7 @@ insights alongside user interviews and usability testing.</p></li>
 <li><p><strong>Track Improvements</strong>: After implementing changes,
 collect new telemetry to verify improvements:</p></li>
 </ol>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Before changes</span></span>
 <span><span class="va">issues_before</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry</a></span><span class="op">(</span><span class="st">"telemetry_before.sqlite"</span><span class="op">)</span></span>
 <span></span>
@@ -372,7 +788,7 @@ collect new telemetry to verify improvements:</p></li>
 <strong>Document Patterns</strong>: Build a knowledge base of common
 patterns in your domain:</li>
 </ol>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Save recurring patterns for future reference</span></span>
 <span><span class="va">telemetry_patterns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  date_filter_confusion <span class="op">=</span> <span class="st">"Users often struggle with date range inputs - consider using presets"</span>,</span>
