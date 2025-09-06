@@ -11,37 +11,36 @@
 
 Examples and vignettes run quickly; no long-running examples are included.
 
-## Resubmission note
-* This is a resubmission following feedback from 2025-08-18.
-* All relative links were replaced with absolute HTTPS URLs to resolve the "invalid file URIs" issue.
-* Documentation has been rebuilt to ensure links and references render correctly across platforms.
+## Release summary (0.3.1)
+This is a follow-up release to 0.3.0 (accepted 2025-08-29).
+It fixes functional bugs introduced during the 0.3.0 refactor, restores proper stage handling, and expands test coverage. It also adds stable telemetry objects, bridge functions, and documentation updates. Highlights (see NEWS.md for full details):
 
-## Release summary (0.3.0)
-This release updates the BID workflow, removes a deprecated argument, and adds automated layout selection and improved suggestions. Highlights (see NEWS for details and a migration guide):
+**Major fixes**
+* Corrected stage progression and `previous_stage` validation to enforce the proper BID order (**Interpret → Notice → Anticipate → Structure → Validate**).
+* Fixed `bid_anticipate()` to generate concept-specific bias mitigations (instead of generic ones).
+* Improved handling of `previous_stage` when supplied as a `data.frame`, preventing errors in downstream functions.
+* Resolved migration issues by adding `stage_number_previous` attributes and migration notices.
 
-**Breaking / API changes**
-* **Stage order:** BID sequence updated to **Interpret → Notice → Anticipate → Structure → Validate** for a more natural workflow to be presented at posit::conf(2025).
-* **`bid_structure()` argument removal:** The `layout` parameter was removed; layout is now selected automatically via deterministic heuristics based on prior stages. A helpful error is thrown if `layout` is supplied.
-* **Field name normalization:** Several output field names were standardized (e.g., `previous_question` → `previous_central_question`, `previous_story_hook` → `previous_hook`, `user_personas` → `personas` in `bid_interpret` output). These changes affect returned object fields, not function signatures.
+**Improvements**
+* Hybrid telemetry objects: `bid_ingest_telemetry()` now returns `bid_issues` hybrids (list + tidy methods) for backward compatibility and modern workflows.
+* New tidy telemetry API: `bid_telemetry()` returns organized `bid_issues_tbl` tibbles for seamless dplyr use.
+* Bridge functions (`bid_notice_issue()`, `bid_notices()`, `bid_address()`, `bid_pipeline()`) connect telemetry to BID stages.
+* `bid_structure()` accepts telemetry-informed flags to adapt layout and suggestion scoring.
+* `bid_validate()` supports provenance tracking via `telemetry_refs`.
+* Expanded test coverage across telemetry methods, suggestion rules, and edge cases.
 
-**Deprecations (with warnings)**
-* `target_audience` in `bid_notice()` (use `data_story`/`user_personas` in `bid_interpret()` instead). Scheduled for removal in 0.4.0.
-* `interaction_principles` in `bid_anticipate()` (replaced by `include_accessibility`). Scheduled for removal in 0.4.0.
+**Deprecations**
+* Layout auto-selection in `bid_structure()` and layout-specific bias mitigations in `bid_anticipate()` are deprecated (removal in 0.4.0). Current code continues to work with warnings.
 
-**New features / improvements**
-* Automatic layout inference in `bid_structure()`; returns ranked, concept-grouped UI/UX suggestions with rationale and relevance scores.
-* Accessibility-focused bias mitigations in `bid_anticipate()` via `include_accessibility = TRUE`.
-* `bid_validate()` gains `include_exp_design`, `include_telemetry`, and `include_empower_tools` flags.
-* Improved context propagation across stages; clearer CLI messages.
-* Comprehensive tests covering heuristic branches, deprecation warnings, error handling, and telemetry-aware scoring.
-
-A concise migration guide with old/new code is included in `NEWS.md` under "MIGRATION GUIDE".
+**Documentation**
+* Vignettes updated with new telemetry API examples, corrected stage numbering, and migration notes.
+* README refreshed with new package hex logo.
 
 ## Rationale for version
-`0.3.0` reflects a **backward-incompatible** removal of the `layout` parameter in `bid_structure()` and standardized field names. The prior submission (`0.2.0`) was not accepted to CRAN; this resubmission supersedes it and documents all changes clearly in NEWS and docs.
+`0.3.1` is a patch release following 0.3.0, needed to fix regressions that broke functionality in user workflows. It also introduces stable telemetry objects, improves migration support, and adds comprehensive test coverage to ensure long-term robustness.
 
 ## Compatibility
-* New dependencies: **none** beyond those introduced for 0.2.0 (DBI, RSQLite; `importFrom(stats, complete.cases)`).
+* No new dependencies added since 0.3.0.
 * Reverse dependencies: none on CRAN.
 
 ## Additional policy notes
