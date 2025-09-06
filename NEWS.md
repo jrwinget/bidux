@@ -45,7 +45,7 @@
 
 * **Enhanced Telemetry Integration vignette** showcasing the new API with hybrid objects, bridge functions, and tidy workflow examples.
 
-* **Comprehensive test coverage** for new bid_issues class methods, bridge functions, and edge cases.
+* **Comprehensive test coverage** for new bid_issues class methods, bridge functions, and edge cases. Also, expanded coverage for previously missed lines across bid_anticipate, bid_concepts, suggest_rules, and utility functions.
 
 ### MIGRATION NOTES
 

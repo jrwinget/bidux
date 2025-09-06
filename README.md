@@ -196,13 +196,16 @@ bid_concepts("cognitive") |>
 
 - Browse the documentation: `help(package = "bidux")`
 - Read the vignettes:
+  - `vignette("behavioral-science-primer")`: Behavioral science for data
+    scientists
   - `vignette("introduction-to-bid")`: Framework overview and core
     principles
+  - `vignette("telemetry-integration")`: Data-driven UX workflows
+  - `vignette("practical-examples")`: Practical dashboard examples
   - `vignette("getting-started")`: Complete walk-through with examples
   - `vignette("concepts-reference")`: Behavioral science concepts with
     practical implementation
-  - `vignette("telemetry-integration")`: Data-driven UX improvement
-    workflows
+  - `vignette("advanced-workflows")`: Advanced BID workflows
 - Visit the BID framework repository:
   <https://github.com/jrwinget/bid-framework>
 

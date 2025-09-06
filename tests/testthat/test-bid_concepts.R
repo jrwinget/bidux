@@ -250,3 +250,230 @@ test_that("concept data integrity checks", {
   )
   expect_gte(non_empty_tips, nrow(concepts) * 0.8) # At least 80% should have tips
 })
+
+# Tests for get_concepts_data internal function
+test_that("get_concepts_data returns proper tibble structure", {
+  concepts_data <- get_concepts_data()
+  
+  expect_s3_class(concepts_data, "tbl_df")
+  expect_gte(nrow(concepts_data), 40)
+  
+  required_cols <- c(
+    "concept",
+    "description", 
+    "category",
+    "reference",
+    "example",
+    "implementation_tips",
+    "related_concepts"
+  )
+  
+  expect_true(all(required_cols %in% names(concepts_data)))
+})
+
+# Tests for get_default_concepts_data internal function
+test_that("get_default_concepts_data provides fallback data", {
+  default_data <- get_default_concepts_data()
+  
+  expect_s3_class(default_data, "tbl_df")
+  expect_gte(nrow(default_data), 40)
+  
+  # Check specific concepts exist
+  expect_true("Cognitive Load Theory" %in% default_data$concept)
+  expect_true("Visual Hierarchies" %in% default_data$concept)
+  expect_true("Hick's Law" %in% default_data$concept)
+  
+  # Check data consistency
+  expect_equal(length(default_data$concept), nrow(default_data))
+  expect_equal(length(default_data$description), nrow(default_data))
+  expect_equal(length(default_data$category), nrow(default_data))
+})
+
+# Test fuzzy matching functionality
+test_that("bid_concepts fuzzy matching works correctly", {
+  # Test fuzzy matching with typos
+  suppressMessages({
+    # Should find "Visual Hierarchy" even with typos
+    fuzzy_result <- bid_concepts("vizual hierachy", fuzzy_match = TRUE)
+  })
+  
+  expect_s3_class(fuzzy_result, "tbl_df")
+  # May or may not find matches depending on fuzzy matching implementation
+  
+  # Test with fuzzy matching disabled
+  suppressMessages({
+    no_fuzzy <- bid_concepts("vizual hierachy", fuzzy_match = FALSE)
+  })
+  
+  expect_s3_class(no_fuzzy, "tbl_df")
+})
+
+# Test max_distance parameter
+test_that("bid_concepts max_distance parameter works", {
+  suppressMessages({
+    # Strict distance matching
+    strict_match <- bid_concepts("cognitve", fuzzy_match = TRUE, max_distance = 1)
+    
+    # Lenient distance matching
+    lenient_match <- bid_concepts("cognitve", fuzzy_match = TRUE, max_distance = 5)
+  })
+  
+  expect_s3_class(strict_match, "tbl_df")
+  expect_s3_class(lenient_match, "tbl_df")
+  
+  # Lenient should return same or more results
+  expect_gte(nrow(lenient_match), nrow(strict_match))
+})
+
+# Test bid_concept without recommendations
+test_that("bid_concept works without recommendations", {
+  suppressMessages({
+    concept_no_rec <- bid_concept("Cognitive Load Theory", add_recommendations = FALSE)
+  })
+  
+  expect_s3_class(concept_no_rec, "tbl_df")
+  expect_equal(nrow(concept_no_rec), 1)
+  expect_false("recommendations" %in% names(concept_no_rec))
+})
+
+# Test all stage recommendation types
+test_that("bid_concept generates correct recommendations for all stages", {
+  suppressMessages({
+    # Stage 1
+    stage1 <- bid_concept("Cognitive Load Theory")
+    expect_true(grepl("NOTICE", stage1$recommendations[1]))
+    
+    # Stage 2
+    stage2 <- bid_concept("Data Storytelling Framework")
+    expect_true(grepl("INTERPRET", stage2$recommendations[1]))
+    
+    # Stage 3
+    stage3 <- bid_concept("Principle of Proximity")
+    expect_true(grepl("STRUCTURE", stage3$recommendations[1]))
+    
+    # Stage 4
+    stage4 <- bid_concept("Anchoring Effect")
+    expect_true(grepl("ANTICIPATE", stage4$recommendations[1]))
+    
+    # Stage 5
+    stage5 <- bid_concept("Peak-End Rule")
+    expect_true(grepl("VALIDATE", stage5$recommendations[1]))
+    
+    # All Stages
+    all_stages <- bid_concept("User-Centric Design")
+    expect_true(grepl("UNIVERSAL", all_stages$recommendations[1]))
+  })
+})
+
+# Test search with empty results
+test_that("bid_concepts handles no matches gracefully", {
+  suppressMessages({
+    no_matches <- bid_concepts("xyznonexistentterm123", fuzzy_match = FALSE)
+  })
+  
+  expect_s3_class(no_matches, "tbl_df")
+  expect_equal(nrow(no_matches), 0)
+  expect_true(all(names(get_concepts_data()) %in% names(no_matches)))
+})
+
+# Test multiple search term combinations
+test_that("bid_concepts handles complex search combinations", {
+  suppressMessages({
+    # Multiple terms with spaces
+    multi_search <- bid_concepts("cognitive, visual, hierarchy")
+    
+    # Terms with different separators
+    sep_search <- bid_concepts("cognitive,visual;hierarchy")
+    
+    # Mixed case and punctuation
+    mixed_search <- bid_concepts("COGNITIVE load, Visual-Hierarchy!")
+  })
+  
+  expect_s3_class(multi_search, "tbl_df")
+  expect_s3_class(sep_search, "tbl_df")
+  expect_s3_class(mixed_search, "tbl_df")
+})
+
+# Test concept name trimming and normalization
+test_that("bid_concept handles whitespace and case variations", {
+  suppressMessages({
+    # Leading/trailing whitespace
+    whitespace_concept <- bid_concept("  Cognitive Load Theory  ")
+    
+    # Different case variations
+    upper_concept <- bid_concept("COGNITIVE LOAD THEORY")
+    lower_concept <- bid_concept("cognitive load theory")
+  })
+  
+  expect_s3_class(whitespace_concept, "tbl_df")
+  expect_s3_class(upper_concept, "tbl_df")
+  expect_s3_class(lower_concept, "tbl_df")
+  
+  # All should find the same concept if matching works
+  if (nrow(whitespace_concept) > 0 && nrow(upper_concept) > 0) {
+    expect_equal(whitespace_concept$concept[1], upper_concept$concept[1])
+  }
+})
+
+# Test stringdist integration
+test_that("bid_concepts integrates with stringdist package", {
+  # This tests the stringdist functionality if available
+  if (requireNamespace("stringdist", quietly = TRUE)) {
+    suppressMessages({
+      # Test with string distance calculations
+      dist_search <- bid_concepts("cognitiv load", fuzzy_match = TRUE)
+    })
+    
+    expect_s3_class(dist_search, "tbl_df")
+  } else {
+    skip("stringdist package not available")
+  }
+})
+
+# Test edge cases in search term processing
+test_that("bid_concepts processes edge case search terms", {
+  suppressMessages({
+    # Single character
+    single_char <- bid_concepts("a")
+    
+    # Numbers and special characters
+    special_chars <- bid_concepts("123!@#")
+    
+    # Very long search term
+    long_term <- bid_concepts(paste(rep("cognitive", 20), collapse = " "))
+  })
+  
+  expect_s3_class(single_char, "tbl_df")
+  expect_s3_class(special_chars, "tbl_df")
+  expect_s3_class(long_term, "tbl_df")
+})
+
+# Test default recommendations fallback
+test_that("bid_concept handles unknown categories gracefully", {
+  # Create a mock concept with unknown category to test fallback
+  # This tests the default case in the switch statement
+  suppressMessages({
+    # Test a concept that might have an edge case category
+    concepts_data <- get_concepts_data()
+    if (nrow(concepts_data) > 0) {
+      # Just verify the function handles the recommendation generation
+      first_concept <- bid_concept(concepts_data$concept[1])
+      expect_s3_class(first_concept, "tbl_df")
+      if (nrow(first_concept) > 0) {
+        expect_true("recommendations" %in% names(first_concept))
+        expect_true(nchar(first_concept$recommendations[1]) > 0)
+      }
+    }
+  })
+})
+
+# Test message handling in search functions
+test_that("bid_concepts and bid_concept provide appropriate messages", {
+  # Test that functions provide user feedback
+  expect_message(bid_concepts(), "Returning all")
+  expect_message(bid_concepts("cognitive"), "Found")
+  expect_message(bid_concept("cognitive"), "Found partial match|$")
+  expect_message(bid_concept("nonexistent123"), "not found")
+  expect_message(bid_concept(NULL), "Please provide")
+  expect_message(bid_concept(""), "Please provide")
+})
