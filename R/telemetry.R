@@ -64,8 +64,25 @@ bid_ingest_telemetry <- function(
     path,
     format = NULL,
     thresholds = list()) {
+  # enhanced file validation
   if (!file.exists(path)) {
     cli::cli_abort("Telemetry file not found: {path}")
+  }
+  
+  # check file size (prevent extremely large files)
+  file_info <- file.info(path)
+  if (is.na(file_info$size) || file_info$size > 100 * 1024 * 1024) {  # 100MB limit
+    cli::cli_abort("File size exceeds maximum limit (100MB) or cannot be accessed")
+  }
+  
+  # validate file permissions
+  if (!file.access(path, 4) == 0) {  # check read permission
+    cli::cli_abort("Cannot read file: {path}. Check file permissions.")
+  }
+  
+  # validate thresholds parameter
+  if (!is.null(thresholds) && !is.list(thresholds)) {
+    cli::cli_abort("thresholds parameter must be a list or NULL")
   }
 
   if (is.null(format)) {
@@ -206,6 +223,21 @@ bid_ingest_telemetry <- function(
   
   # extract global telemetry flags
   flags <- .flags_from_issues(issues_tbl, events, thresholds)
+  
+  # validate that notice_issues is a proper list before creating hybrid object
+  if (!is.list(notice_issues)) {
+    cli::cli_abort("Internal error: notice_issues must be a list for hybrid object creation")
+  }
+  
+  # validate that issues_tbl is a proper tibble
+  if (!tibble::is_tibble(issues_tbl)) {
+    cli::cli_abort("Internal error: issues_tbl must be a tibble for hybrid object creation")
+  }
+  
+  # validate that flags is a proper list
+  if (!is.list(flags)) {
+    cli::cli_abort("Internal error: flags must be a list for hybrid object creation")
+  }
   
   # create hybrid object with both legacy list and new attributes
   result <- structure(
@@ -1215,10 +1247,11 @@ create_confusion_notice <- function(confusion_info, total_sessions) {
     input_id <- gsub("unused_input_", "", issue_key)
     input_id <- gsub("_", " ", input_id) # simple conversion back
     
+    # secure comparison using exact match instead of regex pattern matching with user input
     input_events <- events[events$event_type == "input" & 
-                          grepl(input_id, events$input_id, ignore.case = TRUE), ]
+                          events$input_id == input_id, ]
     affected_sessions <- max(0, total_sessions - length(unique(input_events$session_id)))
-    impact_rate <- affected_sessions / total_sessions
+    impact_rate <- if (total_sessions > 0) affected_sessions / total_sessions else 0.0
     
   } else if (grepl("^delayed", issue_key)) {
     # for delays, this affects multiple sessions
@@ -1229,7 +1262,7 @@ create_confusion_notice <- function(confusion_info, total_sessions) {
     # for errors, count sessions with errors
     error_events <- events[events$event_type == "error", ]
     affected_sessions <- length(unique(error_events$session_id))
-    impact_rate <- affected_sessions / total_sessions
+    impact_rate <- if (total_sessions > 0) affected_sessions / total_sessions else 0.0
     
   } else if (grepl("^navigation", issue_key)) {
     # for navigation issues, estimate based on page visits
@@ -1241,7 +1274,7 @@ create_confusion_notice <- function(confusion_info, total_sessions) {
     # for confusion patterns, count rapid change sessions
     input_events <- events[events$event_type == "input", ]
     affected_sessions <- round(length(unique(input_events$session_id)) * 0.1)
-    impact_rate <- affected_sessions / total_sessions
+    impact_rate <- if (total_sessions > 0) affected_sessions / total_sessions else 0.0
   }
   
   # determine severity based on impact rate
@@ -1549,8 +1582,23 @@ bid_notices <- function(issues, filter = NULL, previous_stage = NULL, max_issues
   # apply filter if provided
   if (!is.null(substitute(filter))) {
     filter_expr <- substitute(filter)
-    filter_result <- eval(filter_expr, issues)
-    filtered_issues <- issues[filter_result, ]
+    tryCatch({
+      # validate that the filter expression only contains safe operations
+      expr_text <- deparse(filter_expr)
+      if (grepl("system|file|eval|source|get|assign|load|save|cat|write", expr_text)) {
+        cli::cli_abort("Filter expression contains potentially unsafe operations")
+      }
+      filter_result <- eval(filter_expr, issues, parent.frame())
+      if (!is.logical(filter_result) || length(filter_result) != nrow(issues)) {
+        cli::cli_abort("Filter expression must return logical vector of same length as issues data")
+      }
+      filtered_issues <- issues[filter_result, ]
+    }, error = function(e) {
+      cli::cli_abort(c(
+        "Error evaluating filter expression: {e$message}",
+        "i" = "Filter must be a valid logical expression using column names from issues"
+      ))
+    })
   } else {
     filtered_issues <- issues
   }

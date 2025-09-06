@@ -362,7 +362,7 @@ validate_previous_stage <- function(previous_stage = NULL, current_stage) {
     "Notice" = c("Interpret", "Notice", "Anticipate", "Structure"),  # inner stages flexible
     "Anticipate" = c("Interpret", "Notice", "Anticipate", "Structure"),  # inner stages flexible
     "Structure" = c("Interpret", "Notice", "Anticipate", "Structure"),  # inner stages flexible
-    "Validate" = c("Notice", "Anticipate", "Structure")  # only accepts inner stages
+    "Validate" = c("Notice", "Anticipate", "Structure", "Interpret")  # accepts inner stages and allows iterative flow to Interpret
   )
 
   # Skip stage progression warnings during tests (except explicit validation tests)

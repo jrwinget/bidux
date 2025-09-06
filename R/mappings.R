@@ -189,8 +189,8 @@ suggest_theory_from_mappings <- function(
     mappings = mappings
   )
   
-  # calculate confidence score
-  theory_confidence <- 1.0
+  # calculate confidence score - start with conservative default
+  theory_confidence <- 0.6  # Conservative default when no specific match found
   auto_suggested_theory <- TRUE
   
   # get confidence score from mappings

@@ -573,7 +573,7 @@ get_cognitive_load_suggestions <- function(chosen_layout, previous_stage) {
 
   # layout-specific adjustments
   if (chosen_layout == "breathable") {
-    base_suggestions[[1]]$score <- base_suggestions[[1]]$score + 0.05
+    base_suggestions[[1]]$score <- min(1.0, base_suggestions[[1]]$score + 0.05)
   }
 
   return(base_suggestions)
@@ -608,8 +608,8 @@ get_progressive_disclosure_suggestions <- function(
 
   # boost score for tabs layout
   if (chosen_layout == "tabs") {
-    base_suggestions[[1]]$score <- base_suggestions[[1]]$score + 0.05
-    base_suggestions[[2]]$score <- base_suggestions[[2]]$score + 0.03
+    base_suggestions[[1]]$score <- min(1.0, base_suggestions[[1]]$score + 0.05)
+    base_suggestions[[2]]$score <- min(1.0, base_suggestions[[2]]$score + 0.03)
   }
 
   # check telemetry for tab issues
@@ -667,7 +667,7 @@ get_dual_processing_suggestions <- function(chosen_layout, previous_stage) {
 
   # boost for dual_process layout
   if (chosen_layout == "dual_process") {
-    base_suggestions[[1]]$score <- base_suggestions[[1]]$score + 0.08
+    base_suggestions[[1]]$score <- min(1.0, base_suggestions[[1]]$score + 0.08)
   }
 
   return(base_suggestions)
@@ -731,7 +731,7 @@ get_proximity_suggestions <- function(chosen_layout, previous_stage) {
 
   # boost for grid layout
   if (chosen_layout == "grid") {
-    base_suggestions[[1]]$score <- base_suggestions[[1]]$score + 0.05
+    base_suggestions[[1]]$score <- min(1.0, base_suggestions[[1]]$score + 0.05)
   }
 
   return(base_suggestions)

@@ -190,37 +190,47 @@ test_that("bid_telemetry returns clean bid_issues_tbl", {
   ")
   
   # create telemetry data that will definitely trigger issues
-  # Need 20+ sessions to trigger percentage-based thresholds reliably
-  sessions_data <- c()
-  for (i in 1:25) {
-    base_time <- sprintf("2023-01-01 %02d:00:00", i %% 24)
+  # Use batched inserts instead of large concatenated strings
+  batch_size <- 10
+  total_sessions <- 25
+  
+  for (batch_start in seq(1, total_sessions, by = batch_size)) {
+    batch_end <- min(batch_start + batch_size - 1, total_sessions)
+    batch_data <- c()
     
-    if (i <= 20) {
-      # Regular sessions - most don't use 'unused_filter' (triggers unused input)
-      sessions_data <- c(sessions_data, sprintf(
-        "('%s', 'click', 'main_button', 'session%d', NULL, NULL, NULL)", base_time, i
-      ))
-      # Add some errors to trigger error patterns
-      if (i <= 5) {
-        error_time <- sprintf("2023-01-01 %02d:00:02", i %% 24)
-        sessions_data <- c(sessions_data, sprintf(
-          "('%s', 'error', 'plot_output', 'session%d', 'Data query failed', 'plot_output', NULL)", error_time, i
+    for (i in batch_start:batch_end) {
+      base_time <- sprintf("2023-01-01 %02d:00:00", i %% 24)
+      
+      if (i <= 20) {
+        # Regular sessions - most don't use 'unused_filter' (triggers unused input)
+        batch_data <- c(batch_data, sprintf(
+          "('%s', 'click', 'main_button', 'session%d', NULL, NULL, NULL)", base_time, i
+        ))
+        # Add some errors to trigger error patterns
+        if (i <= 5) {
+          error_time <- sprintf("2023-01-01 %02d:00:02", i %% 24)
+          batch_data <- c(batch_data, sprintf(
+            "('%s', 'error', 'plot_output', 'session%d', 'Data query failed', 'plot_output', NULL)", error_time, i
+          ))
+        }
+      } else {
+        # Delayed sessions (triggers delay pattern)
+        delayed_time <- sprintf("2023-01-01 %02d:01:00", i %% 24)
+        batch_data <- c(batch_data, sprintf(
+          "('%s', 'click', 'main_button', 'session%d', NULL, NULL, NULL)", delayed_time, i
         ))
       }
-    } else {
-      # Delayed sessions (triggers delay pattern)
-      delayed_time <- sprintf("2023-01-01 %02d:01:00", i %% 24)
-      sessions_data <- c(sessions_data, sprintf(
-        "('%s', 'click', 'main_button', 'session%d', NULL, NULL, NULL)", delayed_time, i
-      ))
+    }
+    
+    # Execute batch insert
+    if (length(batch_data) > 0) {
+      insert_sql <- sprintf("INSERT INTO user_actions VALUES %s", paste(batch_data, collapse = ", "))
+      DBI::dbExecute(con, insert_sql)
     }
   }
   
-  # Add unused filter that only 1 session uses (4% usage, below 5% threshold)
-  sessions_data <- c(sessions_data, "('2023-01-01 23:00:00', 'click', 'unused_filter', 'session1', NULL, NULL, NULL)")
-  
-  insert_sql <- sprintf("INSERT INTO user_actions VALUES %s", paste(sessions_data, collapse = ", "))
-  DBI::dbExecute(con, insert_sql)
+  # Add unused filter that only 1 session uses (4% usage, below 5% threshold) in separate insert
+  DBI::dbExecute(con, "INSERT INTO user_actions VALUES ('2023-01-01 23:00:00', 'click', 'unused_filter', 'session1', NULL, NULL, NULL)")
   
   DBI::dbDisconnect(con)
   
