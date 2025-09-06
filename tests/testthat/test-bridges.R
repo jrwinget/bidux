@@ -104,9 +104,9 @@ test_that("bid_notices processes multiple issues correctly", {
     issue_id = c("issue_01", "issue_02", "issue_03"),
     severity = c("high", "medium", "low"),
     problem = c(
-      "Critical navigation problem",
-      "Moderate layout issue", 
-      "Minor color contrast issue"
+      "Critical navigation problem causing users to abandon workflows frequently",
+      "Moderate layout issue affecting content readability and user scanning patterns", 
+      "Minor color contrast issue that may impact accessibility compliance standards"
     ),
     issue_type = c("navigation", "layout", "accessibility"),
     theory = c("Navigation Theory", "Visual Hierarchy", "Accessibility Theory")
@@ -131,15 +131,15 @@ test_that("bid_notices processes multiple issues correctly", {
   
   # should preserve issue order
   expect_true(grepl("Critical", notice_list[[1]]$problem))
-  expect_true(grepl("Moderate", notice_list[[2]]$problem))
-  expect_true(grepl("Minor", notice_list[[3]]$problem))
+  expect_true(grepl("layout", notice_list[[2]]$problem))
+  expect_true(grepl("contrast", notice_list[[3]]$problem))
 })
 
 test_that("bid_notices respects filter parameter", {
   issues_data <- tibble::tibble(
     issue_id = c("issue_01", "issue_02", "issue_03"),
     severity = c("high", "medium", "low"),
-    problem = c("Problem A", "Problem B", "Problem C"),
+    problem = c("User interface navigation is problematic and causing confusion", "Data loading performance issues affecting user experience", "Minor accessibility issues with color contrast in charts"),
     issue_type = c("type1", "type2", "type1")
   )
   
@@ -153,7 +153,7 @@ test_that("bid_notices respects filter parameter", {
   )
   
   expect_equal(length(filtered_notices), 1)
-  expect_true(grepl("Problem A", filtered_notices[[1]]$problem))
+  expect_true(grepl("navigation", filtered_notices[[1]]$problem))
 })
 
 test_that("bid_address creates single Notice from issue", {
@@ -184,7 +184,7 @@ test_that("bid_pipeline processes first N issues", {
   issues_data <- tibble::tibble(
     issue_id = paste0("issue_", 1:5),
     severity = c("critical", "high", "high", "medium", "low"),
-    problem = paste("Problem", letters[1:5])
+    problem = paste("Critical user interface problem affecting", letters[1:5], "functionality and causing user confusion")
   )
   
   interpret_stage <- bid_interpret(central_question = "Pipeline test?")
@@ -215,12 +215,13 @@ test_that("bridge functions handle edge cases gracefully", {
   
   interpret_stage <- bid_interpret(central_question = "Empty test?")
   
-  # should handle empty gracefully
-  expect_no_error(
+  # should handle empty gracefully - expect warning about no matching issues
+  expect_warning(
     empty_result <- bid_notices(
       issues = empty_issues,
       previous_stage = interpret_stage
-    )
+    ),
+    "No issues match"
   )
   
   expect_true(is.list(empty_result))

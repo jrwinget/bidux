@@ -8,7 +8,7 @@ test_that("bid_ingest_telemetry returns hybrid bid_issues object", {
   
   # create minimal telemetry table
   DBI::dbExecute(con, "
-    CREATE TABLE user_actions (
+    CREATE TABLE events (
       timestamp TEXT,
       action TEXT,
       element_id TEXT,
@@ -20,7 +20,7 @@ test_that("bid_ingest_telemetry returns hybrid bid_issues object", {
   ")
   
   DBI::dbExecute(con, "
-    INSERT INTO user_actions VALUES 
+    INSERT INTO events VALUES 
     ('2023-01-01', 'click', 'filter_button', 'session1', NULL, NULL, NULL),
     ('2023-01-01', 'abandon', 'dashboard', 'session1', NULL, NULL, NULL)
   ")
@@ -56,7 +56,7 @@ test_that("print.bid_issues shows triage view", {
   con <- DBI::dbConnect(RSQLite::SQLite(), temp_file)
   
   DBI::dbExecute(con, "
-    CREATE TABLE user_actions (
+    CREATE TABLE events (
       timestamp TEXT,
       action TEXT,
       element_id TEXT,
@@ -68,7 +68,7 @@ test_that("print.bid_issues shows triage view", {
   ")
   
   DBI::dbExecute(con, "
-    INSERT INTO user_actions VALUES 
+    INSERT INTO events VALUES 
     ('2023-01-01', 'click', 'filter_button', 'session1', NULL, NULL, NULL)
   ")
   
@@ -94,7 +94,7 @@ test_that("as_tibble.bid_issues returns issues tibble", {
   con <- DBI::dbConnect(RSQLite::SQLite(), temp_file)
   
   DBI::dbExecute(con, "
-    CREATE TABLE user_actions (
+    CREATE TABLE events (
       timestamp TEXT,
       action TEXT,
       element_id TEXT,
@@ -106,7 +106,7 @@ test_that("as_tibble.bid_issues returns issues tibble", {
   ")
   
   DBI::dbExecute(con, "
-    INSERT INTO user_actions VALUES 
+    INSERT INTO events VALUES 
     ('2023-01-01', 'click', 'filter_button', 'session1', NULL, NULL, NULL),
     ('2023-01-01', 'abandon', 'dashboard', 'session1', NULL, NULL, NULL)
   ")
@@ -137,7 +137,7 @@ test_that("bid_flags extracts telemetry flags", {
   con <- DBI::dbConnect(RSQLite::SQLite(), temp_file)
   
   DBI::dbExecute(con, "
-    CREATE TABLE user_actions (
+    CREATE TABLE events (
       timestamp TEXT,
       action TEXT,
       element_id TEXT,
@@ -149,7 +149,7 @@ test_that("bid_flags extracts telemetry flags", {
   ")
   
   DBI::dbExecute(con, "
-    INSERT INTO user_actions VALUES 
+    INSERT INTO events VALUES 
     ('2023-01-01', 'click', 'filter_button', 'session1', NULL, NULL, NULL),
     ('2023-01-01', 'abandon', 'dashboard', 'session1', NULL, NULL, NULL)
   ")
@@ -178,7 +178,7 @@ test_that("bid_telemetry returns clean bid_issues_tbl", {
   con <- DBI::dbConnect(RSQLite::SQLite(), temp_file)
   
   DBI::dbExecute(con, "
-    CREATE TABLE user_actions (
+    CREATE TABLE events (
       timestamp TEXT,
       action TEXT,
       element_id TEXT,
@@ -204,7 +204,7 @@ test_that("bid_telemetry returns clean bid_issues_tbl", {
       if (i <= 20) {
         # Regular sessions - most don't use 'unused_filter' (triggers unused input)
         batch_data <- c(batch_data, sprintf(
-          "('%s', 'click', 'main_button', 'session%d', NULL, NULL, NULL)", base_time, i
+          "('%s', 'input', 'main_button', 'session%d', NULL, NULL, NULL)", base_time, i
         ))
         # Add some errors to trigger error patterns
         if (i <= 5) {
@@ -224,13 +224,13 @@ test_that("bid_telemetry returns clean bid_issues_tbl", {
     
     # Execute batch insert
     if (length(batch_data) > 0) {
-      insert_sql <- sprintf("INSERT INTO user_actions VALUES %s", paste(batch_data, collapse = ", "))
+      insert_sql <- sprintf("INSERT INTO events VALUES %s", paste(batch_data, collapse = ", "))
       DBI::dbExecute(con, insert_sql)
     }
   }
   
   # Add unused filter that only 1 session uses (4% usage, below 5% threshold) in separate insert
-  DBI::dbExecute(con, "INSERT INTO user_actions VALUES ('2023-01-01 23:00:00', 'click', 'unused_filter', 'session1', NULL, NULL, NULL)")
+  DBI::dbExecute(con, "INSERT INTO events VALUES ('2023-01-01 23:00:00', 'click', 'unused_filter', 'session1', NULL, NULL, NULL)")
   
   DBI::dbDisconnect(con)
   
@@ -262,7 +262,7 @@ test_that("bid_issues class methods work with minimal data", {
   con <- DBI::dbConnect(RSQLite::SQLite(), temp_file)
   
   DBI::dbExecute(con, "
-    CREATE TABLE user_actions (
+    CREATE TABLE events (
       timestamp TEXT,
       action TEXT,
       element_id TEXT,
@@ -275,7 +275,7 @@ test_that("bid_issues class methods work with minimal data", {
   
   # single minimal record
   DBI::dbExecute(con, "
-    INSERT INTO user_actions VALUES ('2023-01-01', 'click', 'button1', 'session1', NULL, NULL, NULL)
+    INSERT INTO events VALUES ('2023-01-01', 'click', 'button1', 'session1', NULL, NULL, NULL)
   ")
   
   DBI::dbDisconnect(con)

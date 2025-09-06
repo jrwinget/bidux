@@ -34,7 +34,7 @@ best practices, and data storytelling techniques into a systematic
 1.  **Interpret** the User’s Need - Like defining your research question
     and understanding your data
 2.  **Notice** the Problem - Like identifying data quality issues or
-    analytical bottlenecks  
+    analytical bottlenecks
 3.  **Anticipate** User Behavior - Like checking for statistical biases
     that could skew results
 4.  **Structure** the Dashboard - Like choosing the right visualization
@@ -95,7 +95,7 @@ process <- bid_interpret(
 
 # View implementation suggestions for specific packages
 bid_suggest_components(process, package = "bslib")
-bid_suggest_components(process, package = "reactable") 
+bid_suggest_components(process, package = "reactable")
 
 # Generate comprehensive reports
 bid_report(process, format = "html")
@@ -135,7 +135,7 @@ The `bid_telemetry()` function automatically identifies five key
 friction indicators:
 
 - **Unused Inputs**: UI controls rarely interacted with
-- **Delayed Interactions**: Long time-to-first-action patterns  
+- **Delayed Interactions**: Long time-to-first-action patterns
 - **Frequent Errors**: Recurring error patterns that disrupt workflows
 - **Navigation Drop-offs**: Pages or tabs users rarely visit
 - **Confusion Patterns**: Rapid repeated changes indicating user
@@ -180,10 +180,10 @@ design principles. Explore the concept dictionary:
 
 ``` r
 # Browse all available concepts
-bid_concepts() |> 
+bid_concepts() |>
   select(concept, category, description)
 
-# Get detailed information about specific concepts  
+# Get detailed information about specific concepts
 bid_concept("Processing Fluency")
 bid_concept("Hick's Law")
 
@@ -198,7 +198,7 @@ bid_concepts("cognitive") |>
 - Read the vignettes:
   - `vignette("introduction-to-bid")`: Framework overview and core
     principles
-  - `vignette("getting-started")`: Complete walkthrough with examples
+  - `vignette("getting-started")`: Complete walk-through with examples
   - `vignette("concepts-reference")`: Behavioral science concepts with
     practical implementation
   - `vignette("telemetry-integration")`: Data-driven UX improvement

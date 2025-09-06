@@ -600,12 +600,13 @@ test_that("bid_anticipate handles bias_mitigations validation edge cases", {
     "bias_mitigations must be a non-empty named list"
   )
   
-  # Test with completely empty list
-  suppressMessages(
+  # Test with completely empty list - should generate warning
+  expect_warning(
     result3 <- bid_anticipate(
       previous_stage = notice_result,
       bias_mitigations = list()
-    )
+    ),
+    "bias_mitigations must be a non-empty named list"
   )
   
   expect_s3_class(result3, "bid_stage")

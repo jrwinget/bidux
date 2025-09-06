@@ -431,9 +431,11 @@ test_that("bid_ingest_telemetry handles malformed telemetry data", {
     # Create a file that's not a valid SQLite database
     writeLines("This is not a SQLite database", temp_db)
 
-    expect_error(
-      bid_ingest_telemetry(temp_db),
-      "database|SQLite|file|not valid"
+    suppressWarnings(
+      expect_error(
+        bid_ingest_telemetry(temp_db),
+        "database|SQLite|file|not valid"
+      )
     )
 
     unlink(temp_db)
