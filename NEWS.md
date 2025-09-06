@@ -1,4 +1,89 @@
-# bidux 0.3.1
+# bidux 0.3.1 (2025-01-XX)
+==========================
+
+### NEW FEATURES
+
+* **Hybrid telemetry objects for backward compatibility.** `bid_ingest_telemetry()` now returns a hybrid `bid_issues` object that behaves as a list (maintaining legacy compatibility) while providing enhanced functionality through new methods: `print.bid_issues()`, `as_tibble.bid_issues()`, and `bid_flags()`.
+
+* **Modern tidy telemetry API.** New `bid_telemetry()` function provides a clean, tidy approach that returns organized issues tibbles (`bid_issues_tbl` class) for better integration with dplyr workflows and data analysis pipelines.
+
+* **Bridge functions for telemetry-to-BID integration.** New functions seamlessly connect telemetry issues to BID stages:
+  - `bid_notice_issue()` - Convert individual issue to Notice stage
+  - `bid_notices()` - Batch process multiple issues to Notice stages
+  - `bid_address()` - Sugar function for quick issue addressing
+  - `bid_pipeline()` - Process first N issues with limits
+
+* **Telemetry-informed structure selection.** `bid_structure()` now accepts `telemetry_flags` parameter to adjust layout selection and suggestion scoring based on real user behavior patterns (e.g., avoiding tabs layout when navigation issues are detected).
+
+* **Enhanced validation with telemetry references.** `bid_validate()` now includes optional `telemetry_refs` parameter to append provenance information linking improvements back to specific telemetry findings.
+
+### MAJOR FIXES
+
+* **Corrected stage numbering.** Fixed stage progression to proper BID framework order: Interpret (1) → Notice (2) → Anticipate (3) → Structure (4) → Validate (5). Added temporary migration support with `stage_number_previous` attributes and session-level migration notices.
+
+* **Consolidated suggestion system.** Unified suggestion rules for Interpret, Notice, and Validate stages in `R/suggest_rules.R`, reducing code duplication and ensuring consistent messaging across the framework.
+
+* **Removed duplicate warning-suggestion pairs.** Cleaned up verbose output by preferring actionable suggestions over redundant warnings where content overlapped.
+
+### IMPROVEMENTS
+
+* **Enhanced Structure suggestions organization.** Consolidated structure-specific suggestion functions into `R/structure_suggest.R` with documented schema and improved concept-based grouping.
+
+* **Improved telemetry flag extraction.** New `.flags_from_issues()` helper function creates comprehensive boolean flags from telemetry patterns for better layout and suggestion customization.
+
+* **Better suggestion theory integration.** Factored out `.suggest_theory_from_text()` for reuse across Notice stage functions, improving consistency in theory recommendations.
+
+* **Migration support utilities.** Added `.show_stage_numbering_notice()` and `.format_telemetry_refs_for_validation()` helper functions for smooth version migration.
+
+### BREAKING CHANGES
+
+* None
+
+### DOCUMENTATION UPDATES
+
+* **Updated Getting Started vignette** with new telemetry workflow examples and corrected stage numbering throughout.
+
+* **Enhanced Telemetry Integration vignette** showcasing the new API with hybrid objects, bridge functions, and tidy workflow examples.
+
+* **Comprehensive test coverage** for new bid_issues class methods, bridge functions, and edge cases.
+
+### MIGRATION NOTES
+
+For users upgrading from 0.3.0:
+
+```r
+# Legacy telemetry code continues to work
+legacy_notices <- bid_ingest_telemetry("telemetry.sqlite")
+length(legacy_notices)  # Still works as before
+
+# But now also provides enhanced features
+as_tibble(legacy_notices)  # New: get tidy issues view
+bid_flags(legacy_notices)  # New: extract telemetry flags
+
+# New modern API for tidy workflows
+issues <- bid_telemetry("telemetry.sqlite")
+critical <- issues |> filter(severity == "critical")
+notices <- bid_notices(critical, previous_stage = interpret_result)
+```
+
+**Note:** `bid_ingest_telemetry()` will be soft-deprecated in 0.4.0 in favor of `bid_telemetry()`. Current usage remains fully supported.
+
+### BUG FIXES
+
+* **Fixed concept-based bias mitigation generation.** `bid_anticipate()` now correctly generates concept-specific biases (e.g., "attention bias" and "belief perseverance" for Visual Hierarchy) instead of falling back to generic biases.
+
+* **Improved stage flow validation.** Updated validation logic to support the flexible BID workflow where inner stages (Notice, Anticipate, Structure) can occur in any order, while maintaining proper validation for entry and exit points.
+
+* **Enhanced previous_stage handling.** Fixed validation errors when passing data.frame objects to BID functions by improving stage name extraction logic.
+
+* Fixed stage progression validation warnings in tests by correcting test sequences to follow proper BID framework order
+* Updated suggestion pattern matching in tests after DRY refactor consolidation
+
+### DEPRECATIONS
+
+* **Layout auto-selection is deprecated.** The layout selection feature in `bid_structure()` will be removed in bidux 0.4.0 to reduce complexity and focus on concept-based suggestions. Existing code continues to work with deprecation warnings.
+
+* **Layout-specific bias mitigations are deprecated.** The layout-dependent bias mappings in `bid_anticipate()` will be removed in bidux 0.4.0 in favor of concept-driven bias mitigations. Existing code continues to work with deprecation warnings.
 
 # bidux 0.3.0 (2025-08-29)
 ==========================
@@ -12,7 +97,7 @@
 * **`bid_anticipate()` no longer accepts `interaction_principles` parameter.** This parameter has been removed in favor of the new `include_accessibility` parameter (default: TRUE). The function will warn if the deprecated parameter is provided.
 
 * **Field name changes for consistency:**
-  - `previous_question` → `previous_central_question` 
+  - `previous_question` → `previous_central_question`
   - `previous_story_hook` → `previous_hook`
   - `user_personas` → `personas` (in bid_interpret output)
 
@@ -53,14 +138,14 @@ To update existing code for bidux 0.3.0:
 ```r
 # OLD (0.2.x)
 notice <- bid_notice(
-  problem = "Users confused", 
+  problem = "Users confused",
   evidence = "High error rate",
   target_audience = "Analysts"
 )
 
 # NEW (0.3.0)
 notice <- bid_notice(
-  problem = "Users confused", 
+  problem = "Users confused",
   evidence = "High error rate"
 )
 
@@ -145,7 +230,7 @@ anticipate <- bid_anticipate(
 ==========================
 
 * Initial CRAN submission.
-* Complete implementation of the Behavior Insight Design (BID) framework with 5 sequential stages: Notice, Interpret, Structure, Anticipate, and Validate.
+* Complete implementation of the Behavioral Insight Design (BID) framework with 5 sequential stages: Notice, Interpret, Structure, Anticipate, and Validate.
 * Added initial concept dictionary with 41+ behavioral science principles.
 * Added UI component suggestions for major R packages: `{shiny}`, `{bslib}`, `{DT}`, `{plotly}`, `{reactable}`, `{htmlwidgets}`.
 * Added multi-format reporting capabilities (text, HTML, markdown) with `bid_report()`.

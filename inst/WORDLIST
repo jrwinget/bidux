@@ -1,3 +1,4 @@
+50k
 CLI
 CMD
 Codecov
@@ -15,6 +16,7 @@ affordances
 bslib
 deps
 devtools
+dplyr
 echarts4r
 github
 htmlwidgets
@@ -26,6 +28,8 @@ pkgdown
 plotly
 reactable
 roxygen2
+SaaS
 sqlite
+tbl
 testthat
 tibble

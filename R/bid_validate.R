@@ -16,6 +16,10 @@
 #'        design suggestions. Default is TRUE.
 #' @param include_telemetry Logical indicating whether to include telemetry
 #'        tracking and monitoring suggestions. Default is TRUE.
+#' @param telemetry_refs Optional character vector or named list specifying
+#'        specific telemetry reference points to include in validation steps.
+#'        If provided, these will be integrated into the telemetry tracking
+#'        recommendations with provenance information.
 #' @param include_empower_tools Logical indicating whether to include
 #'        context-aware empowerment tool suggestions. Default is TRUE.
 #'
@@ -59,6 +63,7 @@ bid_validate <- function(
     next_steps = NULL,
     include_exp_design = TRUE,
     include_telemetry = TRUE,
+    telemetry_refs = NULL,
     include_empower_tools = TRUE) {
   validate_required_params(previous_stage = previous_stage)
   validate_previous_stage(previous_stage, "Validate")
@@ -88,7 +93,8 @@ bid_validate <- function(
     next_steps <- generate_next_steps_suggestion(
       previous_stage,
       include_exp_design,
-      include_telemetry
+      include_telemetry,
+      telemetry_refs
     )
     cli::cli_alert_info("Suggested next steps:")
     for (step in next_steps) {
@@ -105,7 +111,8 @@ bid_validate <- function(
     previous_stage,
     include_exp_design,
     include_telemetry,
-    include_empower_tools
+    include_empower_tools,
+    telemetry_refs
   )
 
   # normalize previous stage to ensure field name consistency
@@ -278,7 +285,8 @@ generate_collaboration_suggestion <- function(
 generate_next_steps_suggestion <- function(
   previous_stage,
   include_exp_design = TRUE,
-  include_telemetry = TRUE
+  include_telemetry = TRUE,
+  telemetry_refs = NULL
 ) {
   stage_name <- previous_stage$stage[1]
   next_steps <- character(0)
@@ -350,12 +358,21 @@ generate_next_steps_suggestion <- function(
 
   # add telemetry and monitoring recommendations if requested
   if (include_telemetry) {
-    next_steps <- c(
-      next_steps,
+    telemetry_steps <- c(
       "Implement telemetry tracking for user interactions and pain points",
       "Set up monitoring dashboards to track key performance indicators",
       "Plan post-launch telemetry analysis to validate design improvements"
     )
+    
+    # add specific telemetry references if provided
+    if (!is.null(telemetry_refs) && length(telemetry_refs) > 0) {
+      telemetry_steps <- c(
+        telemetry_steps,
+        .format_telemetry_refs_for_validation(telemetry_refs)
+      )
+    }
+    
+    next_steps <- c(next_steps, telemetry_steps)
   }
 
   next_steps <- c(
@@ -375,7 +392,8 @@ generate_validation_suggestions <- function(
     previous_stage,
     include_exp_design = TRUE,
     include_telemetry = TRUE,
-    include_empower_tools = TRUE) {
+    include_empower_tools = TRUE,
+    telemetry_refs = NULL) {
   suggestions <- character(0)
 
   if (!is.null(summary_panel) && nchar(summary_panel) > 0) {

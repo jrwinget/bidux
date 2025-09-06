@@ -346,13 +346,15 @@ test_that("bid_suggest_components handles audience-based context", {
     central_question = "How can executive dashboard be simplified?"
   )
   
-  notice_with_audience <- bid_notice(
-    previous_stage = interpret_result,
-    problem = "Executive dashboard needs simplification",
-    theory = "Cognitive Load Theory",
-    evidence = "Executive feedback",
-    target_audience = "Executive leadership team"
-  )
+  suppressWarnings({
+    notice_with_audience <- bid_notice(
+      previous_stage = interpret_result,
+      problem = "Executive dashboard needs simplification",
+      theory = "Cognitive Load Theory",
+      evidence = "Executive feedback",
+      target_audience = "Executive leadership team"
+    )
+  })
 
   suppressMessages({
     exec_suggestions <- bid_suggest_components(notice_with_audience)

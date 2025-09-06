@@ -115,27 +115,16 @@ bid_notice <- function(
   theory_confidence <- 1.0
 
   if (is.null(theory)) {
-    theory <- suggest_theory_from_mappings(
+    suggestion_result <- .suggest_theory_from_text(
       problem_clean,
       evidence_clean,
-      mappings = NULL
+      mappings = NULL,
+      show_message = TRUE
     )
-    auto_suggested_theory <- TRUE
-
-    # get confidence score
-    default_mappings <- load_theory_mappings()
-    matching_row <- default_mappings[default_mappings$theory == theory, ]
-    if (nrow(matching_row) > 0) {
-      theory_confidence <- matching_row$confidence[1]
-    }
-
-    cat(paste0(
-      "Auto-suggested theory: ",
-      theory,
-      " (confidence: ",
-      round(theory_confidence * 100),
-      "%)\n"
-    ))
+    
+    theory <- suggestion_result$theory
+    theory_confidence <- suggestion_result$confidence
+    auto_suggested_theory <- suggestion_result$auto_suggested
   }
 
   # generate contextual suggestions using unified system

@@ -107,17 +107,19 @@ test_that("bid_structure avoids tabs when telemetry shows navigation issues", {
     stage = "Interpret",
     problem = "Users need progressive disclosure across sections",
     evidence = "Categories require module separation",
-    telemetry = list(nav_dropoff_tabs = TRUE),
     timestamp = Sys.time()
   )
+  
+  # create telemetry flags indicating navigation issues
+  telemetry_flags <- list(has_navigation_issues = TRUE)
 
   suppressMessages(
-    result <- bid_structure(previous_stage)
+    result <- bid_structure(previous_stage, telemetry_flags = telemetry_flags)
   )
 
   expect_s3_class(result, "bid_stage")
   expect_false(result$layout[1] == "tabs")
-  expect_equal(result$layout[1], "grid") # Should fallback to grid
+  expect_equal(result$layout[1], "grid") # should fallback to grid
 })
 
 # T7: Fallback → breathable
@@ -360,15 +362,17 @@ test_that("bid_structure respects telemetry data in scoring", {
   stage_with_telemetry <- tibble::tibble(
     stage = "Interpret",
     problem = "Need progressive disclosure across sections",
-    telemetry = list(nav_dropoff_tabs = TRUE),
     timestamp = Sys.time()
   )
+  
+  # create telemetry flags indicating navigation issues
+  telemetry_flags <- list(has_navigation_issues = TRUE)
 
   suppressMessages(
-    result <- bid_structure(stage_with_telemetry)
+    result <- bid_structure(stage_with_telemetry, telemetry_flags = telemetry_flags)
   )
 
-  # Should avoid tabs layout
+  # should avoid tabs layout
   expect_false(result$layout[1] == "tabs")
 
   # Tab-related suggestions should have lower scores

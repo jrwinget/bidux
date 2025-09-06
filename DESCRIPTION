@@ -1,27 +1,27 @@
 Package: bidux
-Title: Behavior Insight Design: A Toolkit for Integrating Behavioral Science in UI/UX Design
+Title: Behavioral Insight Design: A Toolkit for Integrating Behavioral Science in UI/UX Design
 Version: 0.3.1
-Authors@R: 
+Authors@R:
     person(
         given = "Jeremy",
-        family = "Winget", 
+        family = "Winget",
         role = c("aut", "cre"),
         email="contact@jrwinget.com",
         comment = c(ORCID = "0000-0002-3783-4354")
     )
-Description: Provides a framework and toolkit to guide 'shiny' developers in 
-    implementing the Behavior Insight Design (BID) framework. The package offers
+Description: Provides a framework and toolkit to guide 'shiny' developers in
+    implementing the Behavioral Insight Design (BID) framework. The package offers
     functions for documenting each of the five stages (Notice, Interpret,
     Structure, Anticipate, and Validate), along with a comprehensive concept
     dictionary.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Depends: 
+Depends:
     R (>= 4.1.0)
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
-Imports: 
+Imports:
     cli,
     DBI,
     dplyr,
@@ -33,7 +33,7 @@ Imports:
     stringr (>= 1.5.1),
     tibble (>= 3.2.1),
     utils
-Suggests: 
+Suggests:
     DiagrammeR,
     knitr,
     rmarkdown,

@@ -35,20 +35,23 @@ mitigation strategies related to anchoring, framing, confirmation bias, etc.
 It also supports adding interaction hints and visual feedback elements.
 }
 \examples{
-structure_info <- bid_interpret(
+interpret_stage <- bid_interpret(
   central_question = "How can we improve selection efficiency?",
   data_story = list(
     hook = "Too many options",
-    context = "Excessive choices",
+    context = "Excessive choices", 
     tension = "User frustration",
     resolution = "Simplify menu"
   )
-) |>
-  bid_notice(
-    "Issue with dropdown menus",
-    evidence = "User testing indicated delays"
-  ) |>
-  bid_structure()
+)
+
+notice_stage <- bid_notice(
+  previous_stage = interpret_stage,
+  problem = "Issue with dropdown menus",
+  evidence = "User testing indicated delays"
+)
+
+structure_info <- bid_structure(previous_stage = notice_stage)
 
 # Let the function suggest bias mitigations based on previous stages
 bid_anticipate(previous_stage = structure_info)

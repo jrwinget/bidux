@@ -4,7 +4,7 @@
 \alias{bid_structure}
 \title{Document Dashboard Structure Stage in BID Framework}
 \usage{
-bid_structure(previous_stage, concepts = NULL, ...)
+bid_structure(previous_stage, concepts = NULL, telemetry_flags = NULL, ...)
 }
 \arguments{
 \item{previous_stage}{A tibble or list output from an earlier BID stage
@@ -15,6 +15,10 @@ Concepts can be provided in natural language (e.g., "Principle of
 Proximity") or with underscores (e.g., "principle_of_proximity"). The
 function uses fuzzy matching to identify the concepts. If NULL, will
 detect relevant concepts from previous stages automatically.}
+
+\item{telemetry_flags}{Optional named list of telemetry flags from bid_flags().
+Used to adjust layout choice and suggestion scoring based on observed
+user behavior patterns.}
 
 \item{...}{Additional parameters. If \code{layout} is provided via \code{...}, the
 function will abort with a helpful error message.}

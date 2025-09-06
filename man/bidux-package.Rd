@@ -4,9 +4,11 @@
 \name{bidux-package}
 \alias{bidux}
 \alias{bidux-package}
-\title{bidux: Behavior Insight Design: A Toolkit for Integrating Behavioral Science in UI/UX Design}
+\title{bidux: Behavioral Insight Design: A Toolkit for Integrating Behavioral Science in UI/UX Design}
 \description{
-Provides a framework and toolkit to guide 'shiny' developers in implementing the Behavior Insight Design (BID) framework. The package offers functions for documenting each of the five stages (Notice, Interpret, Structure, Anticipate, and Validate), along with a comprehensive concept dictionary.
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
+Provides a framework and toolkit to guide 'shiny' developers in implementing the Behavioral Insight Design (BID) framework. The package offers functions for documenting each of the five stages (Notice, Interpret, Structure, Anticipate, and Validate), along with a comprehensive concept dictionary.
 }
 \seealso{
 Useful links:

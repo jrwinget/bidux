@@ -14,6 +14,9 @@
 #'        Proximity") or with underscores (e.g., "principle_of_proximity"). The
 #'        function uses fuzzy matching to identify the concepts. If NULL, will
 #'        detect relevant concepts from previous stages automatically.
+#' @param telemetry_flags Optional named list of telemetry flags from bid_flags().
+#'        Used to adjust layout choice and suggestion scoring based on observed
+#'        user behavior patterns.
 #' @param ... Additional parameters. If `layout` is provided via `...`, the
 #'        function will abort with a helpful error message.
 #'
@@ -64,6 +67,7 @@
 bid_structure <- function(
     previous_stage,
     concepts = NULL,
+    telemetry_flags = NULL,
     ...) {
   # check for deprecated layout parameter
   dots <- list(...)
@@ -78,10 +82,24 @@ bid_structure <- function(
   validate_required_params(previous_stage = previous_stage)
   validate_previous_stage(previous_stage, "Structure")
 
-  chosen_layout <- suggest_layout_from_previous(previous_stage)
+  chosen_layout <- suggest_layout_from_previous(previous_stage, telemetry_flags)
 
   cli::cli_alert_info("Auto-selected layout: {chosen_layout}")
   cli::cli_alert_info(layout_rationale(previous_stage, chosen_layout))
+  
+  # issue deprecation warning once per session (skip in tests to reduce noise)
+  # use package namespace instead of global environment for CRAN compliance
+  pkg_env <- asNamespace("bidux")
+  if (!exists(".bidux_layout_selection_warned", envir = pkg_env) && 
+      !identical(Sys.getenv("TESTTHAT"), "true")) {
+    warning(
+      "Layout auto-selection is deprecated and will be removed in bidux 0.4.0. ",
+      "The BID framework will focus on concept-based suggestions instead. ",
+      "Existing code will continue to work until 0.4.0.",
+      call. = FALSE
+    )
+    try(assign(".bidux_layout_selection_warned", TRUE, envir = pkg_env), silent = TRUE)
+  }
 
   # generate ranked, concept-grouped suggestions
   suggestion_groups <- structure_suggestions(
@@ -121,14 +139,18 @@ bid_structure <- function(
     auto_selected_layout = TRUE,
     concepts_count = length(concepts_detected),
     suggestion_groups_count = length(suggestion_groups),
-    stage_number = 3,
+    stage_number = 4,
+    stage_number_previous = 3,  # migration support for 0.3.1
     total_stages = 5
   )
 
   result <- bid_stage("Structure", result_data, metadata)
 
+  # add session-level migration notice (once per session)
+  .show_stage_numbering_notice()
+  
   bid_message(
-    "Stage 3 (Structure) completed.",
+    "Stage 4 (Structure) completed.",
     paste0("Auto-selected layout: ", chosen_layout),
     paste0("Concept groups generated: ", length(suggestion_groups)),
     paste0("Total concepts: ", length(concepts_detected))
