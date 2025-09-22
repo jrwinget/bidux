@@ -148,7 +148,7 @@ normalize_text <- function(
     text,
     capitalize_first = TRUE,
     remove_trailing_punct = TRUE) {
-  if (is.null(text) || length(text) == 0 || nchar(trimws(text)) == 0) {
+  if (is.null(text) || length(text) == 0 || all(nchar(trimws(text))) == 0) {
     return(text)
   }
 
