@@ -179,7 +179,7 @@ normalize_text <- function(
 #' @noRd
 format_suggestions <- function(suggestions, separator = ", ") {
   if (length(suggestions) == 0) {
-    return(character(0))
+    return("")
   }
 
   # normalize each suggestion
