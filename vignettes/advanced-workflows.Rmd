@@ -96,9 +96,6 @@ analyze_dashboard_ux <- function(dashboard_config, telemetry_path = NULL) {
   # Stage 5: Validate with domain-specific next steps
   validate_stage <- bid_validate(
     previous_stage = structure_stage,
-    summary_panel = generate_summary_panel(dashboard_config),
-    collaboration = get_collaboration_features(dashboard_config$team_size),
-    next_steps = generate_next_steps(dashboard_config, structure_stage)
   )
 
   return(validate_stage)
@@ -617,39 +614,35 @@ create_custom_bid_stage <- function(
   return(bid_security_stage)
 }
 
-# Example: Accessibility-focused BID stage
-bid_accessibility <- function(
+# Example: Accessibility-focused analysis using existing functions
+create_accessibility_analysis <- function(
     previous_stage,
     wcag_level = "AA",
     assistive_tech_support = TRUE,
     target_disabilities = c("visual", "motor", "cognitive")) {
-  validate_previous_stage(previous_stage, "Accessibility")
 
-  # Comprehensive accessibility analysis
-  accessibility_audit <- perform_accessibility_audit(
-    previous_stage = previous_stage,
-    wcag_level = wcag_level,
-    target_disabilities = target_disabilities
+  # Use existing bid_concept function to get accessibility recommendations
+  contrast_info <- bid_concept("Accessibility Contrast")
+  keyboard_info <- bid_concept("Keyboard Navigation")
+  screen_reader_info <- bid_concept("Screen Reader Compatibility")
+
+  # Create basic accessibility recommendations using existing concepts
+  accessibility_recommendations <- c(
+    contrast_info$implementation_tips[1],
+    keyboard_info$implementation_tips[1],
+    screen_reader_info$implementation_tips[1]
   )
 
-  # Generate specific recommendations
-  a11y_recommendations <- generate_accessibility_recommendations(
-    audit_results = accessibility_audit,
-    layout = safe_column_access(previous_stage, "layout"),
-    existing_concepts = safe_column_access(previous_stage, "concepts")
-  )
-
-  result_data <- tibble(
-    stage = "Accessibility",
+  # Create a summary rather than a bid_stage since this is just an example
+  accessibility_analysis <- list(
     wcag_level = wcag_level,
     assistive_tech_support = assistive_tech_support,
-    accessibility_score = accessibility_audit$overall_score,
-    recommendations = paste(a11y_recommendations, collapse = "; "),
-    critical_issues = accessibility_audit$critical_issues_count,
-    timestamp = Sys.time()
+    target_disabilities = target_disabilities,
+    recommendations = accessibility_recommendations,
+    concepts_referenced = c("Accessibility Contrast", "Keyboard Navigation", "Screen Reader Compatibility")
   )
 
-  return(bid_stage("Accessibility", result_data))
+  return(accessibility_analysis)
 }
 
 # Integration with main BID workflow
@@ -673,13 +666,14 @@ extended_bid_workflow <- function(config) {
 
   structure_stage <- bid_structure(previous_stage = anticipate_stage)
 
-  # Custom stages
+  # Custom accessibility analysis
   if (config$include_accessibility) {
-    accessibility_stage <- bid_accessibility(
+    accessibility_analysis <- create_accessibility_analysis(
       previous_stage = structure_stage,
       wcag_level = config$accessibility_requirements$wcag_level
     )
-    final_stage <- accessibility_stage
+    # Note: This analysis can inform the validate stage
+    final_stage <- structure_stage
   } else {
     final_stage <- structure_stage
   }
@@ -774,16 +768,45 @@ bid_data_science_workflow <- function(project_config) {
 
 ### 1. Systematic Documentation
 ```{r documentation-practices}
+# Helper function to extract BID stage summary using existing functions
+extract_bid_summary <- function(bid_result) {
+  if (inherits(bid_result, "bid_stage")) {
+    # Single stage, extract key information
+    stage_info <- list(
+      stage = get_stage(bid_result),
+      timestamp = bid_result$timestamp[1],
+      key_fields = names(bid_result)[!names(bid_result) %in% c("stage", "timestamp")]
+    )
+    return(stage_info)
+  } else if (is.list(bid_result)) {
+    # Multiple stages, summarize each
+    summary_list <- lapply(bid_result, function(stage) {
+      if (inherits(stage, "bid_stage")) {
+        list(
+          stage = get_stage(stage),
+          timestamp = stage$timestamp[1]
+        )
+      } else {
+        list(stage = "unknown", timestamp = NA)
+      }
+    })
+    return(summary_list)
+  } else {
+    return(list(error = "Unable to extract summary from provided object"))
+  }
+}
+
 # Create comprehensive BID documentation
 document_bid_decisions <- function(bid_result, project_context) {
   documentation <- list(
     project_overview = project_context,
     bid_stages_summary = extract_bid_summary(bid_result),
-    key_decisions = extract_key_decisions(bid_result),
-    behavioral_science_rationale = extract_behavioral_rationale(bid_result),
-    implementation_guidelines = generate_implementation_guide(bid_result),
-    success_metrics = define_success_metrics(bid_result),
-    iteration_plan = create_iteration_plan(bid_result)
+    # Use existing bid_report functionality instead of custom functions
+    detailed_report = if (inherits(bid_result, "bid_stage")) {
+      "Use bid_report(bid_result) for detailed documentation"
+    } else {
+      "Provide bid_stage object to generate detailed report"
+    }
   )
 
   return(documentation)
@@ -792,13 +815,36 @@ document_bid_decisions <- function(bid_result, project_context) {
 
 ### 2. Collaborative Workflows
 ```{r collaborative-workflows}
-# Enable team collaboration on BID analysis
+# Helper function for consensus building using existing concepts
+build_consensus_on_bid_decisions <- function(team_members) {
+  # Use existing bid_concept to get collaboration guidance
+  cooperation_info <- bid_concept("Cooperation & Coordination")
+
+  consensus_framework <- list(
+    team_size = length(team_members),
+    collaboration_approach = cooperation_info$implementation_tips[1],
+    recommended_process = c(
+      "Review BID stages individually with each team member",
+      "Identify areas of agreement and disagreement",
+      "Use bid_concepts() to find relevant behavioral science principles",
+      "Document final decisions with rationale"
+    ),
+    tools = "Use bid_report() to share findings across team"
+  )
+
+  return(consensus_framework)
+}
+
+# Enable team collaboration on BID analysis using existing functions
 create_bid_collaboration_workflow <- function(team_members, project_config) {
   workflow <- list(
-    stakeholder_input = collect_stakeholder_perspectives(team_members),
-    expert_review = facilitate_expert_review_process(project_config),
+    team_composition = list(
+      members = team_members,
+      roles = c("UX Designer", "Data Analyst", "Product Manager", "Developer")
+    ),
     consensus_building = build_consensus_on_bid_decisions(team_members),
-    implementation_coordination = coordinate_implementation_tasks(team_members)
+    documentation_approach = "Use bid_report() for comprehensive documentation",
+    concept_reference = "Use bid_concepts() to explore relevant principles together"
   )
 
   return(workflow)
