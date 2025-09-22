@@ -17,6 +17,8 @@
 #' @param telemetry_flags Optional named list of telemetry flags from bid_flags().
 #'        Used to adjust layout choice and suggestion scoring based on observed
 #'        user behavior patterns.
+#' @param quiet Logical indicating whether to suppress informational messages.
+#'        If NULL, uses getOption("bidux.quiet", FALSE).
 #' @param ... Additional parameters. If `layout` is provided via `...`, the
 #'        function will abort with a helpful error message.
 #'
@@ -68,6 +70,7 @@ bid_structure <- function(
     previous_stage,
     concepts = NULL,
     telemetry_flags = NULL,
+    quiet = NULL,
     ...) {
   # check for deprecated layout parameter
   dots <- list(...)
@@ -84,8 +87,8 @@ bid_structure <- function(
 
   chosen_layout <- suggest_layout_from_previous(previous_stage, telemetry_flags)
 
-  cli::cli_alert_info("Auto-selected layout: {chosen_layout}")
-  cli::cli_alert_info(layout_rationale(previous_stage, chosen_layout))
+  bid_alert_info(paste0("Auto-selected layout: ", chosen_layout), quiet = quiet)
+  bid_alert_info(layout_rationale(previous_stage, chosen_layout), quiet = quiet)
   
   # issue deprecation warning once per session (skip in tests to reduce noise)
   # use package namespace instead of global environment for CRAN compliance
@@ -153,7 +156,8 @@ bid_structure <- function(
     "Stage 4 (Structure) completed.",
     paste0("Auto-selected layout: ", chosen_layout),
     paste0("Concept groups generated: ", length(suggestion_groups)),
-    paste0("Total concepts: ", length(concepts_detected))
+    paste0("Total concepts: ", length(concepts_detected)),
+    quiet = quiet
   )
 
   return(result)

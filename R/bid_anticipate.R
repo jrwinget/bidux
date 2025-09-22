@@ -12,6 +12,8 @@
 #'        previous stages.
 #' @param include_accessibility Logical indicating whether to include
 #'        accessibility mitigations. Default is TRUE.
+#' @param quiet Logical indicating whether to suppress informational messages.
+#'        If NULL, uses getOption("bidux.quiet", FALSE).
 #' @param ... Additional parameters. If 'interaction_principles' is provided,
 #'        it will be ignored with a warning.
 #'
@@ -57,6 +59,7 @@ bid_anticipate <- function(
     previous_stage,
     bias_mitigations = NULL,
     include_accessibility = TRUE,
+    quiet = NULL,
     ...) {
   if (missing(previous_stage) || is.null(previous_stage)) {
     stop("Required parameter 'previous_stage' must be provided", call. = FALSE)
@@ -543,7 +546,8 @@ bid_anticipate <- function(
         bias_suggestions[seq_len(min(3, length(bias_suggestions)))],
         collapse = ", "
       )
-    )
+    ),
+    quiet = quiet
   )
 
   return(result)

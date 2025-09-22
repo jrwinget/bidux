@@ -4,7 +4,13 @@
 \alias{bid_structure}
 \title{Document Dashboard Structure Stage in BID Framework}
 \usage{
-bid_structure(previous_stage, concepts = NULL, telemetry_flags = NULL, ...)
+bid_structure(
+  previous_stage,
+  concepts = NULL,
+  telemetry_flags = NULL,
+  quiet = NULL,
+  ...
+)
 }
 \arguments{
 \item{previous_stage}{A tibble or list output from an earlier BID stage
@@ -19,6 +25,9 @@ detect relevant concepts from previous stages automatically.}
 \item{telemetry_flags}{Optional named list of telemetry flags from bid_flags().
 Used to adjust layout choice and suggestion scoring based on observed
 user behavior patterns.}
+
+\item{quiet}{Logical indicating whether to suppress informational messages.
+If NULL, uses getOption("bidux.quiet", FALSE).}
 
 \item{...}{Additional parameters. If \code{layout} is provided via \code{...}, the
 function will abort with a helpful error message.}

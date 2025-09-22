@@ -18,6 +18,8 @@
 #'        elements will be suggested based on previous stage.
 #' @param user_personas Optional list of user personas to consider in the
 #'        design.
+#' @param quiet Logical indicating whether to suppress informational messages.
+#'        If NULL, uses getOption("bidux.quiet", FALSE).
 #'
 #' @return A tibble containing the documented information for the "Interpret"
 #'         stage.
@@ -66,7 +68,8 @@ bid_interpret <- function(
     previous_stage = NULL,
     central_question,
     data_story = NULL,
-    user_personas = NULL) {
+    user_personas = NULL,
+    quiet = NULL) {
   # parameter validation
   if (!is.null(data_story) && !is.list(data_story)) {
     cli::cli_abort("'data_story' must be a list")
@@ -151,8 +154,9 @@ bid_interpret <- function(
         )
       }
 
-      cli::cli_alert_info(
-        paste0("Suggested central question: ", central_question)
+      bid_alert_info(
+        paste0("Suggested central question: ", central_question),
+        quiet = quiet
       )
     } else if (
       !is.null(previous_stage) &&
@@ -162,15 +166,17 @@ bid_interpret <- function(
       central_question <- paste0(
         "How can we refine our understanding of user needs for this dashboard?"
       )
-      cli::cli_alert_info(
-        paste0("Suggested central question: ", central_question)
+      bid_alert_info(
+        paste0("Suggested central question: ", central_question),
+        quiet = quiet
       )
     } else if (is.null(previous_stage)) {
       central_question <- paste0(
         "How can we improve the user experience of the dashboard?"
       )
-      cli::cli_alert_info(
-        paste0("Suggested central question: ", central_question)
+      bid_alert_info(
+        paste0("Suggested central question: ", central_question),
+        quiet = quiet
       )
     }
   }
@@ -261,8 +267,9 @@ bid_interpret <- function(
         )
       }
 
-      cli::cli_alert_info(
-        "Suggested data story elements based on previous stage information"
+      bid_alert_info(
+        "Suggested data story elements based on previous stage information",
+        quiet = quiet
       )
     } else if (
       !is.null(previous_stage) &&
@@ -278,7 +285,7 @@ bid_interpret <- function(
         "
       )
 
-      cli::cli_alert_info("Suggested generic data story for iteration cycle")
+      bid_alert_info("Suggested generic data story for iteration cycle", quiet = quiet)
     } else if (is.null(previous_stage)) {
       data_story <- list(
         hook = "Dashboard users may not be getting maximum value",
@@ -287,8 +294,9 @@ bid_interpret <- function(
         resolution = "Redesign interface using behavioral science principles"
       )
 
-      cli::cli_alert_info(
-        "Suggested generic data story for new dashboard design"
+      bid_alert_info(
+        "Suggested generic data story for new dashboard design",
+        quiet = quiet
       )
     }
   }
@@ -441,12 +449,13 @@ bid_interpret <- function(
         )
       )
 
-      cli::cli_alert_info(
+      bid_alert_info(
         paste0(
           "Created user persona '",
           user_personas[[1]]$name,
           "' based on audience information"
-        )
+        ),
+        quiet = quiet
       )
     }
   }
@@ -586,7 +595,8 @@ bid_interpret <- function(
       paste0("User personas: ", length(user_personas), " defined")
     } else {
       "No user personas defined"
-    }
+    },
+    quiet = quiet
   )
 
   return(result)

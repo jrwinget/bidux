@@ -12,7 +12,8 @@ bid_validate(
   include_exp_design = TRUE,
   include_telemetry = TRUE,
   telemetry_refs = NULL,
-  include_empower_tools = TRUE
+  include_empower_tools = TRUE,
+  quiet = NULL
 )
 }
 \arguments{
@@ -41,6 +42,9 @@ recommendations with provenance information.}
 
 \item{include_empower_tools}{Logical indicating whether to include
 context-aware empowerment tool suggestions. Default is TRUE.}
+
+\item{quiet}{Logical indicating whether to suppress informational messages.
+If NULL, uses getOption("bidux.quiet", FALSE).}
 }
 \value{
 A tibble containing the documented information for the "Validate"

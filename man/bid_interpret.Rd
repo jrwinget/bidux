@@ -8,7 +8,8 @@ bid_interpret(
   previous_stage = NULL,
   central_question,
   data_story = NULL,
-  user_personas = NULL
+  user_personas = NULL,
+  quiet = NULL
 )
 }
 \arguments{
@@ -28,6 +29,9 @@ elements will be suggested based on previous stage.}
 
 \item{user_personas}{Optional list of user personas to consider in the
 design.}
+
+\item{quiet}{Logical indicating whether to suppress informational messages.
+If NULL, uses getOption("bidux.quiet", FALSE).}
 }
 \value{
 A tibble containing the documented information for the "Interpret"

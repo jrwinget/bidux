@@ -18,6 +18,7 @@ deps
 devtools
 dplyr
 echarts4r
+getOption
 github
 htmlwidgets
 jrwinget
