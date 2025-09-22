@@ -133,6 +133,64 @@ bid_with_quiet <- function(code) {
   force(code)
 }
 
+#' Normalize text formatting for consistent output
+#'
+#' @param text Character string to normalize
+#' @param capitalize_first Logical indicating whether to capitalize first letter
+#' @param remove_trailing_punct Logical indicating whether to remove trailing
+#'        punctuation
+#'
+#' @return Normalized character string
+#'
+#' @keywords internal
+#' @noRd
+normalize_text <- function(
+    text,
+    capitalize_first = TRUE,
+    remove_trailing_punct = TRUE) {
+  if (is.null(text) || length(text) == 0 || all(nchar(trimws(text))) == 0) {
+    return(text)
+  }
+
+  # trim whitespace
+  text <- trimws(text)
+
+  # remove trailing punctuation if requested
+  if (remove_trailing_punct) {
+    text <- gsub("[.!?]+$", "", text)
+  }
+
+  # capitalize first letter if requested
+  if (capitalize_first && nchar(text) > 0) {
+    substring(text, 1, 1) <- toupper(substring(text, 1, 1))
+  }
+
+  return(text)
+}
+
+#' Format suggestion text with proper capitalization and punctuation
+#'
+#' @param suggestions Character vector of suggestion texts
+#' @param separator Character string to use for joining
+#'
+#' @return Properly formatted character string
+#'
+#' @keywords internal
+#' @noRd
+format_suggestions <- function(suggestions, separator = ", ") {
+  if (length(suggestions) == 0) {
+    return("")
+  }
+
+  # normalize each suggestion
+  normalized_suggestions <- vapply(suggestions, function(s) {
+    normalize_text(s, capitalize_first = TRUE, remove_trailing_punct = TRUE)
+  }, character(1))
+
+  # join with separator
+  paste(normalized_suggestions, collapse = separator)
+}
+
 #' Quiet-aware wrapper for cli::cli_alert_info
 #'
 #' @param ... Arguments passed to cli::cli_alert_info
@@ -376,8 +434,9 @@ validate_bid_stage_params <- function(
 
 #' Validate previous stage follows BID framework flow
 #'
-#' @param previous_stage The previous stage, either a bid_stage/tibble with a 'stage' column,
-#'        or a single character string naming the stage, or NULL if fresh start.
+#' @param previous_stage The previous stage, either a bid_stage/tibble with a
+#'        'stage' column, or a single character string naming the stage, or NULL
+#'        if fresh start.
 #' @param current_stage The current stage name (character)
 #'
 #' @return NULL invisibly if check passes, otherwise stops or warns
@@ -385,7 +444,7 @@ validate_bid_stage_params <- function(
 #' @keywords internal
 #' @noRd
 validate_previous_stage <- function(previous_stage = NULL, current_stage) {
-  # Define the five valid stage names in the correct order (0.3.0+)
+  # define the 5 stage names
   valid_stages <- c(
     "Interpret",
     "Notice",
@@ -393,9 +452,10 @@ validate_previous_stage <- function(previous_stage = NULL, current_stage) {
     "Structure",
     "Validate"
   )
+
   stage_order <- valid_stages
 
-  # 1) Check that current_stage is exactly one of the five
+  # 1) check current_stage is exactly 1 stage
   if (
     !(is.character(current_stage) &&
       length(current_stage) == 1 &&
@@ -408,13 +468,13 @@ validate_previous_stage <- function(previous_stage = NULL, current_stage) {
     ))
   }
 
-  # 2) If previous_stage is NULL:
-  #    - Only allow silently if current_stage == "Interpret" (first stage in 0.3.0+)
+  # 2) if previous_stage is NULL, silently allow only if current_stage is
+  #    Interpret
   if (is.null(previous_stage)) {
     if (current_stage == "Interpret") {
       return(invisible(NULL))
     } else {
-      # Not Interpret but no previous provided → issue warning about unusual progression
+      # not Interpret but no previous provided → issue warning
       warning(
         paste0(
           "Unusual stage progression: (none) -> ",
@@ -426,7 +486,7 @@ validate_previous_stage <- function(previous_stage = NULL, current_stage) {
     }
   }
 
-  # 3) Coerce previous_stage into a single character stage name
+  # 3) coerce previous_stage into a single character stage name
   if (inherits(previous_stage, "bid_stage")) {
     prev_stage_name <- attr(previous_stage, "stage")
   } else if (
@@ -437,7 +497,7 @@ validate_previous_stage <- function(previous_stage = NULL, current_stage) {
   } else if (is.character(previous_stage) && length(previous_stage) == 1) {
     prev_stage_name <- previous_stage
   } else {
-    # Better error message for unsupported previous_stage formats
+    # error message for unsupported previous_stage formats
     stage_type <- if (is.data.frame(previous_stage)) {
       "data.frame without 'stage' column"
     } else if (is.list(previous_stage)) {
@@ -446,12 +506,12 @@ validate_previous_stage <- function(previous_stage = NULL, current_stage) {
       class(previous_stage)[1]
     }
     stop(paste0(
-      "previous_stage must be a bid_stage object, data.frame/tibble with 'stage' column, ",
-      "or single character string. Got: ", stage_type
+      "previous_stage must be a bid_stage object, data.frame/tibble with ",
+      "'stage' column, or single character string. Got: ", stage_type
     ), call. = FALSE)
   }
 
-  # 4) Ensure prev_stage_name is one of the five valid stages
+  # 4) ensure prev_stage_name is 1 of the 5 valid stages
   if (!(prev_stage_name %in% valid_stages)) {
     stop(standard_error_msg(
       "invalid_stage",
@@ -460,9 +520,9 @@ validate_previous_stage <- function(previous_stage = NULL, current_stage) {
     ))
   }
 
-  # 5) Stage flow validation based on BID framework rules
+  # 5) stage flow validation based on BID framework rules
 
-  # Define allowed transitions based on BID workflow
+  # allowed transitions
   allowed_transitions <- list(
     "Interpret" = c("Validate"),  # can be blank (handled above) or iterative from Validate
     "Notice" = c("Interpret", "Notice", "Anticipate", "Structure"),  # inner stages flexible
@@ -471,17 +531,17 @@ validate_previous_stage <- function(previous_stage = NULL, current_stage) {
     "Validate" = c("Notice", "Anticipate", "Structure", "Interpret")  # accepts inner stages and allows iterative flow to Interpret
   )
 
-  # Skip stage progression warnings during tests (except explicit validation tests)
+  # skip stage progression warnings during tests (except explicit validation tests)
   in_test_env <- identical(Sys.getenv("TESTTHAT"), "true")
   calling_test <- if (in_test_env) {
-    # Check if we're being called from a validation test by examining call stack
+    # check if we're being called from a validation test by examining call stack
     call_stack <- sapply(sys.calls(), function(x) paste(deparse(x), collapse = ""))
     any(grepl("validate_previous_stage.*works|utility.*functions.*integrate", call_stack))
   } else {
     FALSE
   }
 
-  # Check if the transition is allowed
+  # check if the transition is allowed
   if (!prev_stage_name %in% allowed_transitions[[current_stage]]) {
     if (!in_test_env || calling_test) {
       warning(
@@ -499,7 +559,7 @@ validate_previous_stage <- function(previous_stage = NULL, current_stage) {
       )
     }
   } else {
-    # Check for discouraged but valid transitions
+    # check for discouraged but valid transitions
     discouraged_transitions <- list(
       "Structure" = c("Interpret"),  # Structure should ideally have Notice/Anticipate first
       "Validate" = c("Interpret")    # Validate should go through inner stages first
@@ -1291,7 +1351,12 @@ parse_next_steps <- function(next_steps_formatted) {
   if (is.character(telemetry_refs)) {
     # simple character vector
     refs_text <- paste(telemetry_refs, collapse = ", ")
-    return(paste0("Track specific metrics identified in telemetry analysis: ", refs_text))
+    return(
+      paste0(
+        "Track specific metrics identified in telemetry analysis: ",
+        refs_text
+      )
+    )
 
   } else if (is.list(telemetry_refs)) {
     # named list with more structured references
