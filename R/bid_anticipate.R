@@ -425,14 +425,14 @@ bid_anticipate <- function(
         nrow(bias_info) > 0
     ) {
       implementation <- paste(
-        bias_name,
+        tools::toTitleCase(bias_name),
         "mitigation:",
-        bias_info$implementation_tips
+        normalize_text(bias_info$implementation_tips, remove_trailing_punct = TRUE)
       )
     } else {
       implementation <- paste(
-        bias_name,
-        "mitigation: Consider how this bias affects user decisions."
+        tools::toTitleCase(bias_name),
+        "mitigation: Consider how this bias affects user decisions"
       )
     }
 
@@ -542,9 +542,8 @@ bid_anticipate <- function(
     },
     paste(
       "Key suggestions:",
-      paste(
-        bias_suggestions[seq_len(min(3, length(bias_suggestions)))],
-        collapse = ", "
+      format_suggestions(
+        bias_suggestions[seq_len(min(3, length(bias_suggestions)))]
       )
     ),
     quiet = quiet
