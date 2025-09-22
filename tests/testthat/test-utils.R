@@ -327,19 +327,19 @@ test_that("validate_character_param works correctly", {
   # Valid character parameters
   expect_silent(validate_character_param("test", "param"))
   expect_silent(validate_character_param("  test  ", "param"))
-  
+
   # NULL handling
   expect_error(validate_character_param(NULL, "param", allow_null = FALSE))
   expect_silent(validate_character_param(NULL, "param", allow_null = TRUE))
-  
+
   # Non-character inputs
   expect_error(validate_character_param(123, "param"))
   expect_error(validate_character_param(c("a", "b"), "param"))
-  
+
   # Empty/whitespace strings
   expect_error(validate_character_param("", "param"))
   expect_error(validate_character_param("   ", "param"))
-  
+
   # Minimum length validation
   expect_silent(validate_character_param("test", "param", min_length = 3))
   expect_error(validate_character_param("ab", "param", min_length = 3))
@@ -349,15 +349,15 @@ test_that("validate_list_param works correctly", {
   # Valid list parameters
   test_list <- list(a = 1, b = 2)
   expect_silent(validate_list_param(test_list, "param"))
-  
+
   # NULL handling
   expect_silent(validate_list_param(NULL, "param", allow_null = TRUE))
   expect_error(validate_list_param(NULL, "param", allow_null = FALSE))
-  
+
   # Non-list inputs
   expect_error(validate_list_param("not a list", "param"))
   expect_error(validate_list_param(123, "param"))
-  
+
   # Required names validation
   expect_silent(validate_list_param(test_list, "param", required_names = c("a")))
   expect_error(validate_list_param(test_list, "param", required_names = c("missing")))
@@ -368,11 +368,11 @@ test_that("validate_logical_param works correctly", {
   # Valid logical parameters
   expect_silent(validate_logical_param(TRUE, "param"))
   expect_silent(validate_logical_param(FALSE, "param"))
-  
+
   # NULL handling
   expect_silent(validate_logical_param(NULL, "param", allow_null = TRUE))
   expect_error(validate_logical_param(NULL, "param", allow_null = FALSE))
-  
+
   # Non-logical inputs
   expect_error(validate_logical_param("true", "param"))
   expect_error(validate_logical_param(1, "param"))
@@ -388,7 +388,7 @@ test_that("is_empty works correctly", {
   expect_true(is_empty(character(0)))
   expect_true(is_empty(c(NA, NA)))
   expect_true(is_empty(list())) # empty list is empty
-  
+
   # Non-empty cases
   expect_false(is_empty("test"))
   expect_false(is_empty("  test  "))
@@ -403,18 +403,18 @@ test_that("standard_error_msg generates proper messages", {
   expect_match(msg1, "Required parameter")
   expect_match(msg1, "test_param")
   expect_match(msg1, "must be provided")
-  
+
   # Invalid parameter errors
   msg2 <- standard_error_msg("invalid_param", "test_param", "character", "numeric")
   expect_match(msg2, "Parameter")
   expect_match(msg2, "test_param")
   expect_match(msg2, "invalid")
-  
+
   # Invalid stage errors
   msg3 <- standard_error_msg("invalid_stage", NULL, c("A", "B"), "C")
   expect_match(msg3, "Invalid stage")
   expect_match(msg3, "Must be one of")
-  
+
   # Default case
   msg4 <- standard_error_msg("unknown_type")
   expect_match(msg4, "error occurred")
@@ -425,13 +425,13 @@ test_that("safe_check works correctly", {
   expect_true(safe_check("test"))
   expect_true(safe_check(123))
   expect_true(safe_check(c(1, 2, 3)))
-  
+
   # Invalid objects
   expect_false(safe_check(NULL))
   expect_false(safe_check(character(0)))
   expect_false(safe_check(NA))
   expect_false(safe_check(c(NA, NA)))
-  
+
   # With condition functions
   expect_true(safe_check("test", function(x) is.character(x)))
   expect_false(safe_check(123, function(x) is.character(x)))
@@ -441,7 +441,7 @@ test_that("safe_check works correctly", {
 test_that("safe_df_check works correctly", {
   test_df <- data.frame(a = 1:3, b = letters[1:3])
   empty_df <- data.frame()
-  
+
   expect_true(safe_df_check(test_df))
   expect_true(safe_df_check(test_df, min_rows = 2))
   expect_false(safe_df_check(test_df, min_rows = 5))
@@ -452,18 +452,18 @@ test_that("safe_df_check works correctly", {
 
 test_that("safe_column_access works correctly", {
   test_df <- data.frame(a = c(1, 2), b = c("x", "y"), c = c(NA, "z"), d = c(NA, NA))
-  
+
   # Valid column access
   expect_equal(safe_column_access(test_df, "a"), 1)
   expect_equal(safe_column_access(test_df, "b"), "x")
-  
+
   # Invalid column access
   expect_equal(safe_column_access(test_df, "missing", "default"), "default")
   expect_equal(safe_column_access(NULL, "a", "default"), "default")
-  
+
   # NA handling - first value is NA but not all are NA, so returns first value (NA)
   expect_equal(safe_column_access(test_df, "c", default = "custom"), NA_character_)
-  
+
   # All values are NA, so returns default
   expect_equal(safe_column_access(test_df, "d", "custom"), "custom")
 })
@@ -475,12 +475,12 @@ test_that("extract_stage_data works correctly", {
     evidence = "Test evidence",
     missing_col = "not extracted"
   )
-  
+
   columns <- c("problem", "evidence", "nonexistent")
   defaults <- list(nonexistent = "default_value")
-  
+
   result <- extract_stage_data(test_stage, columns, defaults)
-  
+
   expect_equal(result$problem, "Test problem")
   expect_equal(result$evidence, "Test evidence")
   expect_equal(result$nonexistent, "default_value")
@@ -492,7 +492,7 @@ test_that("get_stage_metadata works correctly", {
   expect_equal(metadata$stage_number, 3)
   expect_equal(metadata$total_stages, 5)
   expect_equal(metadata$validation_status, "completed")
-  
+
   # With custom metadata
   custom <- list(custom_field = "test")
   metadata_custom <- get_stage_metadata(2, custom)
@@ -503,12 +503,12 @@ test_that("get_stage_metadata works correctly", {
 test_that("safe_list_access works correctly", {
   test_list <- list(a = 1, b = "test", c = NULL)
   test_vector <- c(1, 2, 3)
-  
+
   # Valid access
   expect_equal(safe_list_access(test_list, "a"), 1)
   expect_equal(safe_list_access(test_list, 1), 1)
   expect_equal(safe_list_access(test_vector, 2), 2)
-  
+
   # Invalid access
   expect_equal(safe_list_access(test_list, "missing", "default"), "default")
   expect_equal(safe_list_access(test_list, 10, "default"), "default")
@@ -521,7 +521,7 @@ test_that("safe_string_check works correctly", {
   expect_true(safe_string_check("test"))
   expect_true(safe_string_check(c("a", "b")))
   expect_true(safe_string_check("test", min_length = 3))
-  
+
   # Invalid strings
   expect_false(safe_string_check("a", min_length = 3))
   expect_false(safe_string_check(NULL))
@@ -536,21 +536,21 @@ test_that("find_best_concept_match works correctly", {
     mock_concepts <- tibble::tibble(
       concept = c("Visual Hierarchy", "Cognitive Load Theory", "Principle of Proximity")
     )
-    
+
     # Exact match
     expect_equal(find_best_concept_match("Visual Hierarchy", mock_concepts), "Visual Hierarchy")
-    
+
     # Case insensitive match
     expect_equal(find_best_concept_match("visual hierarchy", mock_concepts), "Visual Hierarchy")
-    
+
     # Partial match
     result <- find_best_concept_match("visual", mock_concepts)
     expect_true(is.character(result) || is.null(result))
-    
+
     # No match
     no_match <- find_best_concept_match("nonexistent", mock_concepts)
     expect_true(is.null(no_match))
-    
+
     # Invalid input
     expect_null(find_best_concept_match("", mock_concepts))
     expect_null(find_best_concept_match(NA, mock_concepts))
@@ -569,15 +569,15 @@ test_that("normalize_previous_stage works correctly", {
       previous_audience = "Test audience",
       timestamp = Sys.time()
     )
-    
+
     result <- normalize_previous_stage(test_tibble)
     expect_s3_class(result, "tbl_df")
     expect_true("previous_central_question" %in% names(result))
     expect_false("previous_question" %in% names(result))
-    
+
     # Test with NULL
     expect_null(normalize_previous_stage(NULL))
-    
+
     # Test with bid_stage object
     if (exists("bid_stage")) {
       bid_obj <- bid_stage("Notice", test_tibble)
@@ -598,15 +598,15 @@ test_that("get_audience_from_previous works correctly", {
       target_audience = "Secondary audience",
       timestamp = Sys.time()
     )
-    
+
     result <- get_audience_from_previous(test_data)
     expect_true(is.character(result))
     expect_false(is.na(result))
-    
+
     # Test with NULL
     result_null <- get_audience_from_previous(NULL)
     expect_true(is.na(result_null))
-    
+
     # Test with no audience fields
     no_audience <- tibble::tibble(stage = "Notice", problem = "Test", timestamp = Sys.time())
     result_empty <- get_audience_from_previous(no_audience)
@@ -620,16 +620,16 @@ test_that("format_next_steps works correctly", {
   if (exists("format_next_steps")) {
     # Single string
     expect_equal(format_next_steps("Step 1"), "Step 1")
-    
+
     # Multiple strings
     expect_equal(format_next_steps(c("Step 1", "Step 2")), "Step 1; Step 2")
-    
+
     # Already formatted
     expect_equal(format_next_steps("Step 1; Step 2"), "Step 1; Step 2")
-    
+
     # NULL input
     expect_true(is.na(format_next_steps(NULL)))
-    
+
     # Other types
     expect_equal(format_next_steps(c(1, 2, 3)), "1; 2; 3")
   } else {
@@ -642,11 +642,11 @@ test_that("parse_next_steps works correctly", {
     # Semicolon separated
     result1 <- parse_next_steps("Step 1; Step 2; Step 3")
     expect_equal(result1, c("Step 1", "Step 2", "Step 3"))
-    
+
     # Single step
     result2 <- parse_next_steps("Single step")
     expect_equal(result2, "Single step")
-    
+
     # NULL/NA input
     expect_equal(parse_next_steps(NULL), character(0))
     expect_equal(parse_next_steps(NA), character(0))
@@ -662,25 +662,25 @@ test_that("validate_user_personas works correctly", {
       list(name = "Analyst", goals = "Analyze data", pain_points = "Complex UI", technical_level = "Advanced"),
       list(name = "Manager", goals = "Review reports", pain_points = "Time constraints", technical_level = "Intermediate")
     )
-    
+
     expect_true(validate_user_personas(valid_personas))
-    
+
     # Valid personas missing some recommended fields (will generate warnings)
     partial_personas <- list(
       list(name = "Valid", goals = "Test goals", pain_points = "Test pain points", technical_level = "Beginner")
     )
-    
+
     expect_true(validate_user_personas(partial_personas))
-    
+
     # Invalid personas - not a list
     expect_error(validate_user_personas("not a list"))
-    
+
     # Invalid persona structure - suppress warnings for missing fields since we expect the error
     invalid_personas <- list(
       list(name = "Valid", goals = "Test goals", pain_points = "Test pain points", technical_level = "Beginner"),
       list(goals = "No name field", pain_points = "Test pain points", technical_level = "Beginner")
     )
-    
+
     expect_error(validate_user_personas(invalid_personas))
   } else {
     skip("validate_user_personas function does not exist")
@@ -693,12 +693,12 @@ test_that("get_accessibility_advice works correctly", {
     expect_match(get_accessibility_advice("tabs"), "keyboard navigation")
     expect_match(get_accessibility_advice("grid"), "screen readers")
     expect_match(get_accessibility_advice("card"), "focus management")
-    
+
     # Unknown/NULL layout
     result <- get_accessibility_advice("unknown")
     expect_true(is.character(result))
     expect_gt(nchar(result), 0)
-    
+
     result_null <- get_accessibility_advice(NULL)
     expect_true(is.character(result_null))
     expect_gt(nchar(result_null), 0)
@@ -712,12 +712,12 @@ test_that("format_accessibility_for_storage works correctly", {
     # String input
     result1 <- format_accessibility_for_storage("High contrast colors")
     expect_true(is.character(result1) || is.na(result1))
-    
+
     # List input
     acc_list <- list(contrast = "AA", keyboard = "full")
     result2 <- format_accessibility_for_storage(acc_list)
     expect_true(is.character(result2) || is.na(result2))
-    
+
     # NULL input
     result3 <- format_accessibility_for_storage(NULL)
     expect_true(is.na(result3))
@@ -734,4 +734,55 @@ test_that("time wrapper .now works correctly", {
   } else {
     skip(".now function does not exist")
   }
+})
+
+test_that("basic normalization works", {
+  expect_equal(
+    normalize_text(" hello world. "),
+    "Hello world"
+  )
+  expect_equal(
+    normalize_text("hi!", capitalize_first = FALSE),
+    "hi"
+  )
+})
+
+test_that("capitalization toggle respected", {
+  expect_equal(
+    normalize_text("hello", capitalize_first = FALSE),
+    "hello"
+  )
+  expect_equal(
+    normalize_text("Hello", capitalize_first = TRUE),
+    "Hello"
+  )
+})
+
+test_that("trailing punctuation removal toggle respected", {
+  expect_equal(
+    normalize_text("hi!", remove_trailing_punct = FALSE),
+    "Hi!"
+  )
+  expect_equal(
+    normalize_text("wow???", remove_trailing_punct = TRUE),
+    "Wow"
+  )
+})
+
+test_that("handles empty or null-like inputs", {
+  expect_null(normalize_text(NULL))
+  expect_equal(normalize_text(character(0)), character(0))
+  expect_equal(normalize_text("   "), "   ") # whitespace-only string returns as-is
+})
+
+test_that("works with non-punct trailing characters", {
+  expect_equal(
+    normalize_text("hello world#"),
+    "Hello world#"
+  )
+})
+
+test_that("single-character input handled", {
+  expect_equal(normalize_text("a"), "A")
+  expect_equal(normalize_text("a!"), "A")
 })
