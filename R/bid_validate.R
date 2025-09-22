@@ -22,6 +22,8 @@
 #'        recommendations with provenance information.
 #' @param include_empower_tools Logical indicating whether to include
 #'        context-aware empowerment tool suggestions. Default is TRUE.
+#' @param quiet Logical indicating whether to suppress informational messages.
+#'        If NULL, uses getOption("bidux.quiet", FALSE).
 #'
 #' @return A tibble containing the documented information for the "Validate"
 #'         stage.
@@ -64,7 +66,8 @@ bid_validate <- function(
     include_exp_design = TRUE,
     include_telemetry = TRUE,
     telemetry_refs = NULL,
-    include_empower_tools = TRUE) {
+    include_empower_tools = TRUE,
+    quiet = NULL) {
   validate_required_params(previous_stage = previous_stage)
   validate_previous_stage(previous_stage, "Validate")
 
@@ -75,7 +78,7 @@ bid_validate <- function(
 
   if (is.null(summary_panel)) {
     summary_panel <- generate_summary_panel_suggestion(previous_stage)
-    cli::cli_alert_info(paste0("Suggested summary panel: ", summary_panel))
+    bid_alert_info(paste0("Suggested summary panel: ", summary_panel), quiet = quiet)
   }
 
   if (is.null(collaboration)) {
@@ -83,10 +86,10 @@ bid_validate <- function(
       previous_stage,
       include_empower_tools
     )
-    cli::cli_alert_info(paste0(
+    bid_alert_info(paste0(
       "Suggested collaboration features: ",
       collaboration
-    ))
+    ), quiet = quiet)
   }
 
   if (is.null(next_steps)) {
@@ -96,7 +99,7 @@ bid_validate <- function(
       include_telemetry,
       telemetry_refs
     )
-    cli::cli_alert_info("Suggested next steps:")
+    bid_alert_info("Suggested next steps:", quiet = quiet)
     for (step in next_steps) {
       cli::cli_li(step)
     }
@@ -165,7 +168,8 @@ bid_validate <- function(
       length(parse_next_steps(next_steps_formatted)),
       " items defined"
     ),
-    suggestions
+    suggestions,
+    quiet = quiet
   )
 
   return(result)

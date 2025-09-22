@@ -14,6 +14,8 @@
 #'        theory mappings.
 #' @param evidence A character string describing evidence supporting the
 #'        problem.
+#' @param quiet Logical indicating whether to suppress informational messages.
+#'        If NULL, uses getOption("bidux.quiet", FALSE).
 #' @param ... Additional parameters. Deprecated parameters (e.g.,
 #'        'target_audience') will generate warnings if provided.
 #'
@@ -52,6 +54,7 @@ bid_notice <- function(
     problem,
     theory = NULL,
     evidence = NULL,
+    quiet = NULL,
     ...) {
   # handle deprecated target_audience parameter via ...
   dots <- list(...)
@@ -173,7 +176,8 @@ bid_notice <- function(
     if (auto_suggested_theory) {
       paste0("Theory confidence: ", round(theory_confidence * 100), "%")
     },
-    "Next: Use bid_anticipate() for Stage 3"
+    "Next: Use bid_anticipate() for Stage 3",
+    quiet = quiet
   )
 
   return(result)

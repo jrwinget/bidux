@@ -4,7 +4,14 @@
 \alias{bid_notice}
 \title{Document User Notice Stage in BID Framework}
 \usage{
-bid_notice(previous_stage, problem, theory = NULL, evidence = NULL, ...)
+bid_notice(
+  previous_stage,
+  problem,
+  theory = NULL,
+  evidence = NULL,
+  quiet = NULL,
+  ...
+)
 }
 \arguments{
 \item{previous_stage}{A tibble or list output from the previous BID stage
@@ -18,6 +25,9 @@ theory mappings.}
 
 \item{evidence}{A character string describing evidence supporting the
 problem.}
+
+\item{quiet}{Logical indicating whether to suppress informational messages.
+If NULL, uses getOption("bidux.quiet", FALSE).}
 
 \item{...}{Additional parameters. Deprecated parameters (e.g.,
 'target_audience') will generate warnings if provided.}
