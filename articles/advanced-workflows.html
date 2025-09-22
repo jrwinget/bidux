@@ -160,9 +160,6 @@ applying the BID framework to each is time-intensive.</p>
 <span>  <span class="co"># Stage 5: Validate with domain-specific next steps</span></span>
 <span>  <span class="va">validate_stage</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_validate.html">bid_validate</a></span><span class="op">(</span></span>
 <span>    previous_stage <span class="op">=</span> <span class="va">structure_stage</span>,</span>
-<span>    summary_panel <span class="op">=</span> <span class="fu">generate_summary_panel</span><span class="op">(</span><span class="va">dashboard_config</span><span class="op">)</span>,</span>
-<span>    collaboration <span class="op">=</span> <span class="fu">get_collaboration_features</span><span class="op">(</span><span class="va">dashboard_config</span><span class="op">$</span><span class="va">team_size</span><span class="op">)</span>,</span>
-<span>    next_steps <span class="op">=</span> <span class="fu">generate_next_steps</span><span class="op">(</span><span class="va">dashboard_config</span>, <span class="va">structure_stage</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">validate_stage</span><span class="op">)</span></span>
@@ -688,39 +685,35 @@ applying the BID framework to each is time-intensive.</p>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">bid_security_stage</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="co"># Example: Accessibility-focused BID stage</span></span>
-<span><span class="va">bid_accessibility</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
+<span><span class="co"># Example: Accessibility-focused analysis using existing functions</span></span>
+<span><span class="va">create_accessibility_analysis</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
 <span>    <span class="va">previous_stage</span>,</span>
 <span>    <span class="va">wcag_level</span> <span class="op">=</span> <span class="st">"AA"</span>,</span>
 <span>    <span class="va">assistive_tech_support</span> <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    <span class="va">target_disabilities</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"visual"</span>, <span class="st">"motor"</span>, <span class="st">"cognitive"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu">validate_previous_stage</span><span class="op">(</span><span class="va">previous_stage</span>, <span class="st">"Accessibility"</span><span class="op">)</span></span>
 <span></span>
-<span>  <span class="co"># Comprehensive accessibility analysis</span></span>
-<span>  <span class="va">accessibility_audit</span> <span class="op">&lt;-</span> <span class="fu">perform_accessibility_audit</span><span class="op">(</span></span>
-<span>    previous_stage <span class="op">=</span> <span class="va">previous_stage</span>,</span>
-<span>    wcag_level <span class="op">=</span> <span class="va">wcag_level</span>,</span>
-<span>    target_disabilities <span class="op">=</span> <span class="va">target_disabilities</span></span>
+<span>  <span class="co"># Use existing bid_concept function to get accessibility recommendations</span></span>
+<span>  <span class="va">contrast_info</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_concept.html">bid_concept</a></span><span class="op">(</span><span class="st">"Accessibility Contrast"</span><span class="op">)</span></span>
+<span>  <span class="va">keyboard_info</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_concept.html">bid_concept</a></span><span class="op">(</span><span class="st">"Keyboard Navigation"</span><span class="op">)</span></span>
+<span>  <span class="va">screen_reader_info</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_concept.html">bid_concept</a></span><span class="op">(</span><span class="st">"Screen Reader Compatibility"</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="co"># Create basic accessibility recommendations using existing concepts</span></span>
+<span>  <span class="va">accessibility_recommendations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="va">contrast_info</span><span class="op">$</span><span class="va">implementation_tips</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>    <span class="va">keyboard_info</span><span class="op">$</span><span class="va">implementation_tips</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>    <span class="va">screen_reader_info</span><span class="op">$</span><span class="va">implementation_tips</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
-<span>  <span class="co"># Generate specific recommendations</span></span>
-<span>  <span class="va">a11y_recommendations</span> <span class="op">&lt;-</span> <span class="fu">generate_accessibility_recommendations</span><span class="op">(</span></span>
-<span>    audit_results <span class="op">=</span> <span class="va">accessibility_audit</span>,</span>
-<span>    layout <span class="op">=</span> <span class="fu">safe_column_access</span><span class="op">(</span><span class="va">previous_stage</span>, <span class="st">"layout"</span><span class="op">)</span>,</span>
-<span>    existing_concepts <span class="op">=</span> <span class="fu">safe_column_access</span><span class="op">(</span><span class="va">previous_stage</span>, <span class="st">"concepts"</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span></span>
-<span>  <span class="va">result_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
-<span>    stage <span class="op">=</span> <span class="st">"Accessibility"</span>,</span>
+<span>  <span class="co"># Create a summary rather than a bid_stage since this is just an example</span></span>
+<span>  <span class="va">accessibility_analysis</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    wcag_level <span class="op">=</span> <span class="va">wcag_level</span>,</span>
 <span>    assistive_tech_support <span class="op">=</span> <span class="va">assistive_tech_support</span>,</span>
-<span>    accessibility_score <span class="op">=</span> <span class="va">accessibility_audit</span><span class="op">$</span><span class="va">overall_score</span>,</span>
-<span>    recommendations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">a11y_recommendations</span>, collapse <span class="op">=</span> <span class="st">"; "</span><span class="op">)</span>,</span>
-<span>    critical_issues <span class="op">=</span> <span class="va">accessibility_audit</span><span class="op">$</span><span class="va">critical_issues_count</span>,</span>
-<span>    timestamp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>    target_disabilities <span class="op">=</span> <span class="va">target_disabilities</span>,</span>
+<span>    recommendations <span class="op">=</span> <span class="va">accessibility_recommendations</span>,</span>
+<span>    concepts_referenced <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Accessibility Contrast"</span>, <span class="st">"Keyboard Navigation"</span>, <span class="st">"Screen Reader Compatibility"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="../reference/bid_stage.html">bid_stage</a></span><span class="op">(</span><span class="st">"Accessibility"</span>, <span class="va">result_data</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">accessibility_analysis</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># Integration with main BID workflow</span></span>
@@ -744,13 +737,14 @@ applying the BID framework to each is time-intensive.</p>
 <span></span>
 <span>  <span class="va">structure_stage</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_structure.html">bid_structure</a></span><span class="op">(</span>previous_stage <span class="op">=</span> <span class="va">anticipate_stage</span><span class="op">)</span></span>
 <span></span>
-<span>  <span class="co"># Custom stages</span></span>
+<span>  <span class="co"># Custom accessibility analysis</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="va">config</span><span class="op">$</span><span class="va">include_accessibility</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">accessibility_stage</span> <span class="op">&lt;-</span> <span class="fu">bid_accessibility</span><span class="op">(</span></span>
+<span>    <span class="va">accessibility_analysis</span> <span class="op">&lt;-</span> <span class="fu">create_accessibility_analysis</span><span class="op">(</span></span>
 <span>      previous_stage <span class="op">=</span> <span class="va">structure_stage</span>,</span>
 <span>      wcag_level <span class="op">=</span> <span class="va">config</span><span class="op">$</span><span class="va">accessibility_requirements</span><span class="op">$</span><span class="va">wcag_level</span></span>
 <span>    <span class="op">)</span></span>
-<span>    <span class="va">final_stage</span> <span class="op">&lt;-</span> <span class="va">accessibility_stage</span></span>
+<span>    <span class="co"># Note: This analysis can inform the validate stage</span></span>
+<span>    <span class="va">final_stage</span> <span class="op">&lt;-</span> <span class="va">structure_stage</span></span>
 <span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
 <span>    <span class="va">final_stage</span> <span class="op">&lt;-</span> <span class="va">structure_stage</span></span>
 <span>  <span class="op">}</span></span>
@@ -850,16 +844,45 @@ applying the BID framework to each is time-intensive.</p>
 <h3 id="systematic-documentation">1. Systematic Documentation<a class="anchor" aria-label="anchor" href="#systematic-documentation"></a>
 </h3>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Create comprehensive BID documentation</span></span>
+<code class="sourceCode R"><span><span class="co"># Helper function to extract BID stage summary using existing functions</span></span>
+<span><span class="va">extract_bid_summary</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">bid_result</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits</a></span><span class="op">(</span><span class="va">bid_result</span>, <span class="st">"bid_stage"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># Single stage, extract key information</span></span>
+<span>    <span class="va">stage_info</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      stage <span class="op">=</span> <span class="fu"><a href="../reference/get_stage.html">get_stage</a></span><span class="op">(</span><span class="va">bid_result</span><span class="op">)</span>,</span>
+<span>      timestamp <span class="op">=</span> <span class="va">bid_result</span><span class="op">$</span><span class="va">timestamp</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>      key_fields <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">bid_result</span><span class="op">)</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">bid_result</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"stage"</span>, <span class="st">"timestamp"</span><span class="op">)</span><span class="op">]</span></span>
+<span>    <span class="op">)</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">stage_info</span><span class="op">)</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">is.list</a></span><span class="op">(</span><span class="va">bid_result</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># Multiple stages, summarize each</span></span>
+<span>    <span class="va">summary_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">bid_result</span>, <span class="kw">function</span><span class="op">(</span><span class="va">stage</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits</a></span><span class="op">(</span><span class="va">stage</span>, <span class="st">"bid_stage"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>          stage <span class="op">=</span> <span class="fu"><a href="../reference/get_stage.html">get_stage</a></span><span class="op">(</span><span class="va">stage</span><span class="op">)</span>,</span>
+<span>          timestamp <span class="op">=</span> <span class="va">stage</span><span class="op">$</span><span class="va">timestamp</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
+<span>        <span class="op">)</span></span>
+<span>      <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>stage <span class="op">=</span> <span class="st">"unknown"</span>, timestamp <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span>
+<span>      <span class="op">}</span></span>
+<span>    <span class="op">}</span><span class="op">)</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">summary_list</span><span class="op">)</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>error <span class="op">=</span> <span class="st">"Unable to extract summary from provided object"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="co"># Create comprehensive BID documentation</span></span>
 <span><span class="va">document_bid_decisions</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">bid_result</span>, <span class="va">project_context</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">documentation</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    project_overview <span class="op">=</span> <span class="va">project_context</span>,</span>
 <span>    bid_stages_summary <span class="op">=</span> <span class="fu">extract_bid_summary</span><span class="op">(</span><span class="va">bid_result</span><span class="op">)</span>,</span>
-<span>    key_decisions <span class="op">=</span> <span class="fu">extract_key_decisions</span><span class="op">(</span><span class="va">bid_result</span><span class="op">)</span>,</span>
-<span>    behavioral_science_rationale <span class="op">=</span> <span class="fu">extract_behavioral_rationale</span><span class="op">(</span><span class="va">bid_result</span><span class="op">)</span>,</span>
-<span>    implementation_guidelines <span class="op">=</span> <span class="fu">generate_implementation_guide</span><span class="op">(</span><span class="va">bid_result</span><span class="op">)</span>,</span>
-<span>    success_metrics <span class="op">=</span> <span class="fu">define_success_metrics</span><span class="op">(</span><span class="va">bid_result</span><span class="op">)</span>,</span>
-<span>    iteration_plan <span class="op">=</span> <span class="fu">create_iteration_plan</span><span class="op">(</span><span class="va">bid_result</span><span class="op">)</span></span>
+<span>    <span class="co"># Use existing bid_report functionality instead of custom functions</span></span>
+<span>    detailed_report <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits</a></span><span class="op">(</span><span class="va">bid_result</span>, <span class="st">"bid_stage"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="st">"Use bid_report(bid_result) for detailed documentation"</span></span>
+<span>    <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>      <span class="st">"Provide bid_stage object to generate detailed report"</span></span>
+<span>    <span class="op">}</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">documentation</span><span class="op">)</span></span>
@@ -869,13 +892,36 @@ applying the BID framework to each is time-intensive.</p>
 <h3 id="collaborative-workflows">2. Collaborative Workflows<a class="anchor" aria-label="anchor" href="#collaborative-workflows"></a>
 </h3>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Enable team collaboration on BID analysis</span></span>
+<code class="sourceCode R"><span><span class="co"># Helper function for consensus building using existing concepts</span></span>
+<span><span class="va">build_consensus_on_bid_decisions</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">team_members</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># Use existing bid_concept to get collaboration guidance</span></span>
+<span>  <span class="va">cooperation_info</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_concept.html">bid_concept</a></span><span class="op">(</span><span class="st">"Cooperation &amp; Coordination"</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="va">consensus_framework</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    team_size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">team_members</span><span class="op">)</span>,</span>
+<span>    collaboration_approach <span class="op">=</span> <span class="va">cooperation_info</span><span class="op">$</span><span class="va">implementation_tips</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>    recommended_process <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>      <span class="st">"Review BID stages individually with each team member"</span>,</span>
+<span>      <span class="st">"Identify areas of agreement and disagreement"</span>,</span>
+<span>      <span class="st">"Use bid_concepts() to find relevant behavioral science principles"</span>,</span>
+<span>      <span class="st">"Document final decisions with rationale"</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    tools <span class="op">=</span> <span class="st">"Use bid_report() to share findings across team"</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">consensus_framework</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="co"># Enable team collaboration on BID analysis using existing functions</span></span>
 <span><span class="va">create_bid_collaboration_workflow</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">team_members</span>, <span class="va">project_config</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">workflow</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    stakeholder_input <span class="op">=</span> <span class="fu">collect_stakeholder_perspectives</span><span class="op">(</span><span class="va">team_members</span><span class="op">)</span>,</span>
-<span>    expert_review <span class="op">=</span> <span class="fu">facilitate_expert_review_process</span><span class="op">(</span><span class="va">project_config</span><span class="op">)</span>,</span>
+<span>    team_composition <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      members <span class="op">=</span> <span class="va">team_members</span>,</span>
+<span>      roles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"UX Designer"</span>, <span class="st">"Data Analyst"</span>, <span class="st">"Product Manager"</span>, <span class="st">"Developer"</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
 <span>    consensus_building <span class="op">=</span> <span class="fu">build_consensus_on_bid_decisions</span><span class="op">(</span><span class="va">team_members</span><span class="op">)</span>,</span>
-<span>    implementation_coordination <span class="op">=</span> <span class="fu">coordinate_implementation_tasks</span><span class="op">(</span><span class="va">team_members</span><span class="op">)</span></span>
+<span>    documentation_approach <span class="op">=</span> <span class="st">"Use bid_report() for comprehensive documentation"</span>,</span>
+<span>    concept_reference <span class="op">=</span> <span class="st">"Use bid_concepts() to explore relevant principles together"</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">workflow</span><span class="op">)</span></span>
