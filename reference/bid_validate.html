@@ -58,7 +58,8 @@ refines the dashboard. It represents stage 5 in the BID framework.</p>
 <span>  include_exp_design <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  include_telemetry <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  telemetry_refs <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  include_empower_tools <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  include_empower_tools <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -106,6 +107,11 @@ recommendations with provenance information.</p></dd>
 <dt id="arg-include-empower-tools">include_empower_tools<a class="anchor" aria-label="anchor" href="#arg-include-empower-tools"></a></dt>
 <dd><p>Logical indicating whether to include
 context-aware empowerment tool suggestions. Default is TRUE.</p></dd>
+
+
+<dt id="arg-quiet">quiet<a class="anchor" aria-label="anchor" href="#arg-quiet"></a></dt>
+<dd><p>Logical indicating whether to suppress informational messages.
+If NULL, uses getOption("bidux.quiet", FALSE).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -211,7 +217,7 @@ stage.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    previous_concepts : Cognitive Load Theory, Visual Hierarchy, Progressive Disclosure </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    suggestions : Consider adding user empowerment tools to enhance collaboration </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-09-22 21:23:23 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-09-22 21:54:02 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

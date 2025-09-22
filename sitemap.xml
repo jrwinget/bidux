@@ -24,6 +24,7 @@
 <url><loc>https://jrwinget.github.io/bidux/reference/bid_concept.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/bid_concepts.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/bid_flags.html</loc></url>
+<url><loc>https://jrwinget.github.io/bidux/reference/bid_get_quiet.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/bid_ingest_telemetry.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/bid_interpret.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/bid_notice.html</loc></url>
@@ -32,11 +33,13 @@
 <url><loc>https://jrwinget.github.io/bidux/reference/bid_pipeline.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/bid_report.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/bid_result.html</loc></url>
+<url><loc>https://jrwinget.github.io/bidux/reference/bid_set_quiet.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/bid_stage.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/bid_structure.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/bid_suggest_components.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/bid_telemetry.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/bid_validate.html</loc></url>
+<url><loc>https://jrwinget.github.io/bidux/reference/bid_with_quiet.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/bidux-package.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/build_concept_group.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/build_groups_with_suggestions.html</loc></url>

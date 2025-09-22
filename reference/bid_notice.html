@@ -56,7 +56,14 @@ support.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bid_notice</span><span class="op">(</span><span class="va">previous_stage</span>, <span class="va">problem</span>, theory <span class="op">=</span> <span class="cn">NULL</span>, evidence <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bid_notice</span><span class="op">(</span></span>
+<span>  <span class="va">previous_stage</span>,</span>
+<span>  <span class="va">problem</span>,</span>
+<span>  theory <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  evidence <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -81,6 +88,11 @@ theory mappings.</p></dd>
 <dt id="arg-evidence">evidence<a class="anchor" aria-label="anchor" href="#arg-evidence"></a></dt>
 <dd><p>A character string describing evidence supporting the
 problem.</p></dd>
+
+
+<dt id="arg-quiet">quiet<a class="anchor" aria-label="anchor" href="#arg-quiet"></a></dt>
+<dd><p>Logical indicating whether to suppress informational messages.
+If NULL, uses getOption("bidux.quiet", FALSE).</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -123,7 +135,7 @@ problem.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Theory confidence: 90%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Next: Use bid_anticipate() for Stage 3 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB; font-weight: bold;">BID Framework</span> - <span style="font-weight: bold;">Notice</span> Stage</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-09-22 21:23:22 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-09-22 21:54:00 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Progress: 40 % (2/5) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Problem:</span> Users struggling with complex dropdowns and too many options </span>
@@ -167,7 +179,7 @@ problem.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    evidence : Mobile users report frustration with small touch targets </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    suggestions : Ensure your problem description is specific and supported by strong evidence </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-09-22 21:23:22 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-09-22 21:54:00 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

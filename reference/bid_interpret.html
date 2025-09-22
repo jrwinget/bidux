@@ -57,7 +57,8 @@ in the BID framework.</p>
 <span>  previous_stage <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">central_question</span>,</span>
 <span>  data_story <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  user_personas <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  user_personas <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -88,6 +89,11 @@ elements will be suggested based on previous stage.</p></dd>
 <dt id="arg-user-personas">user_personas<a class="anchor" aria-label="anchor" href="#arg-user-personas"></a></dt>
 <dd><p>Optional list of user personas to consider in the
 design.</p></dd>
+
+
+<dt id="arg-quiet">quiet<a class="anchor" aria-label="anchor" href="#arg-quiet"></a></dt>
+<dd><p>Logical indicating whether to suppress informational messages.
+If NULL, uses getOption("bidux.quiet", FALSE).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -167,7 +173,7 @@ stage.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    personas : [{"name":["Sara, Data Analyst"],"goals":["Needs to quickly find patterns in d... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    suggestions : Your data story has all key elements. Focus on making each component compelli... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-09-22 21:23:22 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-09-22 21:54:00 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

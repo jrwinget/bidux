@@ -59,7 +59,13 @@ specific component pointers and implementation rationales.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bid_structure</span><span class="op">(</span><span class="va">previous_stage</span>, concepts <span class="op">=</span> <span class="cn">NULL</span>, telemetry_flags <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bid_structure</span><span class="op">(</span></span>
+<span>  <span class="va">previous_stage</span>,</span>
+<span>  concepts <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  telemetry_flags <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -83,6 +89,11 @@ detect relevant concepts from previous stages automatically.</p></dd>
 <dd><p>Optional named list of telemetry flags from bid_flags().
 Used to adjust layout choice and suggestion scoring based on observed
 user behavior patterns.</p></dd>
+
+
+<dt id="arg-quiet">quiet<a class="anchor" aria-label="anchor" href="#arg-quiet"></a></dt>
+<dd><p>Logical indicating whether to suppress informational messages.
+If NULL, uses getOption("bidux.quiet", FALSE).</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -348,7 +359,7 @@ relevance, layout appropriateness, and contextual factors.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    previous_theory : Processing Fluency </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    suggestions : list(concept = "Cognitive Load Theory", suggestions = list(list(title = "Limi... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-09-22 21:23:23 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-09-22 21:54:01 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
