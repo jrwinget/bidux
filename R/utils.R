@@ -236,51 +236,6 @@ is_empty <- function(x) {
   return(FALSE)
 }
 
-#' Standardize error messages
-#'
-#' @param type The type of error: "missing_param", "invalid_param",
-#'        "invalid_stage"
-#' @param param_name The name of the parameter (if applicable)
-#' @param expected The expected value or type (if applicable)
-#' @param actual The actual value or type (if applicable)
-#'
-#' @return A standardized error message
-#'
-#' @keywords internal
-#' @noRd
-standard_error_msg <- function(
-    type,
-    param_name = NULL,
-    expected = NULL,
-    actual = NULL) {
-  switch(
-    type,
-    missing_param = paste0(
-      "Required parameter",
-      if (!is.null(param_name)) paste0(" '", param_name, "'"),
-      " must be provided."
-    ),
-    invalid_param = paste0(
-      "Parameter",
-      if (!is.null(param_name)) paste0(" '", param_name, "'"),
-      " is invalid.",
-      if (!is.null(expected) && !is.null(actual)) {
-        paste0(" Expected: ", expected, ", Actual: ", actual, ".")
-      } else {
-        ""
-      }
-    ),
-    invalid_stage = paste0(
-      "Invalid stage: ",
-      actual,
-      ". Must be one of: ",
-      paste(expected, collapse = ", "),
-      "."
-    ),
-    paste0("An error occurred in the implementation of the BID framework.")
-  )
-}
-
 #' Validate that required parameters are not missing
 #'
 #' @param ... Named parameters to check
@@ -293,8 +248,12 @@ validate_required_params <- function(...) {
   args <- list(...)
 
   for (param_name in names(args)) {
-    if (is_empty(args[[param_name]])) {
-      stop(standard_error_msg("missing_param", param_name))
+    val <- args[[param_name]]
+    if (is.null(val) || (is.character(val) && nchar(trimws(val)) == 0)) {
+      cli::cli_abort(c(
+        "x" = glue::glue("Required parameter '{param_name}' is missing or empty"),
+        "i" = "This parameter must be provided and cannot be an empty string"
+      ))
     }
   }
 
@@ -461,10 +420,9 @@ validate_previous_stage <- function(previous_stage = NULL, current_stage) {
       length(current_stage) == 1 &&
       current_stage %in% valid_stages)
   ) {
-    stop(standard_error_msg(
-      "invalid_stage",
-      actual = current_stage,
-      expected = valid_stages
+    cli::cli_abort(c(
+      "x" = glue::glue("Invalid current stage: {current_stage}"),
+      "i" = glue::glue("Must be one of: {paste(valid_stages, collapse = ', ')}")
     ))
   }
 
@@ -475,13 +433,10 @@ validate_previous_stage <- function(previous_stage = NULL, current_stage) {
       return(invisible(NULL))
     } else {
       # not Interpret but no previous provided → issue warning
-      warning(
-        paste0(
-          "Unusual stage progression: (none) -> ",
-          current_stage
-        ),
-        call. = FALSE
-      )
+      cli::cli_warn(c(
+        "!" = glue::glue("Unusual stage progression: (none) -> {current_stage}"),
+        "i" = "Consider starting with bid_interpret() for a complete workflow"
+      ))
       return(invisible(NULL))
     }
   }
@@ -491,7 +446,7 @@ validate_previous_stage <- function(previous_stage = NULL, current_stage) {
     prev_stage_name <- attr(previous_stage, "stage")
   } else if (
     (tibble::is_tibble(previous_stage) || is.data.frame(previous_stage)) &&
-    "stage" %in% names(previous_stage)
+      "stage" %in% names(previous_stage)
   ) {
     prev_stage_name <- previous_stage$stage[1]
   } else if (is.character(previous_stage) && length(previous_stage) == 1) {
@@ -505,18 +460,18 @@ validate_previous_stage <- function(previous_stage = NULL, current_stage) {
     } else {
       class(previous_stage)[1]
     }
-    stop(paste0(
-      "previous_stage must be a bid_stage object, data.frame/tibble with ",
-      "'stage' column, or single character string. Got: ", stage_type
-    ), call. = FALSE)
+    cli::cli_abort(c(
+      "x" = "Invalid previous_stage format",
+      "i" = glue::glue("Expected: bid_stage object, data.frame/tibble with 'stage' column, or character string"),
+      "i" = glue::glue("Got: {stage_type}")
+    ))
   }
 
   # 4) ensure prev_stage_name is 1 of the 5 valid stages
   if (!(prev_stage_name %in% valid_stages)) {
-    stop(standard_error_msg(
-      "invalid_stage",
-      actual = prev_stage_name,
-      expected = valid_stages
+    cli::cli_abort(c(
+      "x" = glue::glue("Invalid previous stage name: {prev_stage_name}"),
+      "i" = glue::glue("Must be one of: {paste(valid_stages, collapse = ', ')}")
     ))
   }
 
@@ -524,11 +479,11 @@ validate_previous_stage <- function(previous_stage = NULL, current_stage) {
 
   # allowed transitions
   allowed_transitions <- list(
-    "Interpret" = c("Validate"),  # can be blank (handled above) or iterative from Validate
-    "Notice" = c("Interpret", "Notice", "Anticipate", "Structure"),  # inner stages flexible
-    "Anticipate" = c("Interpret", "Notice", "Anticipate", "Structure"),  # inner stages flexible
-    "Structure" = c("Interpret", "Notice", "Anticipate", "Structure"),  # inner stages flexible
-    "Validate" = c("Notice", "Anticipate", "Structure", "Interpret")  # accepts inner stages and allows iterative flow to Interpret
+    "Interpret" = c("Validate"), # can be blank (handled above) or iterative from Validate
+    "Notice" = c("Interpret", "Notice", "Anticipate", "Structure"), # inner stages flexible
+    "Anticipate" = c("Interpret", "Notice", "Anticipate", "Structure"), # inner stages flexible
+    "Structure" = c("Interpret", "Notice", "Anticipate", "Structure"), # inner stages flexible
+    "Validate" = c("Notice", "Anticipate", "Structure", "Interpret") # accepts inner stages and allows iterative flow to Interpret
   )
 
   # skip stage progression warnings during tests (except explicit validation tests)
@@ -544,40 +499,25 @@ validate_previous_stage <- function(previous_stage = NULL, current_stage) {
   # check if the transition is allowed
   if (!prev_stage_name %in% allowed_transitions[[current_stage]]) {
     if (!in_test_env || calling_test) {
-      warning(
-        paste0(
-          "Invalid stage progression: ",
-          prev_stage_name,
-          " -> ",
-          current_stage,
-          ". ",
-          current_stage,
-          " accepts: ",
-          paste(allowed_transitions[[current_stage]], collapse = ", ")
-        ),
-        call. = FALSE
-      )
+      cli::cli_warn(c(
+        "!" = glue::glue("Invalid stage progression: {prev_stage_name} -> {current_stage}"),
+        "i" = glue::glue("{current_stage} accepts: {paste(allowed_transitions[[current_stage]], collapse = ', ')}")
+      ))
     }
   } else {
     # check for discouraged but valid transitions
     discouraged_transitions <- list(
-      "Structure" = c("Interpret"),  # Structure should ideally have Notice/Anticipate first
-      "Validate" = c("Interpret")    # Validate should go through inner stages first
+      "Structure" = c("Interpret"), # Structure should ideally have Notice/Anticipate first
+      "Validate" = c("Interpret") # Validate should go through inner stages first
     )
 
     if (current_stage %in% names(discouraged_transitions) &&
-        prev_stage_name %in% discouraged_transitions[[current_stage]] &&
-        (!in_test_env || calling_test)) {
-      warning(
-        paste0(
-          "Discouraged stage progression: ",
-          prev_stage_name,
-          " -> ",
-          current_stage,
-          ". Consider using Notice and/or Anticipate stages first for better workflow."
-        ),
-        call. = FALSE
-      )
+      prev_stage_name %in% discouraged_transitions[[current_stage]] &&
+      (!in_test_env || calling_test)) {
+      cli::cli_warn(c(
+        "!" = glue::glue("Discouraged stage progression: {prev_stage_name} -> {current_stage}"),
+        "i" = "Consider using Notice and/or Anticipate stages first for better workflow"
+      ))
     }
   }
 
@@ -796,7 +736,6 @@ generate_stage_suggestions <- function(
     stage_name,
     context_data,
     suggestion_rules = NULL) {
-
   # use consolidated rules from suggest_rules.R
   applicable_suggestions <- apply_suggestion_rules(
     stage_name,
@@ -1212,8 +1151,7 @@ get_accessibility_advice <- function(layout_context) {
     layout_context <- "general"
   }
 
-  switch(
-    layout_context,
+  switch(layout_context,
     "tabs" = "ensure keyboard navigation between tabs and screen reader announcements",
     "grid" = "provide proper row/column headers and cell relationships for screen readers",
     "card" = "ensure cards have descriptive labels and proper focus management",
@@ -1357,7 +1295,6 @@ parse_next_steps <- function(next_steps_formatted) {
         refs_text
       )
     )
-
   } else if (is.list(telemetry_refs)) {
     # named list with more structured references
     formatted_refs <- character(0)
@@ -1381,4 +1318,55 @@ parse_next_steps <- function(next_steps_formatted) {
   }
 
   return(character(0))
+}
+
+# ===== IMPROVED EXISTING UTILITIES FOR API CONSISTENCY =====
+
+#' Enhanced validate_character_param with glue support
+#'
+#' @param value Parameter value to validate
+#' @param param_name Parameter name for error messages
+#' @param required Whether parameter is required
+#' @param min_length Minimum string length (for character params)
+#' @param allow_null Whether NULL is acceptable
+#'
+#' @return Invisible NULL if valid, otherwise throws error
+#' @keywords internal
+#' @noRd
+validate_character_param <- function(value, param_name, required = TRUE, min_length = 1, allow_null = FALSE) {
+  if (is.null(value)) {
+    if (allow_null) {
+      return(invisible(NULL))
+    } else if (required) {
+      cli::cli_abort(c(
+        "x" = glue::glue("Parameter '{param_name}' is required"),
+        "i" = "Provide a non-NULL character string"
+      ))
+    } else {
+      return(invisible(NULL))
+    }
+  }
+
+  if (!is.character(value)) {
+    cli::cli_abort(c(
+      "x" = glue::glue("Parameter '{param_name}' must be a character string"),
+      "i" = glue::glue("You provided: {class(value)[1]}")
+    ))
+  }
+
+  if (length(value) != 1) {
+    cli::cli_abort(c(
+      "x" = glue::glue("Parameter '{param_name}' must be a single character string"),
+      "i" = glue::glue("You provided a vector of length {length(value)}")
+    ))
+  }
+
+  if (nchar(trimws(value)) < min_length) {
+    cli::cli_abort(c(
+      "x" = glue::glue("Parameter '{param_name}' must have at least {min_length} character(s)"),
+      "i" = glue::glue("Current length: {nchar(trimws(value))}")
+    ))
+  }
+
+  invisible(NULL)
 }

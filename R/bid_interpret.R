@@ -60,7 +60,7 @@
 #'     )
 #'   )
 #' )
-#' 
+#'
 #' summary(interpret_personas)
 #'
 #' @export

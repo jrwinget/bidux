@@ -60,9 +60,9 @@
 #'
 #' # Auto-selected layout with concept-grouped suggestions
 #' structure_result <- bid_structure(previous_stage = notice_result)
-#' print(structure_result$layout)  # Auto-selected layout
-#' print(structure_result$suggestions)  # Ranked suggestions by concept
-#' 
+#' print(structure_result$layout) # Auto-selected layout
+#' print(structure_result$suggestions) # Ranked suggestions by concept
+#'
 #' summary(structure_result)
 #'
 #' @export
@@ -87,14 +87,16 @@ bid_structure <- function(
 
   chosen_layout <- suggest_layout_from_previous(previous_stage, telemetry_flags)
 
-  bid_alert_info(paste0("Auto-selected layout: ", chosen_layout), quiet = quiet)
+  bid_alert_info(glue::glue("Auto-selected layout: {chosen_layout}"), quiet = quiet)
   bid_alert_info(layout_rationale(previous_stage, chosen_layout), quiet = quiet)
-  
+
   # issue deprecation warning once per session (skip in tests to reduce noise)
   # use package namespace instead of global environment for CRAN compliance
   pkg_env <- asNamespace("bidux")
-  if (!exists(".bidux_layout_selection_warned", envir = pkg_env) && 
-      !identical(Sys.getenv("TESTTHAT"), "true")) {
+  if (
+    !exists(".bidux_layout_selection_warned", envir = pkg_env) &&
+      !identical(Sys.getenv("TESTTHAT"), "true")
+  ) {
     warning(
       "Layout auto-selection is deprecated and will be removed in bidux 0.4.0. ",
       "The BID framework will focus on concept-based suggestions instead. ",
@@ -143,7 +145,7 @@ bid_structure <- function(
     concepts_count = length(concepts_detected),
     suggestion_groups_count = length(suggestion_groups),
     stage_number = 4,
-    stage_number_previous = 3,  # migration support for 0.3.1
+    stage_number_previous = 3, # migration support for 0.3.1
     total_stages = 5
   )
 
@@ -151,12 +153,12 @@ bid_structure <- function(
 
   # add session-level migration notice (once per session)
   .show_stage_numbering_notice()
-  
+
   bid_message(
     "Stage 4 (Structure) completed.",
-    paste0("Auto-selected layout: ", chosen_layout),
-    paste0("Concept groups generated: ", length(suggestion_groups)),
-    paste0("Total concepts: ", length(concepts_detected)),
+    glue::glue("Auto-selected layout: {chosen_layout}"),
+    glue::glue("Concept groups generated: {length(suggestion_groups)}"),
+    glue::glue("Total concepts: {length(concepts_detected)}"),
     quiet = quiet
   )
 

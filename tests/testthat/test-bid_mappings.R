@@ -1,4 +1,7 @@
-# test functions to reduce repetition
+# ==============================================================================
+# HELPERS
+# ==============================================================================
+
 create_sample_custom_mappings <- function() {
   data.frame(
     keywords = c("mobile.*issue", "slow.*performance", "complex.*layout"),
@@ -253,7 +256,7 @@ test_that("mapping system handles large datasets efficiently", {
   large_mappings <- data.frame(
     keywords = paste0("pattern", 1:100, ".*test"),
     theory = paste("Theory", 1:100),
-    confidence = c(rep(0.5, 49), 0.99, rep(0.5, 50))  # pattern50 gets highest confidence
+    confidence = c(rep(0.5, 49), 0.99, rep(0.5, 50)) # pattern50 gets highest confidence
   )
 
   # should handle large datasets without error

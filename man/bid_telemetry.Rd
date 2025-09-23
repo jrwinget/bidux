@@ -40,7 +40,7 @@ for new workflows that don't need backward compatibility.
 issues <- bid_telemetry("telemetry.sqlite")
 high_priority <- issues[issues$severity \%in\% c("critical", "high"), ]
 
-# Use with bridges for BID workflow  
+# Use with bridges for BID workflow
 top_issue <- issues[1, ]
 notice <- bid_notice_issue(top_issue, previous_stage = interpret_stage)
 }

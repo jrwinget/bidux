@@ -253,7 +253,6 @@ generate_domain_insights <- function(bid_result, custom_concepts = NULL) {
 
   if (layout == "dual_process") {
     insights$layout_analysis <- "Dual-process layout chosen. Good for financial dashboards requiring both summary and detailed analysis."
-    )
   }
 
   # Check for domain-specific bias considerations
@@ -620,7 +619,6 @@ create_accessibility_analysis <- function(
     wcag_level = "AA",
     assistive_tech_support = TRUE,
     target_disabilities = c("visual", "motor", "cognitive")) {
-
   # Use existing bid_concept function to get accessibility recommendations
   contrast_info <- bid_concept("Accessibility Contrast")
   keyboard_info <- bid_concept("Keyboard Navigation")

@@ -1,4 +1,7 @@
-# test functions to reduce repetition
+# ==============================================================================
+# HELPERS
+# ==============================================================================
+
 create_complete_bid_workflow <- function() {
   interpret_result <- bid_interpret(
     central_question = "How to simplify?",
@@ -53,7 +56,10 @@ test_that("bid_validate works with complete workflow", {
 
   expect_s3_class(result, "bid_stage")
   expect_equal(result$stage, "Validate")
-  expect_equal(result$summary_panel, "Dashboard simplified for quicker insights")
+  expect_equal(
+    result$summary_panel,
+    "Dashboard simplified for quicker insights"
+  )
   expect_equal(result$collaboration, "Added team annotation features")
   expect_match(result$previous_bias, "anchoring: Provide reference points")
   expect_true(!is.na(result$suggestions))

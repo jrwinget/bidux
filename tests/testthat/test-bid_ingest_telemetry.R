@@ -1,4 +1,7 @@
-# test functions to reduce repetition
+# ==============================================================================
+# HELPERS
+# ==============================================================================
+
 create_sample_telemetry_events <- function(num_sessions = 2) {
   events <- list()
   for (i in 1:num_sessions) {
@@ -84,8 +87,12 @@ test_that("bid_ingest_telemetry auto-detects format correctly", {
   temp_json <- tempfile(fileext = ".json")
   temp_csv <- tempfile(fileext = ".csv")
 
-  # create minimal valid files
-  writeLines("[]", temp_json)
+  # create valid telemetry JSON file
+  test_events <- '[
+    {"timestamp": "2023-01-01 12:00:00", "session_id": "test_session", "event_type": "click", "input_id": "button1"},
+    {"timestamp": "2023-01-01 12:01:00", "session_id": "test_session", "event_type": "input", "input_id": "text1"}
+  ]'
+  writeLines(test_events, temp_json)
   file.create(temp_sqlite)
   file.create(temp_csv)
 
@@ -247,8 +254,13 @@ test_that("bid_ingest_telemetry handles corrupted SQLite files", {
   writeLines("not a sqlite file", temp_sqlite)
   on.exit(unlink(temp_sqlite))
 
+  # Should error when trying to read corrupted SQLite file
+  # Note: RSQLite may also warn about synchronous mode - this is expected
   expect_error(
-    bid_ingest_telemetry(temp_sqlite, format = "sqlite"),
+    expect_warning(
+      bid_ingest_telemetry(temp_sqlite, format = "sqlite"),
+      "synchronous|Error reading SQLite database"
+    ),
     "Error reading SQLite database"
   )
 })
@@ -289,8 +301,8 @@ test_that("bid_ingest_telemetry respects custom thresholds", {
   result <- bid_ingest_telemetry(
     temp_json,
     thresholds = list(
-      unused_input_threshold = 0.1,  # very low threshold
-      delay_threshold_seconds = 1    # very low delay threshold
+      unused_input_threshold = 0.1, # very low threshold
+      delay_threshold_seconds = 1 # very low delay threshold
     )
   )
 

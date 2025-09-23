@@ -45,7 +45,6 @@ You're a data scientist at a SaaS company. Your stakeholders asked for "a dashbo
 # The "show everything" approach
 ui_before <- navbarPage(
   "User Engagement Analytics",
-
   tabPanel(
     "Overview",
     fluidRow(
@@ -77,7 +76,6 @@ ui_before <- navbarPage(
       column(4, plotOutput("ltv_distribution"))
     )
   ),
-
   tabPanel("Segments", "More detailed segmentation..."),
   tabPanel("Cohorts", "Cohort analysis details..."),
   tabPanel("Funnels", "Conversion funnel details..."),
@@ -308,7 +306,6 @@ ui_sales_before <- fluidPage(
       radioButtons("currency", "Currency", choices = c("USD", "EUR", "GBP")),
       actionButton("apply_filters", "Apply Filters", class = "btn-primary")
     ),
-
     mainPanel(
       tabsetPanel(
         tabPanel(
@@ -382,7 +379,6 @@ sales_structure <- bid_structure(previous_stage = sales_anticipate)
 ui_sales_after <- page_navbar(
   title = "Sales Command Center",
   theme = bs_theme(version = 5, preset = "bootstrap"),
-
   nav_panel(
     "🚨 Needs Attention",
     layout_columns(
@@ -461,7 +457,6 @@ ui_sales_after <- page_navbar(
       )
     )
   ),
-
   nav_panel(
     "📊 Performance",
     layout_columns(
@@ -488,13 +483,11 @@ ui_sales_after <- page_navbar(
         theme = "success"
       )
     ),
-
     card(
       card_header("📈 Key Trends"),
       plotOutput("performance_trends", height = "400px")
     )
   ),
-
   nav_panel(
     "🎯 Team Focus",
     # Team-specific insights
@@ -568,7 +561,6 @@ ui_technical_after <- page_sidebar(
   conditionalPanel(
     condition = "input.user_role == 'executive'",
     h2("🟢 System Health: Good"),
-
     layout_columns(
       col_widths = c(6, 6),
       card(
@@ -607,12 +599,10 @@ ui_technical_after <- page_sidebar(
       value_box("Error Rate", "0.02%", theme = "success"),
       value_box("Throughput", "15K/min", theme = "info")
     ),
-
     card(
       card_header("System Trends"),
       plotOutput("system_trends", height = "300px")
     ),
-
     card(
       card_header("Team Alerts"),
       p("2 minor alerts resolved this week"),

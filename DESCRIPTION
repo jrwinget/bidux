@@ -11,8 +11,8 @@ Authors@R:
     )
 Description: Provides a framework and toolkit to guide 'shiny' developers in
     implementing the Behavioral Insight Design (BID) framework. The package offers
-    functions for documenting each of the five stages (Notice, Interpret,
-    Structure, Anticipate, and Validate), along with a comprehensive concept
+    functions for documenting each of the five stages (Interpret, Notice,
+    Anticipate, Structure, and Validate), along with a comprehensive concept
     dictionary.
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -25,8 +25,11 @@ Imports:
     cli,
     DBI,
     dplyr,
+    glue,
     jsonlite,
+    purrr,
     readr (>= 2.1.5),
+    rlang,
     RSQLite,
     stats,
     stringdist (>= 0.9.15),

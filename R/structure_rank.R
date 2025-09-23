@@ -195,10 +195,9 @@ infer_concepts_from_story <- function(previous_stage) {
 #' @return List of concept groups with suggestions
 #' @keywords internal
 build_groups_with_suggestions <- function(
-  concepts_final,
-  chosen_layout,
-  previous_stage
-) {
+    concepts_final,
+    chosen_layout,
+    previous_stage) {
   # ensure at least some core concepts if none provided
   if (length(concepts_final) == 0) {
     concepts_final <- c("Cognitive Load Theory", "Visual Hierarchy")
@@ -232,8 +231,7 @@ build_groups_with_suggestions <- function(
 #' @return List with concept name and suggestions
 #' @keywords internal
 build_concept_group <- function(concept, chosen_layout, previous_stage) {
-  suggestions <- switch(
-    concept,
+  suggestions <- switch(concept,
     "Cognitive Load Theory" = get_cognitive_load_suggestions(
       chosen_layout,
       previous_stage
@@ -325,9 +323,8 @@ get_cognitive_load_suggestions <- function(chosen_layout, previous_stage) {
 #' Generate Progressive Disclosure suggestions
 #' @keywords internal
 get_progressive_disclosure_suggestions <- function(
-  chosen_layout,
-  previous_stage
-) {
+    chosen_layout,
+    previous_stage) {
   base_suggestions <- list(
     list(
       title = "Use collapsible advanced filters",
@@ -541,11 +538,10 @@ rank_and_sort_suggestions <- function(groups, previous_stage, chosen_layout) {
 #' Apply context-based scoring adjustments
 #' @keywords internal
 adjust_suggestion_score <- function(
-  suggestion,
-  previous_stage,
-  chosen_layout,
-  concept
-) {
+    suggestion,
+    previous_stage,
+    chosen_layout,
+    concept) {
   score <- suggestion$score
 
   # Boost if concept originated from Stage 1 theory

@@ -1,4 +1,7 @@
-# test functions to reduce repetition
+# ==============================================================================
+# HELPERS
+# ==============================================================================
+
 create_sample_data_story <- function() {
   list(
     hook = "Users are confused by the current interface",

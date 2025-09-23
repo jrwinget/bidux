@@ -2,7 +2,7 @@ test_that("bid_suggest_components returns tibble with correct structure", {
   interpret_result <- bid_interpret(
     central_question = "How can we help users with complex data?"
   )
-  
+
   notice_result <- bid_notice(
     previous_stage = interpret_result,
     problem = "Users struggle with complex data",
@@ -26,7 +26,7 @@ test_that("bid_suggest_components filters by package correctly", {
   interpret_result <- bid_interpret(
     central_question = "How can we help users with complex data?"
   )
-  
+
   notice_result <- bid_notice(
     previous_stage = interpret_result,
     problem = "Users struggle with complex data",
@@ -78,7 +78,7 @@ test_that("bid_suggest_components handles invalid inputs", {
   interpret_result <- bid_interpret(
     central_question = "What is the test question?"
   )
-  
+
   notice_result <- bid_notice(
     previous_stage = interpret_result,
     problem = "Test problem",
@@ -95,7 +95,7 @@ test_that("bid_suggest_components calculates relevance scores correctly", {
   interpret_result <- bid_interpret(
     central_question = "How can we help users with complex data?"
   )
-  
+
   notice_result <- bid_notice(
     previous_stage = interpret_result,
     problem = "Users struggle with complex data",
@@ -117,11 +117,11 @@ test_that("bid_suggest_components calculates relevance scores correctly", {
 })
 
 test_that("bid_suggest_components works with different BID stages", {
-  # Test with Notice stage
+  # test with Notice stage
   interpret_result <- bid_interpret(
     central_question = "How to simplify the interface?"
   )
-  
+
   notice_result <- bid_notice(
     previous_stage = interpret_result,
     problem = "Complex interface",
@@ -134,7 +134,7 @@ test_that("bid_suggest_components works with different BID stages", {
   })
   expect_s3_class(notice_suggestions, "tbl_df")
 
-  # Test with Interpret stage
+  # test with Interpret stage
   interpret_result2 <- bid_interpret(
     previous_stage = notice_result,
     central_question = "How to simplify the interface?",
@@ -149,10 +149,9 @@ test_that("bid_suggest_components works with different BID stages", {
   })
   expect_s3_class(interpret_suggestions, "tbl_df")
 
-  # Test with Structure stage
+  # test with Structure stage
   structure_result <- bid_structure(
     interpret_result,
-
     concepts = c("Visual Hierarchy", "Cognitive Load Theory")
   )
 
@@ -163,7 +162,7 @@ test_that("bid_suggest_components works with different BID stages", {
 })
 
 test_that("bid_suggest_components handles edge cases", {
-  # Test with minimal Notice result
+  # test with minimal Notice result
   minimal_notice <- tibble(
     stage = "Notice",
     problem = NA_character_,
@@ -177,11 +176,11 @@ test_that("bid_suggest_components handles edge cases", {
   })
   expect_s3_class(minimal_suggestions, "tbl_df")
 
-  # Test with empty package filter that has no matches
+  # test with empty package filter that has no matches
   interpret_result <- bid_interpret(
     central_question = "How can we help users with test data?"
   )
-  
+
   notice_result <- bid_notice(
     previous_stage = interpret_result,
     problem = "Test problem",
@@ -193,17 +192,17 @@ test_that("bid_suggest_components handles edge cases", {
       empty_suggestions <- bid_suggest_components(notice_result, package = "DT")
     },
     NA
-  ) # Should not warn, but may return empty results
+  )
 
   expect_s3_class(empty_suggestions, "tbl_df")
 })
 
 test_that("bid_suggest_components extracts concepts correctly", {
-  # Test concept extraction from theory field
+  # test concept extraction from theory field
   interpret_result <- bid_interpret(
     central_question = "How can we improve visual hierarchy?"
   )
-  
+
   notice_with_theory <- bid_notice(
     previous_stage = interpret_result,
     problem = "Users need better visual hierarchy",
@@ -218,13 +217,12 @@ test_that("bid_suggest_components extracts concepts correctly", {
   expect_s3_class(theory_suggestions, "tbl_df")
   expect_true(nrow(theory_suggestions) > 0)
 
-  # Test concept extraction from Structure stage
+  # test concept extraction from Structure stage
   structure_with_concepts <- bid_structure(
     bid_interpret(
       notice_with_theory,
       central_question = "How to improve visual organization?"
     ),
-
     concepts = c("Principle of Proximity", "Visual Hierarchy")
   )
 
@@ -240,14 +238,14 @@ test_that("bid_suggest_components provides appropriate user feedback", {
   interpret_result <- bid_interpret(
     central_question = "How can we improve user feedback?"
   )
-  
+
   notice_result <- bid_notice(
     previous_stage = interpret_result,
     problem = "Test problem",
     evidence = "Test evidence"
   )
 
-  # Should provide success message
+  # should provide success message
   expect_message(
     bid_suggest_components(notice_result),
     "Found .* component suggestion"
@@ -263,14 +261,13 @@ test_that("bid_suggest_components handles layout-specific scoring", {
   interpret_result <- bid_interpret(
     central_question = "How to organize content?"
   )
-  
+
   structure_result <- bid_structure(
     bid_notice(
       previous_stage = interpret_result,
       problem = "Need better organization",
       evidence = "User feedback"
     ),
-
     concepts = "Information Hierarchy"
   )
 
@@ -304,7 +301,7 @@ test_that("bid_suggest_components component database has required structure", {
   interpret_result <- bid_interpret(
     central_question = "How can we test the database?"
   )
-  
+
   notice_result <- bid_notice(
     previous_stage = interpret_result,
     problem = "Test problem",
@@ -327,7 +324,7 @@ test_that("bid_suggest_components component database has required structure", {
 
   expect_true(all(required_fields %in% names(suggestions)))
 
-  # Check that packages are from expected list
+  # check that packages are from expected list
   valid_packages <- c(
     "shiny",
     "bslib",
@@ -345,7 +342,7 @@ test_that("bid_suggest_components handles audience-based context", {
   interpret_result <- bid_interpret(
     central_question = "How can executive dashboard be simplified?"
   )
-  
+
   suppressWarnings({
     notice_with_audience <- bid_notice(
       previous_stage = interpret_result,
@@ -363,7 +360,7 @@ test_that("bid_suggest_components handles audience-based context", {
   expect_s3_class(exec_suggestions, "tbl_df")
   expect_true(nrow(exec_suggestions) > 0)
 
-  # Should prioritize executive-friendly components
+  # should prioritize executive-friendly components
   exec_components <- exec_suggestions[
     grepl(
       "summary|value|card|executive",

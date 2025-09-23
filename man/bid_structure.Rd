@@ -80,8 +80,8 @@ notice_result <- bid_interpret(
 
 # Auto-selected layout with concept-grouped suggestions
 structure_result <- bid_structure(previous_stage = notice_result)
-print(structure_result$layout)  # Auto-selected layout
-print(structure_result$suggestions)  # Ranked suggestions by concept
+print(structure_result$layout) # Auto-selected layout
+print(structure_result$suggestions) # Ranked suggestions by concept
 
 summary(structure_result)
 
