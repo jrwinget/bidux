@@ -170,6 +170,12 @@ test_that("bid_flags extracts telemetry flags", {
   unlink(temp_file)
 })
 
+test_that("bid_flags.default handles objects without flags", {
+  x <- list()  # no flags element or attribute
+  expect_error(bid_flags(x), "Object does not contain telemetry flags")
+})
+
+
 test_that("bid_telemetry returns clean bid_issues_tbl", {
   temp_file <- tempfile(fileext = ".sqlite")
   con <- DBI::dbConnect(RSQLite::SQLite(), temp_file)

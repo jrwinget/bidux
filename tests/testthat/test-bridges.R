@@ -236,3 +236,24 @@ test_that("bridge functions handle edge cases gracefully", {
   expect_true(is.list(empty_result))
   expect_equal(length(empty_result), 0)
 })
+
+test_that("bid_notices validates bad filter expression", {
+  issues <- tibble::tibble(
+    issue_id = "issue_01",
+    severity = "high",
+    problem = "Problem text"
+  )
+  interpret <- bid_interpret(central_question = "Filter validation test")
+
+  # unsafe call in filter should error
+  expect_error(
+    bid_notices(issues, filter = system("ls"), previous_stage = interpret),
+    "Filter expression contains"
+  )
+
+  # filter returning wrong length should error
+  expect_error(
+    bid_notices(issues, filter = 1, previous_stage = interpret),
+    "must return logical vector"
+  )
+})

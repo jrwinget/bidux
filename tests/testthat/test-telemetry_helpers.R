@@ -199,3 +199,21 @@ test_that(".calculate_severity_metrics handles zero sessions correctly", {
   expect_equal(result$impact_rate, 0.0) # should not cause division by zero
   expect_true(result$severity %in% c("critical", "high", "medium", "low"))
 })
+
+test_that(".calculate_severity_metrics covers all issue types", {
+  events <- data.frame(
+    timestamp   = Sys.time(),
+    session_id  = "s1",
+    event_type  = c("input","error","navigation"),
+    input_id    = "x",
+    output_id   = "out",
+    error_message = "err"
+  )
+
+  # force each branch
+  expect_true(.calculate_severity_metrics("unused_input_x", events, 1)$severity %in% c("low","medium","high","critical"))
+  expect_true(.calculate_severity_metrics("delayed_interaction", events, 1)$severity %in% c("low","medium","high","critical"))
+  expect_true(.calculate_severity_metrics("error_1", events, 1)$severity %in% c("low","medium","high","critical"))
+  expect_true(.calculate_severity_metrics("navigation_page", events, 1)$severity %in% c("low","medium","high","critical"))
+  expect_true(.calculate_severity_metrics("confusion_input", events, 1)$severity %in% c("low","medium","high","critical"))
+})
