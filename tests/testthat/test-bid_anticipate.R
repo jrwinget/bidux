@@ -354,3 +354,78 @@ test_that("bid_anticipate accessibility advice varies by context", {
   expect_true(is.character(result$accessibility))
   expect_gt(nchar(result$accessibility[1]), 0)
 })
+
+# ==============================================================================
+# ADDITIONAL EDGE-CASE COVERAGE
+# ==============================================================================
+
+test_that(
+  "bid_anticipate warns and defaults when include_accessibility is invalid",
+  {
+    notice_result <- create_minimal_notice_tibble()
+
+    expect_warning(
+      result <- bid_anticipate(
+        previous_stage = notice_result,
+        bias_mitigations = list(anchoring = "Test"),
+        include_accessibility = "not_logical"
+      ),
+      "include_accessibility must be a single logical value"
+    )
+
+    expect_s3_class(result, "bid_stage")
+    expect_true("accessibility" %in% names(result))
+  }
+)
+
+test_that("bid_anticipate warns when layout is not a recognized type", {
+  custom_stage <- create_minimal_notice_tibble()
+  custom_stage$layout <- "unknown_layout"
+
+  expect_warning(
+    bid_anticipate(
+      previous_stage = custom_stage,
+      bias_mitigations = list(anchoring = "Test")
+    ),
+    "Layout 'unknown_layout' is not recognized"
+  )
+})
+
+test_that("bid_anticipate detects biases from Interpret stage story keywords", {
+  interpret_stage <- create_basic_interpret_stage(
+    question = "Compare recent trends and baseline targets"
+  )
+
+  suppressMessages(
+    result <- bid_anticipate(
+      previous_stage = interpret_stage,
+      bias_mitigations = NULL
+    )
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_match(
+    result$bias_mitigations,
+    "anchoring|framing|confirmation",
+    ignore.case = TRUE
+  )
+})
+
+test_that(
+  "bid_anticipate issues deprecation warning for layout-specific bias mitigations",
+  {
+    notice_result <- create_basic_notice_stage()
+    # force a valid layout so that layout-specific bias mitigations are evaluated
+    notice_result$layout <- "grid"
+
+    withr::with_envvar(c(TESTTHAT = "false"), {
+      expect_warning(
+        bid_anticipate(
+          previous_stage = notice_result,
+          bias_mitigations = NULL
+        ),
+        "Layout-specific bias mitigations are deprecated"
+      )
+    })
+  }
+)
