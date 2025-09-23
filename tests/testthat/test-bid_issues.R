@@ -171,7 +171,7 @@ test_that("bid_flags extracts telemetry flags", {
 })
 
 test_that("bid_flags.default handles objects without flags", {
-  x <- list()  # no flags element or attribute
+  x <- list() # no flags element or attribute
   expect_error(bid_flags(x), "Object does not contain telemetry flags")
 })
 
