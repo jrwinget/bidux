@@ -252,86 +252,86 @@ applying the BID framework to each is time-intensive.</p>
 <div class="section level3">
 <h3 id="extending-the-concept-dictionary">Extending the Concept Dictionary<a class="anchor" aria-label="anchor" href="#extending-the-concept-dictionary"></a>
 </h3>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Add domain-specific behavioral concepts</span></span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>add_custom_concepts <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="co"># Define custom concepts for your domain</span></span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  custom_finance_concepts <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>    <span class="at">concept =</span> <span class="fu">c</span>(</span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>      <span class="st">"Risk Perception Bias"</span>,</span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>      <span class="st">"Mental Accounting"</span>,</span>
-<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>      <span class="st">"Temporal Discounting"</span></span>
-<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>    ),</span>
-<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>    <span class="at">category =</span> <span class="st">"Financial Psychology"</span>,</span>
-<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>    <span class="at">description =</span> <span class="fu">c</span>(</span>
-<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>      <span class="st">"Tendency to perceive identical risks differently based on presentation context"</span>,</span>
-<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>      <span class="st">"Treating money differently based on its source or intended use"</span>,</span>
-<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a>      <span class="st">"Overvaluing immediate rewards relative to future benefits"</span></span>
-<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>    ),</span>
-<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>    <span class="at">implementation_tips =</span> <span class="fu">c</span>(</span>
-<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a>      <span class="st">"Present risks in multiple formats (percentages, frequencies, visual scales)"</span>,</span>
-<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a>      <span class="st">"Show total portfolio impact rather than individual position P&amp;L"</span>,</span>
-<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a>      <span class="st">"Include time-based context and compound effect visualizations"</span></span>
-<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a>    ),</span>
-<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a>    <span class="at">shiny_components =</span> <span class="fu">c</span>(</span>
-<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a>      <span class="st">"plotly for interactive risk visualization, bslib progress bars for probability"</span>,</span>
-<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a>      <span class="st">"DT tables with conditional formatting, reactable grouping features"</span>,</span>
-<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a>      <span class="st">"echarts4r timeline components, animated value transitions"</span></span>
-<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a>    )</span>
-<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a>  )</span>
-<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a></span>
-<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a>  <span class="co"># You could extend the package concept dictionary (advanced users only)</span></span>
-<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a>  <span class="co"># This would require package development workflow</span></span>
-<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a></span>
-<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a>  <span class="fu">return</span>(custom_finance_concepts)</span>
-<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a>}</span>
-<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a></span>
-<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a><span class="co"># Create domain-specific BID analysis functions</span></span>
-<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a>analyze_financial_dashboard <span class="ot">&lt;-</span> <span class="cf">function</span>(config, <span class="at">custom_concepts =</span> <span class="cn">NULL</span>) {</span>
-<span id="cb3-36"><a href="#cb3-36" tabindex="-1"></a>  <span class="co"># Load custom concepts if provided</span></span>
-<span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(custom_concepts)) {</span>
-<span id="cb3-38"><a href="#cb3-38" tabindex="-1"></a>    <span class="co"># Use custom concepts in analysis</span></span>
-<span id="cb3-39"><a href="#cb3-39" tabindex="-1"></a>    relevant_concepts <span class="ot">&lt;-</span> <span class="fu">filter</span>(</span>
-<span id="cb3-40"><a href="#cb3-40" tabindex="-1"></a>      custom_concepts,</span>
-<span id="cb3-41"><a href="#cb3-41" tabindex="-1"></a>      <span class="fu">grepl</span>(config<span class="sc">$</span>domain_keywords, concept, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb3-42"><a href="#cb3-42" tabindex="-1"></a>    )</span>
-<span id="cb3-43"><a href="#cb3-43" tabindex="-1"></a>  }</span>
-<span id="cb3-44"><a href="#cb3-44" tabindex="-1"></a></span>
-<span id="cb3-45"><a href="#cb3-45" tabindex="-1"></a>  <span class="co"># Apply standard BID workflow with custom extensions</span></span>
-<span id="cb3-46"><a href="#cb3-46" tabindex="-1"></a>  result <span class="ot">&lt;-</span> <span class="fu">analyze_dashboard_ux</span>(config)</span>
-<span id="cb3-47"><a href="#cb3-47" tabindex="-1"></a></span>
-<span id="cb3-48"><a href="#cb3-48" tabindex="-1"></a>  <span class="co"># Add domain-specific analysis</span></span>
-<span id="cb3-49"><a href="#cb3-49" tabindex="-1"></a>  result<span class="sc">$</span>domain_insights <span class="ot">&lt;-</span> <span class="fu">generate_domain_insights</span>(result, custom_concepts)</span>
-<span id="cb3-50"><a href="#cb3-50" tabindex="-1"></a>  result<span class="sc">$</span>specialized_suggestions <span class="ot">&lt;-</span> <span class="fu">get_domain_suggestions</span>(</span>
-<span id="cb3-51"><a href="#cb3-51" tabindex="-1"></a>    result,</span>
-<span id="cb3-52"><a href="#cb3-52" tabindex="-1"></a>    config<span class="sc">$</span>domain</span>
-<span id="cb3-53"><a href="#cb3-53" tabindex="-1"></a>  )</span>
-<span id="cb3-54"><a href="#cb3-54" tabindex="-1"></a></span>
-<span id="cb3-55"><a href="#cb3-55" tabindex="-1"></a>  <span class="fu">return</span>(result)</span>
-<span id="cb3-56"><a href="#cb3-56" tabindex="-1"></a>}</span>
-<span id="cb3-57"><a href="#cb3-57" tabindex="-1"></a></span>
-<span id="cb3-58"><a href="#cb3-58" tabindex="-1"></a><span class="co"># Generate domain-specific insights</span></span>
-<span id="cb3-59"><a href="#cb3-59" tabindex="-1"></a>generate_domain_insights <span class="ot">&lt;-</span> <span class="cf">function</span>(bid_result, <span class="at">custom_concepts =</span> <span class="cn">NULL</span>) {</span>
-<span id="cb3-60"><a href="#cb3-60" tabindex="-1"></a>  insights <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb3-61"><a href="#cb3-61" tabindex="-1"></a></span>
-<span id="cb3-62"><a href="#cb3-62" tabindex="-1"></a>  <span class="co"># Analyze layout choice against domain best practices</span></span>
-<span id="cb3-63"><a href="#cb3-63" tabindex="-1"></a>  layout <span class="ot">&lt;-</span> bid_result<span class="sc">$</span>layout[<span class="dv">1</span>]</span>
-<span id="cb3-64"><a href="#cb3-64" tabindex="-1"></a></span>
-<span id="cb3-65"><a href="#cb3-65" tabindex="-1"></a>  <span class="cf">if</span> (layout <span class="sc">==</span> <span class="st">"dual_process"</span>) {</span>
-<span id="cb3-66"><a href="#cb3-66" tabindex="-1"></a>    insights<span class="sc">$</span>layout_analysis <span class="ot">&lt;-</span> <span class="st">"Dual-process layout chosen. Good for financial dashboards requiring both summary and detailed analysis."</span></span>
-<span id="cb3-67"><a href="#cb3-67" tabindex="-1"></a>    <span class="er">)</span></span>
-<span id="cb3-68"><a href="#cb3-68" tabindex="-1"></a>  }</span>
-<span id="cb3-69"><a href="#cb3-69" tabindex="-1"></a></span>
-<span id="cb3-70"><a href="#cb3-70" tabindex="-1"></a>  <span class="co"># Check for domain-specific bias considerations</span></span>
-<span id="cb3-71"><a href="#cb3-71" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(custom_concepts)) {</span>
-<span id="cb3-72"><a href="#cb3-72" tabindex="-1"></a>    <span class="co"># Suggest additional bias mitigations based on custom concepts</span></span>
-<span id="cb3-73"><a href="#cb3-73" tabindex="-1"></a>    insights<span class="sc">$</span>additional_biases <span class="ot">&lt;-</span> <span class="fu">suggest_domain_biases</span>(</span>
-<span id="cb3-74"><a href="#cb3-74" tabindex="-1"></a>      bid_result,</span>
-<span id="cb3-75"><a href="#cb3-75" tabindex="-1"></a>      custom_concepts</span>
-<span id="cb3-76"><a href="#cb3-76" tabindex="-1"></a>    )</span>
-<span id="cb3-77"><a href="#cb3-77" tabindex="-1"></a>  }</span>
-<span id="cb3-78"><a href="#cb3-78" tabindex="-1"></a></span>
-<span id="cb3-79"><a href="#cb3-79" tabindex="-1"></a>  <span class="fu">return</span>(insights)</span>
-<span id="cb3-80"><a href="#cb3-80" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Add domain-specific behavioral concepts</span></span>
+<span><span class="va">add_custom_concepts</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># Define custom concepts for your domain</span></span>
+<span>  <span class="va">custom_finance_concepts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span>    concept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>      <span class="st">"Risk Perception Bias"</span>,</span>
+<span>      <span class="st">"Mental Accounting"</span>,</span>
+<span>      <span class="st">"Temporal Discounting"</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    category <span class="op">=</span> <span class="st">"Financial Psychology"</span>,</span>
+<span>    description <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>      <span class="st">"Tendency to perceive identical risks differently based on presentation context"</span>,</span>
+<span>      <span class="st">"Treating money differently based on its source or intended use"</span>,</span>
+<span>      <span class="st">"Overvaluing immediate rewards relative to future benefits"</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    implementation_tips <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>      <span class="st">"Present risks in multiple formats (percentages, frequencies, visual scales)"</span>,</span>
+<span>      <span class="st">"Show total portfolio impact rather than individual position P&amp;L"</span>,</span>
+<span>      <span class="st">"Include time-based context and compound effect visualizations"</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    shiny_components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>      <span class="st">"plotly for interactive risk visualization, bslib progress bars for probability"</span>,</span>
+<span>      <span class="st">"DT tables with conditional formatting, reactable grouping features"</span>,</span>
+<span>      <span class="st">"echarts4r timeline components, animated value transitions"</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span>  <span class="co"># You could extend the package concept dictionary (advanced users only)</span></span>
+<span>  <span class="co"># This would require package development workflow</span></span>
+<span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">custom_finance_concepts</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="co"># Create domain-specific BID analysis functions</span></span>
+<span><span class="va">analyze_financial_dashboard</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">config</span>, <span class="va">custom_concepts</span> <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># Load custom concepts if provided</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">custom_concepts</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># Use custom concepts in analysis</span></span>
+<span>    <span class="va">relevant_concepts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
+<span>      <span class="va">custom_concepts</span>,</span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="va">config</span><span class="op">$</span><span class="va">domain_keywords</span>, <span class="va">concept</span>, ignore.case <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span></span>
+<span>  <span class="co"># Apply standard BID workflow with custom extensions</span></span>
+<span>  <span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">analyze_dashboard_ux</span><span class="op">(</span><span class="va">config</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="co"># Add domain-specific analysis</span></span>
+<span>  <span class="va">result</span><span class="op">$</span><span class="va">domain_insights</span> <span class="op">&lt;-</span> <span class="fu">generate_domain_insights</span><span class="op">(</span><span class="va">result</span>, <span class="va">custom_concepts</span><span class="op">)</span></span>
+<span>  <span class="va">result</span><span class="op">$</span><span class="va">specialized_suggestions</span> <span class="op">&lt;-</span> <span class="fu">get_domain_suggestions</span><span class="op">(</span></span>
+<span>    <span class="va">result</span>,</span>
+<span>    <span class="va">config</span><span class="op">$</span><span class="va">domain</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="co"># Generate domain-specific insights</span></span>
+<span><span class="va">generate_domain_insights</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">bid_result</span>, <span class="va">custom_concepts</span> <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">insights</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="co"># Analyze layout choice against domain best practices</span></span>
+<span>  <span class="va">layout</span> <span class="op">&lt;-</span> <span class="va">bid_result</span><span class="op">$</span><span class="va">layout</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
+<span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">layout</span> <span class="op">==</span> <span class="st">"dual_process"</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">insights</span><span class="op">$</span><span class="va">layout_analysis</span> <span class="op">&lt;-</span> <span class="st">"Dual-process layout chosen. Good for financial dashboards requiring both summary and detailed analysis."</span></span>
+<span>  <span class="op">}</span></span>
+<span></span>
+<span>  <span class="co"># Check for domain-specific bias considerations</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">custom_concepts</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># Suggest additional bias mitigations based on custom concepts</span></span>
+<span>    <span class="va">insights</span><span class="op">$</span><span class="va">additional_biases</span> <span class="op">&lt;-</span> <span class="fu">suggest_domain_biases</span><span class="op">(</span></span>
+<span>      <span class="va">bid_result</span>,</span>
+<span>      <span class="va">custom_concepts</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">insights</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -691,7 +691,6 @@ applying the BID framework to each is time-intensive.</p>
 <span>    <span class="va">wcag_level</span> <span class="op">=</span> <span class="st">"AA"</span>,</span>
 <span>    <span class="va">assistive_tech_support</span> <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    <span class="va">target_disabilities</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"visual"</span>, <span class="st">"motor"</span>, <span class="st">"cognitive"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span></span>
 <span>  <span class="co"># Use existing bid_concept function to get accessibility recommendations</span></span>
 <span>  <span class="va">contrast_info</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_concept.html">bid_concept</a></span><span class="op">(</span><span class="st">"Accessibility Contrast"</span><span class="op">)</span></span>
 <span>  <span class="va">keyboard_info</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_concept.html">bid_concept</a></span><span class="op">(</span><span class="st">"Keyboard Navigation"</span><span class="op">)</span></span>

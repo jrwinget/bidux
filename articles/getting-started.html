@@ -400,7 +400,7 @@ insights:</p>
 <span><span class="va">issues</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_telemetry.html">bid_telemetry</a></span><span class="op">(</span><span class="st">"path/to/telemetry.sqlite"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Triage and review issues</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span>  <span class="co"># Shows organized issue summary</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span> <span class="co"># Shows organized issue summary</span></span>
 <span></span>
 <span><span class="co"># Convert high-priority issues to Notice stages</span></span>
 <span><span class="va">critical_issues</span> <span class="op">&lt;-</span> <span class="va">issues</span> <span class="op">|&gt;</span></span>
@@ -426,11 +426,11 @@ functionality:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Legacy approach still works</span></span>
 <span><span class="va">legacy_notices</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry</a></span><span class="op">(</span><span class="st">"path/to/telemetry.sqlite"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">legacy_notices</span><span class="op">)</span>  <span class="co"># Behaves like list of Notice stages</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">legacy_notices</span><span class="op">)</span> <span class="co"># Behaves like list of Notice stages</span></span>
 <span></span>
 <span><span class="co"># But now also provides enhanced features</span></span>
-<span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="va">legacy_notices</span><span class="op">)</span>  <span class="co"># Tidy issues view</span></span>
-<span><span class="fu"><a href="../reference/bid_flags.html">bid_flags</a></span><span class="op">(</span><span class="va">legacy_notices</span><span class="op">)</span>  <span class="co"># Extract global flags</span></span></code></pre></div>
+<span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="va">legacy_notices</span><span class="op">)</span> <span class="co"># Tidy issues view</span></span>
+<span><span class="fu"><a href="../reference/bid_flags.html">bid_flags</a></span><span class="op">(</span><span class="va">legacy_notices</span><span class="op">)</span> <span class="co"># Extract global flags</span></span></code></pre></div>
 <p>Visit <a href="https://github.com/jrwinget/bidux" class="external-link">github.com/jrwinget/bidux</a>
 for updates and to contribute to the package development. We welcome
 feedback and suggestions to help make the BID framework even more

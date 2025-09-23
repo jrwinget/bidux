@@ -116,7 +116,6 @@ thorough, you built exactly that.</p>
 <code class="sourceCode R"><span><span class="co"># The "show everything" approach</span></span>
 <span><span class="va">ui_before</span> <span class="op">&lt;-</span> <span class="fu">navbarPage</span><span class="op">(</span></span>
 <span>  <span class="st">"User Engagement Analytics"</span>,</span>
-<span></span>
 <span>  <span class="fu">tabPanel</span><span class="op">(</span></span>
 <span>    <span class="st">"Overview"</span>,</span>
 <span>    <span class="fu">fluidRow</span><span class="op">(</span></span>
@@ -148,7 +147,6 @@ thorough, you built exactly that.</p>
 <span>      <span class="fu">column</span><span class="op">(</span><span class="fl">4</span>, <span class="fu">plotOutput</span><span class="op">(</span><span class="st">"ltv_distribution"</span><span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span>,</span>
-<span></span>
 <span>  <span class="fu">tabPanel</span><span class="op">(</span><span class="st">"Segments"</span>, <span class="st">"More detailed segmentation..."</span><span class="op">)</span>,</span>
 <span>  <span class="fu">tabPanel</span><span class="op">(</span><span class="st">"Cohorts"</span>, <span class="st">"Cohort analysis details..."</span><span class="op">)</span>,</span>
 <span>  <span class="fu">tabPanel</span><span class="op">(</span><span class="st">"Funnels"</span>, <span class="st">"Conversion funnel details..."</span><span class="op">)</span>,</span>
@@ -391,7 +389,6 @@ uses it.</p>
 <span>      <span class="fu">radioButtons</span><span class="op">(</span><span class="st">"currency"</span>, <span class="st">"Currency"</span>, choices <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"USD"</span>, <span class="st">"EUR"</span>, <span class="st">"GBP"</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>      <span class="fu">actionButton</span><span class="op">(</span><span class="st">"apply_filters"</span>, <span class="st">"Apply Filters"</span>, class <span class="op">=</span> <span class="st">"btn-primary"</span><span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
-<span></span>
 <span>    <span class="fu">mainPanel</span><span class="op">(</span></span>
 <span>      <span class="fu">tabsetPanel</span><span class="op">(</span></span>
 <span>        <span class="fu">tabPanel</span><span class="op">(</span></span>
@@ -467,7 +464,6 @@ and “I just export to Excel instead”</p>
 <code class="sourceCode R"><span><span class="va">ui_sales_after</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rstudio.github.io/bslib/reference/page_navbar.html" class="external-link">page_navbar</a></span><span class="op">(</span></span>
 <span>  title <span class="op">=</span> <span class="st">"Sales Command Center"</span>,</span>
 <span>  theme <span class="op">=</span> <span class="fu"><a href="https://rstudio.github.io/bslib/reference/bs_theme.html" class="external-link">bs_theme</a></span><span class="op">(</span>version <span class="op">=</span> <span class="fl">5</span>, preset <span class="op">=</span> <span class="st">"bootstrap"</span><span class="op">)</span>,</span>
-<span></span>
 <span>  <span class="fu"><a href="https://rstudio.github.io/bslib/reference/nav-items.html" class="external-link">nav_panel</a></span><span class="op">(</span></span>
 <span>    <span class="st">"🚨 Needs Attention"</span>,</span>
 <span>    <span class="fu"><a href="https://rstudio.github.io/bslib/reference/layout_columns.html" class="external-link">layout_columns</a></span><span class="op">(</span></span>
@@ -546,7 +542,6 @@ and “I just export to Excel instead”</p>
 <span>      <span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span>,</span>
-<span></span>
 <span>  <span class="fu"><a href="https://rstudio.github.io/bslib/reference/nav-items.html" class="external-link">nav_panel</a></span><span class="op">(</span></span>
 <span>    <span class="st">"📊 Performance"</span>,</span>
 <span>    <span class="fu"><a href="https://rstudio.github.io/bslib/reference/layout_columns.html" class="external-link">layout_columns</a></span><span class="op">(</span></span>
@@ -573,13 +568,11 @@ and “I just export to Excel instead”</p>
 <span>        theme <span class="op">=</span> <span class="st">"success"</span></span>
 <span>      <span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
-<span></span>
 <span>    <span class="fu"><a href="https://rstudio.github.io/bslib/reference/card.html" class="external-link">card</a></span><span class="op">(</span></span>
 <span>      <span class="fu"><a href="https://rstudio.github.io/bslib/reference/card_body.html" class="external-link">card_header</a></span><span class="op">(</span><span class="st">"📈 Key Trends"</span><span class="op">)</span>,</span>
 <span>      <span class="fu">plotOutput</span><span class="op">(</span><span class="st">"performance_trends"</span>, height <span class="op">=</span> <span class="st">"400px"</span><span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span>,</span>
-<span></span>
 <span>  <span class="fu"><a href="https://rstudio.github.io/bslib/reference/nav-items.html" class="external-link">nav_panel</a></span><span class="op">(</span></span>
 <span>    <span class="st">"🎯 Team Focus"</span>,</span>
 <span>    <span class="co"># Team-specific insights</span></span>
@@ -666,7 +659,6 @@ lost.</p>
 <span>  <span class="fu">conditionalPanel</span><span class="op">(</span></span>
 <span>    condition <span class="op">=</span> <span class="st">"input.user_role == 'executive'"</span>,</span>
 <span>    <span class="fu">h2</span><span class="op">(</span><span class="st">"🟢 System Health: Good"</span><span class="op">)</span>,</span>
-<span></span>
 <span>    <span class="fu"><a href="https://rstudio.github.io/bslib/reference/layout_columns.html" class="external-link">layout_columns</a></span><span class="op">(</span></span>
 <span>      col_widths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">6</span><span class="op">)</span>,</span>
 <span>      <span class="fu"><a href="https://rstudio.github.io/bslib/reference/card.html" class="external-link">card</a></span><span class="op">(</span></span>
@@ -705,12 +697,10 @@ lost.</p>
 <span>      <span class="fu"><a href="https://rstudio.github.io/bslib/reference/value_box.html" class="external-link">value_box</a></span><span class="op">(</span><span class="st">"Error Rate"</span>, <span class="st">"0.02%"</span>, theme <span class="op">=</span> <span class="st">"success"</span><span class="op">)</span>,</span>
 <span>      <span class="fu"><a href="https://rstudio.github.io/bslib/reference/value_box.html" class="external-link">value_box</a></span><span class="op">(</span><span class="st">"Throughput"</span>, <span class="st">"15K/min"</span>, theme <span class="op">=</span> <span class="st">"info"</span><span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
-<span></span>
 <span>    <span class="fu"><a href="https://rstudio.github.io/bslib/reference/card.html" class="external-link">card</a></span><span class="op">(</span></span>
 <span>      <span class="fu"><a href="https://rstudio.github.io/bslib/reference/card_body.html" class="external-link">card_header</a></span><span class="op">(</span><span class="st">"System Trends"</span><span class="op">)</span>,</span>
 <span>      <span class="fu">plotOutput</span><span class="op">(</span><span class="st">"system_trends"</span>, height <span class="op">=</span> <span class="st">"300px"</span><span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
-<span></span>
 <span>    <span class="fu"><a href="https://rstudio.github.io/bslib/reference/card.html" class="external-link">card</a></span><span class="op">(</span></span>
 <span>      <span class="fu"><a href="https://rstudio.github.io/bslib/reference/card_body.html" class="external-link">card_header</a></span><span class="op">(</span><span class="st">"Team Alerts"</span><span class="op">)</span>,</span>
 <span>      <span class="fu">p</span><span class="op">(</span><span class="st">"2 minor alerts resolved this week"</span><span class="op">)</span>,</span>
