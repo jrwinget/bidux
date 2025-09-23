@@ -248,10 +248,11 @@ validate_required_params <- function(...) {
   args <- list(...)
 
   for (param_name in names(args)) {
-    if (is.null(args[[param_name]])) {
+    val <- args[[param_name]]
+    if (is.null(val) || (is.character(val) && nchar(trimws(val)) == 0)) {
       cli::cli_abort(c(
-        "x" = glue::glue("Required parameter '{param_name}' is missing"),
-        "i" = "This parameter must be provided"
+        "x" = glue::glue("Required parameter '{param_name}' is missing or empty"),
+        "i" = "This parameter must be provided and cannot be an empty string"
       ))
     }
   }
