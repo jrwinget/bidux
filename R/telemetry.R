@@ -1582,34 +1582,27 @@ bid_notice_issue <- function(issue, previous_stage = NULL, override = list()) {
 #' top_issues <- issues[order(-issues$impact_rate), ][1:3, ]
 #' notices <- bid_notices(top_issues, previous_stage = interpret)
 #' }
-bid_notices <- function(issues, filter = NULL, previous_stage = NULL, max_issues = 5, ...) {
+bid_notices <- function(
+    issues,
+    filter = NULL,
+    previous_stage = NULL,
+    max_issues = 5,
+    ...) {
   if (!is.data.frame(issues)) {
     cli::cli_abort("issues must be a data frame from bid_telemetry() output")
   }
 
-  # apply filter if provided
-  if (!is.null(substitute(filter))) {
-    filter_expr <- substitute(filter)
-    tryCatch(
-      {
-        # validate that the filter expression only contains safe operations
-        expr_text <- deparse(filter_expr)
-        if (grepl("system|file|eval|source|get|assign|load|save|cat|write", expr_text)) {
-          cli::cli_abort("Filter expression contains potentially unsafe operations")
-        }
-        filter_result <- eval(filter_expr, issues, emptyenv())
-        if (!is.logical(filter_result) || length(filter_result) != nrow(issues)) {
-          cli::cli_abort("Filter expression must return logical vector of same length as issues data")
-        }
-        filtered_issues <- issues[filter_result, ]
-      },
-      error = function(e) {
-        cli::cli_abort(c(
-          "Error evaluating filter expression: {e$message}",
-          "i" = "Filter must be a valid logical expression using column names from issues"
-        ))
-      }
-    )
+  filter_expr <- rlang::enquo(filter)
+
+  if (!rlang::quo_is_null(filter_expr)) {
+    filter_result <- rlang::eval_tidy(filter_expr, data = issues)
+
+    if (!is.logical(filter_result) || length(filter_result) != nrow(issues)) {
+      cli::cli_abort(
+        "Filter must return a logical vector the same length as `issues`"
+      )
+    }
+    filtered_issues <- issues[filter_result, ]
   } else {
     filtered_issues <- issues
   }
@@ -1619,41 +1612,36 @@ bid_notices <- function(issues, filter = NULL, previous_stage = NULL, max_issues
     return(list())
   }
 
-  # limit number of issues
-  if (nrow(filtered_issues) > max_issues) {
-    cli::cli_inform("Limiting to top {max_issues} issues (out of {nrow(filtered_issues)} matched)")
-    # sort by severity then impact rate for prioritization
-    severity_order <- c("critical" = 4, "high" = 3, "medium" = 2, "low" = 1)
-    filtered_issues$severity_rank <- severity_order[filtered_issues$severity]
+  severity_order <- c(critical = 4, high = 3, medium = 2, low = 1)
+  filtered_issues$severity_rank <- severity_order[filtered_issues$severity]
 
-    # Handle impact_rate safely (may not exist or be non-numeric)
-    if ("impact_rate" %in% names(filtered_issues) && is.numeric(filtered_issues$impact_rate)) {
-      filtered_issues <- filtered_issues[order(-filtered_issues$severity_rank, -filtered_issues$impact_rate), ]
-    } else {
-      filtered_issues <- filtered_issues[order(-filtered_issues$severity_rank), ]
-    }
-    filtered_issues <- filtered_issues[1:max_issues, ]
+  if ("impact_rate" %in% names(filtered_issues) && is.numeric(filtered_issues$impact_rate)) {
+    filtered_issues <- filtered_issues[order(
+      -filtered_issues$severity_rank, -filtered_issues$impact_rate
+    ), ]
+  } else {
+    filtered_issues <- filtered_issues[order(-filtered_issues$severity_rank), ]
   }
 
-  # create interpret stage if none provided
+  if (nrow(filtered_issues) > max_issues) {
+    cli::cli_inform(
+      "Limiting to top {max_issues} issues (out of {nrow(filtered_issues)} matched)"
+    )
+    filtered_issues <- head(filtered_issues, max_issues)
+  }
+
   if (is.null(previous_stage)) {
     previous_stage <- bid_interpret(
       central_question = "How can we address multiple telemetry-identified issues?"
     )
   }
 
-  # convert each issue to Notice stage
-  notices <- list()
-  for (i in 1:nrow(filtered_issues)) {
-    issue_row <- filtered_issues[i, ]
-    issue_id <- issue_row$issue_id[1] %||% paste0("issue_", i)
-
-    notices[[issue_id]] <- bid_notice_issue(
-      issue_row,
-      previous_stage = previous_stage,
-      ...
-    )
-  }
+  # iterate over rows, not columns
+  notices <- lapply(seq_len(nrow(filtered_issues)), function(i) {
+    row <- filtered_issues[i, , drop = FALSE]
+    id  <- row$issue_id %||% paste0("issue_", i)
+    bid_notice_issue(row, previous_stage = previous_stage, ...)
+  })
 
   return(notices)
 }

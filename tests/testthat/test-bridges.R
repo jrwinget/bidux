@@ -245,15 +245,19 @@ test_that("bid_notices validates bad filter expression", {
   )
   interpret <- bid_interpret(central_question = "Filter validation test")
 
-  # unsafe call in filter should error
-  expect_error(
-    bid_notices(issues, filter = system("ls"), previous_stage = interpret),
-    "Filter expression contains"
-  )
-
-  # filter returning wrong length should error
+  # filter returning wrong length
   expect_error(
     bid_notices(issues, filter = 1, previous_stage = interpret),
-    "must return logical vector"
+    "Filter must return a logical vector"
+  )
+
+  # invalid expression (uses undefined column) should error
+  expect_error(
+    bid_notices(
+      issues,
+      filter = unknown_col == "high",
+      previous_stage = interpret
+    ),
+    "object 'unknown_col' not found"
   )
 })

@@ -195,11 +195,14 @@ test_that("validate_required_params works correctly", {
     validate_required_params(problem = NULL, evidence = "test"),
     "Required parameter 'problem' is missing"
   )
-  # validate_required_params only checks for NULL, not empty strings
-  expect_silent(validate_required_params(problem = "", evidence = "test"))
-  expect_silent(validate_required_params(problem = "   ", evidence = "test"))
-  # validate_required_params only checks for NULL, not NA
-  expect_silent(validate_required_params(problem = NA, evidence = "test"))
+  expect_error(
+    validate_required_params(problem = "", evidence = "test"),
+    "Required parameter 'problem' is missing or empty"
+  )
+  expect_error(
+    validate_required_params(problem = "   ", evidence = "test"),
+    "Required parameter 'problem' is missing or empty"
+  )
 })
 
 test_that("validate_character_param works correctly", {

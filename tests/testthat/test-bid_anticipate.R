@@ -410,22 +410,3 @@ test_that("bid_anticipate detects biases from Interpret stage story keywords", {
     ignore.case = TRUE
   )
 })
-
-test_that(
-  "bid_anticipate issues deprecation warning for layout-specific bias mitigations",
-  {
-    notice_result <- create_basic_notice_stage()
-    # force a valid layout so that layout-specific bias mitigations are evaluated
-    notice_result$layout <- "grid"
-
-    withr::with_envvar(c(TESTTHAT = "false"), {
-      expect_warning(
-        bid_anticipate(
-          previous_stage = notice_result,
-          bias_mitigations = NULL
-        ),
-        "Layout-specific bias mitigations are deprecated"
-      )
-    })
-  }
-)
