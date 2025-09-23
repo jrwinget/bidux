@@ -1,11 +1,8 @@
-# Test bid_issues class and methods - new for 0.3.1
-# These tests cover the hybrid bid_ingest_telemetry() return object
-
 test_that("bid_ingest_telemetry returns hybrid bid_issues object", {
   # create minimal sqlite file for testing
   temp_file <- tempfile(fileext = ".sqlite")
   con <- DBI::dbConnect(RSQLite::SQLite(), temp_file)
-  
+
   # create minimal telemetry table
   DBI::dbExecute(con, "
     CREATE TABLE events (
@@ -18,35 +15,35 @@ test_that("bid_ingest_telemetry returns hybrid bid_issues object", {
       value TEXT
     )
   ")
-  
+
   DBI::dbExecute(con, "
-    INSERT INTO events VALUES 
+    INSERT INTO events VALUES
     ('2023-01-01', 'click', 'filter_button', 'session1', NULL, NULL, NULL),
     ('2023-01-01', 'abandon', 'dashboard', 'session1', NULL, NULL, NULL)
   ")
-  
+
   DBI::dbDisconnect(con)
-  
+
   # test hybrid return object
   suppressMessages(
     result <- bid_ingest_telemetry(temp_file)
   )
-  
+
   # should inherit from both bid_issues and list
   expect_s3_class(result, c("bid_issues", "list"))
   expect_true(inherits(result, "list"))
-  
+
   # should behave like a list (legacy compatibility)
   expect_true(length(result) >= 0)  # allow empty results
   if (length(result) > 0) {
     expect_s3_class(result[[1]], "bid_stage")
   }
-  
+
   # should have attached attributes
   expect_true("issues_tbl" %in% names(attributes(result)))
   expect_true("flags" %in% names(attributes(result)))
   expect_true("created_at" %in% names(attributes(result)))
-  
+
   # cleanup
   unlink(temp_file)
 })
@@ -54,7 +51,7 @@ test_that("bid_ingest_telemetry returns hybrid bid_issues object", {
 test_that("print.bid_issues shows triage view", {
   temp_file <- tempfile(fileext = ".sqlite")
   con <- DBI::dbConnect(RSQLite::SQLite(), temp_file)
-  
+
   DBI::dbExecute(con, "
     CREATE TABLE events (
       timestamp TEXT,
@@ -66,33 +63,33 @@ test_that("print.bid_issues shows triage view", {
       value TEXT
     )
   ")
-  
+
   DBI::dbExecute(con, "
-    INSERT INTO events VALUES 
+    INSERT INTO events VALUES
     ('2023-01-01', 'click', 'filter_button', 'session1', NULL, NULL, NULL)
   ")
-  
+
   DBI::dbDisconnect(con)
-  
+
   suppressMessages(
     result <- bid_ingest_telemetry(temp_file)
   )
-  
+
   # capture print output
   output <- capture.output(print(result))
-  
+
   # print method may produce minimal output in test environment
   # just ensure print doesn't error and produces some output
   expect_no_error(print(result))
   expect_true(length(output) >= 0)
-  
+
   unlink(temp_file)
 })
 
 test_that("as_tibble.bid_issues returns issues tibble", {
   temp_file <- tempfile(fileext = ".sqlite")
   con <- DBI::dbConnect(RSQLite::SQLite(), temp_file)
-  
+
   DBI::dbExecute(con, "
     CREATE TABLE events (
       timestamp TEXT,
@@ -104,38 +101,38 @@ test_that("as_tibble.bid_issues returns issues tibble", {
       value TEXT
     )
   ")
-  
+
   DBI::dbExecute(con, "
-    INSERT INTO events VALUES 
+    INSERT INTO events VALUES
     ('2023-01-01', 'click', 'filter_button', 'session1', NULL, NULL, NULL),
     ('2023-01-01', 'abandon', 'dashboard', 'session1', NULL, NULL, NULL)
   ")
-  
+
   DBI::dbDisconnect(con)
-  
+
   suppressMessages(
     result <- bid_ingest_telemetry(temp_file)
   )
-  
+
   # extract tibble
   issues_tbl <- as_tibble(result)
-  
+
   expect_true(tibble::is_tibble(issues_tbl))
   expect_true(nrow(issues_tbl) >= 0)  # allow empty results
-  
+
   # should have expected columns if any issues found
-  expected_cols <- c("issue_id", "severity", "problem", "evidence") 
+  expected_cols <- c("issue_id", "severity", "problem", "evidence")
   if (nrow(issues_tbl) > 0) {
     expect_true(all(expected_cols %in% names(issues_tbl)))
   }
-  
+
   unlink(temp_file)
 })
 
 test_that("bid_flags extracts telemetry flags", {
   temp_file <- tempfile(fileext = ".sqlite")
   con <- DBI::dbConnect(RSQLite::SQLite(), temp_file)
-  
+
   DBI::dbExecute(con, "
     CREATE TABLE events (
       timestamp TEXT,
@@ -147,36 +144,36 @@ test_that("bid_flags extracts telemetry flags", {
       value TEXT
     )
   ")
-  
+
   DBI::dbExecute(con, "
-    INSERT INTO events VALUES 
+    INSERT INTO events VALUES
     ('2023-01-01', 'click', 'filter_button', 'session1', NULL, NULL, NULL),
     ('2023-01-01', 'abandon', 'dashboard', 'session1', NULL, NULL, NULL)
   ")
-  
+
   DBI::dbDisconnect(con)
-  
+
   suppressMessages(
     result <- bid_ingest_telemetry(temp_file)
   )
-  
+
   # extract flags
   flags <- bid_flags(result)
-  
+
   expect_true(is.list(flags))
   expect_true(length(flags) > 0)
-  
+
   # should contain boolean flags (and some metadata)
   boolean_flags <- flags[grepl("^has_", names(flags))]
   expect_true(all(sapply(boolean_flags, is.logical)))
-  
+
   unlink(temp_file)
 })
 
 test_that("bid_telemetry returns clean bid_issues_tbl", {
   temp_file <- tempfile(fileext = ".sqlite")
   con <- DBI::dbConnect(RSQLite::SQLite(), temp_file)
-  
+
   DBI::dbExecute(con, "
     CREATE TABLE events (
       timestamp TEXT,
@@ -188,19 +185,19 @@ test_that("bid_telemetry returns clean bid_issues_tbl", {
       value TEXT
     )
   ")
-  
+
   # create telemetry data that will definitely trigger issues
   # Use batched inserts instead of large concatenated strings
   batch_size <- 10
   total_sessions <- 25
-  
+
   for (batch_start in seq(1, total_sessions, by = batch_size)) {
     batch_end <- min(batch_start + batch_size - 1, total_sessions)
     batch_data <- c()
-    
+
     for (i in batch_start:batch_end) {
       base_time <- sprintf("2023-01-01 %02d:00:00", i %% 24)
-      
+
       if (i <= 20) {
         # Regular sessions - most don't use 'unused_filter' (triggers unused input)
         batch_data <- c(batch_data, sprintf(
@@ -221,29 +218,29 @@ test_that("bid_telemetry returns clean bid_issues_tbl", {
         ))
       }
     }
-    
+
     # Execute batch insert
     if (length(batch_data) > 0) {
       insert_sql <- sprintf("INSERT INTO events VALUES %s", paste(batch_data, collapse = ", "))
       DBI::dbExecute(con, insert_sql)
     }
   }
-  
+
   # Add unused filter that only 1 session uses (4% usage, below 5% threshold) in separate insert
   DBI::dbExecute(con, "INSERT INTO events VALUES ('2023-01-01 23:00:00', 'click', 'unused_filter', 'session1', NULL, NULL, NULL)")
-  
+
   DBI::dbDisconnect(con)
-  
+
   # test new concise API
   suppressMessages(
     result <- bid_telemetry(temp_file)
   )
-  
+
   expect_s3_class(result, "bid_issues_tbl")
   expect_true(tibble::is_tibble(result))
   # allow for empty result if no issues detected from minimal data
   expect_true(nrow(result) >= 0)
-  
+
   # should have issue metadata if any issues found
   expected_cols <- c("issue_id", "severity", "problem", "evidence", "theory")
   if (nrow(result) > 0) {
@@ -252,7 +249,7 @@ test_that("bid_telemetry returns clean bid_issues_tbl", {
     # empty tibble should still have the basic structure
     expect_true(tibble::is_tibble(result))
   }
-  
+
   unlink(temp_file)
 })
 
@@ -260,7 +257,7 @@ test_that("bid_issues class methods work with minimal data", {
   # test edge case with minimal telemetry data
   temp_file <- tempfile(fileext = ".sqlite")
   con <- DBI::dbConnect(RSQLite::SQLite(), temp_file)
-  
+
   DBI::dbExecute(con, "
     CREATE TABLE events (
       timestamp TEXT,
@@ -272,26 +269,26 @@ test_that("bid_issues class methods work with minimal data", {
       value TEXT
     )
   ")
-  
+
   # single minimal record
   DBI::dbExecute(con, "
     INSERT INTO events VALUES ('2023-01-01', 'click', 'button1', 'session1', NULL, NULL, NULL)
   ")
-  
+
   DBI::dbDisconnect(con)
-  
+
   suppressMessages(
     result <- bid_ingest_telemetry(temp_file)
   )
-  
+
   # all methods should work even with minimal data
   expect_no_error(print(result))
   expect_no_error(as_tibble(result))
   expect_no_error(bid_flags(result))
-  
+
   # should still maintain class structure
   expect_s3_class(result, c("bid_issues", "list"))
   expect_true(length(result) >= 0)
-  
+
   unlink(temp_file)
 })

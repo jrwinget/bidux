@@ -1,4 +1,7 @@
-# test functions to reduce repetition
+# ==============================================================================
+# HELPERS
+# ==============================================================================
+
 create_sample_telemetry_events <- function(num_sessions = 2) {
   events <- list()
   for (i in 1:num_sessions) {

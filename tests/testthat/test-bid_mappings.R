@@ -1,4 +1,7 @@
-# test functions to reduce repetition
+# ==============================================================================
+# HELPERS
+# ==============================================================================
+
 create_sample_custom_mappings <- function() {
   data.frame(
     keywords = c("mobile.*issue", "slow.*performance", "complex.*layout"),

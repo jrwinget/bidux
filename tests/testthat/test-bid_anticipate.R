@@ -1,4 +1,7 @@
-# Test functions to reduce repetition
+# ==============================================================================
+# HELPERS
+# ==============================================================================
+
 create_basic_interpret_stage <- function(question = "How to simplify?") {
   bid_interpret(
     central_question = question,

@@ -1,4 +1,7 @@
-# Test helper to create a simple bid_stage for testing
+# ==============================================================================
+# HELPERS
+# ==============================================================================
+
 create_test_stage <- function(
     stage_name = "Notice",
     problem = "Test problem",
@@ -11,7 +14,6 @@ create_test_stage <- function(
   )
 }
 
-# Test fixtures for common data structures
 test_personas <- list(
   list(
     name = "Analyst",
@@ -69,8 +71,8 @@ test_that("truncate_text handles various inputs correctly", {
   expect_equal(truncate_text(NA, 10), "")
   expect_equal(truncate_text("exactly10!", 10), "exactly10!")
   expect_equal(truncate_text("exactly11!!", 10), "exactly...")
-  expect_equal(truncate_text("abc", 3), "abc") # Exactly at limit
-  expect_equal(truncate_text("abcd", 3), "...") # One over limit
+  expect_equal(truncate_text("abc", 3), "abc") # exactly at limit
+  expect_equal(truncate_text("abcd", 3), "...") # 1 over limit
 })
 
 # ==============================================================================
@@ -78,11 +80,11 @@ test_that("truncate_text handles various inputs correctly", {
 # ==============================================================================
 
 test_that("quiet mode functions work correctly", {
-  # Store original setting
+  # store original setting
   original_quiet <- getOption("bidux.quiet", FALSE)
   on.exit(options(bidux.quiet = original_quiet))
 
-  # Test bid_set_quiet
+  # test bid_set_quiet
   old_value <- bid_set_quiet(TRUE)
   expect_equal(bid_get_quiet(), TRUE)
   expect_equal(old_value, original_quiet)
@@ -90,34 +92,34 @@ test_that("quiet mode functions work correctly", {
   bid_set_quiet(FALSE)
   expect_equal(bid_get_quiet(), FALSE)
 
-  # Test bid_with_quiet
+  # test bid_with_quiet
   options(bidux.quiet = FALSE)
   result <- bid_with_quiet({
     expect_true(bid_get_quiet())
     "test_result"
   })
   expect_equal(result, "test_result")
-  expect_false(bid_get_quiet()) # Should be restored
+  expect_false(bid_get_quiet()) # should be restored
 })
 
 test_that("bid_message respects quiet mode", {
   original_quiet <- getOption("bidux.quiet", FALSE)
   on.exit(options(bidux.quiet = original_quiet))
 
-  # Test with quiet = FALSE
+  # test with quiet = FALSE
   options(bidux.quiet = FALSE)
   expect_output(bid_message("Title", "Message 1", "Message 2"), "Title")
   expect_output(bid_message("Title", "Message 1", "Message 2"), "Message 1")
 
-  # Test with quiet = TRUE
+  # test with quiet = TRUE
   options(bidux.quiet = TRUE)
   expect_silent(bid_message("Title", "Message 1", "Message 2"))
 
-  # Test parameter override
+  # test parameter override
   expect_output(bid_message("Title", "Message", quiet = FALSE), "Title")
   expect_silent(bid_message("Title", "Message", quiet = TRUE))
 
-  # Test edge cases
+  # test edge cases
   expect_silent(bid_message(NULL))
   expect_silent(bid_message(""))
   expect_silent(bid_message("Something", NULL, NA, ""))
@@ -211,7 +213,7 @@ test_that("validate_character_param works correctly", {
   expect_error(validate_character_param("", "param"))
   expect_error(validate_character_param("   ", "param"))
 
-  # Minimum length validation
+  # minimum length validation
   expect_silent(validate_character_param("test", "param", min_length = 3))
   expect_error(validate_character_param("ab", "param", min_length = 3))
 })
@@ -244,30 +246,42 @@ test_that("validate_logical_param works correctly", {
 })
 
 test_that("validate_previous_stage works correctly", {
-  # Valid progressions
+  # valid progressions
   expect_silent(validate_previous_stage(NULL, "Interpret"))
   expect_silent(validate_previous_stage("Interpret", "Notice"))
   expect_silent(validate_previous_stage("Notice", "Anticipate"))
   expect_silent(validate_previous_stage("Anticipate", "Structure"))
   expect_silent(validate_previous_stage("Structure", "Validate"))
 
-  # Invalid stages
-  expect_error(validate_previous_stage(NULL, "InvalidStage"), "Invalid current stage: InvalidStage")
-  expect_error(validate_previous_stage("NotAStage", "Notice"), "Invalid previous stage name: NotAStage")
+  # invalid stages
+  expect_error(
+    validate_previous_stage(NULL, "InvalidStage"),
+    "Invalid current stage: InvalidStage"
+  )
+  expect_error(
+    validate_previous_stage("NotAStage", "Notice"),
+    "Invalid previous stage name: NotAStage"
+  )
 
-  # Discouraged progressions
-  expect_warning(validate_previous_stage("Interpret", "Structure"), "Discouraged stage progression")
-  expect_warning(validate_previous_stage("Notice", "Interpret"), "Invalid stage progression")
+  # discouraged progressions
+  expect_warning(
+    validate_previous_stage("Interpret", "Structure"),
+    "Discouraged stage progression"
+  )
+  expect_warning(
+    validate_previous_stage("Notice", "Interpret"),
+    "Invalid stage progression"
+  )
 })
 
 test_that("validate_user_personas works correctly", {
   expect_true(validate_user_personas(test_personas))
 
-  # Invalid structure
+  # invalid structure
   expect_error(validate_user_personas("not a list"))
   expect_error(validate_user_personas(list(list(goals = "missing name"))))
 
-  # Missing recommended fields should warn but not error
+  # missing recommended fields should warn but not error
   minimal_personas <- list(list(name = "Test"))
   expect_warning(expect_true(validate_user_personas(minimal_personas)))
 })
@@ -284,7 +298,7 @@ test_that("safe_check functions work correctly", {
   expect_false(safe_check(character(0)))
   expect_false(safe_check(NA))
 
-  # With condition functions
+  # with condition functions
   expect_true(safe_check("test", function(x) is.character(x)))
   expect_false(safe_check(123, function(x) is.character(x)))
   expect_false(safe_check("test", function(x) stop("error")))
@@ -366,7 +380,7 @@ test_that("get_stage_metadata works correctly", {
   expect_equal(metadata$total_stages, 5)
   expect_equal(metadata$validation_status, "completed")
 
-  # With custom metadata
+  # with custom metadata
   custom <- list(custom_field = "test")
   metadata_custom <- get_stage_metadata(2, custom)
   expect_equal(metadata_custom$stage_number, 2)
@@ -427,15 +441,9 @@ test_that("get_personas_from_previous works correctly", {
   expect_true(is.character(result))
   expect_false(is.na(result))
 
-  # Test with NULL
+  # test with NULL
   expect_true(is.na(get_personas_from_previous(NULL)))
 })
-
-# ==============================================================================
-# ERROR HANDLING AND MESSAGING
-# ==============================================================================
-
-# standard_error_msg function has been removed in favor of modern cli error handling
 
 # ==============================================================================
 # DOMAIN-SPECIFIC FUNCTIONS
@@ -470,7 +478,7 @@ test_that("detect_concepts_from_text works correctly", {
   expect_true(is.character(concepts))
   expect_gte(length(concepts), 0)
 
-  # Empty/NA text
+  # empty/NA text
   empty_result <- detect_concepts_from_text("")
   expect_true(is.character(empty_result))
   expect_equal(length(empty_result), 0)
@@ -481,11 +489,11 @@ test_that("detect_concepts_from_text works correctly", {
 })
 
 test_that("format_accessibility_for_storage works correctly", {
-  # String input
+  # string input
   result1 <- format_accessibility_for_storage("High contrast colors")
   expect_true(is.character(result1) || is.na(result1))
 
-  # List input
+  # list input
   acc_list <- list(contrast = "AA", keyboard = "full")
   result2 <- format_accessibility_for_storage(acc_list)
   expect_true(is.character(result2) || is.na(result2))
@@ -500,7 +508,7 @@ test_that("get_accessibility_advice works correctly", {
   expect_match(get_accessibility_advice("grid"), "screen readers")
   expect_match(get_accessibility_advice("card"), "focus management")
 
-  # Unknown/NULL layout
+  # unknown/NULL layout
   result <- get_accessibility_advice("unknown")
   expect_true(is.character(result))
   expect_gt(nchar(result), 0)
@@ -550,18 +558,18 @@ test_that("generate_stage_suggestions works correctly", {
 })
 
 test_that("evaluate_suggestion_condition works correctly", {
-  # Valid function condition
+  # valid function condition
   valid_condition <- function(ctx) !is.null(ctx$problem)
   context_data <- list(problem = "Test problem")
   result <- evaluate_suggestion_condition(valid_condition, context_data)
   expect_true(is.logical(result))
 
-  # Condition that returns FALSE
+  # condition that returns FALSE
   false_condition <- function(ctx) is.null(ctx$problem)
   result_false <- evaluate_suggestion_condition(false_condition, context_data)
   expect_true(is.logical(result_false))
 
-  # Non-function condition
+  # non-function condition
   suppressWarnings({
     result_invalid <- evaluate_suggestion_condition(
       "not a function",
@@ -571,7 +579,7 @@ test_that("evaluate_suggestion_condition works correctly", {
     expect_false(result_invalid)
   })
 
-  # Condition that throws error
+  # condition that throws error
   error_condition <- function(ctx) stop("Test error")
   suppressWarnings({
     result_error <- evaluate_suggestion_condition(error_condition, context_data)
@@ -591,13 +599,13 @@ test_that("time wrapper .now works correctly", {
 })
 
 test_that(".format_telemetry_refs_for_validation works correctly", {
-  # Character vector input
+  # character vector input
   char_refs <- c("metric1", "metric2")
   result1 <- .format_telemetry_refs_for_validation(char_refs)
   expect_true(is.character(result1))
   expect_match(result1, "Track specific metrics")
 
-  # List input
+  # list input
   list_refs <- list(clicks = "button clicks", views = "page views")
   result2 <- .format_telemetry_refs_for_validation(list_refs)
   expect_true(is.character(result2))

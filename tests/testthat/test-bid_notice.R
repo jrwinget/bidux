@@ -1,22 +1,19 @@
-library(testthat)
-library(tibble)
-
 test_that("bid_notice returns a bid_stage object with correct structure", {
   interpret_stage <- bid_interpret(
     central_question = "How can we improve dashboard navigation?"
   )
-  
+
   result <- bid_notice(
     previous_stage = interpret_stage,
     problem = "Users struggle to navigate cluttered dashboards",
     evidence = "User testing showed increased time to locate key metrics."
   )
 
-  # Check S3 class
+  # check S3 class
   expect_s3_class(result, "bid_stage")
   expect_s3_class(result, "bid_stage")
 
-  # Check required columns
+  # check required columns
   expected_cols <- c(
     "stage",
     "problem",
@@ -28,7 +25,7 @@ test_that("bid_notice returns a bid_stage object with correct structure", {
   expect_equal(sort(names(result)), sort(expected_cols))
   expect_equal(result$stage, "Notice")
 
-  # Check S3 methods work
+  # check S3 methods work
   expect_equal(get_stage(result), "Notice")
   expect_type(get_metadata(result), "list")
 })
@@ -37,7 +34,7 @@ test_that("bid_notice respects provided theory and doesn't auto-suggest", {
   interpret_stage <- bid_interpret(
     central_question = "How can we improve user experience?"
   )
-  
+
   result <- bid_notice(
     previous_stage = interpret_stage,
     problem = "Simple dashboard issue",
@@ -46,7 +43,7 @@ test_that("bid_notice respects provided theory and doesn't auto-suggest", {
   )
   expect_equal(result$theory, "Custom Theory")
 
-  # Check metadata reflects manual theory selection
+  # check metadata reflects manual theory selection
   metadata <- get_metadata(result)
   expect_false(metadata$auto_suggested_theory)
 })
@@ -55,17 +52,17 @@ test_that("bid_notice auto-suggests theory when not provided", {
   interpret_stage <- bid_interpret(
     central_question = "How can we reduce user overwhelm?"
   )
-  
+
   result <- bid_notice(
     previous_stage = interpret_stage,
     problem = "Users are overwhelmed with too many options in the dropdown",
     evidence = "User testing shows confusion"
   )
 
-  # Should suggest a theory
+  # should suggest a theory
   expect_false(is.na(result$theory))
 
-  # Check metadata reflects auto-suggestion
+  # check metadata reflects auto-suggestion
   metadata <- get_metadata(result)
   expect_true(metadata$auto_suggested_theory)
   expect_type(metadata$theory_confidence, "double")
@@ -76,7 +73,7 @@ test_that("bid_notice warns for deprecated target_audience parameter", {
   interpret_stage <- bid_interpret(
     central_question = "How can we improve sales team efficiency?"
   )
-  
+
   expect_warning(
     result <- bid_notice(
       previous_stage = interpret_stage,
@@ -94,7 +91,7 @@ test_that("bid_notice works correctly without target_audience", {
   interpret_stage <- bid_interpret(
     central_question = "How can we clarify chart design?"
   )
-  
+
   result <- bid_notice(
     previous_stage = interpret_stage,
     problem = "The chart is cluttered and confusing",
@@ -110,7 +107,7 @@ test_that("bid_notice warns for short problem description", {
       interpret_stage <- bid_interpret(central_question = "Test question?")
       bid_notice(
         previous_stage = interpret_stage,
-        problem = "Short", 
+        problem = "Short",
         evidence = "Sufficient evidence provided."
       )
     },
@@ -134,7 +131,7 @@ test_that("bid_notice warns for short evidence description", {
 
 test_that("bid_notice errors with proper validation messages", {
   interpret_stage <- bid_interpret(central_question = "Test question?")
-  
+
   expect_error(
     bid_notice(
       previous_stage = interpret_stage,
@@ -147,7 +144,7 @@ test_that("bid_notice errors with proper validation messages", {
   expect_error(
     bid_notice(
       previous_stage = interpret_stage,
-      problem = "Valid problem", 
+      problem = "Valid problem",
       evidence = 456
     ),
     "Parameter 'evidence' must be a character string"
@@ -179,7 +176,7 @@ test_that("bid_notice returns timestamp as a POSIXct object", {
   interpret_stage <- bid_interpret(
     central_question = "How can we improve user experience?"
   )
-  
+
   result <- bid_notice(
     previous_stage = interpret_stage,
     problem = "A sufficiently detailed problem description.",
@@ -192,7 +189,7 @@ test_that("bid_notice suggests appropriate theory based on problem description",
   interpret_stage <- bid_interpret(
     central_question = "How can we reduce user overwhelm?"
   )
-  
+
   result1 <- bid_notice(
     previous_stage = interpret_stage,
     problem = "Users are overwhelmed with too many options in the dropdown",
@@ -215,7 +212,7 @@ test_that("bid_notice suggests appropriate theory based on problem description",
 
 test_that("bid_notice handles empty strings and validates properly", {
   interpret_stage <- bid_interpret(central_question = "Test question?")
-  
+
   expect_error(
     bid_notice(
       previous_stage = interpret_stage,
@@ -228,7 +225,7 @@ test_that("bid_notice handles empty strings and validates properly", {
   expect_error(
     bid_notice(
       previous_stage = interpret_stage,
-      problem = "   ", 
+      problem = "   ",
       evidence = "Valid evidence"
     ),
     "Parameter 'problem' must have at least 1 character"
@@ -237,7 +234,7 @@ test_that("bid_notice handles empty strings and validates properly", {
   expect_error(
     bid_notice(
       previous_stage = interpret_stage,
-      problem = "Valid problem", 
+      problem = "Valid problem",
       evidence = ""
     ),
     "Parameter 'evidence' must have at least 1 character"
@@ -246,7 +243,7 @@ test_that("bid_notice handles empty strings and validates properly", {
   expect_error(
     bid_notice(
       previous_stage = interpret_stage,
-      problem = NULL, 
+      problem = NULL,
       evidence = "Valid evidence"
     ),
     "Parameter 'problem' is required"
@@ -255,7 +252,7 @@ test_that("bid_notice handles empty strings and validates properly", {
   expect_error(
     bid_notice(
       previous_stage = interpret_stage,
-      problem = "Valid problem", 
+      problem = "Valid problem",
       evidence = NULL
     ),
     "Parameter 'evidence' is required"
@@ -276,7 +273,7 @@ test_that("bid_notice handles edge cases in optional parameters", {
   interpret_stage <- bid_interpret(
     central_question = "How can we improve user experience?"
   )
-  
+
   result <- bid_notice(
     previous_stage = interpret_stage,
     problem = long_problem,
@@ -301,7 +298,7 @@ test_that("bid_notice metadata contains expected information", {
   interpret_stage <- bid_interpret(
     central_question = "How can we simplify complex dashboards?"
   )
-  
+
   result <- bid_notice(
     previous_stage = interpret_stage,
     problem = "Complex dashboard with many options",
@@ -310,18 +307,17 @@ test_that("bid_notice metadata contains expected information", {
 
   metadata <- get_metadata(result)
 
-  # Check required metadata fields
+  # check required metadata fields
   expect_true("auto_suggested_theory" %in% names(metadata))
   expect_true("theory_confidence" %in% names(metadata))
   expect_true("problem_length" %in% names(metadata))
   expect_true("evidence_length" %in% names(metadata))
-  # has_target_audience is no longer in metadata since target_audience was removed
   expect_true("validation_status" %in% names(metadata))
   expect_true("stage_number" %in% names(metadata))
   expect_true("total_stages" %in% names(metadata))
   expect_true("custom_mappings_used" %in% names(metadata))
 
-  # Check values
+  # check values
   expect_equal(metadata$stage_number, 2)
   expect_equal(metadata$total_stages, 5)
   expect_equal(metadata$validation_status, "completed")
@@ -332,7 +328,7 @@ test_that("bid_notice print method works correctly", {
   interpret_stage <- bid_interpret(
     central_question = "How can we improve data visualization?"
   )
-  
+
   suppressWarnings(
     result <- bid_notice(
       previous_stage = interpret_stage,
@@ -342,27 +338,26 @@ test_that("bid_notice print method works correctly", {
     )
   )
 
-  # Test that print method executes without error
+  # test that print method executes without error
   expect_output(print(result), "BID Framework")
   expect_output(print(result), "Notice Stage")
   expect_output(print(result), "Problem:")
   expect_output(print(result), "Theory:")
   expect_output(print(result), "Evidence:")
-  # Target Audience is no longer displayed since it's been removed
 })
 
 test_that("bid_notice summary method works correctly", {
   interpret_stage <- bid_interpret(
     central_question = "How can we reduce interface complexity?"
   )
-  
+
   result <- bid_notice(
     previous_stage = interpret_stage,
     problem = "Complex interface overwhelms users",
     evidence = "Analytics show high bounce rates"
   )
 
-  # Test that summary method executes without error
+  # test that summary method executes without error
   expect_output(summary(result), "BID Framework:")
   expect_output(summary(result), "Notice Stage Summary")
   expect_output(summary(result), "Metadata:")
@@ -372,21 +367,21 @@ test_that("bid_notice as_tibble method works correctly", {
   interpret_stage <- bid_interpret(
     central_question = "How can we address interface complexity?"
   )
-  
+
   result <- bid_notice(
     previous_stage = interpret_stage,
     problem = "Interface complexity issue",
     evidence = "User research indicates problems"
   )
 
-  # Convert to tibble
+  # convert to tibble
   tibble_result <- as_tibble(result)
 
-  # Should be a regular tibble without bid_stage class
+  # should be a regular tibble without bid_stage class
   expect_s3_class(tibble_result, "tbl_df")
   expect_false(inherits(tibble_result, "bid_stage"))
 
-  # Should have same data
+  # should have same data
   expect_equal(names(tibble_result), names(result))
   expect_equal(nrow(tibble_result), nrow(result))
 })
@@ -395,8 +390,8 @@ test_that("bid_notice theory confidence scoring works", {
   interpret_stage <- bid_interpret(
     central_question = "How can we reduce user overwhelm?"
   )
-  
-  # Test high-confidence match
+
+  # test high-confidence match
   result1 <- bid_notice(
     previous_stage = interpret_stage,
     problem = "Too many dropdown options overwhelm users",
@@ -404,9 +399,9 @@ test_that("bid_notice theory confidence scoring works", {
   )
 
   metadata1 <- get_metadata(result1)
-  expect_true(metadata1$theory_confidence >= 0.8) # Should be high confidence
+  expect_true(metadata1$theory_confidence >= 0.8) # should be high confidence
 
-  # Test lower confidence scenario
+  # test lower confidence scenario
   result2 <- bid_notice(
     previous_stage = interpret_stage,
     problem = "General usability issues",
@@ -414,21 +409,21 @@ test_that("bid_notice theory confidence scoring works", {
   )
 
   metadata2 <- get_metadata(result2)
-  expect_true(metadata2$theory_confidence > 0) # Should have some confidence
+  expect_true(metadata2$theory_confidence > 0) # should have some confidence
 })
 
 test_that("bid_notice generates appropriate suggestions", {
   interpret_stage <- bid_interpret(
     central_question = "How can we improve mobile interface usability?"
   )
-  
+
   result <- bid_notice(
     previous_stage = interpret_stage,
     problem = "Mobile interface is difficult to use",
     evidence = "Touch targets are too small"
   )
 
-  # Should generate relevant suggestions
+  # should generate relevant suggestions
   expect_true(nchar(result$suggestions) > 0)
   expect_match(
     result$suggestions,
@@ -442,7 +437,7 @@ test_that("bid_notice generates appropriate suggestions", {
     evidence = "Decision time is very long"
   )
 
-  # Should generate relevant suggestions
+  # should generate relevant suggestions
   expect_true(nchar(result2$suggestions) > 0)
   expect_match(
     result2$suggestions,
