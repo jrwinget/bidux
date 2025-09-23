@@ -1597,7 +1597,7 @@ bid_notices <- function(issues, filter = NULL, previous_stage = NULL, max_issues
         if (grepl("system|file|eval|source|get|assign|load|save|cat|write", expr_text)) {
           cli::cli_abort("Filter expression contains potentially unsafe operations")
         }
-        filter_result <- eval(filter_expr, issues, parent.frame())
+        filter_result <- eval(filter_expr, issues, emptyenv())
         if (!is.logical(filter_result) || length(filter_result) != nrow(issues)) {
           cli::cli_abort("Filter expression must return logical vector of same length as issues data")
         }
