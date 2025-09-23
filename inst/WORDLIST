@@ -28,6 +28,7 @@ pak
 pkgdown
 plotly
 reactable
+repo
 roxygen2
 SaaS
 sqlite
