@@ -43,7 +43,7 @@ interpret_stage <- bid_interpret(
   central_question = "How can we improve selection efficiency?",
   data_story = list(
     hook = "Too many options",
-    context = "Excessive choices", 
+    context = "Excessive choices",
     tension = "User frustration",
     resolution = "Simplify menu"
   )

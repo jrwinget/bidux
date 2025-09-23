@@ -30,7 +30,7 @@ notice <- bid_notice_issue(issues[1, ], previous_stage = interpret)
 
 # Override problem description
 notice <- bid_notice_issue(
-  issues[1, ], 
+  issues[1, ],
   previous_stage = interpret,
   override = list(problem = "Custom problem description")
 )
