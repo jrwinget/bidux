@@ -166,15 +166,11 @@ bid_notice <- function(
   # enhanced user feedback with progress tracking
   bid_message(
     "Stage 2 (Notice) completed. (40% complete)",
-    paste0("Problem: ", truncate_text(problem_clean, 60)),
-    paste0(
-      "Theory: ",
-      theory,
-      if (auto_suggested_theory) " (auto-suggested)" else ""
-    ),
-    paste0("Evidence: ", truncate_text(evidence_clean, 60)),
+    glue::glue("Problem: {truncate_text(problem_clean, 60)}"),
+    glue::glue("Theory: {theory}{if (auto_suggested_theory) ' (auto-suggested)' else ''}"),
+    glue::glue("Evidence: {truncate_text(evidence_clean, 60)}"),
     if (auto_suggested_theory) {
-      paste0("Theory confidence: ", round(theory_confidence * 100), "%")
+      glue::glue("Theory confidence: {round(theory_confidence * 100)}%")
     },
     "Next: Use bid_anticipate() for Stage 3",
     quiet = quiet

@@ -87,7 +87,7 @@ bid_structure <- function(
 
   chosen_layout <- suggest_layout_from_previous(previous_stage, telemetry_flags)
 
-  bid_alert_info(paste0("Auto-selected layout: ", chosen_layout), quiet = quiet)
+  bid_alert_info(glue::glue("Auto-selected layout: {chosen_layout}"), quiet = quiet)
   bid_alert_info(layout_rationale(previous_stage, chosen_layout), quiet = quiet)
   
   # issue deprecation warning once per session (skip in tests to reduce noise)
@@ -154,9 +154,9 @@ bid_structure <- function(
   
   bid_message(
     "Stage 4 (Structure) completed.",
-    paste0("Auto-selected layout: ", chosen_layout),
-    paste0("Concept groups generated: ", length(suggestion_groups)),
-    paste0("Total concepts: ", length(concepts_detected)),
+    glue::glue("Auto-selected layout: {chosen_layout}"),
+    glue::glue("Concept groups generated: {length(suggestion_groups)}"),
+    glue::glue("Total concepts: {length(concepts_detected)}"),
     quiet = quiet
   )
 

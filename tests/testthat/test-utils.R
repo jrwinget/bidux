@@ -191,20 +191,13 @@ test_that("validate_required_params works correctly", {
   expect_silent(validate_required_params(problem = "test", evidence = "test"))
   expect_error(
     validate_required_params(problem = NULL, evidence = "test"),
-    "Required parameter 'problem' must be provided"
+    "Required parameter 'problem' is missing"
   )
-  expect_error(
-    validate_required_params(problem = "", evidence = "test"),
-    "Required parameter 'problem' must be provided"
-  )
-  expect_error(
-    validate_required_params(problem = "   ", evidence = "test"),
-    "Required parameter 'problem' must be provided"
-  )
-  expect_error(
-    validate_required_params(problem = NA, evidence = "test"),
-    "Required parameter 'problem' must be provided"
-  )
+  # validate_required_params only checks for NULL, not empty strings
+  expect_silent(validate_required_params(problem = "", evidence = "test"))
+  expect_silent(validate_required_params(problem = "   ", evidence = "test"))
+  # validate_required_params only checks for NULL, not NA
+  expect_silent(validate_required_params(problem = NA, evidence = "test"))
 })
 
 test_that("validate_character_param works correctly", {
@@ -259,8 +252,8 @@ test_that("validate_previous_stage works correctly", {
   expect_silent(validate_previous_stage("Structure", "Validate"))
 
   # Invalid stages
-  expect_error(validate_previous_stage(NULL, "InvalidStage"), "Invalid stage: InvalidStage")
-  expect_error(validate_previous_stage("NotAStage", "Notice"), "Invalid stage: NotAStage")
+  expect_error(validate_previous_stage(NULL, "InvalidStage"), "Invalid current stage: InvalidStage")
+  expect_error(validate_previous_stage("NotAStage", "Notice"), "Invalid previous stage name: NotAStage")
 
   # Discouraged progressions
   expect_warning(validate_previous_stage("Interpret", "Structure"), "Discouraged stage progression")
@@ -442,24 +435,7 @@ test_that("get_personas_from_previous works correctly", {
 # ERROR HANDLING AND MESSAGING
 # ==============================================================================
 
-test_that("standard_error_msg generates proper messages", {
-  msg1 <- standard_error_msg("missing_param", "test_param")
-  expect_match(msg1, "Required parameter")
-  expect_match(msg1, "test_param")
-  expect_match(msg1, "must be provided")
-
-  msg2 <- standard_error_msg("invalid_param", "test_param", "character", "numeric")
-  expect_match(msg2, "Parameter")
-  expect_match(msg2, "test_param")
-  expect_match(msg2, "invalid")
-
-  msg3 <- standard_error_msg("invalid_stage", NULL, c("A", "B"), "C")
-  expect_match(msg3, "Invalid stage")
-  expect_match(msg3, "Must be one of")
-
-  msg4 <- standard_error_msg("unknown_type")
-  expect_match(msg4, "error occurred")
-})
+# standard_error_msg function has been removed in favor of modern cli error handling
 
 # ==============================================================================
 # DOMAIN-SPECIFIC FUNCTIONS

@@ -138,10 +138,10 @@ test_that("bid_notice errors with proper validation messages", {
   expect_error(
     bid_notice(
       previous_stage = interpret_stage,
-      problem = 123, 
+      problem = 123,
       evidence = "Valid evidence"
     ),
-    "'problem' must be a single character string"
+    "Parameter 'problem' must be a character string"
   )
 
   expect_error(
@@ -150,7 +150,7 @@ test_that("bid_notice errors with proper validation messages", {
       problem = "Valid problem", 
       evidence = 456
     ),
-    "'evidence' must be a single character string"
+    "Parameter 'evidence' must be a character string"
   )
 
   expect_error(
@@ -160,7 +160,7 @@ test_that("bid_notice errors with proper validation messages", {
       evidence = "Valid evidence",
       theory = 789
     ),
-    "'theory' must be a single character string"
+    "Parameter 'theory' must be a character string"
   )
 
   # target_audience parameter is now deprecated and ignored with warning
@@ -219,10 +219,10 @@ test_that("bid_notice handles empty strings and validates properly", {
   expect_error(
     bid_notice(
       previous_stage = interpret_stage,
-      problem = "", 
+      problem = "",
       evidence = "Valid evidence"
     ),
-    "'problem' cannot be empty or contain only whitespace"
+    "Parameter 'problem' must have at least 1 character"
   )
 
   expect_error(
@@ -231,7 +231,7 @@ test_that("bid_notice handles empty strings and validates properly", {
       problem = "   ", 
       evidence = "Valid evidence"
     ),
-    "'problem' cannot be empty or contain only whitespace"
+    "Parameter 'problem' must have at least 1 character"
   )
 
   expect_error(
@@ -240,7 +240,7 @@ test_that("bid_notice handles empty strings and validates properly", {
       problem = "Valid problem", 
       evidence = ""
     ),
-    "'evidence' cannot be empty or contain only whitespace"
+    "Parameter 'evidence' must have at least 1 character"
   )
 
   expect_error(
@@ -249,7 +249,7 @@ test_that("bid_notice handles empty strings and validates properly", {
       problem = NULL, 
       evidence = "Valid evidence"
     ),
-    "'problem' cannot be NULL"
+    "Parameter 'problem' is required"
   )
 
   expect_error(
@@ -258,7 +258,7 @@ test_that("bid_notice handles empty strings and validates properly", {
       problem = "Valid problem", 
       evidence = NULL
     ),
-    "'evidence' cannot be NULL"
+    "Parameter 'evidence' is required"
   )
 })
 
