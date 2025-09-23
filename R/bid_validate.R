@@ -30,14 +30,14 @@
 #'
 #' @examples
 #' validate_result <- bid_interpret(
-#'     central_question = "How can we improve delivery efficiency?",
-#'     data_story = list(
-#'       hook = "Too many delays",
-#'       context = "Excessive shipments",
-#'       tension = "User frustration",
-#'       resolution = "Increase delivery channels"
-#'     )
-#'   ) |>
+#'   central_question = "How can we improve delivery efficiency?",
+#'   data_story = list(
+#'     hook = "Too many delays",
+#'     context = "Excessive shipments",
+#'     tension = "User frustration",
+#'     resolution = "Increase delivery channels"
+#'   )
+#' ) |>
 #'   bid_notice(
 #'     problem  = "Issue with dropdown menus",
 #'     evidence = "User testing indicated delays"
@@ -50,9 +50,9 @@
 #'   ) |>
 #'   bid_structure() |>
 #'   bid_validate(
-#'    include_exp_design = FALSE,
-#'    include_telemetry = TRUE,
-#'    include_empower_tools = TRUE
+#'     include_exp_design = FALSE,
+#'     include_telemetry = TRUE,
+#'     include_empower_tools = TRUE
 #'   )
 #'
 #' summary(validate_result)
@@ -228,9 +228,8 @@ generate_summary_panel_suggestion <- function(previous_stage) {
 }
 
 generate_collaboration_suggestion <- function(
-  previous_stage,
-  include_empower_tools = TRUE
-) {
+    previous_stage,
+    include_empower_tools = TRUE) {
   # use the standardized helper function for consistency
   audience <- get_audience_from_previous(previous_stage)
 
@@ -287,11 +286,10 @@ generate_collaboration_suggestion <- function(
 }
 
 generate_next_steps_suggestion <- function(
-  previous_stage,
-  include_exp_design = TRUE,
-  include_telemetry = TRUE,
-  telemetry_refs = NULL
-) {
+    previous_stage,
+    include_exp_design = TRUE,
+    include_telemetry = TRUE,
+    telemetry_refs = NULL) {
   stage_name <- previous_stage$stage[1]
   next_steps <- character(0)
 
@@ -367,7 +365,7 @@ generate_next_steps_suggestion <- function(
       "Set up monitoring dashboards to track key performance indicators",
       "Plan post-launch telemetry analysis to validate design improvements"
     )
-    
+
     # add specific telemetry references if provided
     if (!is.null(telemetry_refs) && length(telemetry_refs) > 0) {
       telemetry_steps <- c(
@@ -375,7 +373,7 @@ generate_next_steps_suggestion <- function(
         .format_telemetry_refs_for_validation(telemetry_refs)
       )
     }
-    
+
     next_steps <- c(next_steps, telemetry_steps)
   }
 

@@ -45,7 +45,7 @@
 #'   theory = "Fitts's Law",
 #'   evidence = "Mobile users report frustration with small touch targets"
 #' )
-#' 
+#'
 #' summary(notice_result)
 #'
 #' @export
@@ -124,7 +124,7 @@ bid_notice <- function(
       mappings = NULL,
       show_message = TRUE
     )
-    
+
     theory <- suggestion_result$theory
     theory_confidence <- suggestion_result$confidence
     auto_suggested_theory <- suggestion_result$auto_suggested

@@ -2,7 +2,7 @@ test_that("safe_lower handles various input types", {
   expect_equal(safe_lower("UPPERCASE"), "uppercase")
   expect_equal(safe_lower("MixedCase"), "mixedcase")
   expect_equal(safe_lower(NULL), "")
-  expect_equal(safe_lower(NA), "na")  # NA gets converted to "na" string
+  expect_equal(safe_lower(NA), "na") # NA gets converted to "na" string
   expect_equal(safe_lower(""), "")
   expect_equal(safe_lower(c("A", "B")), "a b")
   expect_equal(safe_lower("  spaced  "), "spaced")
@@ -135,7 +135,7 @@ test_that("suggest_layout_from_previous detects layout patterns", {
 
   telemetry_flags <- list(has_navigation_issues = TRUE)
   layout_avoid_tabs <- suggest_layout_from_previous(tabs_with_issues, telemetry_flags)
-  expect_equal(layout_avoid_tabs, "grid")  # should fallback to grid
+  expect_equal(layout_avoid_tabs, "grid") # should fallback to grid
 
   # test default fallback
   empty_context <- data.frame()

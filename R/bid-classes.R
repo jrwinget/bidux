@@ -650,8 +650,7 @@ summary.bid_result <- function(object, ...) {
     cat("\n", cli::style_bold(paste0(i, ". ", get_stage(stage_obj))), "\n")
 
     # print key details without full summary
-    important_cols <- switch(
-      get_stage(stage_obj),
+    important_cols <- switch(get_stage(stage_obj),
       "Notice" = c("problem", "theory", "evidence"),
       "Interpret" = c("central_question", "hook"),
       "Structure" = c("layout", "concepts"),

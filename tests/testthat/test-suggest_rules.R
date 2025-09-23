@@ -372,12 +372,15 @@ test_that("all consolidated rules have valid conditions", {
         # should not throw error
         expect_silent({
           if (is.function(rule$condition)) {
-            tryCatch({
-              result <- rule$condition(context)
-              expect_true(is.logical(result) || is.null(result))
-            }, error = function(e) {
-              # errors in rule conditions are acceptable - they should be handled gracefully
-            })
+            tryCatch(
+              {
+                result <- rule$condition(context)
+                expect_true(is.logical(result) || is.null(result))
+              },
+              error = function(e) {
+                # errors are acceptable as long as they are caught
+              }
+            )
           }
         })
       }

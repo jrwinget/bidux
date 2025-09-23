@@ -34,7 +34,7 @@ test_that("bid_ingest_telemetry returns hybrid bid_issues object", {
   expect_true(inherits(result, "list"))
 
   # should behave like a list (legacy compatibility)
-  expect_true(length(result) >= 0)  # allow empty results
+  expect_true(length(result) >= 0) # allow empty results
   if (length(result) > 0) {
     expect_s3_class(result[[1]], "bid_stage")
   }
@@ -118,7 +118,7 @@ test_that("as_tibble.bid_issues returns issues tibble", {
   issues_tbl <- as_tibble(result)
 
   expect_true(tibble::is_tibble(issues_tbl))
-  expect_true(nrow(issues_tbl) >= 0)  # allow empty results
+  expect_true(nrow(issues_tbl) >= 0) # allow empty results
 
   # should have expected columns if any issues found
   expected_cols <- c("issue_id", "severity", "problem", "evidence")

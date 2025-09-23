@@ -445,7 +445,7 @@ validate_previous_stage <- function(previous_stage = NULL, current_stage) {
     prev_stage_name <- attr(previous_stage, "stage")
   } else if (
     (tibble::is_tibble(previous_stage) || is.data.frame(previous_stage)) &&
-    "stage" %in% names(previous_stage)
+      "stage" %in% names(previous_stage)
   ) {
     prev_stage_name <- previous_stage$stage[1]
   } else if (is.character(previous_stage) && length(previous_stage) == 1) {
@@ -478,11 +478,11 @@ validate_previous_stage <- function(previous_stage = NULL, current_stage) {
 
   # allowed transitions
   allowed_transitions <- list(
-    "Interpret" = c("Validate"),  # can be blank (handled above) or iterative from Validate
-    "Notice" = c("Interpret", "Notice", "Anticipate", "Structure"),  # inner stages flexible
-    "Anticipate" = c("Interpret", "Notice", "Anticipate", "Structure"),  # inner stages flexible
-    "Structure" = c("Interpret", "Notice", "Anticipate", "Structure"),  # inner stages flexible
-    "Validate" = c("Notice", "Anticipate", "Structure", "Interpret")  # accepts inner stages and allows iterative flow to Interpret
+    "Interpret" = c("Validate"), # can be blank (handled above) or iterative from Validate
+    "Notice" = c("Interpret", "Notice", "Anticipate", "Structure"), # inner stages flexible
+    "Anticipate" = c("Interpret", "Notice", "Anticipate", "Structure"), # inner stages flexible
+    "Structure" = c("Interpret", "Notice", "Anticipate", "Structure"), # inner stages flexible
+    "Validate" = c("Notice", "Anticipate", "Structure", "Interpret") # accepts inner stages and allows iterative flow to Interpret
   )
 
   # skip stage progression warnings during tests (except explicit validation tests)
@@ -506,13 +506,13 @@ validate_previous_stage <- function(previous_stage = NULL, current_stage) {
   } else {
     # check for discouraged but valid transitions
     discouraged_transitions <- list(
-      "Structure" = c("Interpret"),  # Structure should ideally have Notice/Anticipate first
-      "Validate" = c("Interpret")    # Validate should go through inner stages first
+      "Structure" = c("Interpret"), # Structure should ideally have Notice/Anticipate first
+      "Validate" = c("Interpret") # Validate should go through inner stages first
     )
 
     if (current_stage %in% names(discouraged_transitions) &&
-        prev_stage_name %in% discouraged_transitions[[current_stage]] &&
-        (!in_test_env || calling_test)) {
+      prev_stage_name %in% discouraged_transitions[[current_stage]] &&
+      (!in_test_env || calling_test)) {
       cli::cli_warn(c(
         "!" = glue::glue("Discouraged stage progression: {prev_stage_name} -> {current_stage}"),
         "i" = "Consider using Notice and/or Anticipate stages first for better workflow"
@@ -735,7 +735,6 @@ generate_stage_suggestions <- function(
     stage_name,
     context_data,
     suggestion_rules = NULL) {
-
   # use consolidated rules from suggest_rules.R
   applicable_suggestions <- apply_suggestion_rules(
     stage_name,
@@ -1151,8 +1150,7 @@ get_accessibility_advice <- function(layout_context) {
     layout_context <- "general"
   }
 
-  switch(
-    layout_context,
+  switch(layout_context,
     "tabs" = "ensure keyboard navigation between tabs and screen reader announcements",
     "grid" = "provide proper row/column headers and cell relationships for screen readers",
     "card" = "ensure cards have descriptive labels and proper focus management",
@@ -1296,7 +1294,6 @@ parse_next_steps <- function(next_steps_formatted) {
         refs_text
       )
     )
-
   } else if (is.list(telemetry_refs)) {
     # named list with more structured references
     formatted_refs <- character(0)

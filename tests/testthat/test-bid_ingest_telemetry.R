@@ -301,8 +301,8 @@ test_that("bid_ingest_telemetry respects custom thresholds", {
   result <- bid_ingest_telemetry(
     temp_json,
     thresholds = list(
-      unused_input_threshold = 0.1,  # very low threshold
-      delay_threshold_seconds = 1    # very low delay threshold
+      unused_input_threshold = 0.1, # very low threshold
+      delay_threshold_seconds = 1 # very low delay threshold
     )
   )
 

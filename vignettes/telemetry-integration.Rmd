@@ -34,7 +34,7 @@ library(dplyr)
 
 # Modern approach: get tidy issues tibble
 issues <- bid_telemetry("telemetry.sqlite")
-print(issues)  # Shows organized issue summary
+print(issues) # Shows organized issue summary
 
 # Triage critical issues
 critical <- issues |>
@@ -62,12 +62,12 @@ The `bid_ingest_telemetry()` function now returns a hybrid object that maintains
 ```{r legacy_compat, eval=FALSE}
 # Legacy approach still works exactly as before
 legacy_notices <- bid_ingest_telemetry("telemetry.sqlite")
-length(legacy_notices)  # Behaves like list of Notice stages
-legacy_notices[[1]]     # Access individual Notice objects
+length(legacy_notices) # Behaves like list of Notice stages
+legacy_notices[[1]] # Access individual Notice objects
 
 # But now also provides enhanced functionality
-as_tibble(legacy_notices)  # Get tidy issues view
-bid_flags(legacy_notices)  # Extract global telemetry flags
+as_tibble(legacy_notices) # Get tidy issues view
+bid_flags(legacy_notices) # Extract global telemetry flags
 ```
 
 ## Prerequisites
@@ -290,14 +290,14 @@ high_priority <- issues |>
 notice_list <- bid_notices(
   issues = high_priority,
   previous_stage = interpret_result,
-  filter = function(x) x$severity == "critical"  # Additional filtering
+  filter = function(x) x$severity == "critical" # Additional filtering
 )
 
 # Pipeline approach - process first N issues
 pipeline_notices <- bid_pipeline(
   issues = high_priority,
   previous_stage = interpret_result,
-  max = 3  # Limit to 3 most critical issues
+  max = 3 # Limit to 3 most critical issues
 )
 ```
 
@@ -311,7 +311,7 @@ flags <- bid_flags(issues)
 # Use flags to inform layout selection
 structure_result <- bid_structure(
   previous_stage = anticipate_result,
-  telemetry_flags = flags  # Influences layout choice and suggestion scoring
+  telemetry_flags = flags # Influences layout choice and suggestion scoring
 )
 
 # The layout selection will avoid problematic patterns based on your data
@@ -456,7 +456,7 @@ anticipate_stage <- bid_anticipate(
 flags <- bid_flags(issues)
 structure_stage <- bid_structure(
   previous_stage = anticipate_stage,
-  telemetry_flags = flags  # This influences layout selection
+  telemetry_flags = flags # This influences layout selection
 )
 
 # Define success criteria and validation approach
@@ -533,7 +533,8 @@ ui_after <- page_fillable(
             tags$li("⚠️ Cart abandonment rate increased")
           ),
           actionButton("investigate_abandonment", "Investigate",
-                      class = "btn btn-warning btn-sm")
+            class = "btn btn-warning btn-sm"
+          )
         )
       )
     ),
@@ -638,7 +639,7 @@ Here's the complete workflow using the streamlined modern API:
 issues <- bid_telemetry("telemetry.sqlite")
 
 # 2. Triage issues using tidy workflow
-print(issues)  # Review issue summary
+print(issues) # Review issue summary
 
 # Focus on critical issues
 critical_issues <- issues |>

@@ -152,7 +152,6 @@ test_that("bid_suggest_components works with different BID stages", {
   # test with Structure stage
   structure_result <- bid_structure(
     interpret_result,
-
     concepts = c("Visual Hierarchy", "Cognitive Load Theory")
   )
 
@@ -224,7 +223,6 @@ test_that("bid_suggest_components extracts concepts correctly", {
       notice_with_theory,
       central_question = "How to improve visual organization?"
     ),
-
     concepts = c("Principle of Proximity", "Visual Hierarchy")
   )
 
@@ -247,7 +245,7 @@ test_that("bid_suggest_components provides appropriate user feedback", {
     evidence = "Test evidence"
   )
 
-  # Should provide success message
+  # should provide success message
   expect_message(
     bid_suggest_components(notice_result),
     "Found .* component suggestion"
@@ -270,7 +268,6 @@ test_that("bid_suggest_components handles layout-specific scoring", {
       problem = "Need better organization",
       evidence = "User feedback"
     ),
-
     concepts = "Information Hierarchy"
   )
 
@@ -327,7 +324,7 @@ test_that("bid_suggest_components component database has required structure", {
 
   expect_true(all(required_fields %in% names(suggestions)))
 
-  # Check that packages are from expected list
+  # check that packages are from expected list
   valid_packages <- c(
     "shiny",
     "bslib",
@@ -363,7 +360,7 @@ test_that("bid_suggest_components handles audience-based context", {
   expect_s3_class(exec_suggestions, "tbl_df")
   expect_true(nrow(exec_suggestions) > 0)
 
-  # Should prioritize executive-friendly components
+  # should prioritize executive-friendly components
   exec_components <- exec_suggestions[
     grepl(
       "summary|value|card|executive",

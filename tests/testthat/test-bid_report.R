@@ -14,7 +14,6 @@ test_that("bid_report generates text report with expected content", {
           theory = "Cognitive Load Theory",
           evidence = "User complaints"
         ),
-
         concepts = c("Principle of Proximity", "Default Effect")
       ),
       bias_mitigations = list(
@@ -57,7 +56,6 @@ test_that("bid_report generates HTML report with correct format", {
           theory = "Cognitive Load Theory",
           evidence = "User complaints"
         ),
-
         concepts = c("Principle of Proximity", "Default Effect")
       ),
       bias_mitigations = list(
@@ -108,7 +106,7 @@ test_that("bid_report fails with incorrect input", {
   interpret_result <- bid_interpret(
     central_question = "How to test error handling?"
   )
-  
+
   notice_result <- bid_notice(
     previous_stage = interpret_result,
     problem = "Complex interface",

@@ -290,7 +290,7 @@ If you have telemetry data from user interactions, `{bidux}` can help transform 
 issues <- bid_telemetry("path/to/telemetry.sqlite")
 
 # Triage and review issues
-print(issues)  # Shows organized issue summary
+print(issues) # Shows organized issue summary
 
 # Convert high-priority issues to Notice stages
 critical_issues <- issues |>
@@ -317,11 +317,11 @@ The hybrid object returned by `bid_ingest_telemetry()` maintains backward compat
 ```{r legacy_compatibility}
 # Legacy approach still works
 legacy_notices <- bid_ingest_telemetry("path/to/telemetry.sqlite")
-length(legacy_notices)  # Behaves like list of Notice stages
+length(legacy_notices) # Behaves like list of Notice stages
 
 # But now also provides enhanced features
-as_tibble(legacy_notices)  # Tidy issues view
-bid_flags(legacy_notices)  # Extract global flags
+as_tibble(legacy_notices) # Tidy issues view
+bid_flags(legacy_notices) # Extract global flags
 ```
 
 Visit [github.com/jrwinget/bidux](https://github.com/jrwinget/bidux) for updates and to contribute to the package development. We welcome feedback and suggestions to help make the BID framework even more effective for Shiny developers.

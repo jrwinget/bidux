@@ -61,7 +61,7 @@ test_that("normalize_telemetry_columns handles various formats", {
   )
 
   filtered <- normalize_telemetry_columns(mixed_events)
-  expect_equal(nrow(filtered), 2)  # should filter out empty row
+  expect_equal(nrow(filtered), 2) # should filter out empty row
 })
 
 test_that("read_telemetry_json handles different JSON formats", {
@@ -113,12 +113,15 @@ test_that("read_telemetry_json handles different JSON formats", {
   writeLines("invalid json content", temp_invalid)
 
   # function may handle invalid JSON by returning empty data frame or error
-  result_invalid <- tryCatch({
-    read_telemetry_json(temp_invalid)
-  }, error = function(e) {
-    expect_true(grepl("Error reading JSON file", e$message))
-    NULL
-  })
+  result_invalid <- tryCatch(
+    {
+      read_telemetry_json(temp_invalid)
+    },
+    error = function(e) {
+      expect_true(grepl("Error reading JSON file", e$message))
+      NULL
+    }
+  )
 
   # if no error, should return data frame
   if (!is.null(result_invalid)) {
@@ -193,6 +196,6 @@ test_that(".calculate_severity_metrics handles zero sessions correctly", {
   expect_true("severity" %in% names(result))
   expect_true("affected_sessions" %in% names(result))
   expect_true("impact_rate" %in% names(result))
-  expect_equal(result$impact_rate, 0.0)  # Should not cause division by zero
+  expect_equal(result$impact_rate, 0.0) # should not cause division by zero
   expect_true(result$severity %in% c("critical", "high", "medium", "low"))
 })

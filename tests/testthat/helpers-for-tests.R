@@ -108,7 +108,7 @@ expect_non_empty_character <- function(value, min_length = 1) {
 # skip helpers for conditional testing
 skip_if_no_telemetry_deps <- function() {
   if (!requireNamespace("DBI", quietly = TRUE) ||
-      !requireNamespace("RSQLite", quietly = TRUE)) {
+    !requireNamespace("RSQLite", quietly = TRUE)) {
     skip("Telemetry dependencies not available")
   }
 }
