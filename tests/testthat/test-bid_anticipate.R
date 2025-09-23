@@ -1,7 +1,4 @@
-# Optimized tests for bid_anticipate function
-# focused on core functionality and essential edge cases
-
-# Test fixtures to reduce repetition
+# Test functions to reduce repetition
 create_basic_interpret_stage <- function(question = "How to simplify?") {
   bid_interpret(
     central_question = question,
@@ -34,9 +31,9 @@ create_minimal_notice_tibble <- function() {
   )
 }
 
-# ============================================================================
+# ==============================================================================
 # CORE FUNCTIONALITY TESTS
-# ============================================================================
+# ==============================================================================
 
 test_that("bid_anticipate works with valid complete workflow", {
   notice_result <- create_basic_notice_stage()
@@ -52,7 +49,10 @@ test_that("bid_anticipate works with valid complete workflow", {
   expect_s3_class(result, "bid_stage")
   expect_equal(result$stage, "Anticipate")
   expect_match(result$bias_mitigations, "anchoring: Provide reference points")
-  expect_match(result$bias_mitigations, "framing: Use consistent positive framing")
+  expect_match(
+    result$bias_mitigations,
+    "framing: Use consistent positive framing"
+  )
   expect_true(!is.na(result$suggestions))
 })
 
@@ -74,9 +74,9 @@ test_that("bid_anticipate works with optional bias_mitigations", {
   expect_equal(result$stage, "Anticipate")
 })
 
-# ============================================================================
+# ==============================================================================
 # AUTO-SUGGESTION FUNCTIONALITY
-# ============================================================================
+# ==============================================================================
 
 test_that("bid_anticipate auto-suggests bias_mitigations when NULL", {
   notice_result <- create_basic_notice_stage()
@@ -114,9 +114,9 @@ test_that("bid_anticipate suggests missing common biases", {
   )
 })
 
-# ============================================================================
+# ==============================================================================
 # ACCESSIBILITY FUNCTIONALITY
-# ============================================================================
+# ==============================================================================
 
 test_that("bid_anticipate includes accessibility when requested", {
   notice_result <- create_basic_notice_stage()
@@ -134,25 +134,29 @@ test_that("bid_anticipate includes accessibility when requested", {
   expect_false(is.na(result$accessibility[1]))
 })
 
-test_that("bid_anticipate handles accessibility when include_accessibility is FALSE", {
-  notice_result <- create_minimal_notice_tibble()
+test_that(
+  "bid_anticipate handles accessibility when include_accessibility is FALSE",
+  {
+    notice_result <- create_minimal_notice_tibble()
 
-  result <- bid_anticipate(
-    previous_stage = notice_result,
-    bias_mitigations = list(anchoring = "Test bias mitigation"),
-    include_accessibility = FALSE
-  )
+    result <- bid_anticipate(
+      previous_stage = notice_result,
+      bias_mitigations = list(anchoring = "Test bias mitigation"),
+      include_accessibility = FALSE
+    )
 
-  expect_s3_class(result, "bid_stage")
-  # when include_accessibility is FALSE, accessibility field may be NA or absent
-  if ("accessibility" %in% names(result)) {
-    expect_true(is.na(result$accessibility[1]) || nchar(result$accessibility[1]) == 0)
+    expect_s3_class(result, "bid_stage")
+    # when include_accessibility is FALSE, accessibility field may be NA/absent
+    if ("accessibility" %in% names(result)) {
+      expect_true(is.na(result$accessibility[1]) ||
+        nchar(result$accessibility[1]) == 0)
+    }
   }
-})
+)
 
-# ============================================================================
+# ==============================================================================
 # PARAMETER VALIDATION AND ERROR HANDLING
-# ============================================================================
+# ==============================================================================
 
 test_that("bid_anticipate validates bias_mitigations parameter", {
   notice_result <- create_minimal_notice_tibble()
@@ -170,7 +174,10 @@ test_that("bid_anticipate validates bias_mitigations parameter", {
   expect_warning(
     bid_anticipate(
       previous_stage = notice_result,
-      bias_mitigations = list("Provide reference points", "Use positive framing")
+      bias_mitigations = list(
+        "Provide reference points",
+        "Use positive framing"
+      )
     ),
     "bias_mitigations must be a non-empty named list"
   )
@@ -191,22 +198,25 @@ test_that("bid_anticipate handles non-character bias mitigation values", {
   expect_match(result$bias_mitigations, "framing: TRUE")
 })
 
-test_that("bid_anticipate handles deprecated interaction_principles parameter", {
-  notice_result <- create_minimal_notice_tibble()
+test_that(
+  "bid_anticipate handles deprecated interaction_principles parameter",
+  {
+    notice_result <- create_minimal_notice_tibble()
 
-  expect_warning(
-    bid_anticipate(
-      previous_stage = notice_result,
-      bias_mitigations = list(anchoring = "Test"),
-      interaction_principles = list("unnamed", hover = "named")
-    ),
-    "deprecated|named"
-  )
-})
+    expect_warning(
+      bid_anticipate(
+        previous_stage = notice_result,
+        bias_mitigations = list(anchoring = "Test"),
+        interaction_principles = list("unnamed", hover = "named")
+      ),
+      "deprecated|named"
+    )
+  }
+)
 
-# ============================================================================
+# ==============================================================================
 # DATA HANDLING AND EDGE CASES
-# ============================================================================
+# ==============================================================================
 
 test_that("bid_anticipate handles NA values in previous_stage fields", {
   notice_result <- create_minimal_notice_tibble()
@@ -266,9 +276,9 @@ test_that("bid_anticipate handles missing fields in previous_stage", {
   expect_false(is.na(result$bias_mitigations[1]))
 })
 
-# ============================================================================
+# ==============================================================================
 # INTEGRATION AND WORKFLOW TESTS
-# ============================================================================
+# ==============================================================================
 
 test_that("bid_anticipate integrates properly with BID workflow", {
   # test full workflow integration without excessive repetition
@@ -308,9 +318,9 @@ test_that("bid_anticipate preserves essential stage metadata", {
   expect_s3_class(result$timestamp, "POSIXct")
 })
 
-# ============================================================================
+# ==============================================================================
 # PARAMETER EDGE CASES
-# ============================================================================
+# ==============================================================================
 
 test_that("bid_anticipate handles unexpected parameters gracefully", {
   notice_result <- create_minimal_notice_tibble()
