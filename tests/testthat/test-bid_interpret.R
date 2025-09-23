@@ -1,7 +1,4 @@
-# Optimized tests for bid_interpret function
-# focused on core functionality and essential edge cases
-
-# Test fixtures to reduce repetition
+# test functions to reduce repetition
 create_sample_data_story <- function() {
   list(
     hook = "Users are confused by the current interface",
@@ -40,17 +37,22 @@ create_sample_previous_stage <- function() {
   )
 }
 
-# ============================================================================
+# ==============================================================================
 # CORE FUNCTIONALITY TESTS
-# ============================================================================
+# ==============================================================================
 
 test_that("bid_interpret works with minimal required parameters", {
-  result <- bid_interpret(central_question = "How can we improve the test scenario?")
+  result <- bid_interpret(
+    central_question = "How can we improve the test scenario?"
+  )
 
   expect_s3_class(result, "bid_stage")
   expect_equal(result$stage[1], "Interpret")
   expect_true("central_question" %in% names(result))
-  expect_equal(result$central_question[1], "How can we improve the test scenario?")
+  expect_equal(
+    result$central_question[1],
+    "How can we improve the test scenario?"
+  )
 })
 
 test_that("bid_interpret works with complete data story", {
@@ -60,7 +62,10 @@ test_that("bid_interpret works with complete data story", {
   )
 
   expect_s3_class(result, "bid_stage")
-  expect_equal(result$central_question[1], "What is causing data complexity issues?")
+  expect_equal(
+    result$central_question[1],
+    "What is causing data complexity issues?"
+  )
   expect_true(!is.na(result$data_story_hook[1]))
   expect_true(!is.na(result$data_story_context[1]))
 })
@@ -86,9 +91,9 @@ test_that("bid_interpret works with target audience", {
   expect_equal(result$target_audience[1], "Executive team")
 })
 
-# ============================================================================
+# ==============================================================================
 # PARAMETER VALIDATION TESTS
-# ============================================================================
+# ==============================================================================
 
 test_that("bid_interpret validates data_story parameter", {
   expect_error(
@@ -142,9 +147,9 @@ test_that("bid_interpret validates central_question parameter", {
   )
 })
 
-# ============================================================================
+# ==============================================================================
 # AUTO-SUGGESTION FUNCTIONALITY TESTS
-# ============================================================================
+# ==============================================================================
 
 test_that("bid_interpret auto-suggests central_question when provided as NULL with previous_stage", {
   previous_stage <- create_sample_previous_stage()
@@ -187,9 +192,9 @@ test_that("bid_interpret auto-suggests user_personas when NULL", {
   expect_true(nchar(result$user_personas[1]) > 0)
 })
 
-# ============================================================================
+# ==============================================================================
 # DATA STORY HANDLING TESTS
-# ============================================================================
+# ==============================================================================
 
 test_that("bid_interpret handles partial data_story", {
   partial_story <- list(
@@ -226,9 +231,9 @@ test_that("bid_interpret handles empty data_story elements", {
   # empty/NA/NULL elements should be handled gracefully
 })
 
-# ============================================================================
+# ==============================================================================
 # WORKFLOW INTEGRATION TESTS
-# ============================================================================
+# ==============================================================================
 
 test_that("bid_interpret works as first stage in BID workflow", {
   result <- bid_interpret(
@@ -275,9 +280,9 @@ test_that("bid_interpret preserves essential metadata", {
   expect_s3_class(result$timestamp, "POSIXct")
 })
 
-# ============================================================================
+# ==============================================================================
 # EDGE CASES AND ERROR HANDLING
-# ============================================================================
+# ==============================================================================
 
 test_that("bid_interpret handles missing optional fields gracefully", {
   result <- bid_interpret(central_question = "Minimal test")
