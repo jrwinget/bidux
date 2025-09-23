@@ -1,10 +1,8 @@
-# Optimized test suite for utils.R functions
-# This file provides comprehensive coverage while minimizing redundancy
-
 # Test helper to create a simple bid_stage for testing
-create_test_stage <- function(stage_name = "Notice",
-                             problem = "Test problem",
-                             evidence = "Test evidence") {
+create_test_stage <- function(
+    stage_name = "Notice",
+    problem = "Test problem",
+    evidence = "Test evidence") {
   tibble::tibble(
     stage = stage_name,
     problem = problem,
@@ -15,17 +13,31 @@ create_test_stage <- function(stage_name = "Notice",
 
 # Test fixtures for common data structures
 test_personas <- list(
-  list(name = "Analyst", goals = "Analyze data", pain_points = "Complex UI", technical_level = "Advanced"),
-  list(name = "Manager", goals = "Review reports", pain_points = "Time constraints", technical_level = "Intermediate")
+  list(
+    name = "Analyst",
+    goals = "Analyze data",
+    pain_points = "Complex UI",
+    technical_level = "Advanced"
+  ),
+  list(
+    name = "Manager",
+    goals = "Review reports",
+    pain_points = "Time constraints",
+    technical_level = "Intermediate"
+  )
 )
 
 test_concepts_data <- tibble::tibble(
-  concept = c("Visual Hierarchy", "Cognitive Load Theory", "Principle of Proximity")
+  concept = c(
+    "Visual Hierarchy",
+    "Cognitive Load Theory",
+    "Principle of Proximity"
+  )
 )
 
-# ============================================================================
+# ==============================================================================
 # CORE OPERATORS AND BASIC UTILITIES
-# ============================================================================
+# ==============================================================================
 
 test_that("%||% operator works correctly", {
   expect_equal(5 %||% "default", 5)
@@ -61,9 +73,9 @@ test_that("truncate_text handles various inputs correctly", {
   expect_equal(truncate_text("abcd", 3), "...") # One over limit
 })
 
-# ============================================================================
+# ==============================================================================
 # QUIET MODE FUNCTIONS
-# ============================================================================
+# ==============================================================================
 
 test_that("quiet mode functions work correctly", {
   # Store original setting
@@ -115,18 +127,18 @@ test_that("bid_alert_info respects quiet mode", {
   original_quiet <- getOption("bidux.quiet", FALSE)
   on.exit(options(bidux.quiet = original_quiet))
 
-  # When not quiet, should produce output (but we can't test cli output easily)
+  # when not quiet, should produce output (but we can't test cli output easily)
   options(bidux.quiet = FALSE)
   expect_no_error(bid_alert_info("test message"))
 
-  # When quiet, should be silent
+  # when quiet, should be silent
   options(bidux.quiet = TRUE)
   expect_silent(bid_alert_info("test message"))
 })
 
-# ============================================================================
+# ==============================================================================
 # TEXT NORMALIZATION AND FORMATTING
-# ============================================================================
+# ==============================================================================
 
 test_that("normalize_text works correctly", {
   expect_equal(normalize_text(" hello world. "), "Hello world")
@@ -144,40 +156,55 @@ test_that("normalize_text works correctly", {
 })
 
 test_that("format_suggestions works correctly", {
-  expect_equal(format_suggestions(c("suggestion 1", "suggestion 2")), "Suggestion 1, Suggestion 2")
+  expect_equal(
+    format_suggestions(c("suggestion 1", "suggestion 2")),
+    "Suggestion 1, Suggestion 2"
+  )
   expect_equal(format_suggestions(c("test.", "another!")), "Test, Another")
   expect_equal(format_suggestions(character(0)), "")
   expect_equal(format_suggestions(c("test"), " | "), "Test")
 })
 
 test_that("format_next_steps and parse_next_steps work together", {
-  # Single string
+  # single string
   expect_equal(format_next_steps("Step 1"), "Step 1")
 
-  # Multiple strings
+  # multiple strings
   formatted <- format_next_steps(c("Step 1", "Step 2", "Step 3"))
   expect_equal(formatted, "Step 1; Step 2; Step 3")
 
-  # Parse back
+  # parse back
   parsed <- parse_next_steps(formatted)
   expect_equal(parsed, c("Step 1", "Step 2", "Step 3"))
 
-  # Edge cases
+  # edge cases
   expect_true(is.na(format_next_steps(NULL)))
   expect_equal(parse_next_steps(NULL), character(0))
   expect_equal(parse_next_steps(NA), character(0))
 })
 
-# ============================================================================
+# ==============================================================================
 # VALIDATION FUNCTIONS
-# ============================================================================
+# ==============================================================================
 
 test_that("validate_required_params works correctly", {
   expect_silent(validate_required_params(problem = "test", evidence = "test"))
-  expect_error(validate_required_params(problem = NULL, evidence = "test"), "Required parameter 'problem' must be provided")
-  expect_error(validate_required_params(problem = "", evidence = "test"), "Required parameter 'problem' must be provided")
-  expect_error(validate_required_params(problem = "   ", evidence = "test"), "Required parameter 'problem' must be provided")
-  expect_error(validate_required_params(problem = NA, evidence = "test"), "Required parameter 'problem' must be provided")
+  expect_error(
+    validate_required_params(problem = NULL, evidence = "test"),
+    "Required parameter 'problem' must be provided"
+  )
+  expect_error(
+    validate_required_params(problem = "", evidence = "test"),
+    "Required parameter 'problem' must be provided"
+  )
+  expect_error(
+    validate_required_params(problem = "   ", evidence = "test"),
+    "Required parameter 'problem' must be provided"
+  )
+  expect_error(
+    validate_required_params(problem = NA, evidence = "test"),
+    "Required parameter 'problem' must be provided"
+  )
 })
 
 test_that("validate_character_param works correctly", {
@@ -200,12 +227,16 @@ test_that("validate_list_param works correctly", {
   test_list <- list(a = 1, b = 2)
   expect_silent(validate_list_param(test_list, "param"))
   expect_silent(validate_list_param(NULL, "param", allow_null = TRUE))
-  expect_silent(validate_list_param(test_list, "param", required_names = c("a")))
+  expect_silent(
+    validate_list_param(test_list, "param", required_names = c("a"))
+  )
 
   expect_error(validate_list_param(NULL, "param", allow_null = FALSE))
   expect_error(validate_list_param("not a list", "param"))
   expect_error(validate_list_param(123, "param"))
-  expect_error(validate_list_param(test_list, "param", required_names = c("missing")))
+  expect_error(
+    validate_list_param(test_list, "param", required_names = c("missing"))
+  )
 })
 
 test_that("validate_logical_param works correctly", {
@@ -248,9 +279,9 @@ test_that("validate_user_personas works correctly", {
   expect_warning(expect_true(validate_user_personas(minimal_personas)))
 })
 
-# ============================================================================
+# ==============================================================================
 # SAFE ACCESS FUNCTIONS
-# ============================================================================
+# ==============================================================================
 
 test_that("safe_check functions work correctly", {
   # safe_check
@@ -314,9 +345,9 @@ test_that("safe_string_check works correctly", {
   expect_false(safe_string_check("   "))
 })
 
-# ============================================================================
+# ==============================================================================
 # STAGE DATA MANAGEMENT
-# ============================================================================
+# ==============================================================================
 
 test_that("extract_stage_data works correctly", {
   test_stage <- tibble::tibble(
@@ -350,7 +381,7 @@ test_that("get_stage_metadata works correctly", {
 })
 
 test_that("normalize_previous_stage works correctly", {
-  # Test with tibble containing legacy field names
+  # test with tibble containing legacy field names
   test_tibble <- tibble::tibble(
     stage = "Notice",
     previous_question = "Old field name",
@@ -364,7 +395,7 @@ test_that("normalize_previous_stage works correctly", {
   expect_true("previous_central_question" %in% names(result))
   expect_false("previous_question" %in% names(result))
 
-  # Test with NULL
+  # test with NULL
   expect_null(normalize_previous_stage(NULL))
 })
 
@@ -380,11 +411,15 @@ test_that("get_audience_from_previous works correctly", {
   expect_true(is.character(result))
   expect_false(is.na(result))
 
-  # Test with NULL
+  # test with NULL
   expect_true(is.na(get_audience_from_previous(NULL)))
 
-  # Test with no audience fields
-  no_audience <- tibble::tibble(stage = "Notice", problem = "Test", timestamp = Sys.time())
+  # test with no audience fields
+  no_audience <- tibble::tibble(
+    stage = "Notice",
+    problem = "Test",
+    timestamp = Sys.time()
+  )
   expect_true(is.na(get_audience_from_previous(no_audience)))
 })
 
@@ -403,9 +438,9 @@ test_that("get_personas_from_previous works correctly", {
   expect_true(is.na(get_personas_from_previous(NULL)))
 })
 
-# ============================================================================
+# ==============================================================================
 # ERROR HANDLING AND MESSAGING
-# ============================================================================
+# ==============================================================================
 
 test_that("standard_error_msg generates proper messages", {
   msg1 <- standard_error_msg("missing_param", "test_param")
@@ -426,22 +461,28 @@ test_that("standard_error_msg generates proper messages", {
   expect_match(msg4, "error occurred")
 })
 
-# ============================================================================
+# ==============================================================================
 # DOMAIN-SPECIFIC FUNCTIONS
-# ============================================================================
+# ==============================================================================
 
 test_that("find_best_concept_match works correctly", {
-  # Exact match
-  expect_equal(find_best_concept_match("Visual Hierarchy", test_concepts_data), "Visual Hierarchy")
+  # exact match
+  expect_equal(
+    find_best_concept_match("Visual Hierarchy", test_concepts_data),
+    "Visual Hierarchy"
+  )
 
-  # Case insensitive match
-  expect_equal(find_best_concept_match("visual hierarchy", test_concepts_data), "Visual Hierarchy")
+  # case insensitive match
+  expect_equal(
+    find_best_concept_match("visual hierarchy", test_concepts_data),
+    "Visual Hierarchy"
+  )
 
-  # Partial match
+  # partial match
   result <- find_best_concept_match("visual", test_concepts_data)
   expect_true(is.character(result) || is.null(result))
 
-  # No match
+  # no match
   expect_null(find_best_concept_match("nonexistent", test_concepts_data))
   expect_null(find_best_concept_match("", test_concepts_data))
   expect_null(find_best_concept_match(NA, test_concepts_data))
@@ -494,18 +535,22 @@ test_that("get_accessibility_advice works correctly", {
 })
 
 test_that("safe_data_story_access works correctly", {
-  data_story <- list(hook = "Test hook", context = "Test context", resolution = "")
+  data_story <- list(
+    hook = "Test hook",
+    context = "Test context",
+    resolution = ""
+  )
 
   expect_equal(safe_data_story_access(data_story, "hook"), "Test hook")
   expect_equal(safe_data_story_access(data_story, "context"), "Test context")
-  expect_true(is.na(safe_data_story_access(data_story, "resolution"))) # empty string
+  expect_true(is.na(safe_data_story_access(data_story, "resolution"))) # empty
   expect_true(is.na(safe_data_story_access(data_story, "missing")))
   expect_true(is.na(safe_data_story_access(NULL, "hook")))
 })
 
-# ============================================================================
+# ==============================================================================
 # SUGGESTION SYSTEM
-# ============================================================================
+# ==============================================================================
 
 test_that("generate_stage_suggestions works correctly", {
   # check if dependencies are available before testing
@@ -542,7 +587,10 @@ test_that("evaluate_suggestion_condition works correctly", {
 
   # Non-function condition
   suppressWarnings({
-    result_invalid <- evaluate_suggestion_condition("not a function", context_data)
+    result_invalid <- evaluate_suggestion_condition(
+      "not a function",
+      context_data
+    )
     expect_true(is.logical(result_invalid))
     expect_false(result_invalid)
   })
@@ -556,9 +604,9 @@ test_that("evaluate_suggestion_condition works correctly", {
   })
 })
 
-# ============================================================================
+# ==============================================================================
 # PRIVATE/INTERNAL FUNCTIONS
-# ============================================================================
+# ==============================================================================
 
 test_that("time wrapper .now works correctly", {
   result <- .now()
@@ -587,12 +635,12 @@ test_that(".format_telemetry_refs_for_validation works correctly", {
   expect_equal(result4, character(0))
 })
 
-# ============================================================================
+# ==============================================================================
 # INTEGRATION TESTS
-# ============================================================================
+# ==============================================================================
 
 test_that("validation functions work together correctly", {
-  # Test validate_bid_stage_params with various parameters
+  # test validate_bid_stage_params with various parameters
   previous_stage <- create_test_stage()
 
   additional_params <- list(
@@ -610,19 +658,23 @@ test_that("validation functions work together correctly", {
     )
   )
 
-  expect_silent(validate_bid_stage_params(previous_stage, "Notice", additional_params))
+  expect_silent(
+    validate_bid_stage_params(previous_stage, "Notice", additional_params)
+  )
 
-  # Test with Interpret stage (no previous_stage required)
-  expect_silent(validate_bid_stage_params(NULL, "Interpret", additional_params))
+  # test with Interpret stage (no previous_stage required)
+  expect_silent(
+    validate_bid_stage_params(NULL, "Interpret", additional_params)
+  )
 })
 
 test_that("utility functions handle Unicode and edge cases", {
-  # Unicode characters in text processing
+  # unicode characters in text processing
   unicode_text <- "Test with émojis 🎉 and àccénts"
   expect_type(truncate_text(unicode_text, 20), "character")
   expect_type(normalize_text(unicode_text), "character")
 
-  # Very long text
+  # very long text
   long_text <- paste(rep("word", 100), collapse = " ")
   truncated <- truncate_text(long_text, 50)
   expect_true(nchar(truncated) <= 50)
@@ -632,12 +684,16 @@ test_that("utility functions handle Unicode and edge cases", {
 test_that("functions are deterministic and consistent", {
   test_problem <- "Test problem for unit testing purposes"
 
-  # Multiple calls should return same result
+  # multiple calls should return same result
   truncated1 <- truncate_text(test_problem, 15)
   truncated2 <- truncate_text(test_problem, 15)
   expect_equal(truncated1, truncated2)
 
-  # Validation should be consistent
-  expect_silent(validate_required_params(problem = test_problem, evidence = "test"))
-  expect_silent(validate_required_params(problem = test_problem, evidence = "test"))
+  # validation should be consistent
+  expect_silent(
+    validate_required_params(problem = test_problem, evidence = "test")
+  )
+  expect_silent(
+    validate_required_params(problem = test_problem, evidence = "test")
+  )
 })
