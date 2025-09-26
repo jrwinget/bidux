@@ -1588,12 +1588,14 @@ bid_notice_issue <- function(issue, previous_stage = NULL, override = list()) {
     "Telemetry analysis identified this issue"
   }
 
+  evidence_column <- safe_column_access(issue, "evidence")
   evidence <- override$evidence %||%
-    safe_column_access(issue, "evidence") %||%
+    (if (!is.na(evidence_column) && is.character(evidence_column)) evidence_column else NULL) %||%
     default_evidence
 
+  theory_column <- safe_column_access(issue, "theory")
   theory <- override$theory %||%
-    safe_column_access(issue, "theory") %||%
+    (if (!is.na(theory_column) && is.character(theory_column)) theory_column else NULL) %||%
     NULL
 
   # ensure we have a previous_stage for workflow continuity
