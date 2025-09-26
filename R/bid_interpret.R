@@ -73,7 +73,7 @@ bid_interpret <- function(
   # enhanced parameter validation for data_story
   if (!is.null(data_story)) {
     if (inherits(data_story, "bidux_data_story")) {
-      # new S3 class - validate structure
+      # new s3 class - validate structure
       if (!validate_data_story(data_story)) {
         cli::cli_abort(standard_error_msg(
           "Invalid bidux_data_story object",
@@ -81,7 +81,7 @@ bid_interpret <- function(
         ))
       }
     } else if (is.list(data_story)) {
-      # legacy list format - migrate to new S3 class with deprecation warning
+      # legacy list format - migrate to new s3 class with deprecation warning
       cli::cli_warn(c(
         "!" = "Using deprecated list format for data_story parameter",
         "i" = "Please use new_data_story() constructor for new code",
@@ -113,7 +113,7 @@ bid_interpret <- function(
   # enhanced parameter validation for user_personas
   if (!is.null(user_personas)) {
     if (inherits(user_personas, "bidux_user_personas")) {
-      # new S3 class - validate structure
+      # new s3 class - validate structure
       if (!validate_user_personas(user_personas)) {
         cli::cli_abort(standard_error_msg(
           "Invalid bidux_user_personas object",
@@ -121,7 +121,7 @@ bid_interpret <- function(
         ))
       }
     } else if (is.list(user_personas)) {
-      # legacy list format - migrate to new S3 class with deprecation warning
+      # legacy list format - migrate to new s3 class with deprecation warning
       cli::cli_warn(c(
         "!" = "Using deprecated list format for user_personas parameter",
         "i" = "Please use new_user_personas() constructor for new code",
@@ -233,7 +233,7 @@ bid_interpret <- function(
   }
 
   if (is.null(data_story)) {
-    # create structured data story using S3 class
+    # create structured data story using s3 class
     if (!is.null(previous_stage) && previous_stage$stage[1] == "Notice") {
       stage_data <- extract_stage_data(
         previous_stage,
@@ -403,7 +403,7 @@ bid_interpret <- function(
     audience <- NULL
 
     if (
-      # try to get audience from data_story (both S3 and legacy formats)
+      # try to get audience from data_story (both s3 and legacy formats)
       !is.null(data_story)
     ) {
       if (inherits(data_story, "bidux_data_story")) {
@@ -495,7 +495,7 @@ bid_interpret <- function(
         "Gets overwhelmed by complex dashboards with too many options"
       }
 
-      # create persona using new S3 class
+      # create persona using new s3 class
       persona_df <- data.frame(
         name = paste(user_type, "Persona"),
         goals = goals,
@@ -546,10 +546,10 @@ bid_interpret <- function(
     persona_suggestion
   )
 
-  # extract fields from data_story S3 object or legacy format
+  # extract fields from data_story s3 object or legacy format
   audience <- if (!is.null(data_story)) {
     if (inherits(data_story, "bidux_data_story")) {
-      # new S3 class - check metadata
+      # new s3 class - check metadata
       safe_list_access(data_story$metadata, "audience", NA_character_)
     } else if (is.list(data_story) && "audience" %in% names(data_story)) {
       # legacy list format
@@ -589,7 +589,7 @@ bid_interpret <- function(
 
   visual_approach <- if (!is.null(data_story)) {
     if (inherits(data_story, "bidux_data_story")) {
-      # new S3 class - check metadata
+      # new s3 class - check metadata
       safe_list_access(data_story$metadata, "visual_approach", NA_character_)
     } else if (is.list(data_story) && "visual_approach" %in% names(data_story)) {
       # legacy list format

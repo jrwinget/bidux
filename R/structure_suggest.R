@@ -30,19 +30,19 @@
 #'
 #' @keywords internal
 suggest_layout_from_previous <- function(previous_stage, telemetry_flags = NULL) {
-  # Extract and normalize text from various fields in previous_stage
-  # Handle both flattened columns (from bid_interpret) and nested data_story
+  # extract and normalize text from various fields in previous_stage
+  # handle both flattened columns (from bid_interpret) and nested data_story
   txt <- paste(
     safe_lower(safe_column_access(previous_stage, "problem", "")),
     safe_lower(safe_column_access(previous_stage, "evidence", "")),
     safe_lower(safe_column_access(previous_stage, "central_question", "")),
-    # Try flattened columns first (from bid_interpret output)
+    # try flattened columns first (from bid_interpret output)
     safe_lower(safe_column_access(previous_stage, "hook", "")),
     safe_lower(safe_column_access(previous_stage, "context", "")),
     safe_lower(safe_column_access(previous_stage, "tension", "")),
     safe_lower(safe_column_access(previous_stage, "resolution", "")),
     safe_lower(safe_column_access(previous_stage, "audience", "")),
-    # Fallback to nested data_story access (for other tibble structures)
+    # fallback to nested data_story access (for other tibble structures)
     safe_lower(safe_stage_data_story_access(previous_stage, "hook")),
     safe_lower(safe_stage_data_story_access(previous_stage, "context")),
     safe_lower(safe_stage_data_story_access(previous_stage, "tension")),
@@ -51,7 +51,7 @@ suggest_layout_from_previous <- function(previous_stage, telemetry_flags = NULL)
     collapse = " "
   )
 
-  # Heuristic 1: Dual-process for overview vs detail patterns
+  # heuristic 1: dual-process for overview vs detail patterns
   # (check first since it's more specific)
   if (
     grepl(
@@ -125,18 +125,18 @@ suggest_layout_from_previous <- function(previous_stage, telemetry_flags = NULL)
 #' @keywords internal
 layout_rationale <- function(previous_stage, chosen) {
   # Extract text for pattern matching
-  # Handle both flattened columns (from bid_interpret) and nested data_story
+  # handle both flattened columns (from bid_interpret) and nested data_story
   txt <- paste(
     safe_lower(safe_column_access(previous_stage, "problem", "")),
     safe_lower(safe_column_access(previous_stage, "evidence", "")),
     safe_lower(safe_column_access(previous_stage, "central_question", "")),
-    # Try flattened columns first (from bid_interpret output)
+    # try flattened columns first (from bid_interpret output)
     safe_lower(safe_column_access(previous_stage, "hook", "")),
     safe_lower(safe_column_access(previous_stage, "context", "")),
     safe_lower(safe_column_access(previous_stage, "tension", "")),
     safe_lower(safe_column_access(previous_stage, "resolution", "")),
     safe_lower(safe_column_access(previous_stage, "audience", "")),
-    # Fallback to nested data_story access (for other tibble structures)
+    # fallback to nested data_story access (for other tibble structures)
     safe_lower(safe_stage_data_story_access(previous_stage, "hook")),
     safe_lower(safe_stage_data_story_access(previous_stage, "context")),
     safe_lower(safe_stage_data_story_access(previous_stage, "tension")),

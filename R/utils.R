@@ -803,7 +803,7 @@ evaluate_suggestion_condition <- function(condition, context_data) {
   )
 }
 
-# Safe access to data story elements
+# safe access to data story elements
 safe_data_story_access <- function(data_story, element) {
   if (!is.null(data_story) && element %in% names(data_story)) {
     value <- data_story[[element]]
@@ -818,7 +818,7 @@ safe_data_story_access <- function(data_story, element) {
   return(NA_character_)
 }
 
-# Generic helper to validate user personas structure
+# generic helper to validate user personas structure
 validate_user_personas <- function(user_personas) {
   if (!is.list(user_personas)) {
     cli::cli_abort(c(
@@ -871,7 +871,7 @@ validate_user_personas <- function(user_personas) {
   return(TRUE)
 }
 
-# Generic fuzzy matching function for concepts
+# generic fuzzy matching function for concepts
 find_best_concept_match <- function(concept, d_all_concepts) {
   if (is.na(concept) || nchar(trimws(concept)) == 0) {
     return(NULL)
@@ -973,7 +973,7 @@ find_best_concept_match <- function(concept, d_all_concepts) {
   return(NULL)
 }
 
-# Generic text analysis for concept detection
+# generic text analysis for concept detection
 detect_concepts_from_text <- function(text, source_type = "general") {
   if (is.na(text) || nchar(trimws(text)) == 0) {
     return(character(0))
@@ -1061,7 +1061,7 @@ detect_concepts_from_text <- function(text, source_type = "general") {
   return(unique(detected_concepts))
 }
 
-# Generic formatting function for accessibility storage
+# generic formatting function for accessibility storage
 format_accessibility_for_storage <- function(accessibility) {
   if (!is.null(accessibility)) {
     if (is.list(accessibility)) {
@@ -1246,7 +1246,7 @@ format_next_steps <- function(next_steps) {
   return(paste(next_steps_char, collapse = "; "))
 }
 
-# Generic next steps parsing
+# generic next steps parsing
 parse_next_steps <- function(next_steps_formatted) {
   if (is.na(next_steps_formatted) || is.null(next_steps_formatted)) {
     return(character(0))
@@ -1539,12 +1539,12 @@ validate_choice <- function(value, choices, param_name, allow_null = FALSE) {
 validate_param <- function(value, arg_name, type = "character", min_length = 1,
                           max_length = Inf, allow_na = FALSE, choices = NULL) {
 
-  # Check if missing
+  # check if missing
   if (missing(value)) {
     stop(sprintf("Argument '%s' is missing with no default", arg_name), call. = FALSE)
   }
 
-  # Type validation
+  # type validation
   type_check <- switch(type,
     "character" = is.character(value) || all(is.na(value)),
     "logical" = is.logical(value),
@@ -1556,7 +1556,7 @@ validate_param <- function(value, arg_name, type = "character", min_length = 1,
     stop(sprintf("Argument '%s' must be a %s vector", arg_name, type), call. = FALSE)
   }
 
-  # Length validation
+  # length validation
   if (length(value) < min_length) {
     stop(sprintf("Argument '%s' must have at least %d element(s)", arg_name, min_length), call. = FALSE)
   }
@@ -1570,14 +1570,14 @@ validate_param <- function(value, arg_name, type = "character", min_length = 1,
     stop(sprintf("Argument '%s' cannot contain NA values", arg_name), call. = FALSE)
   }
 
-  # Choice validation
-  if (!is.null(choices) && type == "character") {
+  # choice validation
+  if (!is.null(choices) && type == "character" && length(choices) > 0) {
     if (!all(value %in% choices | is.na(value))) {
       stop(sprintf("Argument '%s' must be one of: %s", arg_name, paste(choices, collapse = ", ")), call. = FALSE)
     }
   }
 
-  # Special case for single logical values
+  # special case for single logical values
   if (type == "logical" && max_length == 1 && (length(value) != 1 || is.na(value))) {
     stop(sprintf("Argument '%s' must be a single logical value (TRUE or FALSE)", arg_name), call. = FALSE)
   }
@@ -1595,22 +1595,22 @@ validate_param <- function(value, arg_name, type = "character", min_length = 1,
 #' @keywords internal
 create_bid_result <- function(data_list, class_name, attributes = list(), return_tibble = TRUE) {
 
-  # Add timestamp if not present
+  # add timestamp if not present
   if (!"timestamp" %in% names(data_list)) {
     data_list$timestamp <- rep(Sys.time(), length(data_list[[1]]))
   }
 
-  # Create tibble or data.frame
+  # create tibble or data.frame
   if (return_tibble && requireNamespace("tibble", quietly = TRUE)) {
     result <- tibble::tibble(!!!data_list)
   } else {
     result <- data.frame(data_list, stringsAsFactors = FALSE)
   }
 
-  # Apply S3 class
+  # apply S3 class
   class(result) <- c(class_name, class(result))
 
-  # Set attributes
+  # set attributes
   for (attr_name in names(attributes)) {
     attr(result, attr_name) <- attributes[[attr_name]]
   }
