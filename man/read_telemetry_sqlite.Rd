@@ -4,10 +4,12 @@
 \alias{read_telemetry_sqlite}
 \title{Read telemetry from SQLite database}
 \usage{
-read_telemetry_sqlite(path)
+read_telemetry_sqlite(path, events_table = NULL)
 }
 \arguments{
 \item{path}{SQLite database path}
+
+\item{events_table}{Optional custom events table data.frame}
 }
 \value{
 Data frame of events

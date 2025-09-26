@@ -4,12 +4,14 @@
 \alias{read_telemetry_data}
 \title{Read telemetry data from file}
 \usage{
-read_telemetry_data(path, format)
+read_telemetry_data(path, format, events_table = NULL)
 }
 \arguments{
 \item{path}{File path}
 
 \item{format}{Format ("sqlite" or "json")}
+
+\item{events_table}{Optional custom events table for SQLite}
 }
 \value{
 Data frame of events

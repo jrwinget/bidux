@@ -170,30 +170,6 @@ get_default_concepts_data <- function() {
   })
 }
 
-#' Load concepts data from external file with caching
-#'
-#' @description
-#' Loads concepts data from CSV file with caching for performance.
-#' Uses memoise to ensure data is only loaded once per session.
-#'
-#' @return A tibble with concepts data
-#' @keywords internal
-load_concepts_data <- memoise::memoise({
-  concepts_file <- system.file("extdata", "bid_concepts_data.csv", package = "bidux")
-
-  if (!file.exists(concepts_file)) {
-    cli::cli_abort(standard_error_msg(
-      "Concepts data file not found",
-      context = glue::glue("Expected file: {concepts_file}"),
-      suggestions = "Ensure package is properly installed"
-    ))
-  }
-
-  concepts_data <- readr::read_csv(concepts_file, show_col_types = FALSE)
-  validate_concepts_data_structure(concepts_data)
-  concepts_data
-})
-
 #' Validate loaded concepts data structure
 #'
 #' @param concepts_data Raw concepts data from CSV
@@ -215,6 +191,30 @@ validate_concepts_data_structure <- function(concepts_data) {
 
   invisible(NULL)
 }
+
+#' Load concepts data from external file with caching
+#'
+#' @description
+#' Loads concepts data from CSV file with caching for performance.
+#' Uses memoise to ensure data is only loaded once per session.
+#'
+#' @return A tibble with concepts data
+#' @keywords internal
+load_concepts_data <- memoise::memoise(function() {
+  concepts_file <- system.file("extdata", "bid_concepts_data.csv", package = "bidux")
+
+  if (!file.exists(concepts_file)) {
+    cli::cli_abort(standard_error_msg(
+      "Concepts data file not found",
+      context = glue::glue("Expected file: {concepts_file}"),
+      suggestions = "Ensure package is properly installed"
+    ))
+  }
+
+  concepts_data <- readr::read_csv(concepts_file, show_col_types = FALSE)
+  validate_concepts_data_structure(concepts_data)
+  concepts_data
+})
 
 #' Fallback concepts data for emergency use
 #'

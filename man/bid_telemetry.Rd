@@ -4,13 +4,17 @@
 \alias{bid_telemetry}
 \title{Concise telemetry analysis with tidy output}
 \usage{
-bid_telemetry(path, format = NULL, thresholds = list())
+bid_telemetry(path, format = NULL, events_table = NULL, thresholds = list())
 }
 \arguments{
 \item{path}{File path to telemetry data (SQLite database or JSON log file)}
 
 \item{format}{Optional format specification ("sqlite" or "json"). If NULL,
 auto-detected from file extension.}
+
+\item{events_table}{Optional data.frame specifying custom events table when
+reading from SQLite. Must have columns: event_id, timestamp, event_type, user_id.
+If NULL, auto-detects standard table names (event_data, events).}
 
 \item{thresholds}{Optional list of threshold parameters:
 - unused_input_threshold: percentage of sessions below which input is

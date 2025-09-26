@@ -2,7 +2,7 @@
 % Please edit documentation in R/bid-concepts.R
 \name{get_default_concepts_data}
 \alias{get_default_concepts_data}
-\title{Get default concepts data (fallback when external file unavailable)}
+\title{Get default concepts data with lazy loading}
 \usage{
 get_default_concepts_data()
 }
@@ -10,6 +10,9 @@ get_default_concepts_data()
 A tibble with default BID framework concepts
 }
 \description{
-Get default concepts data (fallback when external file unavailable)
+Internal function to retrieve default BID framework concepts data using
+lazy loading from external CSV file. This includes behavioral science
+concepts, cognitive principles, and implementation guidance for each
+stage of the BID framework.
 }
 \keyword{internal}

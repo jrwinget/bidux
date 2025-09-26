@@ -1340,29 +1340,29 @@ standard_error_msg <- function(message, context = NULL, suggestions = NULL, call
     stop("message must be a single character string", call. = FALSE)
   }
 
-  # build error components
-  error_parts <- list()
-  error_parts[["x"]] <- message
+  # Build a single character string instead of a list
+  error_parts <- c(message)
 
   if (!is.null(context)) {
     if (is.character(context) && length(context) == 1) {
-      error_parts[["i"]] <- paste("Context:", context)
+      error_parts <- c(error_parts, paste("Context:", context))
     }
   }
 
   if (!is.null(suggestions)) {
     if (is.character(suggestions) && length(suggestions) > 0) {
       if (length(suggestions) == 1) {
-        error_parts[["*"]] <- suggestions
+        error_parts <- c(error_parts, paste("Suggestion:", suggestions))
       } else {
         for (i in seq_along(suggestions)) {
-          error_parts[[paste0("*", i)]] <- suggestions[i]
+          error_parts <- c(error_parts, paste("Suggestion", i, ":", suggestions[i]))
         }
       }
     }
   }
 
-  return(error_parts)
+  # Return a single character string
+  return(paste(error_parts, collapse = ". "))
 }
 
 #' Enhanced validate_character_param with glue support
@@ -1525,42 +1525,4 @@ validate_choice <- function(value, choices, param_name, allow_null = FALSE) {
   if (is.null(lhs) || length(lhs) == 0) rhs else lhs
 }
 
-#' Safe list access helper
-#'
-#' @param list_obj List to access
-#' @param key Key to access
-#' @param default Default value if key not found
-#'
-#' @return Value at key or default
-#' @keywords internal
-#' @noRd
-safe_list_access <- function(list_obj, key, default = NULL) {
-  if (is.null(list_obj) || !is.list(list_obj)) {
-    return(default)
-  }
-  if (key %in% names(list_obj)) {
-    list_obj[[key]]
-  } else {
-    default
-  }
-}
 
-#' Safe column access helper for data frames
-#'
-#' @param df Data frame to access
-#' @param column Column name to access
-#' @param default Default value if column not found
-#'
-#' @return Column value or default
-#' @keywords internal
-#' @noRd
-safe_column_access <- function(df, column, default = NA) {
-  if (!is.data.frame(df) || nrow(df) == 0) {
-    return(default)
-  }
-  if (column %in% names(df)) {
-    df[[column]][1]
-  } else {
-    default
-  }
-}
