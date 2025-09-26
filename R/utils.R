@@ -1525,4 +1525,97 @@ validate_choice <- function(value, choices, param_name, allow_null = FALSE) {
   if (is.null(lhs) || length(lhs) == 0) rhs else lhs
 }
 
+#' Common validation utility for bidux functions (DRY principle)
+#'
+#' Centralized parameter validation to reduce code duplication
+#' @param value The value to validate
+#' @param arg_name The argument name for error messages
+#' @param type Expected type: "character", "logical", "numeric"
+#' @param min_length Minimum length for vectors
+#' @param max_length Maximum length for vectors
+#' @param allow_na Whether NA values are allowed
+#' @param choices Valid choices for character parameters
+#' @keywords internal
+validate_param <- function(value, arg_name, type = "character", min_length = 1,
+                          max_length = Inf, allow_na = FALSE, choices = NULL) {
+
+  # Check if missing
+  if (missing(value)) {
+    stop(sprintf("Argument '%s' is missing with no default", arg_name), call. = FALSE)
+  }
+
+  # Type validation
+  type_check <- switch(type,
+    "character" = is.character(value) || all(is.na(value)),
+    "logical" = is.logical(value),
+    "numeric" = is.numeric(value),
+    TRUE
+  )
+
+  if (!type_check) {
+    stop(sprintf("Argument '%s' must be a %s vector", arg_name, type), call. = FALSE)
+  }
+
+  # Length validation
+  if (length(value) < min_length) {
+    stop(sprintf("Argument '%s' must have at least %d element(s)", arg_name, min_length), call. = FALSE)
+  }
+
+  if (length(value) > max_length) {
+    stop(sprintf("Argument '%s' must have at most %d element(s)", arg_name, max_length), call. = FALSE)
+  }
+
+  # NA validation
+  if (!allow_na && any(is.na(value))) {
+    stop(sprintf("Argument '%s' cannot contain NA values", arg_name), call. = FALSE)
+  }
+
+  # Choice validation
+  if (!is.null(choices) && type == "character") {
+    if (!all(value %in% choices | is.na(value))) {
+      stop(sprintf("Argument '%s' must be one of: %s", arg_name, paste(choices, collapse = ", ")), call. = FALSE)
+    }
+  }
+
+  # Special case for single logical values
+  if (type == "logical" && max_length == 1 && (length(value) != 1 || is.na(value))) {
+    stop(sprintf("Argument '%s' must be a single logical value (TRUE or FALSE)", arg_name), call. = FALSE)
+  }
+
+  invisible(value)
+}
+
+#' Create consistent result structure (DRY principle)
+#'
+#' Standardized result creation to reduce duplication
+#' @param data_list List of data elements
+#' @param class_name S3 class name to apply
+#' @param attributes Named list of attributes to set
+#' @param return_tibble Whether to return tibble if available
+#' @keywords internal
+create_bid_result <- function(data_list, class_name, attributes = list(), return_tibble = TRUE) {
+
+  # Add timestamp if not present
+  if (!"timestamp" %in% names(data_list)) {
+    data_list$timestamp <- rep(Sys.time(), length(data_list[[1]]))
+  }
+
+  # Create tibble or data.frame
+  if (return_tibble && requireNamespace("tibble", quietly = TRUE)) {
+    result <- tibble::tibble(!!!data_list)
+  } else {
+    result <- data.frame(data_list, stringsAsFactors = FALSE)
+  }
+
+  # Apply S3 class
+  class(result) <- c(class_name, class(result))
+
+  # Set attributes
+  for (attr_name in names(attributes)) {
+    attr(result, attr_name) <- attributes[[attr_name]]
+  }
+
+  result
+}
+
 
