@@ -70,9 +70,34 @@ bid_interpret <- function(
     data_story = NULL,
     user_personas = NULL,
     quiet = NULL) {
-  # parameter validation
-  if (!is.null(data_story) && !is.list(data_story)) {
-    cli::cli_abort("'data_story' must be a list")
+  # enhanced parameter validation for data_story
+  if (!is.null(data_story)) {
+    if (inherits(data_story, "bidux_data_story")) {
+      # new S3 class - validate structure
+      if (!validate_data_story(data_story)) {
+        cli::cli_abort(standard_error_msg(
+          "Invalid bidux_data_story object",
+          suggestions = "Use new_data_story() constructor to create valid objects"
+        ))
+      }
+    } else if (is.list(data_story)) {
+      # legacy list format - migrate to new S3 class with deprecation warning
+      cli::cli_warn(c(
+        "!" = "Using deprecated list format for data_story parameter",
+        "i" = "Please use new_data_story() constructor for new code",
+        "i" = "Legacy format will be automatically migrated"
+      ))
+      data_story <- migrate_data_story(data_story)
+    } else {
+      cli::cli_abort(standard_error_msg(
+        "data_story must be a bidux_data_story object or list",
+        context = glue::glue("You provided: {class(data_story)[1]}"),
+        suggestions = c(
+          "Use new_data_story() constructor",
+          "Or provide a list with context, variables, relationships"
+        )
+      ))
+    }
   }
 
 
@@ -85,8 +110,34 @@ bid_interpret <- function(
     )
   }
 
+  # enhanced parameter validation for user_personas
   if (!is.null(user_personas)) {
-    validate_user_personas(user_personas)
+    if (inherits(user_personas, "bidux_user_personas")) {
+      # new S3 class - validate structure
+      if (!validate_user_personas(user_personas)) {
+        cli::cli_abort(standard_error_msg(
+          "Invalid bidux_user_personas object",
+          suggestions = "Use new_user_personas() constructor to create valid objects"
+        ))
+      }
+    } else if (is.list(user_personas)) {
+      # legacy list format - migrate to new S3 class with deprecation warning
+      cli::cli_warn(c(
+        "!" = "Using deprecated list format for user_personas parameter",
+        "i" = "Please use new_user_personas() constructor for new code",
+        "i" = "Legacy format will be automatically migrated"
+      ))
+      user_personas <- migrate_user_personas(user_personas)
+    } else {
+      cli::cli_abort(standard_error_msg(
+        "user_personas must be a bidux_user_personas object or list",
+        context = glue::glue("You provided: {class(user_personas)[1]}"),
+        suggestions = c(
+          "Use new_user_personas() constructor",
+          "Or provide a list of persona objects"
+        )
+      ))
+    }
   }
 
   if (is.null(central_question)) {
@@ -182,8 +233,7 @@ bid_interpret <- function(
   }
 
   if (is.null(data_story)) {
-    data_story <- list()
-
+    # create structured data story using S3 class
     if (!is.null(previous_stage) && previous_stage$stage[1] == "Notice") {
       stage_data <- extract_stage_data(
         previous_stage,
@@ -195,75 +245,65 @@ bid_interpret <- function(
       target_audience <- stage_data$target_audience
 
       if (!is.na(problem)) {
-        # hook
-        data_story$hook <- paste0(
-          "Users are experiencing problems with ",
-          problem
+        # create context from problem and evidence
+        context_text <- paste0("Users are experiencing problems with ", problem)
+
+        # build variables list from extracted data
+        variables_list <- list(
+          problem = problem,
+          evidence = if (!is.na(evidence)) evidence else "Interface usability issue",
+          theory = if (!is.na(theory)) theory else "General usability principles"
         )
 
-        # context
-        if (!is.na(evidence)) {
-          data_story$context <- paste0("According to our evidence: ", evidence)
-        } else {
-          data_story$context <- "
-            Our current interface may be contributing to this issue.
-          "
-        }
-
-        # tension
-        data_story$tension <- paste0(
-          "This is creating friction in the user experience",
-          if (!is.na(theory)) paste0(" related to ", theory) else ""
+        # build relationships based on theory
+        relationships_list <- list(
+          problem_to_solution = paste0(
+            "We need to redesign the interface",
+            if (!is.na(theory)) paste0(" using principles from ", theory) else "",
+            " to address this problem."
+          ),
+          user_friction = paste0(
+            "This is creating friction in the user experience",
+            if (!is.na(theory)) paste0(" related to ", theory) else ""
+          )
         )
 
-        # resolution
-        data_story$resolution <- paste0(
-          "We need to redesign the interface",
-          if (!is.na(theory)) {
-            paste0(" using principles from ", theory)
+        # add metadata with legacy fields for backward compatibility
+        metadata_list <- list(
+          audience = if (!is.na(target_audience)) target_audience else NULL,
+          visual_approach = if (!is.na(theory)) {
+            theory_lower <- tolower(theory)
+            if (grepl("cognitive load", theory_lower)) {
+              "Simplified visualizations with reduced clutter"
+            } else if (grepl("hick", theory_lower)) {
+              "Clear hierarchy of choices with progressive disclosure"
+            } else if (grepl("visual hierarch", theory_lower)) {
+              "Strong visual hierarchy using size, color, and positioning"
+            } else {
+              "Clean, focused visualizations with clear purpose"
+            }
           } else {
-            ""
-          },
-          " to address this problem."
-        )
-
-        # audience
-        if (!is.na(target_audience)) {
-          data_story$audience <- target_audience
-        }
-
-        # visual approach
-        if (!is.na(theory)) {
-          theory_lower <- tolower(theory)
-
-          if (grepl("cognitive load", theory_lower)) {
-            data_story$visual_approach <- "
-              Simplified visualizations with reduced clutter
-            "
-          } else if (grepl("hick", theory_lower)) {
-            data_story$visual_approach <- "
-              Clear hierarchy of choices with progressive disclosure
-            "
-          } else if (grepl("visual hierarch", theory_lower)) {
-            data_story$visual_approach <- "
-              Strong visual hierarchy using size, color, and positioning
-            "
-          } else {
-            data_story$visual_approach <- "
-              Clean, focused visualizations with clear purpose
-            "
+            "Clean, focused visualizations with clear purpose"
           }
-        }
+        )
+
+        data_story <- new_data_story(
+          context = context_text,
+          variables = variables_list,
+          relationships = relationships_list,
+          metadata = metadata_list
+        )
       } else {
-        data_story <- list(
-          hook = "Dashboard users may not be getting maximum value",
-          context = "
-            Current interface could be improved for better user experience
-          ",
-          tension = "
-            Users may be missing important insights or spending too much time
-          ",
-          resolution = "Redesign interface using behavioral science principles"
+        # fallback for missing problem data
+        data_story <- new_data_story(
+          context = "Dashboard users may not be getting maximum value from current interface",
+          variables = list(
+            user_challenge = "Suboptimal user experience",
+            improvement_area = "Interface design"
+          ),
+          relationships = list(
+            solution_path = "Redesign interface using behavioral science principles"
+          )
         )
       }
 
@@ -276,22 +316,30 @@ bid_interpret <- function(
         (previous_stage$stage[1] == "Structure" ||
           previous_stage$stage[1] == "Anticipate")
     ) {
-      data_story <- list(
-        hook = "We need to revisit our understanding of user needs",
-        context = "The current design may need refinement",
-        tension = "User needs may have evolved or been incompletely understood",
-        resolution = "
-          Gather additional user feedback and refine our interpretation
-        "
+      # iteration cycle data story
+      data_story <- new_data_story(
+        context = "We need to revisit our understanding of user needs",
+        variables = list(
+          design_status = "The current design may need refinement",
+          user_understanding = "User needs may have evolved or been incompletely understood"
+        ),
+        relationships = list(
+          improvement_cycle = "Gather additional user feedback and refine our interpretation"
+        )
       )
 
       bid_alert_info("Suggested generic data story for iteration cycle", quiet = quiet)
     } else if (is.null(previous_stage)) {
-      data_story <- list(
-        hook = "Dashboard users may not be getting maximum value",
-        context = "Current interface could be improved for better user experience",
-        tension = "Users may be missing important insights or spending too much time",
-        resolution = "Redesign interface using behavioral science principles"
+      # new project data story
+      data_story <- new_data_story(
+        context = "Dashboard users may not be getting maximum value from current interface",
+        variables = list(
+          user_challenge = "Users may be missing important insights or spending too much time",
+          opportunity = "Current interface could be improved for better user experience"
+        ),
+        relationships = list(
+          solution_approach = "Redesign interface using behavioral science principles"
+        )
       )
 
       bid_alert_info(
@@ -355,12 +403,20 @@ bid_interpret <- function(
     audience <- NULL
 
     if (
-      # try to get audience from data_story
-      !is.null(data_story) &&
-        "audience" %in% names(data_story) &&
-        !is.na(data_story$audience)
+      # try to get audience from data_story (both S3 and legacy formats)
+      !is.null(data_story)
     ) {
-      audience <- data_story$audience
+      if (inherits(data_story, "bidux_data_story")) {
+        audience <- safe_list_access(data_story$metadata, "audience", NULL)
+      } else if (is.list(data_story) && "audience" %in% names(data_story)) {
+        audience <- data_story$audience
+      }
+
+      if (!is.null(audience) && !is.na(audience)) {
+        # audience found, continue with this value
+      } else {
+        audience <- NULL  # reset if no valid audience found
+      }
     } else if (
       # try to get audience from previous_stage
       !is.null(previous_stage) &&
@@ -439,20 +495,21 @@ bid_interpret <- function(
         "Gets overwhelmed by complex dashboards with too many options"
       }
 
-      # complete persona
-      user_personas <- list(
-        list(
-          name = paste(user_type, "Persona"),
-          goals = goals,
-          pain_points = pain_points,
-          technical_level = technical_level
-        )
+      # create persona using new S3 class
+      persona_df <- data.frame(
+        name = paste(user_type, "Persona"),
+        goals = goals,
+        pain_points = pain_points,
+        technical_level = technical_level,
+        stringsAsFactors = FALSE
       )
+
+      user_personas <- new_user_personas(persona_df)
 
       bid_alert_info(
         paste0(
           "Created user persona '",
-          user_personas[[1]]$name,
+          persona_df$name,
           "' based on audience information"
         ),
         quiet = quiet
@@ -460,16 +517,25 @@ bid_interpret <- function(
     }
   }
 
-  persona_suggestion <- if (
-    !is.null(user_personas) &&
-      length(user_personas) > 0
-  ) {
-    paste0(
-      "You've defined ",
-      length(user_personas),
-      " persona(s). ",
-      "Ensure your design addresses the specific needs of each."
-    )
+  persona_suggestion <- if (!is.null(user_personas)) {
+    persona_count <- if (inherits(user_personas, "bidux_user_personas")) {
+      nrow(user_personas)
+    } else if (is.list(user_personas)) {
+      length(user_personas)
+    } else {
+      0
+    }
+
+    if (persona_count > 0) {
+      paste0(
+        "You've defined ",
+        persona_count,
+        " persona(s). ",
+        "Ensure your design addresses the specific needs of each."
+      )
+    } else {
+      "Consider defining specific user personas to better target your design."
+    }
   } else {
     "Consider defining specific user personas to better target your design."
   }
@@ -480,23 +546,14 @@ bid_interpret <- function(
     persona_suggestion
   )
 
-  audience <- if (!is.null(data_story) && "audience" %in% names(data_story)) {
-    data_story$audience %||% NA_character_
-  } else {
-    NA_character_
-  }
-
-  metrics <- if (
-    !is.null(data_story) &&
-      "metrics" %in% names(data_story) &&
-      !is.null(data_story$metrics)
-  ) {
-    if (is.character(data_story$metrics)) {
-      paste(data_story$metrics, collapse = ", ")
-    } else if (is.numeric(data_story$metrics)) {
-      paste(as.character(data_story$metrics), collapse = ", ")
-    } else if (is.list(data_story$metrics)) {
-      paste(unlist(lapply(data_story$metrics, as.character)), collapse = ", ")
+  # extract fields from data_story S3 object or legacy format
+  audience <- if (!is.null(data_story)) {
+    if (inherits(data_story, "bidux_data_story")) {
+      # new S3 class - check metadata
+      safe_list_access(data_story$metadata, "audience", NA_character_)
+    } else if (is.list(data_story) && "audience" %in% names(data_story)) {
+      # legacy list format
+      data_story$audience %||% NA_character_
     } else {
       NA_character_
     }
@@ -504,32 +561,87 @@ bid_interpret <- function(
     NA_character_
   }
 
-  visual_approach <- if (
-    !is.null(data_story) &&
-      "visual_approach" %in% names(data_story)
-  ) {
-    data_story$visual_approach %||% NA_character_
+  metrics <- if (!is.null(data_story)) {
+    metrics_value <- if (inherits(data_story, "bidux_data_story")) {
+      safe_list_access(data_story$metadata, "metrics", NULL)
+    } else if (is.list(data_story)) {
+      safe_list_access(data_story, "metrics", NULL)
+    } else {
+      NULL
+    }
+
+    if (!is.null(metrics_value)) {
+      if (is.character(metrics_value)) {
+        paste(metrics_value, collapse = ", ")
+      } else if (is.numeric(metrics_value)) {
+        paste(as.character(metrics_value), collapse = ", ")
+      } else if (is.list(metrics_value)) {
+        paste(unlist(lapply(metrics_value, as.character)), collapse = ", ")
+      } else {
+        NA_character_
+      }
+    } else {
+      NA_character_
+    }
   } else {
     NA_character_
   }
 
-  personas_formatted <- if (
-    !is.null(user_personas) &&
-      length(user_personas) > 0
-  ) {
-    tryCatch(
-      {
-        jsonlite::toJSON(user_personas)
-      },
-      error = function(e) {
-        cli::cli_warn(c(
-          "Could not convert user_personas to JSON format",
-          "i" = "Using default NA value instead",
-          "x" = paste0(e$message)
-        ))
-        NA_character_
-      }
-    )
+  visual_approach <- if (!is.null(data_story)) {
+    if (inherits(data_story, "bidux_data_story")) {
+      # new S3 class - check metadata
+      safe_list_access(data_story$metadata, "visual_approach", NA_character_)
+    } else if (is.list(data_story) && "visual_approach" %in% names(data_story)) {
+      # legacy list format
+      data_story$visual_approach %||% NA_character_
+    } else {
+      NA_character_
+    }
+  } else {
+    NA_character_
+  }
+
+  personas_formatted <- if (!is.null(user_personas)) {
+    persona_count <- if (inherits(user_personas, "bidux_user_personas")) {
+      nrow(user_personas)
+    } else if (is.list(user_personas)) {
+      length(user_personas)
+    } else {
+      0
+    }
+
+    if (persona_count > 0) {
+      tryCatch(
+        {
+          # for tibble format, convert to list structure that's JSON-friendly
+          if (inherits(user_personas, "bidux_user_personas")) {
+            # convert tibble rows to list of objects for JSON serialization
+            persona_list <- lapply(seq_len(nrow(user_personas)), function(i) {
+              list(
+                name = user_personas$name[i],
+                goals = user_personas$goals[i],
+                pain_points = user_personas$pain_points[i],
+                technical_level = user_personas$technical_level[i]
+              )
+            })
+            jsonlite::toJSON(persona_list, auto_unbox = TRUE)
+          } else {
+            # legacy list format
+            jsonlite::toJSON(user_personas, auto_unbox = TRUE)
+          }
+        },
+        error = function(e) {
+          cli::cli_warn(c(
+            "Could not convert user_personas to JSON format",
+            "i" = "Using default NA value instead",
+            "x" = paste0(e$message)
+          ))
+          NA_character_
+        }
+      )
+    } else {
+      NA_character_
+    }
   } else {
     NA_character_
   }

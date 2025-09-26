@@ -1320,7 +1320,50 @@ parse_next_steps <- function(next_steps_formatted) {
   return(character(0))
 }
 
-# ===== IMPROVED EXISTING UTILITIES FOR API CONSISTENCY =====
+#' Create standardized error messages for bidux package
+#'
+#' @description
+#' Creates consistent error messages following bidux conventions with optional
+#' context and suggestions.
+#'
+#' @param message Main error message
+#' @param context Optional context information to help debug the error
+#' @param suggestions Character vector of actionable suggestions
+#' @param call Optional call environment for better error tracking
+#'
+#' @return Character string formatted for cli::cli_abort()
+#'
+#' @keywords internal
+#' @noRd
+standard_error_msg <- function(message, context = NULL, suggestions = NULL, call = NULL) {
+  if (!is.character(message) || length(message) != 1) {
+    stop("message must be a single character string", call. = FALSE)
+  }
+
+  # build error components
+  error_parts <- list()
+  error_parts[["x"]] <- message
+
+  if (!is.null(context)) {
+    if (is.character(context) && length(context) == 1) {
+      error_parts[["i"]] <- paste("Context:", context)
+    }
+  }
+
+  if (!is.null(suggestions)) {
+    if (is.character(suggestions) && length(suggestions) > 0) {
+      if (length(suggestions) == 1) {
+        error_parts[["*"]] <- suggestions
+      } else {
+        for (i in seq_along(suggestions)) {
+          error_parts[[paste0("*", i)]] <- suggestions[i]
+        }
+      }
+    }
+  }
+
+  return(error_parts)
+}
 
 #' Enhanced validate_character_param with glue support
 #'
@@ -1338,9 +1381,9 @@ validate_character_param <- function(value, param_name, required = TRUE, min_len
     if (allow_null) {
       return(invisible(NULL))
     } else if (required) {
-      cli::cli_abort(c(
-        "x" = glue::glue("Parameter '{param_name}' is required"),
-        "i" = "Provide a non-NULL character string"
+      cli::cli_abort(standard_error_msg(
+        glue::glue("Parameter '{param_name}' is required"),
+        suggestions = "Provide a non-NULL character string"
       ))
     } else {
       return(invisible(NULL))
@@ -1348,25 +1391,176 @@ validate_character_param <- function(value, param_name, required = TRUE, min_len
   }
 
   if (!is.character(value)) {
-    cli::cli_abort(c(
-      "x" = glue::glue("Parameter '{param_name}' must be a character string"),
-      "i" = glue::glue("You provided: {class(value)[1]}")
+    cli::cli_abort(standard_error_msg(
+      glue::glue("Parameter '{param_name}' must be a character string"),
+      context = glue::glue("You provided: {class(value)[1]}")
     ))
   }
 
   if (length(value) != 1) {
-    cli::cli_abort(c(
-      "x" = glue::glue("Parameter '{param_name}' must be a single character string"),
-      "i" = glue::glue("You provided a vector of length {length(value)}")
+    cli::cli_abort(standard_error_msg(
+      glue::glue("Parameter '{param_name}' must be a single character string"),
+      context = glue::glue("You provided a vector of length {length(value)}")
     ))
   }
 
   if (nchar(trimws(value)) < min_length) {
-    cli::cli_abort(c(
-      "x" = glue::glue("Parameter '{param_name}' must have at least {min_length} character(s)"),
-      "i" = glue::glue("Current length: {nchar(trimws(value))}")
+    cli::cli_abort(standard_error_msg(
+      glue::glue("Parameter '{param_name}' must have at least {min_length} character(s)"),
+      context = glue::glue("Current length: {nchar(trimws(value))}")
     ))
   }
 
   invisible(NULL)
+}
+
+#' Enhanced validate_data_frame for consistent API validation
+#'
+#' @param value Data frame to validate
+#' @param param_name Parameter name for error messages
+#' @param min_rows Minimum number of rows required
+#' @param required_columns Required column names
+#' @param allow_null Whether NULL is acceptable
+#'
+#' @return Invisible NULL if valid, otherwise throws error
+#' @keywords internal
+#' @noRd
+validate_data_frame <- function(value, param_name, min_rows = 1, required_columns = NULL, allow_null = FALSE) {
+  if (is.null(value)) {
+    if (allow_null) {
+      return(invisible(NULL))
+    } else {
+      cli::cli_abort(standard_error_msg(
+        glue::glue("Parameter '{param_name}' is required"),
+        suggestions = "Provide a data.frame or tibble"
+      ))
+    }
+  }
+
+  if (!is.data.frame(value)) {
+    cli::cli_abort(standard_error_msg(
+      glue::glue("Parameter '{param_name}' must be a data.frame or tibble"),
+      context = glue::glue("You provided: {class(value)[1]}")
+    ))
+  }
+
+  if (nrow(value) < min_rows) {
+    cli::cli_abort(standard_error_msg(
+      glue::glue("Parameter '{param_name}' must have at least {min_rows} row(s)"),
+      context = glue::glue("Current rows: {nrow(value)}")
+    ))
+  }
+
+  if (!is.null(required_columns)) {
+    missing_cols <- setdiff(required_columns, names(value))
+    if (length(missing_cols) > 0) {
+      cli::cli_abort(standard_error_msg(
+        glue::glue("Parameter '{param_name}' is missing required columns"),
+        context = glue::glue("Missing: {paste(missing_cols, collapse = ', ')}"),
+        suggestions = c(
+          glue::glue("Ensure data.frame has columns: {paste(required_columns, collapse = ', ')}"),
+          "Check column names for typos"
+        )
+      ))
+    }
+  }
+
+  invisible(NULL)
+}
+
+#' Enhanced validate_choice for parameter validation
+#'
+#' @param value Value to validate against choices
+#' @param choices Valid choices vector
+#' @param param_name Parameter name for error messages
+#' @param allow_null Whether NULL is acceptable
+#'
+#' @return Invisible NULL if valid, otherwise throws error
+#' @keywords internal
+#' @noRd
+validate_choice <- function(value, choices, param_name, allow_null = FALSE) {
+  if (is.null(value)) {
+    if (allow_null) {
+      return(invisible(NULL))
+    } else {
+      cli::cli_abort(standard_error_msg(
+        glue::glue("Parameter '{param_name}' is required"),
+        suggestions = glue::glue("Choose from: {paste(choices, collapse = ', ')}")
+      ))
+    }
+  }
+
+  if (length(value) != 1) {
+    cli::cli_abort(standard_error_msg(
+      glue::glue("Parameter '{param_name}' must be a single value"),
+      context = glue::glue("You provided a vector of length {length(value)}")
+    ))
+  }
+
+  if (!value %in% choices) {
+    cli::cli_abort(standard_error_msg(
+      glue::glue("Parameter '{param_name}' must be one of the valid choices"),
+      context = glue::glue("You provided: '{value}'"),
+      suggestions = glue::glue("Valid choices: {paste(choices, collapse = ', ')}")
+    ))
+  }
+
+  invisible(NULL)
+}
+
+# ===== HELPER UTILITIES FOR S3 CLASSES =====
+
+#' Null-coalescing operator
+#'
+#' @description
+#' Returns the left-hand side if it's not NULL, otherwise returns the right-hand side.
+#'
+#' @param lhs Left-hand side value
+#' @param rhs Right-hand side value (default value)
+#'
+#' @return lhs if not NULL, otherwise rhs
+#' @keywords internal
+#' @noRd
+`%||%` <- function(lhs, rhs) {
+  if (is.null(lhs) || length(lhs) == 0) rhs else lhs
+}
+
+#' Safe list access helper
+#'
+#' @param list_obj List to access
+#' @param key Key to access
+#' @param default Default value if key not found
+#'
+#' @return Value at key or default
+#' @keywords internal
+#' @noRd
+safe_list_access <- function(list_obj, key, default = NULL) {
+  if (is.null(list_obj) || !is.list(list_obj)) {
+    return(default)
+  }
+  if (key %in% names(list_obj)) {
+    list_obj[[key]]
+  } else {
+    default
+  }
+}
+
+#' Safe column access helper for data frames
+#'
+#' @param df Data frame to access
+#' @param column Column name to access
+#' @param default Default value if column not found
+#'
+#' @return Column value or default
+#' @keywords internal
+#' @noRd
+safe_column_access <- function(df, column, default = NA) {
+  if (!is.data.frame(df) || nrow(df) == 0) {
+    return(default)
+  }
+  if (column %in% names(df)) {
+    df[[column]][1]
+  } else {
+    default
+  }
 }

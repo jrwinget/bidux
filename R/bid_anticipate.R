@@ -88,48 +88,65 @@ bid_anticipate <- function(
 
   validate_previous_stage(previous_stage, "Anticipate")
 
+  # enhanced parameter validation for bias_mitigations
   if (!is.null(bias_mitigations)) {
-    if (!is.list(bias_mitigations)) {
-      cli::cli_abort(
-        c(
-          "The bias_mitigations parameter must be a list",
-          "i" = "You provided {.cls {class(bias_mitigations)}}"
-        )
-      )
-    }
-
-    if (
-      length(bias_mitigations) == 0 ||
-        is.null(names(bias_mitigations)) ||
-        any(names(bias_mitigations) == "")
-    ) {
-      cli::cli_warn(
-        c(
-          "!" = "bias_mitigations must be a non-empty named list.",
-          "i" = "Using automatically generated bias mitigations instead."
-        )
-      )
-      bias_mitigations <- NULL
-    } else {
-      empty_values <- sapply(bias_mitigations, function(x) {
-        is.null(x) || is.na(x) || (is.character(x) && nchar(trimws(x)) == 0)
-      })
-
-      if (any(empty_values)) {
-        cli::cli_warn(
-          c(
-            "!" = "bias_mitigations must be a non-empty named list.",
-            "i" = "Using automatically generated bias mitigations instead."
-          )
-        )
+    if (inherits(bias_mitigations, "bidux_bias_mitigations")) {
+      # new S3 class - validate structure
+      if (!validate_bias_mitigations(bias_mitigations)) {
+        cli::cli_abort(standard_error_msg(
+          "Invalid bidux_bias_mitigations object",
+          suggestions = "Use new_bias_mitigations() constructor to create valid objects"
+        ))
+      }
+    } else if (is.list(bias_mitigations)) {
+      # legacy list format - validate and migrate with deprecation warning
+      if (
+        length(bias_mitigations) == 0 ||
+          is.null(names(bias_mitigations)) ||
+          any(names(bias_mitigations) == "")
+      ) {
+        cli::cli_warn(c(
+          "!" = "bias_mitigations must be a non-empty named list",
+          "i" = "Using automatically generated bias mitigations instead"
+        ))
         bias_mitigations <- NULL
       } else {
-        for (i in seq_along(bias_mitigations)) {
-          if (!is.character(bias_mitigations[[i]])) {
-            bias_mitigations[[i]] <- as.character(bias_mitigations[[i]])
+        empty_values <- sapply(bias_mitigations, function(x) {
+          is.null(x) || is.na(x) || (is.character(x) && nchar(trimws(x)) == 0)
+        })
+
+        if (any(empty_values)) {
+          cli::cli_warn(c(
+            "!" = "bias_mitigations contains empty values",
+            "i" = "Using automatically generated bias mitigations instead"
+          ))
+          bias_mitigations <- NULL
+        } else {
+          # convert legacy format to character for migration
+          for (i in seq_along(bias_mitigations)) {
+            if (!is.character(bias_mitigations[[i]])) {
+              bias_mitigations[[i]] <- as.character(bias_mitigations[[i]])
+            }
           }
+
+          # migrate to new S3 class with deprecation warning
+          cli::cli_warn(c(
+            "!" = "Using deprecated list format for bias_mitigations parameter",
+            "i" = "Please use new_bias_mitigations() constructor for new code",
+            "i" = "Legacy format will be automatically migrated"
+          ))
+          bias_mitigations <- migrate_bias_mitigations(bias_mitigations)
         }
       }
+    } else {
+      cli::cli_abort(standard_error_msg(
+        "bias_mitigations must be a bidux_bias_mitigations object or list",
+        context = glue::glue("You provided: {class(bias_mitigations)[1]}"),
+        suggestions = c(
+          "Use new_bias_mitigations() constructor",
+          "Or provide a named list of bias mitigation strategies"
+        )
+      ))
     }
   }
 

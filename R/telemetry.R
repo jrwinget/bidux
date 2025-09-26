@@ -10,6 +10,9 @@
 #' @param path File path to telemetry data (SQLite database or JSON log file)
 #' @param format Optional format specification ("sqlite" or "json"). If NULL,
 #'        auto-detected from file extension.
+#' @param events_table Optional data.frame specifying custom events table when
+#'        reading from SQLite. Must have columns: event_id, timestamp, event_type, user_id.
+#'        If NULL, auto-detects standard table names (event_data, events).
 #' @param thresholds Optional list of threshold parameters:
 #'        - unused_input_threshold: percentage of sessions below which input is
 #'          considered unused (default: 0.05)
@@ -63,6 +66,7 @@
 bid_ingest_telemetry <- function(
     path,
     format = NULL,
+    events_table = NULL,
     thresholds = list()) {
   # enhanced file validation
   if (!file.exists(path)) {
@@ -80,9 +84,18 @@ bid_ingest_telemetry <- function(
     cli::cli_abort("Cannot read file: {path}. Check file permissions.")
   }
 
+  # validate events_table parameter
+  if (!is.null(events_table)) {
+    validate_data_frame(events_table, "events_table",
+                       required_columns = c("event_id", "timestamp", "event_type", "user_id"))
+  }
+
   # validate thresholds parameter
   if (!is.null(thresholds) && !is.list(thresholds)) {
-    cli::cli_abort("thresholds parameter must be a list or NULL")
+    cli::cli_abort(standard_error_msg(
+      "thresholds parameter must be a list or NULL",
+      context = glue::glue("You provided: {class(thresholds)[1]}")
+    ))
   }
 
   if (is.null(format)) {
@@ -105,7 +118,7 @@ bid_ingest_telemetry <- function(
   thresholds <- modifyList(default_thresholds, thresholds)
 
   cli::cli_alert_info("Reading telemetry data from {format} file...")
-  events <- read_telemetry_data(path, format)
+  events <- read_telemetry_data(path, format, events_table)
 
   if (nrow(events) == 0) {
     cli::cli_warn("No telemetry events found in {path}")
@@ -274,11 +287,12 @@ detect_telemetry_format <- function(path) {
 #' Read telemetry data from file
 #' @param path File path
 #' @param format Format ("sqlite" or "json")
+#' @param events_table Optional custom events table for SQLite
 #' @return Data frame of events
 #' @keywords internal
-read_telemetry_data <- function(path, format) {
+read_telemetry_data <- function(path, format, events_table = NULL) {
   if (format == "sqlite") {
-    return(read_telemetry_sqlite(path))
+    return(read_telemetry_sqlite(path, events_table))
   } else if (format == "json") {
     return(read_telemetry_json(path))
   }
@@ -286,9 +300,10 @@ read_telemetry_data <- function(path, format) {
 
 #' Read telemetry from SQLite database
 #' @param path SQLite database path
+#' @param events_table Optional custom events table data.frame
 #' @return Data frame of events
 #' @keywords internal
-read_telemetry_sqlite <- function(path) {
+read_telemetry_sqlite <- function(path, events_table = NULL) {
   if (
     !requireNamespace("DBI", quietly = TRUE) ||
       !requireNamespace("RSQLite", quietly = TRUE)
@@ -302,28 +317,38 @@ read_telemetry_sqlite <- function(path) {
   tryCatch(
     {
       con <- DBI::dbConnect(RSQLite::SQLite(), path)
-      tables <- DBI::dbListTables(con)
 
-      # look for events table (common {shiny.telemetry} table name)
-      event_table <- NULL
-      if ("event_data" %in% tables) {
-        event_table <- "event_data"
-      } else if ("events" %in% tables) {
-        event_table <- "events"
-      } else if (length(tables) > 0) {
-        # use first table if no standard name found
-        # TODO: allow user to specify table name
-        event_table <- tables[1]
-        cli::cli_warn(
-          "No standard event table found, using '{event_table}'"
-        )
+      # if custom events_table provided, use it directly
+      if (!is.null(events_table)) {
+        events <- events_table
+        cli::cli_alert_info("Using provided events_table data.frame")
       } else {
-        cli::cli_abort("No tables found in SQLite database")
+        # discover tables and read from database
+        tables <- DBI::dbListTables(con)
+
+        # look for events table (common {shiny.telemetry} table name)
+        event_table <- NULL
+        if ("event_data" %in% tables) {
+          event_table <- "event_data"
+        } else if ("events" %in% tables) {
+          event_table <- "events"
+        } else if (length(tables) > 0) {
+          # use first table if no standard name found
+          event_table <- tables[1]
+          cli::cli_warn(
+            "No standard event table found, using '{event_table}'"
+          )
+        } else {
+          cli::cli_abort(standard_error_msg(
+            "No tables found in SQLite database",
+            suggestions = "Ensure the database contains event data or provide events_table parameter"
+          ))
+        }
+
+        events <- DBI::dbReadTable(con, event_table)
       }
 
-      events <- DBI::dbReadTable(con, event_table)
       events <- normalize_telemetry_columns(events)
-
       return(events)
     },
     error = function(e) {
@@ -1471,9 +1496,9 @@ bid_flags.default <- function(x) {
 #' top_issue <- issues[1, ]
 #' notice <- bid_notice_issue(top_issue, previous_stage = interpret_stage)
 #' }
-bid_telemetry <- function(path, format = NULL, thresholds = list()) {
+bid_telemetry <- function(path, format = NULL, events_table = NULL, thresholds = list()) {
   # use existing ingest function but extract only the tibble
-  hybrid_result <- bid_ingest_telemetry(path, format, thresholds)
+  hybrid_result <- bid_ingest_telemetry(path, format, events_table, thresholds)
 
   # extract the tidy tibble and add specific class
   issues_tbl <- attr(hybrid_result, "issues_tbl")
@@ -1513,48 +1538,97 @@ bid_telemetry <- function(path, format = NULL, thresholds = list()) {
 #' )
 #' }
 bid_notice_issue <- function(issue, previous_stage = NULL, override = list()) {
-  if (!is.data.frame(issue) || nrow(issue) != 1) {
-    cli::cli_abort("issue must be a single row data frame from bid_telemetry() output")
+  # validate inputs using enhanced validation
+  validate_data_frame(issue, "issue", min_rows = 1)
+  if (nrow(issue) != 1) {
+    cli::cli_abort(standard_error_msg(
+      "issue must contain exactly one row",
+      context = glue::glue("You provided {nrow(issue)} rows"),
+      suggestions = "Use a single row from bid_telemetry() output"
+    ))
+  }
+
+  if (!is.null(override) && !is.list(override)) {
+    cli::cli_abort(standard_error_msg(
+      "override must be a list or NULL",
+      context = glue::glue("You provided: {class(override)[1]}")
+    ))
   }
 
   # extract values from issue, allowing overrides
   problem <- override$problem %||%
-    (if ("problem" %in% names(issue)) issue$problem[1] else NULL) %||%
-    "Telemetry issue identified"
+    safe_column_access(issue, "problem") %||%
+    "Telemetry issue identified requiring attention"
 
-  # Build evidence string safely
+  # build structured evidence from telemetry data
   evidence_parts <- c()
-  if ("affected_sessions" %in% names(issue) && !is.na(issue$affected_sessions[1])) {
-    evidence_parts <- c(evidence_parts, paste("Issue affects", issue$affected_sessions[1], "sessions"))
-  }
-  if ("impact_rate" %in% names(issue) && !is.na(issue$impact_rate[1])) {
-    evidence_parts <- c(evidence_parts, paste0("(", round(issue$impact_rate[1] * 100, 1), "% impact)"))
+
+  affected_sessions <- safe_column_access(issue, "affected_sessions")
+  if (!is.na(affected_sessions) && is.numeric(affected_sessions)) {
+    evidence_parts <- c(evidence_parts,
+                       glue::glue("Affects {affected_sessions} user sessions"))
   }
 
-  default_evidence <- if (length(evidence_parts) > 0) paste(evidence_parts, collapse = " ") else "Telemetry issue detected"
+  impact_rate <- safe_column_access(issue, "impact_rate")
+  if (!is.na(impact_rate) && is.numeric(impact_rate)) {
+    impact_pct <- round(impact_rate * 100, 1)
+    evidence_parts <- c(evidence_parts,
+                       glue::glue("Impact rate: {impact_pct}%"))
+  }
+
+  severity <- safe_column_access(issue, "severity")
+  if (!is.na(severity)) {
+    evidence_parts <- c(evidence_parts,
+                       glue::glue("Severity level: {severity}"))
+  }
+
+  default_evidence <- if (length(evidence_parts) > 0) {
+    paste(evidence_parts, collapse = ", ")
+  } else {
+    "Telemetry analysis identified this issue"
+  }
+
   evidence <- override$evidence %||%
-    (if ("evidence" %in% names(issue)) issue$evidence[1] else NULL) %||%
+    safe_column_access(issue, "evidence") %||%
     default_evidence
 
   theory <- override$theory %||%
-    (if ("theory" %in% names(issue)) issue$theory[1] else NULL) %||%
+    safe_column_access(issue, "theory") %||%
     NULL
 
-  # create interpret stage if none provided
+  # ensure we have a previous_stage for workflow continuity
   if (is.null(previous_stage)) {
     previous_stage <- bid_interpret(
-      central_question = "How can we address telemetry-identified issues?"
+      central_question = "How can we address telemetry-identified issues systematically?"
     )
   }
 
-  notice <- bid_notice(
+  # execute notice step - this is the single focus of this function
+  notice_result <- bid_notice(
     previous_stage = previous_stage,
     problem = problem,
     theory = theory,
     evidence = evidence
   )
 
-  return(notice)
+  # prep for next step by adding telemetry context to metadata
+  # this helps the next stage (bid_anticipate) understand the context
+  if (inherits(notice_result, "bid_stage")) {
+    existing_metadata <- attr(notice_result, "metadata")
+    enhanced_metadata <- c(existing_metadata, list(
+      telemetry_issue_type = safe_column_access(issue, "issue_type", "unknown"),
+      telemetry_issue_id = safe_column_access(issue, "issue_id", "unknown"),
+      next_stage_suggestion = "bid_anticipate",
+      next_stage_context = list(
+        focus_on_bias_types = c("confirmation_bias", "availability_heuristic"),
+        suggested_mitigations = "data_driven_approaches",
+        telemetry_guided = TRUE
+      )
+    ))
+    attr(notice_result, "metadata") <- enhanced_metadata
+  }
+
+  return(notice_result)
 }
 
 #' Create multiple Notice stages from telemetry issues
