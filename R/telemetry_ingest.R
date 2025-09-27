@@ -451,7 +451,11 @@ read_telemetry_json <- function(path) {
       return(events)
     },
     error = function(e) {
-      cli::cli_abort("Error reading JSON file: {e$message}")
+      cli::cli_abort(c(
+        "Error reading JSON file: {e$message}",
+        "i" = "File: {path}",
+        "i" = "Ensure the file contains valid JSON with required fields: timestamp, session_id, event_type"
+      ))
     }
   )
 }

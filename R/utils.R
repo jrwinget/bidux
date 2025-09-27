@@ -271,35 +271,7 @@ validate_required_params <- function(...) {
 #'
 #' @keywords internal
 #' @noRd
-validate_character_param <- function(
-    value,
-    param_name,
-    min_length = 1,
-    allow_null = FALSE) {
-  if (is.null(value)) {
-    if (allow_null) {
-      return(invisible(NULL))
-    }
-    stop(paste0("'", param_name, "' cannot be NULL"), call. = FALSE)
-  }
-
-  if (!is.character(value) || length(value) != 1) {
-    stop(
-      paste0("'", param_name, "' must be a single character string"),
-      call. = FALSE
-    )
-  }
-
-  clean_value <- trimws(value)
-  if (nchar(clean_value) < min_length) {
-    stop(
-      paste0("'", param_name, "' cannot be empty or contain only whitespace"),
-      call. = FALSE
-    )
-  }
-
-  invisible(NULL)
-}
+# Removed duplicate validate_character_param function (moved to utils_validation.R)
 
 #' Validate list parameter structure
 #'
@@ -375,8 +347,9 @@ validate_bid_stage_params <- function(
       validate_character_param(
         param_value,
         param_name,
-        param_config$min_length %||% 1,
-        param_config$allow_null %||% FALSE
+        required = !param_config$allow_null %||% FALSE,
+        min_length = param_config$min_length %||% 1,
+        allow_null = param_config$allow_null %||% FALSE
       )
     } else if (param_config$type == "list") {
       validate_list_param(
@@ -1388,54 +1361,8 @@ standard_error_msg <- function(message, context = NULL, suggestions = NULL, call
   return(paste(error_parts, collapse = ". "))
 }
 
-#' Enhanced validate_character_param with glue support
-#'
-#' @param value Parameter value to validate
-#' @param param_name Parameter name for error messages
-#' @param required Whether parameter is required
-#' @param min_length Minimum string length (for character params)
-#' @param allow_null Whether NULL is acceptable
-#'
-#' @return Invisible NULL if valid, otherwise throws error
-#' @keywords internal
-#' @noRd
-validate_character_param <- function(value, param_name, required = TRUE, min_length = 1, allow_null = FALSE) {
-  if (is.null(value)) {
-    if (allow_null) {
-      return(invisible(NULL))
-    } else if (required) {
-      cli::cli_abort(standard_error_msg(
-        glue::glue("Parameter '{param_name}' is required"),
-        suggestions = "Provide a non-NULL character string"
-      ))
-    } else {
-      return(invisible(NULL))
-    }
-  }
-
-  if (!is.character(value)) {
-    cli::cli_abort(standard_error_msg(
-      glue::glue("Parameter '{param_name}' must be a character string"),
-      context = glue::glue("You provided: {class(value)[1]}")
-    ))
-  }
-
-  if (length(value) != 1) {
-    cli::cli_abort(standard_error_msg(
-      glue::glue("Parameter '{param_name}' must be a single character string"),
-      context = glue::glue("You provided a vector of length {length(value)}")
-    ))
-  }
-
-  if (nchar(trimws(value)) < min_length) {
-    cli::cli_abort(standard_error_msg(
-      glue::glue("Parameter '{param_name}' must have at least {min_length} character(s)"),
-      context = glue::glue("Current length: {nchar(trimws(value))}")
-    ))
-  }
-
-  invisible(NULL)
-}
+# Removed second duplicate validate_character_param function
+# Use the version in utils_validation.R instead
 
 #' Enhanced validate_data_frame for consistent API validation
 #'

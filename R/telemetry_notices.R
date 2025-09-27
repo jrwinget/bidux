@@ -351,11 +351,18 @@ create_confusion_notice <- function(confusion_info, total_sessions) {
     input_id <- gsub("unused_input_", "", issue_key)
     input_id <- gsub("_", " ", input_id) # simple conversion back
 
-    # secure comparison using exact match instead of regex pattern matching with user input
-    input_events <- events[events$event_type == "input" &
-      events$input_id == input_id, ]
-    affected_sessions <- max(0, total_sessions - length(unique(input_events$session_id)))
-    impact_rate <- if (total_sessions > 0) affected_sessions / total_sessions else 0.0
+    # validate extracted input_id for security
+    if (!is.character(input_id) || length(input_id) != 1 || nchar(trimws(input_id)) == 0) {
+      cli::cli_warn("Invalid input_id extracted from issue_key, using fallback metrics")
+      affected_sessions <- round(total_sessions * 0.1) # conservative estimate
+      impact_rate <- 0.1
+    } else {
+      # secure comparison using exact match instead of regex pattern matching with user input
+      input_events <- events[events$event_type == "input" &
+        events$input_id == input_id, ]
+      affected_sessions <- max(0, total_sessions - length(unique(input_events$session_id)))
+      impact_rate <- if (total_sessions > 0) affected_sessions / total_sessions else 0.0
+    }
   } else if (grepl("^delayed", issue_key)) {
     # for delays, this affects multiple sessions
     affected_sessions <- round(total_sessions * 0.3) # estimate
