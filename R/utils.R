@@ -260,46 +260,7 @@ validate_required_params <- function(...) {
   invisible(NULL)
 }
 
-#' Validate character parameter with length and content checks
-#'
-#' @param value The value to validate
-#' @param param_name Name of the parameter
-#' @param min_length Minimum length after trimming
-#' @param allow_null Whether NULL values are allowed
-#'
-#' @return NULL invisibly if valid, stops with error otherwise
-#'
-#' @keywords internal
-#' @noRd
-validate_character_param <- function(
-    value,
-    param_name,
-    min_length = 1,
-    allow_null = FALSE) {
-  if (is.null(value)) {
-    if (allow_null) {
-      return(invisible(NULL))
-    }
-    stop(paste0("'", param_name, "' cannot be NULL"), call. = FALSE)
-  }
-
-  if (!is.character(value) || length(value) != 1) {
-    stop(
-      paste0("'", param_name, "' must be a single character string"),
-      call. = FALSE
-    )
-  }
-
-  clean_value <- trimws(value)
-  if (nchar(clean_value) < min_length) {
-    stop(
-      paste0("'", param_name, "' cannot be empty or contain only whitespace"),
-      call. = FALSE
-    )
-  }
-
-  invisible(NULL)
-}
+# Removed duplicate validate_character_param function (moved to utils_validation.R)
 
 #' Validate list parameter structure
 #'
@@ -375,8 +336,9 @@ validate_bid_stage_params <- function(
       validate_character_param(
         param_value,
         param_name,
-        param_config$min_length %||% 1,
-        param_config$allow_null %||% FALSE
+        required = !param_config$allow_null %||% FALSE,
+        min_length = param_config$min_length %||% 1,
+        allow_null = param_config$allow_null %||% FALSE
       )
     } else if (param_config$type == "list") {
       validate_list_param(
@@ -803,22 +765,45 @@ evaluate_suggestion_condition <- function(condition, context_data) {
   )
 }
 
-# Safe access to data story elements
+# safe access to data story elements
 safe_data_story_access <- function(data_story, element) {
-  if (!is.null(data_story) && element %in% names(data_story)) {
-    value <- data_story[[element]]
-    if (
-      !is.null(value) &&
-        !is.na(value) &&
-        nchar(trimws(as.character(value))) > 0
-    ) {
-      return(as.character(value))
-    }
+  if (is.null(data_story)) {
+    return(NA_character_)
   }
+
+  # handle new bid_data_story S3 class
+  if (inherits(data_story, "bid_data_story")) {
+    # for new S3 class, map elements to the appropriate structure
+    value <- switch(element,
+      "hook" = safe_list_access(data_story$variables, "hook", NA_character_),
+      "context" = data_story$context %||% NA_character_,
+      "tension" = safe_list_access(data_story$variables, "tension", NA_character_),
+      "resolution" = safe_list_access(data_story$relationships, "resolution", NA_character_),
+      "audience" = safe_list_access(data_story$metadata, "audience", NA_character_),
+      "metrics" = safe_list_access(data_story$metadata, "metrics", NA_character_),
+      "visual_approach" = safe_list_access(data_story$metadata, "visual_approach", NA_character_),
+      NA_character_
+    )
+  } else if (is.list(data_story) && element %in% names(data_story)) {
+    # handle legacy list format
+    value <- data_story[[element]]
+  } else {
+    return(NA_character_)
+  }
+
+  # validate and return the value
+  if (
+    !is.null(value) &&
+      !is.na(value) &&
+      nchar(trimws(as.character(value))) > 0
+  ) {
+    return(as.character(value))
+  }
+
   return(NA_character_)
 }
 
-# Generic helper to validate user personas structure
+# generic helper to validate user personas structure
 validate_user_personas <- function(user_personas) {
   if (!is.list(user_personas)) {
     cli::cli_abort(c(
@@ -871,7 +856,7 @@ validate_user_personas <- function(user_personas) {
   return(TRUE)
 }
 
-# Generic fuzzy matching function for concepts
+# generic fuzzy matching function for concepts
 find_best_concept_match <- function(concept, d_all_concepts) {
   if (is.na(concept) || nchar(trimws(concept)) == 0) {
     return(NULL)
@@ -973,7 +958,7 @@ find_best_concept_match <- function(concept, d_all_concepts) {
   return(NULL)
 }
 
-# Generic text analysis for concept detection
+# generic text analysis for concept detection
 detect_concepts_from_text <- function(text, source_type = "general") {
   if (is.na(text) || nchar(trimws(text)) == 0) {
     return(character(0))
@@ -1061,7 +1046,7 @@ detect_concepts_from_text <- function(text, source_type = "general") {
   return(unique(detected_concepts))
 }
 
-# Generic formatting function for accessibility storage
+# generic formatting function for accessibility storage
 format_accessibility_for_storage <- function(accessibility) {
   if (!is.null(accessibility)) {
     if (is.list(accessibility)) {
@@ -1246,7 +1231,7 @@ format_next_steps <- function(next_steps) {
   return(paste(next_steps_char, collapse = "; "))
 }
 
-# Generic next steps parsing
+# generic next steps parsing
 parse_next_steps <- function(next_steps_formatted) {
   if (is.na(next_steps_formatted) || is.null(next_steps_formatted)) {
     return(character(0))
@@ -1320,53 +1305,54 @@ parse_next_steps <- function(next_steps_formatted) {
   return(character(0))
 }
 
-# ===== IMPROVED EXISTING UTILITIES FOR API CONSISTENCY =====
+# ===== HELPER UTILITIES FOR S3 CLASSES =====
 
-#' Enhanced validate_character_param with glue support
+#' Null-coalescing operator
 #'
-#' @param value Parameter value to validate
-#' @param param_name Parameter name for error messages
-#' @param required Whether parameter is required
-#' @param min_length Minimum string length (for character params)
-#' @param allow_null Whether NULL is acceptable
+#' @description
+#' Returns the left-hand side if it's not NULL, otherwise returns the right-hand side.
 #'
-#' @return Invisible NULL if valid, otherwise throws error
+#' @param lhs Left-hand side value
+#' @param rhs Right-hand side value (default value)
+#'
+#' @return lhs if not NULL, otherwise rhs
 #' @keywords internal
 #' @noRd
-validate_character_param <- function(value, param_name, required = TRUE, min_length = 1, allow_null = FALSE) {
-  if (is.null(value)) {
-    if (allow_null) {
-      return(invisible(NULL))
-    } else if (required) {
-      cli::cli_abort(c(
-        "x" = glue::glue("Parameter '{param_name}' is required"),
-        "i" = "Provide a non-NULL character string"
-      ))
-    } else {
-      return(invisible(NULL))
-    }
-  }
-
-  if (!is.character(value)) {
-    cli::cli_abort(c(
-      "x" = glue::glue("Parameter '{param_name}' must be a character string"),
-      "i" = glue::glue("You provided: {class(value)[1]}")
-    ))
-  }
-
-  if (length(value) != 1) {
-    cli::cli_abort(c(
-      "x" = glue::glue("Parameter '{param_name}' must be a single character string"),
-      "i" = glue::glue("You provided a vector of length {length(value)}")
-    ))
-  }
-
-  if (nchar(trimws(value)) < min_length) {
-    cli::cli_abort(c(
-      "x" = glue::glue("Parameter '{param_name}' must have at least {min_length} character(s)"),
-      "i" = glue::glue("Current length: {nchar(trimws(value))}")
-    ))
-  }
-
-  invisible(NULL)
+`%||%` <- function(lhs, rhs) {
+  if (is.null(lhs) || length(lhs) == 0) rhs else lhs
 }
+
+#' Create consistent result structure (DRY principle)
+#'
+#' Standardized result creation to reduce duplication
+#' @param data_list List of data elements
+#' @param class_name S3 class name to apply
+#' @param attributes Named list of attributes to set
+#' @param return_tibble Whether to return tibble if available
+#' @keywords internal
+create_bid_result <- function(data_list, class_name, attributes = list(), return_tibble = TRUE) {
+
+  # add timestamp if not present
+  if (!"timestamp" %in% names(data_list)) {
+    data_list$timestamp <- rep(Sys.time(), length(data_list[[1]]))
+  }
+
+  # create tibble or data.frame
+  if (return_tibble && requireNamespace("tibble", quietly = TRUE)) {
+    result <- tibble::tibble(!!!data_list)
+  } else {
+    result <- data.frame(data_list, stringsAsFactors = FALSE)
+  }
+
+  # apply S3 class
+  class(result) <- c(class_name, class(result))
+
+  # set attributes
+  for (attr_name in names(attributes)) {
+    attr(result, attr_name) <- attributes[[attr_name]]
+  }
+
+  result
+}
+
+

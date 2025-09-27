@@ -94,7 +94,7 @@ bid_structure <- function(
   # use package namespace instead of global environment for CRAN compliance
   pkg_env <- asNamespace("bidux")
   if (
-    !exists(".bidux_layout_selection_warned", envir = pkg_env) &&
+    !exists(".bid_layout_selection_warned", envir = pkg_env) &&
       !identical(Sys.getenv("TESTTHAT"), "true")
   ) {
     warning(
@@ -103,7 +103,7 @@ bid_structure <- function(
       "Existing code will continue to work until 0.4.0.",
       call. = FALSE
     )
-    try(assign(".bidux_layout_selection_warned", TRUE, envir = pkg_env), silent = TRUE)
+    try(assign(".bid_layout_selection_warned", TRUE, envir = pkg_env), silent = TRUE)
   }
 
   # generate ranked, concept-grouped suggestions
