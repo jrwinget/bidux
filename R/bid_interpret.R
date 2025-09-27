@@ -50,13 +50,13 @@
 #'       name = "Sara, Data Analyst",
 #'       goals = "Needs to quickly find patterns in data",
 #'       pain_points = "Gets overwhelmed by too many visualizations",
-#'       technical_level = "Advanced"
+#'       technical_level = "advanced"
 #'     ),
 #'     list(
 #'       name = "Marcus, Executive",
 #'       goals = "Wants high-level insights at a glance",
 #'       pain_points = "Limited time to analyze detailed reports",
-#'       technical_level = "Basic"
+#'       technical_level = "beginner"
 #'     )
 #'   )
 #' )
@@ -72,11 +72,11 @@ bid_interpret <- function(
     quiet = NULL) {
   # enhanced parameter validation for data_story
   if (!is.null(data_story)) {
-    if (inherits(data_story, "bidux_data_story")) {
+    if (inherits(data_story, "bid_data_story")) {
       # new s3 class - validate structure
       if (!validate_data_story(data_story)) {
         cli::cli_abort(standard_error_msg(
-          "Invalid bidux_data_story object",
+          "Invalid bid_data_story object",
           suggestions = "Use new_data_story() constructor to create valid objects"
         ))
       }
@@ -90,7 +90,7 @@ bid_interpret <- function(
       data_story <- migrate_data_story(data_story)
     } else {
       cli::cli_abort(standard_error_msg(
-        "data_story must be a bidux_data_story object or list",
+        "data_story must be a bid_data_story object or list",
         context = glue::glue("You provided: {class(data_story)[1]}"),
         suggestions = c(
           "Use new_data_story() constructor",
@@ -112,11 +112,11 @@ bid_interpret <- function(
 
   # enhanced parameter validation for user_personas
   if (!is.null(user_personas)) {
-    if (inherits(user_personas, "bidux_user_personas")) {
+    if (inherits(user_personas, "bid_user_personas")) {
       # new s3 class - validate structure
       if (!validate_user_personas(user_personas)) {
         cli::cli_abort(standard_error_msg(
-          "Invalid bidux_user_personas object",
+          "Invalid bid_user_personas object",
           suggestions = "Use new_user_personas() constructor to create valid objects"
         ))
       }
@@ -130,7 +130,7 @@ bid_interpret <- function(
       user_personas <- migrate_user_personas(user_personas)
     } else {
       cli::cli_abort(standard_error_msg(
-        "user_personas must be a bidux_user_personas object or list",
+        "user_personas must be a bid_user_personas object or list",
         context = glue::glue("You provided: {class(user_personas)[1]}"),
         suggestions = c(
           "Use new_user_personas() constructor",
@@ -252,7 +252,8 @@ bid_interpret <- function(
         variables_list <- list(
           problem = problem,
           evidence = if (!is.na(evidence)) evidence else "Interface usability issue",
-          theory = if (!is.na(theory)) theory else "General usability principles"
+          theory = if (!is.na(theory)) theory else "General usability principles",
+          hook = paste0("Current interface challenges are affecting user success")
         )
 
         # build relationships based on theory
@@ -299,7 +300,8 @@ bid_interpret <- function(
           context = "Dashboard users may not be getting maximum value from current interface",
           variables = list(
             user_challenge = "Suboptimal user experience",
-            improvement_area = "Interface design"
+            improvement_area = "Interface design",
+            hook = "Users may be experiencing interface challenges"
           ),
           relationships = list(
             solution_path = "Redesign interface using behavioral science principles"
@@ -321,7 +323,8 @@ bid_interpret <- function(
         context = "We need to revisit our understanding of user needs",
         variables = list(
           design_status = "The current design may need refinement",
-          user_understanding = "User needs may have evolved or been incompletely understood"
+          user_understanding = "User needs may have evolved or been incompletely understood",
+          hook = "There may be gaps in our current understanding"
         ),
         relationships = list(
           improvement_cycle = "Gather additional user feedback and refine our interpretation"
@@ -335,7 +338,8 @@ bid_interpret <- function(
         context = "Dashboard users may not be getting maximum value from current interface",
         variables = list(
           user_challenge = "Users may be missing important insights or spending too much time",
-          opportunity = "Current interface could be improved for better user experience"
+          opportunity = "Current interface could be improved for better user experience",
+          hook = "Users deserve a better interface experience"
         ),
         relationships = list(
           solution_approach = "Redesign interface using behavioral science principles"
@@ -406,7 +410,7 @@ bid_interpret <- function(
       # try to get audience from data_story (both s3 and legacy formats)
       !is.null(data_story)
     ) {
-      if (inherits(data_story, "bidux_data_story")) {
+      if (inherits(data_story, "bid_data_story")) {
         audience <- safe_list_access(data_story$metadata, "audience", NULL)
       } else if (is.list(data_story) && "audience" %in% names(data_story)) {
         audience <- data_story$audience
@@ -518,7 +522,7 @@ bid_interpret <- function(
   }
 
   persona_suggestion <- if (!is.null(user_personas)) {
-    persona_count <- if (inherits(user_personas, "bidux_user_personas")) {
+    persona_count <- if (inherits(user_personas, "bid_user_personas")) {
       nrow(user_personas)
     } else if (is.list(user_personas)) {
       length(user_personas)
@@ -548,7 +552,7 @@ bid_interpret <- function(
 
   # extract fields from data_story s3 object or legacy format
   audience <- if (!is.null(data_story)) {
-    if (inherits(data_story, "bidux_data_story")) {
+    if (inherits(data_story, "bid_data_story")) {
       # new s3 class - check metadata
       safe_list_access(data_story$metadata, "audience", NA_character_)
     } else if (is.list(data_story) && "audience" %in% names(data_story)) {
@@ -562,7 +566,7 @@ bid_interpret <- function(
   }
 
   metrics <- if (!is.null(data_story)) {
-    metrics_value <- if (inherits(data_story, "bidux_data_story")) {
+    metrics_value <- if (inherits(data_story, "bid_data_story")) {
       safe_list_access(data_story$metadata, "metrics", NULL)
     } else if (is.list(data_story)) {
       safe_list_access(data_story, "metrics", NULL)
@@ -588,7 +592,7 @@ bid_interpret <- function(
   }
 
   visual_approach <- if (!is.null(data_story)) {
-    if (inherits(data_story, "bidux_data_story")) {
+    if (inherits(data_story, "bid_data_story")) {
       # new s3 class - check metadata
       safe_list_access(data_story$metadata, "visual_approach", NA_character_)
     } else if (is.list(data_story) && "visual_approach" %in% names(data_story)) {
@@ -602,7 +606,7 @@ bid_interpret <- function(
   }
 
   personas_formatted <- if (!is.null(user_personas)) {
-    persona_count <- if (inherits(user_personas, "bidux_user_personas")) {
+    persona_count <- if (inherits(user_personas, "bid_user_personas")) {
       nrow(user_personas)
     } else if (is.list(user_personas)) {
       length(user_personas)
@@ -614,7 +618,7 @@ bid_interpret <- function(
       tryCatch(
         {
           # for tibble format, convert to list structure that's JSON-friendly
-          if (inherits(user_personas, "bidux_user_personas")) {
+          if (inherits(user_personas, "bid_user_personas")) {
             # convert tibble rows to list of objects for JSON serialization
             persona_list <- lapply(seq_len(nrow(user_personas)), function(i) {
               list(

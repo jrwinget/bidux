@@ -10,7 +10,7 @@ new_user_personas(personas_df)
 \item{personas_df}{Data.frame with required columns: name, goals, pain_points, technical_level}
 }
 \value{
-A bidux_user_personas S3 object (inherits from data.frame)
+A bid_user_personas S3 object (inherits from data.frame)
 }
 \description{
 Creates a structured user personas tibble for use in bidux functions.

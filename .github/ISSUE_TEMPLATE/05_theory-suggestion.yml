@@ -88,7 +88,7 @@ body:
       required: true
 
   - type: textarea
-    id: bidux_integration
+    id: bid_integration
     attributes:
       label: Integration Proposal
       description: How would you integrate this theory into the {bidux} package?

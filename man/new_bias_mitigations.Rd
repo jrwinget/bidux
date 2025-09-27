@@ -10,7 +10,7 @@ new_bias_mitigations(mitigations_df)
 \item{mitigations_df}{Data.frame with required columns: bias_type, mitigation_strategy, confidence_level}
 }
 \value{
-A bidux_bias_mitigations S3 object (inherits from data.frame)
+A bid_bias_mitigations S3 object (inherits from data.frame)
 }
 \description{
 Creates a structured bias mitigations tibble for use in bidux functions.

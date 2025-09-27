@@ -805,16 +805,39 @@ evaluate_suggestion_condition <- function(condition, context_data) {
 
 # safe access to data story elements
 safe_data_story_access <- function(data_story, element) {
-  if (!is.null(data_story) && element %in% names(data_story)) {
-    value <- data_story[[element]]
-    if (
-      !is.null(value) &&
-        !is.na(value) &&
-        nchar(trimws(as.character(value))) > 0
-    ) {
-      return(as.character(value))
-    }
+  if (is.null(data_story)) {
+    return(NA_character_)
   }
+
+  # handle new bid_data_story S3 class
+  if (inherits(data_story, "bid_data_story")) {
+    # for new S3 class, map elements to the appropriate structure
+    value <- switch(element,
+      "hook" = safe_list_access(data_story$variables, "hook", NA_character_),
+      "context" = data_story$context %||% NA_character_,
+      "tension" = safe_list_access(data_story$variables, "tension", NA_character_),
+      "resolution" = safe_list_access(data_story$relationships, "resolution", NA_character_),
+      "audience" = safe_list_access(data_story$metadata, "audience", NA_character_),
+      "metrics" = safe_list_access(data_story$metadata, "metrics", NA_character_),
+      "visual_approach" = safe_list_access(data_story$metadata, "visual_approach", NA_character_),
+      NA_character_
+    )
+  } else if (is.list(data_story) && element %in% names(data_story)) {
+    # handle legacy list format
+    value <- data_story[[element]]
+  } else {
+    return(NA_character_)
+  }
+
+  # validate and return the value
+  if (
+    !is.null(value) &&
+      !is.na(value) &&
+      nchar(trimws(as.character(value))) > 0
+  ) {
+    return(as.character(value))
+  }
+
   return(NA_character_)
 }
 

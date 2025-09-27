@@ -21,7 +21,7 @@ new_data_story(
 \item{metadata}{Optional metadata list}
 }
 \value{
-A bidux_data_story S3 object
+A bid_data_story S3 object
 }
 \description{
 Creates a structured data story object for use in bid_interpret() and other

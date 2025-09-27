@@ -9,7 +9,7 @@
 #' @param relationships List describing data relationships
 #' @param metadata Optional metadata list
 #'
-#' @return A bidux_data_story S3 object
+#' @return A bid_data_story S3 object
 #'
 #' @examples
 #' \dontrun{
@@ -46,7 +46,7 @@ new_data_story <- function(context, variables = list(), relationships = list(), 
       metadata = metadata,
       created_at = Sys.time()
     ),
-    class = c("bidux_data_story", "list")
+    class = c("bid_data_story", "list")
   )
 }
 
@@ -59,7 +59,7 @@ new_data_story <- function(context, variables = list(), relationships = list(), 
 #' @keywords internal
 #' @noRd
 validate_data_story <- function(x) {
-  if (!inherits(x, "bidux_data_story")) {
+  if (!inherits(x, "bid_data_story")) {
     return(FALSE)
   }
 
@@ -81,11 +81,11 @@ validate_data_story <- function(x) {
 
 #' Print method for data story objects
 #'
-#' @param x A bidux_data_story object
+#' @param x A bid_data_story object
 #' @param ... Additional arguments (unused)
 #'
 #' @export
-print.bidux_data_story <- function(x, ...) {
+print.bid_data_story <- function(x, ...) {
   cat("bidux data story:\n")
   cat("  context:", x$context, "\n")
   cat("  variables:", length(x$variables), "defined\n")
@@ -103,7 +103,7 @@ print.bidux_data_story <- function(x, ...) {
 #'
 #' @param personas_df Data.frame with required columns: name, goals, pain_points, technical_level
 #'
-#' @return A bidux_user_personas S3 object (inherits from data.frame)
+#' @return A bid_user_personas S3 object (inherits from data.frame)
 #'
 #' @examples
 #' \dontrun{
@@ -122,20 +122,25 @@ new_user_personas <- function(personas_df) {
   required_cols <- c("name", "goals", "pain_points", "technical_level")
   validate_data_frame(personas_df, "personas_df", required_columns = required_cols)
 
-  # validate technical_level values
+  # validate technical_level values (case-insensitive)
   valid_levels <- c("beginner", "intermediate", "advanced", "expert")
-  invalid_levels <- setdiff(personas_df$technical_level, valid_levels)
+  # normalize to lowercase for validation
+  normalized_levels <- tolower(personas_df$technical_level)
+  invalid_levels <- setdiff(normalized_levels, valid_levels)
   if (length(invalid_levels) > 0) {
+    original_invalid <- personas_df$technical_level[normalized_levels %in% invalid_levels]
     cli::cli_abort(standard_error_msg(
       "Invalid technical_level values found",
-      context = glue::glue("Invalid values: {paste(invalid_levels, collapse = ', ')}"),
+      context = glue::glue("Invalid values: {paste(original_invalid, collapse = ', ')}"),
       suggestions = glue::glue("Valid levels: {paste(valid_levels, collapse = ', ')}")
     ))
   }
+  # update to normalized lowercase values
+  personas_df$technical_level <- normalized_levels
 
   structure(
     tibble::as_tibble(personas_df),
-    class = c("bidux_user_personas", "tbl_df", "tbl", "data.frame"),
+    class = c("bid_user_personas", "tbl_df", "tbl", "data.frame"),
     created_at = Sys.time()
   )
 }
@@ -149,7 +154,7 @@ new_user_personas <- function(personas_df) {
 #' @keywords internal
 #' @noRd
 validate_user_personas <- function(x) {
-  if (!inherits(x, "bidux_user_personas")) {
+  if (!inherits(x, "bid_user_personas")) {
     return(FALSE)
   }
 
@@ -167,11 +172,11 @@ validate_user_personas <- function(x) {
 
 #' Print method for user personas objects
 #'
-#' @param x A bidux_user_personas object
+#' @param x A bid_user_personas object
 #' @param ... Additional arguments passed to print.data.frame
 #'
 #' @export
-print.bidux_user_personas <- function(x, ...) {
+print.bid_user_personas <- function(x, ...) {
   cat("bidux user personas (", nrow(x), " personas):\n", sep = "")
   NextMethod("print")
 }
@@ -184,7 +189,7 @@ print.bidux_user_personas <- function(x, ...) {
 #'
 #' @param mitigations_df Data.frame with required columns: bias_type, mitigation_strategy, confidence_level
 #'
-#' @return A bidux_bias_mitigations S3 object (inherits from data.frame)
+#' @return A bid_bias_mitigations S3 object (inherits from data.frame)
 #'
 #' @examples
 #' \dontrun{
@@ -220,7 +225,7 @@ new_bias_mitigations <- function(mitigations_df) {
 
   structure(
     tibble::as_tibble(mitigations_df),
-    class = c("bidux_bias_mitigations", "tbl_df", "tbl", "data.frame"),
+    class = c("bid_bias_mitigations", "tbl_df", "tbl", "data.frame"),
     created_at = Sys.time()
   )
 }
@@ -234,7 +239,7 @@ new_bias_mitigations <- function(mitigations_df) {
 #' @keywords internal
 #' @noRd
 validate_bias_mitigations <- function(x) {
-  if (!inherits(x, "bidux_bias_mitigations")) {
+  if (!inherits(x, "bid_bias_mitigations")) {
     return(FALSE)
   }
 
@@ -252,11 +257,11 @@ validate_bias_mitigations <- function(x) {
 
 #' Print method for bias mitigations objects
 #'
-#' @param x A bidux_bias_mitigations object
+#' @param x A bid_bias_mitigations object
 #' @param ... Additional arguments passed to print.data.frame
 #'
 #' @export
-print.bidux_bias_mitigations <- function(x, ...) {
+print.bid_bias_mitigations <- function(x, ...) {
   cat("bidux bias mitigations (", nrow(x), " strategies):\n", sep = "")
   NextMethod("print")
 }
@@ -265,23 +270,55 @@ print.bidux_bias_mitigations <- function(x, ...) {
 #'
 #' @param old_list Legacy list structure
 #'
-#' @return bidux_data_story object
+#' @return bid_data_story object
 #'
 #' @keywords internal
 #' @noRd
 migrate_data_story <- function(old_list) {
   if (!is.list(old_list)) {
     cli::cli_abort(standard_error_msg(
-      "data_story must be a list or bidux_data_story object",
+      "data_story must be a list or bid_data_story object",
       suggestions = "Use new_data_story() constructor for new code"
     ))
   }
 
+  # provide meaningful defaults for empty values and map old structure
+  context <- old_list$context %||% "Legacy data story migration"
+
+  # handle non-character context values (convert to character)
+  if (!is.character(context)) {
+    context <- "Legacy data story migration"
+  }
+
+  # handle empty string context
+  if (is.character(context) && nchar(trimws(context)) == 0) {
+    context <- "Legacy data story migration"
+  }
+
+  # map old structure to new structure, preserving legacy fields in variables/relationships
+  variables <- old_list$variables %||% list()
+  relationships <- old_list$relationships %||% list()
+
+  # map legacy fields to appropriate locations
+  if ("hook" %in% names(old_list)) {
+    variables$hook <- old_list$hook
+  }
+  if ("tension" %in% names(old_list)) {
+    variables$tension <- old_list$tension
+  }
+  if ("resolution" %in% names(old_list)) {
+    relationships$resolution <- old_list$resolution
+  }
+
+  # preserve other fields in metadata
+  excluded_fields <- c("context", "variables", "relationships", "hook", "tension", "resolution")
+  metadata <- old_list[!names(old_list) %in% excluded_fields]
+
   new_data_story(
-    context = old_list$context %||% "",
-    variables = old_list$variables %||% list(),
-    relationships = old_list$relationships %||% list(),
-    metadata = old_list[!names(old_list) %in% c("context", "variables", "relationships")]
+    context = context,
+    variables = variables,
+    relationships = relationships,
+    metadata = metadata
   )
 }
 
@@ -289,14 +326,14 @@ migrate_data_story <- function(old_list) {
 #'
 #' @param old_list Legacy list of lists structure
 #'
-#' @return bidux_user_personas object
+#' @return bid_user_personas object
 #'
 #' @keywords internal
 #' @noRd
 migrate_user_personas <- function(old_list) {
   if (!is.list(old_list)) {
     cli::cli_abort(standard_error_msg(
-      "user_personas must be a list or bidux_user_personas object",
+      "user_personas must be a list or bid_user_personas object",
       suggestions = "Use new_user_personas() constructor for new code"
     ))
   }
@@ -319,14 +356,14 @@ migrate_user_personas <- function(old_list) {
 #'
 #' @param old_list Legacy named list structure
 #'
-#' @return bidux_bias_mitigations object
+#' @return bid_bias_mitigations object
 #'
 #' @keywords internal
 #' @noRd
 migrate_bias_mitigations <- function(old_list) {
   if (!is.list(old_list)) {
     cli::cli_abort(standard_error_msg(
-      "bias_mitigations must be a list or bidux_bias_mitigations object",
+      "bias_mitigations must be a list or bid_bias_mitigations object",
       suggestions = "Use new_bias_mitigations() constructor for new code"
     ))
   }

@@ -170,7 +170,7 @@ test_that("bid_anticipate validates bias_mitigations parameter", {
       previous_stage = notice_result,
       bias_mitigations = list(anchoring = "", framing = NA)
     ),
-    "bias_mitigations must be a non-empty named list"
+    "bias_mitigations contains empty values"
   )
 
   # unnamed list should warn
@@ -182,7 +182,7 @@ test_that("bid_anticipate validates bias_mitigations parameter", {
         "Use positive framing"
       )
     ),
-    "bias_mitigations must be a non-empty named list"
+"bias_mitigations must be a non-empty named list"
   )
 })
 
