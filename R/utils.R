@@ -260,17 +260,6 @@ validate_required_params <- function(...) {
   invisible(NULL)
 }
 
-#' Validate character parameter with length and content checks
-#'
-#' @param value The value to validate
-#' @param param_name Name of the parameter
-#' @param min_length Minimum length after trimming
-#' @param allow_null Whether NULL values are allowed
-#'
-#' @return NULL invisibly if valid, stops with error otherwise
-#'
-#' @keywords internal
-#' @noRd
 # Removed duplicate validate_character_param function (moved to utils_validation.R)
 
 #' Validate list parameter structure
