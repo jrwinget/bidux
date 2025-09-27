@@ -90,12 +90,12 @@ test_that("bid_interpret works with user personas", {
 # ==============================================================================
 
 test_that("bid_interpret validates data_story parameter", {
-  expect_error(
+expect_error(
     bid_interpret(
       central_question = "Test question",
       data_story = "not a list"
     ),
-    regexp = "'data_story' must be a list"
+    regexp = "data_story must be a bid_data_story object or list"
   )
 
   expect_error(
@@ -103,7 +103,7 @@ test_that("bid_interpret validates data_story parameter", {
       central_question = "Test question",
       data_story = 123
     ),
-    regexp = "'data_story' must be a list"
+regexp = "data_story must be a bid_data_story object or list"
   )
 })
 
@@ -116,12 +116,16 @@ test_that("bid_interpret validates user_personas parameter", {
     )
   )
 
-  expect_error(
-    bid_interpret(
+  # Migration provides default name for missing names
+  expect_warning(
+    result <- bid_interpret(
       central_question = "Test question",
       user_personas = list(list(goals = "missing name"))
-    )
+    ),
+    "deprecated list format"
   )
+  # Should auto-fill missing name
+  expect_true("personas" %in% names(result))
 })
 
 test_that("bid_interpret handles NULL/empty central_question by auto-suggestion", {
