@@ -170,10 +170,15 @@ find_error_patterns <- function(events, threshold_rate = 0.1) {
   result <- lapply(seq_len(nrow(error_patterns)), function(i) {
     pattern <- error_patterns[i, ]
 
+    # Helper for NA-safe comparison
+    na_safe_equal <- function(a, b) {
+      (is.na(a) & is.na(b)) | (!is.na(a) & !is.na(b) & a == b)
+    }
+
     # find inputs changed just before these errors
     error_sessions <- error_events[
       error_events$error_message == pattern$error_message &
-        (error_events$output_id %||% "") == (pattern$output_id %||% ""),
+        na_safe_equal(error_events$output_id, pattern$output_id),
       c("session_id", "timestamp")
     ]
 
