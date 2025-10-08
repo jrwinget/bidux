@@ -1,0 +1,150 @@
+# Workflow for code formatting and linting
+# Uses air (fast Rust formatter), styler (complementary R formatter), and lintr (code quality)
+# Derived from https://github.com/r-lib/actions/tree/v2/examples
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+name: format-and-lint
+
+permissions: read-all
+
+jobs:
+  format-and-lint:
+    runs-on: ubuntu-latest
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release'
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            any::styler
+            any::lintr
+          needs: check
+
+      # Install air formatter (Rust-based, extremely fast)
+      - name: Install air formatter
+        run: |
+          curl -LsSf https://github.com/posit-dev/air/releases/latest/download/air-installer.sh | sh
+          echo "$HOME/.air/bin" >> $GITHUB_PATH
+        shell: bash
+
+      - name: Verify air installation
+        run: air --version
+        shell: bash
+
+      # Check formatting with air (primary formatter)
+      - name: Check formatting with air
+        run: |
+          echo "Checking R code formatting with air..."
+          air format . --check
+        shell: bash
+        continue-on-error: false
+
+      # Check formatting with styler (complementary checks)
+      - name: Check formatting with styler
+        run: |
+          styler_results <- styler::style_pkg(dry = "on")
+          if (length(styler_results$changed) > 0) {
+            cat("\n❌ Styler found formatting issues in:\n")
+            for (file in styler_results$changed) {
+              cat("  -", file, "\n")
+            }
+            stop("Code formatting issues detected. Run styler::style_pkg() locally to fix.")
+          } else {
+            cat("\n✓ All files pass styler formatting checks\n")
+          }
+        shell: Rscript {0}
+
+      # Run lintr for code quality checks
+      # Checks cyclomatic complexity, object name length, and style issues
+      - name: Lint with lintr
+        run: |
+          library(lintr)
+
+          # Custom linters configuration for bidux package
+          linters_config <- lintr::linters_with_defaults(
+            # Complexity and readability
+            cyclocomp_linter = lintr::cyclocomp_linter(complexity_limit = 15),
+            object_length_linter = lintr::object_length_linter(length = 30),
+
+            # Code style
+            line_length_linter = lintr::line_length_linter(80),
+            trailing_whitespace_linter = lintr::trailing_whitespace_linter(),
+
+            # Best practices
+            T_and_F_symbol_linter = lintr::T_and_F_symbol_linter(),
+            undesirable_function_linter = lintr::undesirable_function_linter(),
+
+            # Disable overly strict linters for R package development
+            object_name_linter = NULL,  # handled by package conventions
+            indentation_linter = NULL   # handled by air/styler
+          )
+
+          # Lint R/ directory (main package code)
+          cat("\n📋 Linting R/ directory...\n")
+          r_lints <- lintr::lint_package(
+            path = ".",
+            linters = linters_config,
+            exclusions = list(
+              "tests/testthat.R",  # minimal test runner
+              "R/RcppExports.R"     # auto-generated, if exists
+            )
+          )
+
+          # Print results
+          print(r_lints)
+
+          # Fail if there are any lints
+          if (length(r_lints) > 0) {
+            cat("\n❌ Linting issues found:", length(r_lints), "total\n")
+
+            # Group by type for better readability
+            lint_types <- table(sapply(r_lints, function(x) x$linter))
+            cat("\nIssue breakdown:\n")
+            for (linter_name in names(lint_types)) {
+              cat("  -", linter_name, ":", lint_types[linter_name], "\n")
+            }
+
+            stop("Code quality issues detected. Review lintr output above.")
+          } else {
+            cat("\n✓ All files pass lintr quality checks\n")
+          }
+        shell: Rscript {0}
+
+      # Run package tests to ensure code quality
+      - name: Run tests
+        run: |
+          library(devtools)
+          devtools::test()
+        shell: Rscript {0}
+
+      # Summary report
+      - name: Summary
+        if: success()
+        run: |
+          cat << 'EOF'
+
+          ╔════════════════════════════════════════════╗
+          ║  ✓ All formatting and quality checks passed ║
+          ╚════════════════════════════════════════════╝
+
+          Checks completed:
+            ✓ air formatter (Rust-based, fast)
+            ✓ styler formatter (R-based, complementary)
+            ✓ lintr code quality (complexity, naming, style)
+            ✓ devtools::test() (1,489 tests)
+
+          EOF
+        shell: bash

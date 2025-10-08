@@ -1,0 +1,10 @@
+# Air formatter configuration for bidux package
+# See: https://posit-dev.github.io/air/
+
+[formatter]
+# Line width for formatting (tidyverse style guide default)
+line_width = 80
+
+# Indent using spaces (tidyverse convention)
+indent_style = "space"
+indent_width = 2

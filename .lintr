@@ -1,0 +1,14 @@
+linters: linters_with_defaults(
+    cyclocomp_linter = cyclocomp_linter(complexity_limit = 15),
+    object_length_linter = object_length_linter(length = 30),
+    line_length_linter = line_length_linter(80),
+    trailing_whitespace_linter = trailing_whitespace_linter(),
+    T_and_F_symbol_linter = T_and_F_symbol_linter(),
+    undesirable_function_linter = undesirable_function_linter(),
+    object_name_linter = NULL,
+    indentation_linter = NULL
+  )
+exclusions: list(
+    "tests/testthat.R",
+    "R/RcppExports.R"
+  )
