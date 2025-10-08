@@ -387,3 +387,43 @@ migrate_bias_mitigations <- function(old_list) {
 
   new_bias_mitigations(mitigations_df)
 }
+
+#' Create consistent result structure (DRY principle)
+#'
+#' @description
+#' Standardized result creation to reduce duplication across BID stage functions.
+#' Creates a tibble or data.frame with consistent structure and S3 class.
+#'
+#' @param data_list List of data elements
+#' @param class_name S3 class name to apply
+#' @param attributes Named list of attributes to set
+#' @param return_tibble Whether to return tibble if available
+#'
+#' @return Object with specified S3 class
+#'
+#' @keywords internal
+#' @noRd
+create_bid_result <- function(data_list, class_name, attributes = list(), return_tibble = TRUE) {
+
+  # add timestamp if not present
+  if (!"timestamp" %in% names(data_list)) {
+    data_list$timestamp <- rep(Sys.time(), length(data_list[[1]]))
+  }
+
+  # create tibble or data.frame
+  if (return_tibble && requireNamespace("tibble", quietly = TRUE)) {
+    result <- tibble::tibble(!!!data_list)
+  } else {
+    result <- data.frame(data_list, stringsAsFactors = FALSE)
+  }
+
+  # apply S3 class
+  class(result) <- c(class_name, class(result))
+
+  # set attributes
+  for (attr_name in names(attributes)) {
+    attr(result, attr_name) <- attributes[[attr_name]]
+  }
+
+  result
+}

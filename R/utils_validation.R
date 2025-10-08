@@ -625,38 +625,7 @@ validate_param <- function(value, arg_name, type = "character", min_length = 1,
   invisible(value)
 }
 
-#' Create consistent result structure (DRY principle)
-#'
-#' Standardized result creation to reduce duplication
-#' @param data_list List of data elements
-#' @param class_name S3 class name to apply
-#' @param attributes Named list of attributes to set
-#' @param return_tibble Whether to return tibble if available
-#' @keywords internal
-create_bid_result <- function(data_list, class_name, attributes = list(), return_tibble = TRUE) {
-
-  # add timestamp if not present
-  if (!"timestamp" %in% names(data_list)) {
-    data_list$timestamp <- rep(Sys.time(), length(data_list[[1]]))
-  }
-
-  # create tibble or data.frame
-  if (return_tibble && requireNamespace("tibble", quietly = TRUE)) {
-    result <- tibble::tibble(!!!data_list)
-  } else {
-    result <- data.frame(data_list, stringsAsFactors = FALSE)
-  }
-
-  # apply s3 class
-  class(result) <- c(class_name, class(result))
-
-  # set attributes
-  for (attr_name in names(attributes)) {
-    attr(result, attr_name) <- attributes[[attr_name]]
-  }
-
-  result
-}
+# Removed duplicate create_bid_result function (moved to s3_classes.R)
 
 # ===== UTILITY OPERATORS =====
 
