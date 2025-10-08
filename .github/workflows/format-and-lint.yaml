@@ -1,6 +1,5 @@
-# Workflow for code formatting and linting
-# Uses air (fast Rust formatter), styler (complementary R formatter), and lintr (code quality)
-# Derived from https://github.com/r-lib/actions/tree/v2/examples
+# code formatting and linting workflow
+
 on:
   push:
     branches: [main, master]
@@ -33,7 +32,6 @@ jobs:
             any::lintr
           needs: check
 
-      # Install air formatter (Rust-based, extremely fast)
       - name: Install air formatter
         run: |
           curl -LsSf https://github.com/posit-dev/air/releases/latest/download/air-installer.sh | sh
@@ -44,7 +42,7 @@ jobs:
         run: air --version
         shell: bash
 
-      # Check formatting with air (primary formatter)
+      # check with air (primary formatter)
       - name: Check formatting with air
         run: |
           echo "Checking R code formatting with air..."
@@ -52,7 +50,7 @@ jobs:
         shell: bash
         continue-on-error: false
 
-      # Check formatting with styler (complementary checks)
+      # check with styler (complementary checks)
       - name: Check formatting with styler
         run: |
           styler_results <- styler::style_pkg(dry = "on")
@@ -67,8 +65,8 @@ jobs:
           }
         shell: Rscript {0}
 
-      # Run lintr for code quality checks
-      # Checks cyclomatic complexity, object name length, and style issues
+      # lintr for additional qual checks
+      # cyclomatic complexity, object name length, etc.
       - name: Lint with lintr
         run: |
           library(lintr)
@@ -123,22 +121,20 @@ jobs:
           }
         shell: Rscript {0}
 
-      # Run package tests to ensure code quality
       - name: Run tests
         run: |
           library(devtools)
           devtools::test()
         shell: Rscript {0}
 
-      # Summary report
       - name: Summary
         if: success()
         run: |
           cat << 'EOF'
 
-          ╔════════════════════════════════════════════╗
-          ║  ✓ All formatting and quality checks passed ║
-          ╚════════════════════════════════════════════╝
+          ╔══════════════════════════════════════════════╗
+          ║  ✓ All formatting and quality checks passed  ║
+          ╚══════════════════════════════════════════════╝
 
           Checks completed:
             ✓ air formatter (Rust-based, fast)
