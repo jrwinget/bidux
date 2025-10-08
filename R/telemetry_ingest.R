@@ -126,7 +126,7 @@ bid_ingest_telemetry <- function(
   }
 
   # get total sessions for pct calculations
-  total_sessions <- length(unique(events$session_id))
+  total_sessions <- get_total_sessions(events)
   cli::cli_alert_info(
     "Analyzing {nrow(events)} events from {total_sessions} sessions..."
   )

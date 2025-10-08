@@ -15,7 +15,7 @@ find_unused_inputs <- function(events, threshold = 0.05) {
   }
 
   # get total sessions
-  total_sessions <- length(unique(events$session_id))
+  total_sessions <- get_total_sessions(events)
 
   # count sessions per input
   input_usage <- input_events |>
@@ -146,7 +146,7 @@ find_error_patterns <- function(events, threshold_rate = 0.1) {
     return(list())
   }
 
-  total_sessions <- length(unique(events$session_id))
+  total_sessions <- get_total_sessions(events)
 
   # count errors by message and output
   error_patterns <- error_events |>
@@ -236,7 +236,7 @@ find_navigation_dropoffs <- function(events, threshold = 0.2) {
     return(list())
   }
 
-  total_sessions <- length(unique(events$session_id))
+  total_sessions <- get_total_sessions(events)
 
   # count page visits
   page_visits <- nav_events |>
