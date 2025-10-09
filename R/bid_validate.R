@@ -78,7 +78,10 @@ bid_validate <- function(
 
   if (is.null(summary_panel)) {
     summary_panel <- generate_summary_panel_suggestion(previous_stage)
-    bid_alert_info(paste0("Suggested summary panel: ", summary_panel), quiet = quiet)
+    bid_alert_info(
+      paste0("Suggested summary panel: ", summary_panel),
+      quiet = quiet
+    )
   }
 
   if (is.null(collaboration)) {

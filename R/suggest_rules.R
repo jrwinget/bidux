@@ -1,14 +1,3 @@
-#' Centralized Suggestion Rules for BID Framework
-#'
-#' @description
-#' This file consolidates simple suggestion rules for Interpret, Notice, and
-#' Validate stages to reduce duplication and provide consistent messaging
-#' across the BID framework.
-
-# ==============================================================================
-# SIMPLE SUGGESTION RULES
-# ==============================================================================
-
 #' Get consolidated suggestion rules for all BID stages
 #'
 #' @description

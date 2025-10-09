@@ -1,10 +1,3 @@
-# ==============================================================================
-# CORE UTILITIES
-# ==============================================================================
-#
-# Fundamental utility functions used throughout the bidux package.
-#
-
 #' Null Coalescing Operator
 #'
 #' Returns the left-hand side if it is not NULL, otherwise returns the

@@ -1,10 +1,3 @@
-# ==============================================================================
-# SAFE ACCESS UTILITIES
-# ==============================================================================
-#
-# Defensive programming utilities for safe data access with defaults.
-#
-
 #' Safe conditional checking
 #'
 #' @param obj The object to check
@@ -151,9 +144,9 @@ safe_data_story_access <- function(data_story, element) {
     # check if using new flat format (has hook/tension/resolution at top level)
     # or old nested format (has variables/relationships)
     using_flat_format <- !is.null(data_story$hook) ||
-                         !is.null(data_story$tension) ||
-                         !is.null(data_story$resolution) ||
-                         (is.null(data_story$variables) && is.null(data_story$relationships))
+      !is.null(data_story$tension) ||
+      !is.null(data_story$resolution) ||
+      (is.null(data_story$variables) && is.null(data_story$relationships))
 
     if (using_flat_format) {
       # new flat format: elements are at top level

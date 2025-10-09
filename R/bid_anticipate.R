@@ -446,7 +446,10 @@ bid_anticipate <- function(
       implementation <- paste(
         tools::toTitleCase(bias_name),
         "mitigation:",
-        normalize_text(bias_info$implementation_tips, remove_trailing_punct = TRUE)
+        normalize_text(
+          bias_info$implementation_tips,
+          remove_trailing_punct = TRUE
+        )
       )
     } else {
       implementation <- paste(

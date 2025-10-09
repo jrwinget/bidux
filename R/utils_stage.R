@@ -1,10 +1,3 @@
-# ==============================================================================
-# STAGE UTILITIES
-# ==============================================================================
-#
-# Functions for extracting and manipulating BID stage data.
-#
-
 #' Extract stage data safely from previous stage object
 #'
 #' @param previous_stage Previous stage object (bid_stage or tibble)

@@ -113,7 +113,7 @@ generate_text_report <- function(validate_stage, format, include_diagrams) {
     )
     report <- c(
       report,
-      "|    NOTICE   |  |  INTERPRET  |  |  STRUCTURE  |  |  ANTICIPATE |  |   VALIDATE  |"
+      "|    INTERPRET  |  |  NOTICE   |  |  ANTICIPATE |  |   STRUCTURE  |  |  VALIDATE  |"
     )
     report <- c(
       report,
@@ -195,11 +195,11 @@ generate_text_report <- function(validate_stage, format, include_diagrams) {
   report <- c(report, paste0(format_label("Suggestions", format), suggestions))
   report <- c(report, "")
 
-  # stage 4: anticipate
+  # stage 3: anticipate
   if ("previous_bias" %in% names(validate_stage)) {
     report <- c(
       report,
-      format_label("Stage 4: Anticipate User Behavior", format, "header")
+      format_label("Stage 3: Anticipate User Behavior", format, "header")
     )
 
     bias_mitigations <- safe_extract(validate_stage, "previous_bias")
@@ -223,11 +223,11 @@ generate_text_report <- function(validate_stage, format, include_diagrams) {
     report <- c(report, "")
   }
 
-  # stage 3: structure
+  # stage 4: structure
   if ("previous_layout" %in% names(validate_stage)) {
     report <- c(
       report,
-      format_label("Stage 3: Structure the Dashboard", format, "header")
+      format_label("Stage 4: Structure the Dashboard", format, "header")
     )
 
     layout <- safe_extract(validate_stage, "previous_layout")
@@ -548,7 +548,7 @@ generate_html_report_direct <- function(validate_stage, include_diagrams) {
       '<div class="section"><h2>BID Framework Overview</h2>
       <pre class="diagram">
       +-------------+  +-------------+  +-------------+  +-------------+  +-------------+
-      |    NOTICE   |  |  INTERPRET  |  |  STRUCTURE  |  |  ANTICIPATE |  |   VALIDATE  |
+      |   INTERPRET |  |    NOTICE   |  |  ANTICIPATE |  |  STRUCTURE  |  |   VALIDATE  |
       |    Stage 1  |->|    Stage 2  |->|    Stage 3  |->|    Stage 4  |->|    Stage 5  |
       +-------------+  +-------------+  +-------------+  +-------------+  +-------------+
       </pre>
@@ -606,11 +606,11 @@ generate_html_report_direct <- function(validate_stage, include_diagrams) {
     "</p></div>"
   )
 
-  # stage 4: anticipate
+  # stage 3: anticipate
   if ("previous_bias" %in% names(validate_stage)) {
     html_body <- paste0(
       html_body,
-      '<div class="section"><h2>Stage 4: Anticipate User Behavior</h2>
+      '<div class="section"><h2>Stage 3: Anticipate User Behavior</h2>
         <p><strong>Bias Mitigations:</strong> ',
       safe_extract(validate_stage, "previous_bias"),
       "</p><p><strong>Interaction Principles:</strong> ",
@@ -619,11 +619,11 @@ generate_html_report_direct <- function(validate_stage, include_diagrams) {
     )
   }
 
-  # stage 3: structure
+  # stage 4: structure
   if ("previous_layout" %in% names(validate_stage)) {
     html_body <- paste0(
       html_body,
-      '<div class="section"><h2>Stage 3: Structure the Dashboard</h2>
+      '<div class="section"><h2>Stage 4: Structure the Dashboard</h2>
         <p><strong>Layout:</strong> ',
       safe_extract(validate_stage, "previous_layout"),
       "</p><p><strong>Applied Concepts:</strong> ",

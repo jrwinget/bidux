@@ -4,9 +4,11 @@ test_that("find_unused_inputs identifies unused inputs correctly", {
     session_id = c("s1", "s1", "s2", "s2", "s3"),
     event_type = c("input", "input", "input", "login", "input"),
     input_id = c("btn1", "btn2", "btn1", NA, "btn3"),
-    timestamp = as.POSIXct(c("2023-01-01 10:00:00", "2023-01-01 10:01:00",
-                            "2023-01-01 10:02:00", "2023-01-01 10:03:00",
-                            "2023-01-01 10:04:00")),
+    timestamp = as.POSIXct(c(
+      "2023-01-01 10:00:00", "2023-01-01 10:01:00",
+      "2023-01-01 10:02:00", "2023-01-01 10:03:00",
+      "2023-01-01 10:04:00"
+    )),
     stringsAsFactors = FALSE
   )
 
@@ -53,9 +55,11 @@ test_that("find_delayed_sessions calculates delays correctly", {
   events <- data.frame(
     session_id = c("s1", "s1", "s2", "s2", "s3"),
     event_type = c("login", "input", "login", "navigation", "login"),
-    timestamp = as.POSIXct(c("2023-01-01 10:00:00", "2023-01-01 10:00:05",
-                            "2023-01-01 10:01:00", "2023-01-01 10:01:35",
-                            "2023-01-01 10:02:00")),
+    timestamp = as.POSIXct(c(
+      "2023-01-01 10:00:00", "2023-01-01 10:00:05",
+      "2023-01-01 10:01:00", "2023-01-01 10:01:35",
+      "2023-01-01 10:02:00"
+    )),
     input_id = c(NA, "btn1", NA, NA, NA),
     navigation_id = c(NA, NA, NA, "page1", NA),
     stringsAsFactors = FALSE
@@ -104,9 +108,11 @@ test_that("find_error_patterns identifies error patterns", {
     error_message = c(NA, "timeout", NA, "timeout", "connection", NA),
     output_id = c(NA, "plot1", NA, "plot1", "plot2", NA),
     input_id = c("btn1", NA, "btn1", NA, NA, NA),
-    timestamp = as.POSIXct(c("2023-01-01 10:00:00", "2023-01-01 10:00:03",
-                            "2023-01-01 10:01:00", "2023-01-01 10:01:03",
-                            "2023-01-01 10:02:00", "2023-01-01 10:02:03")),
+    timestamp = as.POSIXct(c(
+      "2023-01-01 10:00:00", "2023-01-01 10:00:03",
+      "2023-01-01 10:01:00", "2023-01-01 10:01:03",
+      "2023-01-01 10:02:00", "2023-01-01 10:02:03"
+    )),
     stringsAsFactors = FALSE
   )
 
@@ -152,14 +158,20 @@ test_that("find_navigation_dropoffs identifies underused pages", {
   # Create navigation events
   events <- data.frame(
     session_id = c("s1", "s1", "s2", "s2", "s3", "s4", "s5"),
-    event_type = c("navigation", "navigation", "navigation", "navigation",
-                   "navigation", "navigation", "login"),
-    navigation_id = c("home", "rare_page", "home", "popular_page",
-                      "rare_page", "popular_page", NA),
-    timestamp = as.POSIXct(c("2023-01-01 10:00:00", "2023-01-01 10:00:30",
-                            "2023-01-01 10:01:00", "2023-01-01 10:01:30",
-                            "2023-01-01 10:02:00", "2023-01-01 10:02:30",
-                            "2023-01-01 10:03:00")),
+    event_type = c(
+      "navigation", "navigation", "navigation", "navigation",
+      "navigation", "navigation", "login"
+    ),
+    navigation_id = c(
+      "home", "rare_page", "home", "popular_page",
+      "rare_page", "popular_page", NA
+    ),
+    timestamp = as.POSIXct(c(
+      "2023-01-01 10:00:00", "2023-01-01 10:00:30",
+      "2023-01-01 10:01:00", "2023-01-01 10:01:30",
+      "2023-01-01 10:02:00", "2023-01-01 10:02:30",
+      "2023-01-01 10:03:00"
+    )),
     stringsAsFactors = FALSE
   )
 

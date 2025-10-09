@@ -37,21 +37,21 @@ bid_telemetry_presets <- function(preset = c("moderate", "strict", "relaxed")) {
 
   presets <- list(
     strict = list(
-      unused_input_threshold = 0.02,      # flag if used by < 2% of sessions
-      delay_threshold_secs = 20,          # flag if > 20s to first action
-      error_rate_threshold = 0.05,        # flag if errors in > 5% of sessions
-      navigation_threshold = 0.1,         # flag if page visited by < 10%
-      rapid_change_window = 15,           # check 15s windows for confusion
-      rapid_change_count = 4              # 4+ changes in window = confusion
+      unused_input_threshold = 0.02, # flag if used by < 2% of sessions
+      delay_threshold_secs = 20, # flag if > 20s to first action
+      error_rate_threshold = 0.05, # flag if errors in > 5% of sessions
+      navigation_threshold = 0.1, # flag if page visited by < 10%
+      rapid_change_window = 15, # check 15s windows for confusion
+      rapid_change_count = 4 # 4+ changes in window = confusion
     ),
-    moderate = .default_telemetry_thresholds,  # use centralized defaults
+    moderate = .default_telemetry_thresholds, # use centralized defaults
     relaxed = list(
-      unused_input_threshold = 0.1,       # flag if used by < 10% of sessions
-      delay_threshold_secs = 60,          # flag if > 60s to first action
-      error_rate_threshold = 0.2,         # flag if errors in > 20% of sessions
-      navigation_threshold = 0.3,         # flag if page visited by < 30%
-      rapid_change_window = 5,            # check 5s windows for confusion
-      rapid_change_count = 7              # 7+ changes in window = confusion
+      unused_input_threshold = 0.1, # flag if used by < 10% of sessions
+      delay_threshold_secs = 60, # flag if > 60s to first action
+      error_rate_threshold = 0.2, # flag if errors in > 20% of sessions
+      navigation_threshold = 0.3, # flag if page visited by < 30%
+      rapid_change_window = 5, # check 5s windows for confusion
+      rapid_change_count = 7 # 7+ changes in window = confusion
     )
   )
 

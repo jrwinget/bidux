@@ -90,7 +90,7 @@ test_that("bid_interpret works with user personas", {
 # ==============================================================================
 
 test_that("bid_interpret validates data_story parameter", {
-expect_error(
+  expect_error(
     bid_interpret(
       central_question = "Test question",
       data_story = "not a list"
@@ -103,7 +103,7 @@ expect_error(
       central_question = "Test question",
       data_story = 123
     ),
-regexp = "data_story must be a bid_data_story object or list"
+    regexp = "data_story must be a bid_data_story object or list"
   )
 })
 

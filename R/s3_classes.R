@@ -36,8 +36,14 @@
 #' )
 #'
 #' @export
-new_data_story <- function(hook = NULL, context = NULL, tension = NULL, resolution = NULL,
-                           ..., variables = NULL, relationships = NULL) {
+new_data_story <- function(
+    hook = NULL,
+    context = NULL,
+    tension = NULL,
+    resolution = NULL,
+    variables = NULL,
+    relationships = NULL,
+    ...) {
   # detect if using deprecated nested format
   using_nested_format <- !is.null(variables) || !is.null(relationships)
 
@@ -138,10 +144,13 @@ validate_data_story <- function(x) {
   }
 
   # check for new flat format (hook, context, tension, resolution)
-  has_flat_format <- "hook" %in% names(x) || "tension" %in% names(x) || "resolution" %in% names(x)
+  has_flat_format <- "hook" %in% names(x) ||
+    "tension" %in% names(x) ||
+    "resolution" %in% names(x)
 
   # check for old nested format (variables, relationships)
-  has_nested_format <- "variables" %in% names(x) && "relationships" %in% names(x)
+  has_nested_format <- "variables" %in% names(x) &&
+    "relationships" %in% names(x)
 
   # must have at least one valid format
   if (!has_flat_format && !has_nested_format) {
@@ -162,10 +171,16 @@ validate_data_story <- function(x) {
     if (!is.null(x$hook) && (!is.character(x$hook) || length(x$hook) != 1)) {
       return(FALSE)
     }
-    if (!is.null(x$tension) && (!is.character(x$tension) || length(x$tension) != 1)) {
+    if (
+      !is.null(x$tension) &&
+        (!is.character(x$tension) || length(x$tension) != 1)
+    ) {
       return(FALSE)
     }
-    if (!is.null(x$resolution) && (!is.character(x$resolution) || length(x$resolution) != 1)) {
+    if (
+      !is.null(x$resolution) &&
+        (!is.character(x$resolution) || length(x$resolution) != 1)
+    ) {
       return(FALSE)
     }
   }
@@ -190,8 +205,10 @@ print.bid_data_story <- function(x, ...) {
   cat("bidux data story:\n")
 
   # check which format is being used
-  using_flat_format <- !is.null(x$hook) || !is.null(x$tension) || !is.null(x$resolution) ||
-                       (is.null(x$variables) && is.null(x$relationships))
+  using_flat_format <- !is.null(x$hook) ||
+    !is.null(x$tension) ||
+    !is.null(x$resolution) ||
+    (is.null(x$variables) && is.null(x$relationships))
 
   if (using_flat_format) {
     # new flat format display
@@ -221,7 +238,8 @@ print.bid_data_story <- function(x, ...) {
 #' Creates a structured user personas tibble for use in bidux functions.
 #' Replaces nested list structures with a validated data.frame structure.
 #'
-#' @param personas_df Data.frame with required columns: name, goals, pain_points, technical_level
+#' @param personas_df Data.frame with required columns: name, goals,
+#'        pain_points, technical_level
 #'
 #' @return A bid_user_personas S3 object (inherits from data.frame)
 #'
@@ -240,7 +258,11 @@ new_user_personas <- function(personas_df) {
   validate_data_frame(personas_df, "personas_df")
 
   required_cols <- c("name", "goals", "pain_points", "technical_level")
-  validate_data_frame(personas_df, "personas_df", required_columns = required_cols)
+  validate_data_frame(
+    personas_df,
+    "personas_df",
+    required_columns = required_cols
+  )
 
   # validate technical_level values (case-insensitive)
   valid_levels <- c("beginner", "intermediate", "advanced", "expert")
@@ -307,7 +329,8 @@ print.bid_user_personas <- function(x, ...) {
 #' Creates a structured bias mitigations tibble for use in bidux functions.
 #' Replaces nested list structures with a validated data.frame structure.
 #'
-#' @param mitigations_df Data.frame with required columns: bias_type, mitigation_strategy, confidence_level
+#' @param mitigations_df Data.frame with required columns: bias_type,
+#'        mitigation_strategy, confidence_level
 #'
 #' @return A bid_bias_mitigations S3 object (inherits from data.frame)
 #'
@@ -339,7 +362,9 @@ new_bias_mitigations <- function(mitigations_df) {
   if (any(invalid_confidence)) {
     cli::cli_abort(standard_error_msg(
       "confidence_level values must be between 0 and 1",
-      context = glue::glue("Invalid values found: {paste(mitigations_df$confidence_level[invalid_confidence], collapse = ', ')}")
+      context = glue::glue(
+        "Invalid values found: {paste(mitigations_df$confidence_level[invalid_confidence], collapse = ', ')}"
+      )
     ))
   }
 
@@ -415,7 +440,8 @@ migrate_data_story <- function(old_list) {
     context <- "Legacy data story migration"
   }
 
-  # map old structure to new structure, preserving legacy fields in variables/relationships
+  # map old structure to new structure,
+  # preserving legacy fields in variables/relationships
   variables <- old_list$variables %||% list()
   relationships <- old_list$relationships %||% list()
 
@@ -431,7 +457,14 @@ migrate_data_story <- function(old_list) {
   }
 
   # preserve other fields in metadata
-  excluded_fields <- c("context", "variables", "relationships", "hook", "tension", "resolution")
+  excluded_fields <- c(
+    "context",
+    "variables",
+    "relationships",
+    "hook",
+    "tension",
+    "resolution"
+  )
   metadata <- old_list[!names(old_list) %in% excluded_fields]
 
   new_data_story(
@@ -523,8 +556,11 @@ migrate_bias_mitigations <- function(old_list) {
 #'
 #' @keywords internal
 #' @noRd
-create_bid_result <- function(data_list, class_name, attributes = list(), return_tibble = TRUE) {
-
+create_bid_result <- function(
+    data_list,
+    class_name,
+    attributes = list(),
+    return_tibble = TRUE) {
   # add timestamp if not present
   if (!"timestamp" %in% names(data_list)) {
     data_list$timestamp <- rep(Sys.time(), length(data_list[[1]]))

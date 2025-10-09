@@ -432,7 +432,7 @@ bid_interpret <- function(
       if (!is.null(audience) && !is.na(audience)) {
         # audience found, continue with this value
       } else {
-        audience <- NULL  # reset if no valid audience found
+        audience <- NULL # reset if no valid audience found
       }
     } else if (
       # try to get audience from previous_stage

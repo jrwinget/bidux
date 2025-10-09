@@ -1,10 +1,3 @@
-# ==============================================================================
-# MESSAGING UTILITIES
-# ==============================================================================
-#
-# Functions for user-facing messages, quiet mode, and output formatting.
-#
-
 #' Create standardized message output
 #'
 #' @param title The title or heading for the message

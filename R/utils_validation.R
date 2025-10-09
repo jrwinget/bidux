@@ -1,5 +1,3 @@
-# ===== PARAMETER VALIDATION UTILITIES =====
-
 #' Validate required parameters are provided
 #' @param ... Named parameters to validate
 #' @return NULL invisibly if valid, stops with error otherwise
@@ -382,8 +380,6 @@ validate_logical_param <- function(value, param_name, allow_null = FALSE) {
   invisible(TRUE)
 }
 
-# ===== ENHANCED VALIDATION FUNCTIONS =====
-
 #' Create standardized error messages with context and suggestions
 #' @param message Main error message
 #' @param context Optional context information
@@ -573,9 +569,14 @@ validate_choice <- function(value, choices, param_name, allow_null = FALSE) {
 #' @param allow_na Whether NA values are allowed
 #' @param choices Valid choices for character parameters
 #' @keywords internal
-validate_param <- function(value, arg_name, type = "character", min_length = 1,
-                          max_length = Inf, allow_na = FALSE, choices = NULL) {
-
+validate_param <- function(
+    value,
+    arg_name,
+    type = "character",
+    min_length = 1,
+    max_length = Inf,
+    allow_na = FALSE,
+    choices = NULL) {
   # check if missing
   if (missing(value)) {
     stop(sprintf("Argument '%s' is missing with no default", arg_name), call. = FALSE)
@@ -621,7 +622,3 @@ validate_param <- function(value, arg_name, type = "character", min_length = 1,
 
   invisible(value)
 }
-
-# Removed duplicate create_bid_result function (moved to s3_classes.R)
-
-# note: %||% operator is defined in utils_core.R (canonical version)

@@ -157,10 +157,10 @@ test_that("read_telemetry_json handles different JSON formats", {
   # Test JSON array format
   json_array_file <- file.path(temp_dir, "test_array.json")
   writeLines(c(
-    '[',
+    "[",
     '  {"timestamp": "2023-01-01 10:00:00", "session_id": "s1", "event_type": "input"},',
     '  {"timestamp": "2023-01-01 10:01:00", "session_id": "s2", "event_type": "login"}',
-    ']'
+    "]"
   ), json_array_file)
 
   result_array <- read_telemetry_json(json_array_file)
@@ -185,7 +185,7 @@ test_that("read_telemetry_json handles invalid JSON", {
   # Test invalid JSON
   invalid_json_file <- file.path(temp_dir, "invalid.json")
   writeLines(c(
-    '{"timestamp": "2023-01-01 10:00:00", "session_id": "s1"',  # missing closing brace
+    '{"timestamp": "2023-01-01 10:00:00", "session_id": "s1"', # missing closing brace
     '{"invalid": "json"}'
   ), invalid_json_file)
 
@@ -205,14 +205,14 @@ test_that("read_telemetry_json filters events without required fields", {
   # Test JSON with missing required fields
   incomplete_json_file <- file.path(temp_dir, "incomplete.json")
   writeLines(c(
-    '{"timestamp": "2023-01-01 10:00:00", "session_id": "s1", "event_type": "input"}',  # valid
-    '{"timestamp": "2023-01-01 10:01:00", "session_id": "s2"}',  # missing event_type
-    '{"session_id": "s3", "event_type": "login"}'  # missing timestamp
+    '{"timestamp": "2023-01-01 10:00:00", "session_id": "s1", "event_type": "input"}', # valid
+    '{"timestamp": "2023-01-01 10:01:00", "session_id": "s2"}', # missing event_type
+    '{"session_id": "s3", "event_type": "login"}' # missing timestamp
   ), incomplete_json_file)
 
   result <- read_telemetry_json(incomplete_json_file)
   expect_true(is.data.frame(result))
-  expect_equal(nrow(result), 1)  # Only one valid event
+  expect_equal(nrow(result), 1) # Only one valid event
   expect_equal(result$session_id[1], "s1")
 
   # Clean up

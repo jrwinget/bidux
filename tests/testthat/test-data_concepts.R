@@ -24,13 +24,13 @@ test_that("bid_concepts filters by search term", {
 
 test_that("bid_concepts fuzzy matching works", {
   # Test with fuzzy matching enabled (default)
-  result_fuzzy <- bid_concepts("proximty", fuzzy_match = TRUE)  # intentional typo
+  result_fuzzy <- bid_concepts("proximty", fuzzy_match = TRUE) # intentional typo
   expect_true(is.data.frame(result_fuzzy))
 
   # Test with fuzzy matching disabled
-  result_exact <- bid_concepts("proximty", fuzzy_match = FALSE)  # intentional typo
+  result_exact <- bid_concepts("proximty", fuzzy_match = FALSE) # intentional typo
   expect_true(is.data.frame(result_exact))
-  expect_equal(nrow(result_exact), 0)  # Should find nothing with exact match
+  expect_equal(nrow(result_exact), 0) # Should find nothing with exact match
 })
 
 test_that("bid_concepts max_distance parameter works", {
@@ -75,7 +75,7 @@ test_that("bid_concept recommendations parameter works", {
     # With recommendations
     result_with_rec <- bid_concept(test_concept, add_recommendations = TRUE)
     expect_true("recommendations" %in% names(result_with_rec) ||
-                length(result_with_rec) > 2)
+      length(result_with_rec) > 2)
 
     # Without recommendations
     result_without_rec <- bid_concept(test_concept, add_recommendations = FALSE)

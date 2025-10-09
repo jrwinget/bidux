@@ -288,8 +288,8 @@ test_that("migrate_user_personas handles legacy formats", {
     ),
     list(
       name = "Bob",
-      background = "Strategic overview",  # old field name
-      concerns = "Too much detail",       # old field name
+      background = "Strategic overview", # old field name
+      concerns = "Too much detail", # old field name
       technical_level = "beginner"
     )
   )
@@ -299,8 +299,8 @@ test_that("migrate_user_personas handles legacy formats", {
   expect_s3_class(migrated, "bid_user_personas")
   expect_equal(nrow(migrated), 2)
   expect_equal(migrated$name[1], "Alice")
-  expect_equal(migrated$goals[2], "Strategic overview")  # mapped from background
-  expect_equal(migrated$pain_points[2], "Too much detail")  # mapped from concerns
+  expect_equal(migrated$goals[2], "Strategic overview") # mapped from background
+  expect_equal(migrated$pain_points[2], "Too much detail") # mapped from concerns
 
   # Test with invalid input
   expect_error(
@@ -323,7 +323,7 @@ test_that("migrate_bias_mitigations handles legacy formats", {
   expect_equal(nrow(migrated), 3)
   expect_true("anchoring" %in% migrated$bias_type)
   expect_true("Show multiple reference points" %in% migrated$mitigation_strategy)
-  expect_true(all(migrated$confidence_level == 0.7))  # default confidence
+  expect_true(all(migrated$confidence_level == 0.7)) # default confidence
 
   # Test with unnamed list (should error)
   expect_error(
