@@ -1,0 +1,876 @@
+# ==============================================================================
+# TELEMETRY NOTICE CREATION FUNCTIONS
+# ==============================================================================
+
+#' Create notice stage for unused input
+#' @param input_info List with input usage information
+#' @param total_sessions Total number of sessions
+#' @return bid_stage object
+#' @keywords internal
+create_unused_input_notice <- function(input_info, total_sessions) {
+  problem <- sprintf(
+    "Users are not interacting with the '%s' input control",
+    input_info$input_id
+  )
+
+  if (input_info$sessions_used == 0) {
+    evidence <- sprintf(
+      "Telemetry shows 0 out of %d sessions where '%s' was changed",
+      total_sessions,
+      input_info$input_id
+    )
+  } else {
+    evidence <- sprintf(
+      "Only %d out of %d sessions (%.1f%%) interacted with '%s'",
+      input_info$sessions_used,
+      total_sessions,
+      input_info$usage_rate * 100,
+      input_info$input_id
+    )
+  }
+
+  # create interpret stage first, then notice stage with auto-suggested theory
+  interpret <- bid_interpret(
+    central_question = "How can we improve user interaction with unused inputs?"
+  )
+
+  notice <- bid_notice(
+    previous_stage = interpret,
+    problem = problem,
+    evidence = evidence
+  )
+
+  return(notice)
+}
+
+#' Create notice stage for delayed interactions
+#' @param delay_info List with delay statistics
+#' @param total_sessions Total number of sessions
+#' @param threshold Threshold used for analysis
+#' @return bid_stage object
+#' @keywords internal
+create_delay_notice <- function(delay_info, total_sessions, threshold) {
+  problem <- "Users take a long time before making their first interaction with the dashboard"
+
+  evidence_parts <- character(0)
+
+  if (!is.na(delay_info$median_delay) && delay_info$median_delay > 0) {
+    evidence_parts <- c(
+      evidence_parts,
+      sprintf(
+        "Median time to first input is %.0f seconds",
+        delay_info$median_delay
+      )
+    )
+  }
+
+  if (delay_info$no_action_rate > 0) {
+    evidence_parts <- c(
+      evidence_parts,
+      sprintf(
+        "%.0f%% of sessions had no interactions at all",
+        delay_info$no_action_rate * 100
+      )
+    )
+  }
+
+  if (delay_info$rate_over_threshold > 0.1) {
+    evidence_parts <- c(
+      evidence_parts,
+      sprintf(
+        "%.0f%% of sessions took over %d seconds to interact",
+        delay_info$rate_over_threshold * 100,
+        threshold
+      )
+    )
+  }
+
+  evidence <- paste(evidence_parts, collapse = ", and ")
+
+  # create interpret stage first, then notice stage
+  interpret <- bid_interpret(
+    central_question = "How can we reduce user interaction delays?"
+  )
+
+  notice <- bid_notice(
+    previous_stage = interpret,
+    problem = problem,
+    evidence = evidence
+  )
+
+  return(notice)
+}
+
+#' Create notice stage for error patterns
+#' @param error_info List with error pattern information
+#' @param total_sessions Total number of sessions
+#' @return bid_stage object
+#' @keywords internal
+create_error_notice <- function(error_info, total_sessions) {
+  problem <- "Users encounter errors when using the dashboard"
+
+  evidence_parts <- sprintf(
+    "Error '%s' occurred %d times in %.0f%% of sessions",
+    truncate_text(error_info$error_message %||% "Unknown error", 50),
+    error_info$count,
+    error_info$session_rate * 100
+  )
+
+  if (!is.null(error_info$output_id)) {
+    evidence_parts <- paste0(
+      evidence_parts,
+      sprintf(" (in output '%s')", error_info$output_id)
+    )
+  }
+
+  if (!is.null(error_info$associated_input)) {
+    evidence_parts <- paste0(
+      evidence_parts,
+      sprintf(", often after changing '%s'", error_info$associated_input)
+    )
+  }
+
+  # create interpret stage first, then notice stage
+  interpret <- bid_interpret(
+    central_question = "How can we reduce user errors and confusion?"
+  )
+
+  notice <- bid_notice(
+    previous_stage = interpret,
+    problem = problem,
+    evidence = evidence_parts
+  )
+
+  return(notice)
+}
+
+#' Create notice stage for navigation issues
+#' @param nav_info List with navigation pattern information
+#' @param total_sessions Total number of sessions
+#' @return bid_stage object
+#' @keywords internal
+create_navigation_notice <- function(nav_info, total_sessions) {
+  problem <- sprintf(
+    "The '%s' page/tab is rarely visited by users",
+    nav_info$page
+  )
+
+  evidence <- sprintf(
+    "Only %d sessions (%.1f%%) visited '%s'",
+    nav_info$unique_sessions,
+    nav_info$visit_rate * 100,
+    nav_info$page
+  )
+
+  if (nav_info$exit_rate > 0.5) {
+    evidence <- paste0(
+      evidence,
+      sprintf(
+        ", and %.0f%% of those sessions ended there",
+        nav_info$exit_rate * 100
+      )
+    )
+  }
+
+  # create interpret stage first, then notice stage
+  interpret <- bid_interpret(
+    central_question = "How can we improve user navigation flow?"
+  )
+
+  notice <- bid_notice(
+    previous_stage = interpret,
+    problem = problem,
+    evidence = evidence
+  )
+
+  return(notice)
+}
+
+#' Create notice stage for confusion patterns
+#' @param confusion_info List with confusion pattern information
+#' @param total_sessions Total number of sessions
+#' @return bid_stage object
+#' @keywords internal
+create_confusion_notice <- function(confusion_info, total_sessions) {
+  problem <- sprintf(
+    "Users show signs of confusion when interacting with '%s'",
+    confusion_info$input_id
+  )
+
+  evidence <- sprintf(
+    "%d sessions showed rapid repeated changes (avg %.0f changes in %.1f seconds), suggesting users are unsure about the input's behavior",
+    confusion_info$affected_sessions,
+    confusion_info$total_rapid_changes / confusion_info$affected_sessions,
+    confusion_info$avg_time_window
+  )
+
+  # create interpret stage first, then notice stage
+  interpret <- bid_interpret(
+    central_question = "How can we improve user navigation flow?"
+  )
+
+  notice <- bid_notice(
+    previous_stage = interpret,
+    problem = problem,
+    evidence = evidence
+  )
+
+  return(notice)
+}
+
+# ==============================================================================
+# BID_ISSUES CLASS HELPER FUNCTIONS
+# ==============================================================================
+
+#' Create tidy issues tibble from notice issues list
+#' @param notice_issues List of bid_stage objects from telemetry analysis
+#' @param total_sessions Total number of sessions analyzed
+#' @param events Raw events data frame
+#' @return Tibble with structured issue metadata
+#' @keywords internal
+.create_issues_tibble <- function(notice_issues, total_sessions, events) {
+  if (length(notice_issues) == 0) {
+    return(tibble::tibble(
+      issue_id = character(0),
+      issue_type = character(0),
+      severity = character(0),
+      affected_sessions = integer(0),
+      impact_rate = numeric(0),
+      problem = character(0),
+      evidence = character(0),
+      theory = character(0),
+      stage = character(0),
+      created_at = as.POSIXct(character(0))
+    ))
+  }
+
+  # extract metadata from each notice issue
+  issues_data <- lapply(names(notice_issues), function(issue_key) {
+    notice <- notice_issues[[issue_key]]
+
+    # extract basic info from the bid_stage object
+    if (is.data.frame(notice) && nrow(notice) > 0) {
+      problem_text <- if ("problem" %in% names(notice)) notice$problem[1] else NA_character_
+      evidence_text <- if ("evidence" %in% names(notice)) notice$evidence[1] else NA_character_
+      theory_text <- if ("theory" %in% names(notice)) notice$theory[1] else NA_character_
+      stage_text <- if ("stage" %in% names(notice)) notice$stage[1] else "Notice"
+    } else {
+      problem_text <- NA_character_
+      evidence_text <- NA_character_
+      theory_text <- NA_character_
+      stage_text <- "Notice"
+    }
+
+    # infer issue type from key
+    issue_type <- .classify_issue_type(issue_key)
+
+    # calculate severity and impact metrics
+    severity_info <- .calculate_severity_metrics(issue_key, notice, events, total_sessions)
+
+    tibble::tibble(
+      issue_id = issue_key,
+      issue_type = issue_type,
+      severity = severity_info$severity,
+      affected_sessions = severity_info$affected_sessions,
+      impact_rate = severity_info$impact_rate,
+      problem = problem_text,
+      evidence = evidence_text,
+      theory = theory_text,
+      stage = stage_text,
+      created_at = Sys.time()
+    )
+  })
+
+  dplyr::bind_rows(issues_data)
+}
+
+#' Extract global telemetry flags from issues and events
+#' @param issues_tbl Tidy issues tibble
+#' @param events Raw events data frame
+#' @param thresholds Threshold parameters used in analysis
+#' @return Named list of boolean flags
+#' @keywords internal
+.flags_from_issues <- function(issues_tbl, events, thresholds) {
+  flags <- list(
+    has_issues = nrow(issues_tbl) > 0,
+    has_critical_issues = any(issues_tbl$severity == "critical", na.rm = TRUE),
+    has_input_issues = any(grepl("input", issues_tbl$issue_type), na.rm = TRUE),
+    has_navigation_issues = any(grepl("navigation", issues_tbl$issue_type), na.rm = TRUE),
+    has_error_patterns = any(grepl("error", issues_tbl$issue_type), na.rm = TRUE),
+    has_confusion_patterns = any(grepl("confusion", issues_tbl$issue_type), na.rm = TRUE),
+    has_delay_issues = any(grepl("delay", issues_tbl$issue_type), na.rm = TRUE),
+    session_count = length(unique(events$session_id)),
+    analysis_timestamp = Sys.time()
+  )
+
+  # add threshold-specific flags
+  flags$unused_input_threshold <- thresholds$unused_input_threshold
+  flags$delay_threshold_seconds <- thresholds$delay_threshold_seconds
+  flags$error_rate_threshold <- thresholds$error_rate_threshold
+
+  return(flags)
+}
+
+#' Classify issue type from issue key
+#' @param issue_key String identifier for the issue
+#' @return Classified issue type
+#' @keywords internal
+.classify_issue_type <- function(issue_key) {
+  if (grepl("^unused_input", issue_key)) {
+    return("unused_input")
+  }
+  if (grepl("^delayed", issue_key)) {
+    return("delayed_interaction")
+  }
+  if (grepl("^error", issue_key)) {
+    return("error_pattern")
+  }
+  if (grepl("^navigation", issue_key)) {
+    return("navigation_dropoff")
+  }
+  if (grepl("^confusion", issue_key)) {
+    return("confusion_pattern")
+  }
+  return("unknown")
+}
+
+#' Calculate severity metrics for an issue
+#' @param issue_key String identifier for the issue
+#' @param notice Bid_stage notice object containing problem description
+#' @param events Raw events data frame
+#' @param total_sessions Total number of sessions
+#' @return List with severity, affected_sessions, and impact_rate
+#' @keywords internal
+.calculate_severity_metrics <- function(issue_key, notice, events, total_sessions) {
+  # default values
+  affected_sessions <- 0
+  impact_rate <- 0.0
+
+  # calculate metrics based on issue type
+  if (grepl("^unused_input", issue_key)) {
+    # for unused inputs, extract input_id from problem text to avoid lossy conversion
+    # problem format: "Users are not interacting with the 'INPUT_ID' input control"
+    input_id <- NA_character_
+
+    if (is.data.frame(notice) && "problem" %in% names(notice) && !is.na(notice$problem[1])) {
+      # extract input_id from between single quotes in problem text
+      extracted <- sub(".*'([^']+)'.*", "\\1", notice$problem[1])
+      if (!is.na(extracted) && extracted != notice$problem[1]) {
+        input_id <- extracted
+      }
+    }
+
+    # validate extracted input_id
+    if (is.na(input_id) || !is.character(input_id) || length(input_id) != 1 || nchar(trimws(input_id)) == 0) {
+      cli::cli_warn("Could not extract valid input_id from notice, using fallback metrics")
+      affected_sessions <- round(total_sessions * 0.1) # conservative estimate
+      impact_rate <- 0.1
+    } else {
+      # secure comparison using exact match
+      input_events <- events[events$event_type == "input" &
+        !is.na(events$input_id) &
+        events$input_id == input_id, ]
+      affected_sessions <- max(0, total_sessions - length(unique(input_events$session_id)))
+      impact_rate <- if (total_sessions > 0) affected_sessions / total_sessions else 0.0
+    }
+  } else if (grepl("^delayed", issue_key)) {
+    # for delays, this affects multiple sessions
+    affected_sessions <- round(total_sessions * 0.3) # estimate
+    impact_rate <- 0.3
+  } else if (grepl("^error", issue_key)) {
+    # for errors, count sessions with errors
+    error_events <- events[events$event_type == "error", ]
+    affected_sessions <- length(unique(error_events$session_id))
+    impact_rate <- if (total_sessions > 0) affected_sessions / total_sessions else 0.0
+  } else if (grepl("^navigation", issue_key)) {
+    # for navigation issues, estimate based on page visits
+    nav_events <- events[events$event_type == "navigation", ]
+    affected_sessions <- round(total_sessions * 0.2) # estimate
+    impact_rate <- 0.2
+  } else if (grepl("^confusion", issue_key)) {
+    # for confusion patterns, count rapid change sessions
+    input_events <- events[events$event_type == "input", ]
+    affected_sessions <- round(length(unique(input_events$session_id)) * 0.1)
+    impact_rate <- if (total_sessions > 0) affected_sessions / total_sessions else 0.0
+  }
+
+  # determine severity based on impact rate
+  severity <- if (impact_rate >= 0.3) {
+    "critical"
+  } else if (impact_rate >= 0.1) {
+    "high"
+  } else if (impact_rate >= 0.05) {
+    "medium"
+  } else {
+    "low"
+  }
+
+  list(
+    severity = severity,
+    affected_sessions = as.integer(affected_sessions),
+    impact_rate = as.numeric(impact_rate)
+  )
+}
+
+# ==============================================================================
+# BID_ISSUES CLASS METHODS
+# ==============================================================================
+
+#' Print method for bid_issues objects
+#'
+#' @description
+#' Displays a triage view of telemetry issues with severity-based prioritization
+#' and provides a reminder about legacy list access for backward compatibility.
+#'
+#' @param x A bid_issues object from bid_ingest_telemetry()
+#' @param ... Additional arguments (unused)
+#' @return Invisible x (for chaining)
+#' @export
+print.bid_issues <- function(x, ...) {
+  issues_tbl <- attr(x, "issues_tbl")
+  flags <- attr(x, "flags")
+  created_at <- attr(x, "created_at")
+
+  cli::cli_h2("BID Telemetry Issues Summary")
+
+  if (nrow(issues_tbl) == 0) {
+    cli::cli_alert_success("No telemetry issues detected")
+    cli::cli_text("All tracked inputs are being used and no systematic problems found.")
+  } else {
+    # show summary stats
+    cli::cli_alert_info("Found {nrow(issues_tbl)} issue{?s} from {flags$session_count} session{?s}")
+
+    # group by severity for triage view
+    severity_summary <- table(issues_tbl$severity)
+    if ("critical" %in% names(severity_summary)) {
+      cli::cli_alert_danger("Critical: {severity_summary[['critical']]} issue{?s}")
+    }
+    if ("high" %in% names(severity_summary)) {
+      cli::cli_alert_warning("High: {severity_summary[['high']]} issue{?s}")
+    }
+    if ("medium" %in% names(severity_summary)) {
+      cli::cli_alert_info("Medium: {severity_summary[['medium']]} issue{?s}")
+    }
+    if ("low" %in% names(severity_summary)) {
+      cli::cli_text("Low: {severity_summary[['low']]} issue{?s}")
+    }
+
+    cli::cli_text("")
+
+    # show top issues by severity
+    top_issues <- issues_tbl[order(
+      -match(issues_tbl$severity, c("critical", "high", "medium", "low")),
+      -issues_tbl$impact_rate
+    ), ][1:min(3, nrow(issues_tbl)), ]
+
+    cli::cli_h3("Top Priority Issues:")
+    for (i in 1:nrow(top_issues)) {
+      issue <- top_issues[i, ]
+      impact_pct <- round(issue$impact_rate * 100, 1)
+
+      if (issue$severity == "critical") {
+        cli::cli_alert_danger("{issue$issue_type}: {impact_pct}% impact ({issue$affected_sessions} sessions)")
+      } else if (issue$severity == "high") {
+        cli::cli_alert_warning("{issue$issue_type}: {impact_pct}% impact ({issue$affected_sessions} sessions)")
+      } else {
+        cli::cli_alert_info("{issue$issue_type}: {impact_pct}% impact ({issue$affected_sessions} sessions)")
+      }
+
+      if (!is.na(issue$problem) && nchar(issue$problem) > 0) {
+        cli::cli_text("   Problem: {cli::col_silver(substr(issue$problem, 1, 80))}")
+      }
+    }
+  }
+
+  cli::cli_text("")
+  cli::cli_rule()
+  cli::cli_text("{cli::col_blue('Usage:')} Use {.code as_tibble()} for tidy analysis, {.code bid_flags()} for flags")
+  cli::cli_text("{cli::col_silver('Legacy:')} Access as list for backward compatibility: {.code issues[[1]]}, {.code length(issues)}")
+
+  if (!is.null(created_at)) {
+    cli::cli_text("{cli::col_silver('Created:')} {format(created_at, '%Y-%m-%d %H:%M:%S')}")
+  }
+
+  invisible(x)
+}
+
+#' Convert bid_issues object to tibble
+#'
+#' @description
+#' Extracts the tidy issues tibble from a bid_issues object for analysis
+#' and visualization. This provides a structured view of all telemetry issues
+#' with metadata for prioritization and reporting.
+#'
+#' @param x A bid_issues object from bid_ingest_telemetry()
+#' @param ... Additional arguments (unused)
+#' @return A tibble with issue metadata including severity, impact, and descriptions
+#' @export
+as_tibble.bid_issues <- function(x, ...) {
+  issues_tbl <- attr(x, "issues_tbl")
+
+  if (is.null(issues_tbl)) {
+    cli::cli_abort("Invalid bid_issues object: missing issues_tbl attribute")
+  }
+
+  return(issues_tbl)
+}
+
+#' Extract telemetry flags from bid_issues object
+#'
+#' @description
+#' Extracts global telemetry flags and metadata from a bid_issues object.
+#' These flags provide boolean indicators for different types of issues
+#' and can be used for conditional logic in downstream BID stages.
+#'
+#' @param x A bid_issues object from bid_ingest_telemetry() or any object with a flags attribute
+#' @return A named list of boolean flags and metadata
+#' @export
+bid_flags <- function(x) {
+  UseMethod("bid_flags")
+}
+
+#' @rdname bid_flags
+#' @export
+bid_flags.bid_issues <- function(x) {
+  flags <- attr(x, "flags")
+
+  if (is.null(flags)) {
+    cli::cli_abort("Invalid bid_issues object: missing flags attribute")
+  }
+
+  return(flags)
+}
+
+#' @rdname bid_flags
+#' @export
+bid_flags.default <- function(x) {
+  # for objects that might have flags in a different structure
+  if (is.list(x) && "flags" %in% names(x)) {
+    return(x$flags)
+  }
+
+  # check for flags attribute
+  flags <- attr(x, "flags")
+  if (!is.null(flags)) {
+    return(flags)
+  }
+
+  cli::cli_abort("Object does not contain telemetry flags")
+}
+
+# ==============================================================================
+# NEW CONCISE TELEMETRY API
+# ==============================================================================
+
+#' Concise telemetry analysis with tidy output
+#'
+#' @description
+#' Preferred modern interface for telemetry analysis. Returns a clean tibble
+#' of identified issues without the legacy list structure. Use this function
+#' for new workflows that don't need backward compatibility.
+#'
+#' @inheritParams bid_ingest_telemetry
+#' @return A tibble of class "bid_issues_tbl" with structured issue metadata
+#' @export
+#' @examples
+#' \dontrun{
+#' # Modern workflow
+#' issues <- bid_telemetry("telemetry.sqlite")
+#' high_priority <- issues[issues$severity %in% c("critical", "high"), ]
+#'
+#' # Use with bridges for BID workflow
+#' top_issue <- issues[1, ]
+#' notice <- bid_notice_issue(top_issue, previous_stage = interpret_stage)
+#' }
+bid_telemetry <- function(path, format = NULL, events_table = NULL, thresholds = list()) {
+  # use existing ingest function but extract only the tibble
+  hybrid_result <- bid_ingest_telemetry(path, format, events_table, thresholds)
+
+  # extract the tidy tibble and add specific class
+  issues_tbl <- attr(hybrid_result, "issues_tbl")
+  class(issues_tbl) <- c("bid_issues_tbl", class(issues_tbl))
+
+  # preserve flags as attribute for compatibility
+  attr(issues_tbl, "flags") <- attr(hybrid_result, "flags")
+  attr(issues_tbl, "created_at") <- attr(hybrid_result, "created_at")
+
+  return(issues_tbl)
+}
+
+#' Create Notice stage from individual telemetry issue
+#'
+#' @description
+#' Bridge function that converts a single telemetry issue row into a BID Notice stage.
+#' This allows seamless integration between telemetry analysis and the BID framework.
+#'
+#' @param issue A single row from bid_telemetry() output or issues tibble
+#' @param previous_stage Optional previous BID stage (typically from bid_interpret)
+#' @param override List of values to override from the issue (problem, evidence, theory)
+#' @return A bid_stage object in the Notice stage
+#' @export
+#' @examples
+#' \dontrun{
+#' issues <- bid_telemetry("data.sqlite")
+#' interpret <- bid_interpret("How can we reduce user friction?")
+#'
+#' # Convert first issue to Notice stage
+#' notice <- bid_notice_issue(issues[1, ], previous_stage = interpret)
+#'
+#' # Override problem description
+#' notice <- bid_notice_issue(
+#'   issues[1, ],
+#'   previous_stage = interpret,
+#'   override = list(problem = "Custom problem description")
+#' )
+#' }
+bid_notice_issue <- function(issue, previous_stage = NULL, override = list()) {
+  # validate inputs using enhanced validation
+  validate_data_frame(issue, "issue", min_rows = 1)
+  if (nrow(issue) != 1) {
+    cli::cli_abort(standard_error_msg(
+      "issue must contain exactly one row",
+      context = glue::glue("You provided {nrow(issue)} rows"),
+      suggestions = "Use a single row from bid_telemetry() output"
+    ))
+  }
+
+  if (!is.null(override) && !is.list(override)) {
+    cli::cli_abort(standard_error_msg(
+      "override must be a list or NULL",
+      context = glue::glue("You provided: {class(override)[1]}")
+    ))
+  }
+
+  # extract values from issue, allowing overrides
+  problem <- override$problem %||%
+    safe_column_access(issue, "problem") %||%
+    "Telemetry issue identified requiring attention"
+
+  # build structured evidence from telemetry data
+  evidence_parts <- c()
+
+  affected_sessions <- safe_column_access(issue, "affected_sessions")
+  if (!is.na(affected_sessions) && is.numeric(affected_sessions)) {
+    evidence_parts <- c(evidence_parts,
+                       glue::glue("Affects {affected_sessions} user sessions"))
+  }
+
+  impact_rate <- safe_column_access(issue, "impact_rate")
+  if (!is.na(impact_rate) && is.numeric(impact_rate)) {
+    impact_pct <- round(impact_rate * 100, 1)
+    evidence_parts <- c(evidence_parts,
+                       glue::glue("Impact rate: {impact_pct}%"))
+  }
+
+  severity <- safe_column_access(issue, "severity")
+  if (!is.na(severity)) {
+    evidence_parts <- c(evidence_parts,
+                       glue::glue("Severity level: {severity}"))
+  }
+
+  default_evidence <- if (length(evidence_parts) > 0) {
+    paste(evidence_parts, collapse = ", ")
+  } else {
+    "Telemetry analysis identified this issue"
+  }
+
+  evidence_column <- safe_column_access(issue, "evidence")
+  evidence <- override$evidence %||%
+    (if (!is.na(evidence_column) && is.character(evidence_column)) evidence_column else NULL) %||%
+    default_evidence
+
+  theory_column <- safe_column_access(issue, "theory")
+  theory <- override$theory %||%
+    (if (!is.na(theory_column) && is.character(theory_column)) theory_column else NULL) %||%
+    NULL
+
+  # ensure we have a previous_stage for workflow continuity
+  if (is.null(previous_stage)) {
+    previous_stage <- bid_interpret(
+      central_question = "How can we address telemetry-identified issues systematically?"
+    )
+  }
+
+  # execute notice step - this is the single focus of this function
+  notice_result <- bid_notice(
+    previous_stage = previous_stage,
+    problem = problem,
+    theory = theory,
+    evidence = evidence
+  )
+
+  # prep for next step by adding telemetry context to metadata
+  # this helps the next stage (bid_anticipate) understand the context
+  if (inherits(notice_result, "bid_stage")) {
+    existing_metadata <- attr(notice_result, "metadata")
+    enhanced_metadata <- c(existing_metadata, list(
+      telemetry_issue_type = safe_column_access(issue, "issue_type", "unknown"),
+      telemetry_issue_id = safe_column_access(issue, "issue_id", "unknown"),
+      next_stage_suggestion = "bid_anticipate",
+      next_stage_context = list(
+        focus_on_bias_types = c("confirmation_bias", "availability_heuristic"),
+        suggested_mitigations = "data_driven_approaches",
+        telemetry_guided = TRUE
+      )
+    ))
+    attr(notice_result, "metadata") <- enhanced_metadata
+  }
+
+  return(notice_result)
+}
+
+#' Create multiple Notice stages from telemetry issues
+#'
+#' @description
+#' Bridge function that converts multiple telemetry issues into Notice stages.
+#' Provides filtering and limiting options for managing large issue sets.
+#'
+#' @param issues A tibble from bid_telemetry() output
+#' @param filter Optional filter expression for subsetting issues (e.g., severity == "critical")
+#' @param previous_stage Optional previous BID stage (typically from bid_interpret)
+#' @param max_issues Maximum number of issues to convert (default: 5)
+#' @param ... Additional arguments passed to bid_notice_issue()
+#' @return A named list of bid_stage objects in the Notice stage
+#' @export
+#' @examples
+#' \dontrun{
+#' issues <- bid_telemetry("data.sqlite")
+#' interpret <- bid_interpret("How can we reduce user friction?")
+#'
+#' # Convert all critical issues
+#' notices <- bid_notices(issues, filter = severity == "critical", interpret)
+#'
+#' # Convert top 3 issues by impact
+#' top_issues <- issues[order(-issues$impact_rate), ][1:3, ]
+#' notices <- bid_notices(top_issues, previous_stage = interpret)
+#' }
+bid_notices <- function(
+    issues,
+    filter = NULL,
+    previous_stage = NULL,
+    max_issues = 5,
+    ...) {
+  if (!is.data.frame(issues)) {
+    cli::cli_abort("issues must be a data frame from bid_telemetry() output")
+  }
+
+  filter_expr <- rlang::enquo(filter)
+
+  if (!rlang::quo_is_null(filter_expr)) {
+    filter_result <- rlang::eval_tidy(filter_expr, data = issues)
+
+    if (!is.logical(filter_result) || length(filter_result) != nrow(issues)) {
+      cli::cli_abort(
+        "Filter must return a logical vector the same length as `issues`"
+      )
+    }
+    filtered_issues <- issues[filter_result, ]
+  } else {
+    filtered_issues <- issues
+  }
+
+  if (nrow(filtered_issues) == 0) {
+    cli::cli_warn("No issues match the specified filter")
+    return(list())
+  }
+
+  severity_order <- c(critical = 4, high = 3, medium = 2, low = 1)
+  filtered_issues$severity_rank <- severity_order[filtered_issues$severity]
+
+  if ("impact_rate" %in% names(filtered_issues) && is.numeric(filtered_issues$impact_rate)) {
+    filtered_issues <- filtered_issues[order(
+      -filtered_issues$severity_rank, -filtered_issues$impact_rate
+    ), ]
+  } else {
+    filtered_issues <- filtered_issues[order(-filtered_issues$severity_rank), ]
+  }
+
+  if (nrow(filtered_issues) > max_issues) {
+    cli::cli_inform(
+      "Limiting to top {max_issues} issues (out of {nrow(filtered_issues)} matched)"
+    )
+    filtered_issues <- head(filtered_issues, max_issues)
+  }
+
+  if (is.null(previous_stage)) {
+    previous_stage <- bid_interpret(
+      central_question = "How can we address multiple telemetry-identified issues?"
+    )
+  }
+
+  # iterate over rows, not columns
+  notices <- lapply(seq_len(nrow(filtered_issues)), function(i) {
+    row <- filtered_issues[i, , drop = FALSE]
+    id  <- row$issue_id %||% paste0("issue_", i)
+    bid_notice_issue(row, previous_stage = previous_stage, ...)
+  })
+
+  return(notices)
+}
+
+#' Create Notice stage from single telemetry issue (sugar)
+#'
+#' @description
+#' Convenience function that combines issue selection and Notice creation in one step.
+#' Useful for quick workflows where you want to address a specific issue immediately.
+#'
+#' @param issue A single row from bid_telemetry() output
+#' @param previous_stage Previous BID stage (typically from bid_interpret)
+#' @param ... Additional arguments passed to bid_notice_issue()
+#' @return A bid_stage object in the Notice stage
+#' @export
+#' @examples
+#' \dontrun{
+#' issues <- bid_telemetry("data.sqlite")
+#' interpret <- bid_interpret("How can we improve user experience?")
+#'
+#' # Address the highest impact issue
+#' top_issue <- issues[which.max(issues$impact_rate), ]
+#' notice <- bid_address(top_issue, interpret)
+#' }
+bid_address <- function(issue, previous_stage, ...) {
+  bid_notice_issue(issue, previous_stage, ...)
+}
+
+#' Create pipeline of Notice stages from top telemetry issues (sugar)
+#'
+#' @description
+#' Convenience function that creates a pipeline of Notice stages from the highest
+#' priority telemetry issues. Useful for systematic issue resolution workflows.
+#'
+#' @param issues A tibble from bid_telemetry() output
+#' @param previous_stage Previous BID stage (typically from bid_interpret)
+#' @param max Maximum number of issues to include in pipeline (default: 3)
+#' @param ... Additional arguments passed to bid_notices()
+#' @return A named list of bid_stage objects in the Notice stage
+#' @export
+#' @examples
+#' \dontrun{
+#' issues <- bid_telemetry("data.sqlite")
+#' interpret <- bid_interpret("How can we systematically improve UX?")
+#'
+#' # Create pipeline for top 3 issues
+#' notice_pipeline <- bid_pipeline(issues, interpret, max = 3)
+#'
+#' # Continue with first issue in pipeline
+#' anticipate <- bid_anticipate(previous_stage = notice_pipeline[[1]])
+#' }
+bid_pipeline <- function(issues, previous_stage, max = 3, ...) {
+  if (!is.data.frame(issues)) {
+    cli::cli_abort("issues must be a data frame from bid_telemetry() output")
+  }
+
+  # sort by priority (severity then impact)
+  severity_order <- c("critical" = 4, "high" = 3, "medium" = 2, "low" = 1)
+  issues$severity_rank <- severity_order[issues$severity]
+
+  # handle impact_rate safely (may not exist or be non-numeric)
+  if ("impact_rate" %in% names(issues) && is.numeric(issues$impact_rate)) {
+    priority_issues <- issues[order(-issues$severity_rank, -issues$impact_rate), ]
+  } else {
+    priority_issues <- issues[order(-issues$severity_rank), ]
+  }
+
+  # use bid_notices with max limit
+  bid_notices(priority_issues, previous_stage = previous_stage, max_issues = max, ...)
+}

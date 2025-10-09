@@ -68,13 +68,13 @@ interpret_personas <- bid_interpret(
       name = "Sara, Data Analyst",
       goals = "Needs to quickly find patterns in data",
       pain_points = "Gets overwhelmed by too many visualizations",
-      technical_level = "Advanced"
+      technical_level = "advanced"
     ),
     list(
       name = "Marcus, Executive",
       goals = "Wants high-level insights at a glance",
       pain_points = "Limited time to analyze detailed reports",
-      technical_level = "Basic"
+      technical_level = "beginner"
     )
   )
 )

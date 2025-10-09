@@ -23,6 +23,7 @@ github
 htmlwidgets
 jrwinget
 json
+memoise
 mitigations
 pak
 pkgdown
@@ -30,6 +31,7 @@ plotly
 reactable
 repo
 roxygen2
+S3
 SaaS
 sqlite
 tbl
