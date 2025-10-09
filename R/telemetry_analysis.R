@@ -2,7 +2,8 @@
 # TELEMETRY ANALYSIS FUNCTIONS
 # ==============================================================================
 
-# telemetry analysis default thresholds
+# telemetry analysis default thresholds (single source of truth)
+# these constants are used as default parameter values in functions below
 unused_input_threshold <- 0.05  # 5% usage rate
 delay_threshold_secs <- 30  # 30 seconds
 no_action_rate_threshold <- 0.1  # 10% of sessions
@@ -14,6 +15,16 @@ nav_dropoff_threshold <- 0.2  # 20% visit rate
 confusion_window_secs <- 10  # rapid change window
 confusion_min_changes <- 5  # minimum changes to flag
 confusion_min_sessions <- 2  # minimum affected sessions
+
+# centralized default thresholds list for bid_ingest_telemetry and bid_telemetry_presets
+.default_telemetry_thresholds <- list(
+  unused_input_threshold = unused_input_threshold,
+  delay_threshold_secs = delay_threshold_secs,
+  error_rate_threshold = error_rate_threshold,
+  navigation_threshold = nav_dropoff_threshold,
+  rapid_change_window = confusion_window_secs,
+  rapid_change_count = confusion_min_changes
+)
 
 #' Find unused or under-used inputs
 #' @param events Telemetry events data frame

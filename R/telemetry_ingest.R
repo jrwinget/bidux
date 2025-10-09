@@ -38,23 +38,16 @@ bid_telemetry_presets <- function(preset = c("moderate", "strict", "relaxed")) {
   presets <- list(
     strict = list(
       unused_input_threshold = 0.02,      # flag if used by < 2% of sessions
-      delay_threshold_secs = 20,       # flag if > 20s to first action
+      delay_threshold_secs = 20,          # flag if > 20s to first action
       error_rate_threshold = 0.05,        # flag if errors in > 5% of sessions
       navigation_threshold = 0.1,         # flag if page visited by < 10%
       rapid_change_window = 15,           # check 15s windows for confusion
       rapid_change_count = 4              # 4+ changes in window = confusion
     ),
-    moderate = list(
-      unused_input_threshold = 0.05,      # flag if used by < 5% of sessions
-      delay_threshold_secs = 30,       # flag if > 30s to first action
-      error_rate_threshold = 0.1,         # flag if errors in > 10% of sessions
-      navigation_threshold = 0.2,         # flag if page visited by < 20%
-      rapid_change_window = 10,           # check 10s windows for confusion
-      rapid_change_count = 5              # 5+ changes in window = confusion
-    ),
+    moderate = .default_telemetry_thresholds,  # use centralized defaults
     relaxed = list(
       unused_input_threshold = 0.1,       # flag if used by < 10% of sessions
-      delay_threshold_secs = 60,       # flag if > 60s to first action
+      delay_threshold_secs = 60,          # flag if > 60s to first action
       error_rate_threshold = 0.2,         # flag if errors in > 20% of sessions
       navigation_threshold = 0.3,         # flag if page visited by < 30%
       rapid_change_window = 5,            # check 5s windows for confusion
@@ -181,16 +174,8 @@ bid_ingest_telemetry <- function(
     cli::cli_abort("Format must be 'sqlite' or 'json', got: {format}")
   }
 
-  default_thresholds <- list(
-    unused_input_threshold = 0.05,
-    delay_threshold_secs = 30,
-    error_rate_threshold = 0.1,
-    navigation_threshold = 0.2,
-    rapid_change_window = 10,
-    rapid_change_count = 5
-  )
-
-  thresholds <- modifyList(default_thresholds, thresholds)
+  # use centralized defaults from telemetry_analysis.R (single source of truth)
+  thresholds <- modifyList(.default_telemetry_thresholds, thresholds)
 
   cli::cli_alert_info("Reading telemetry data from {format} file...")
   events <- read_telemetry_data(path, format, events_table)
