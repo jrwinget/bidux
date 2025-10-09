@@ -624,19 +624,4 @@ validate_param <- function(value, arg_name, type = "character", min_length = 1,
 
 # Removed duplicate create_bid_result function (moved to s3_classes.R)
 
-# ===== UTILITY OPERATORS =====
-
-#' Null-coalescing operator
-#'
-#' @description
-#' Returns the left-hand side if it's not NULL, otherwise returns the right-hand side.
-#'
-#' @param lhs Left-hand side value
-#' @param rhs Right-hand side value (default value)
-#'
-#' @return lhs if not NULL, otherwise rhs
-#' @keywords internal
-#' @noRd
-`%||%` <- function(lhs, rhs) {
-  if (is.null(lhs) || length(lhs) == 0) rhs else lhs
-}
+# note: %||% operator is defined in utils_core.R (canonical version)

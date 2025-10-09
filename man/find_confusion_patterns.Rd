@@ -4,7 +4,11 @@
 \alias{find_confusion_patterns}
 \title{Find confusion patterns (rapid repeated changes)}
 \usage{
-find_confusion_patterns(events, window_seconds = 10, min_changes = 5)
+find_confusion_patterns(
+  events,
+  window_seconds = confusion_window_secs,
+  min_changes = confusion_min_changes
+)
 }
 \arguments{
 \item{events}{Telemetry events data frame}

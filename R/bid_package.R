@@ -13,7 +13,6 @@
 #' @importFrom dplyr select
 #' @importFrom jsonlite fromJSON
 #' @importFrom jsonlite toJSON
-#' @importFrom purrr imap
 #' @importFrom readr read_csv
 #' @importFrom rlang enexpr
 #' @importFrom rlang eval_tidy

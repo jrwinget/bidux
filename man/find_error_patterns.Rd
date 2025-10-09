@@ -4,7 +4,7 @@
 \alias{find_error_patterns}
 \title{Find error patterns in telemetry}
 \usage{
-find_error_patterns(events, threshold_rate = 0.1)
+find_error_patterns(events, threshold_rate = error_rate_threshold)
 }
 \arguments{
 \item{events}{Telemetry events data frame}

@@ -2,12 +2,25 @@
 # TELEMETRY ANALYSIS FUNCTIONS
 # ==============================================================================
 
+# telemetry analysis default thresholds
+unused_input_threshold <- 0.05  # 5% usage rate
+delay_threshold_secs <- 30  # 30 seconds
+no_action_rate_threshold <- 0.1  # 10% of sessions
+delay_rate_threshold <- 0.2  # 20% of sessions
+error_rate_threshold <- 0.1  # 10% of sessions
+min_error_count <- 5  # minimum occurrences
+error_lookback_secs <- 5  # seconds before error
+nav_dropoff_threshold <- 0.2  # 20% visit rate
+confusion_window_secs <- 10  # rapid change window
+confusion_min_changes <- 5  # minimum changes to flag
+confusion_min_sessions <- 2  # minimum affected sessions
+
 #' Find unused or under-used inputs
 #' @param events Telemetry events data frame
 #' @param threshold Percentage threshold for considering input unused
 #' @return List of unused input information
 #' @keywords internal
-find_unused_inputs <- function(events, threshold = 0.05) {
+find_unused_inputs <- function(events, threshold = unused_input_threshold) {
   input_events <- events[events$event_type == "input", ]
 
   if (nrow(input_events) == 0) {
@@ -53,7 +66,9 @@ find_unused_inputs <- function(events, threshold = 0.05) {
 #' @param threshold_seconds Delay threshold in seconds
 #' @return List with delay statistics
 #' @keywords internal
-find_delayed_sessions <- function(events, threshold_seconds = 30) {
+find_delayed_sessions <- function(
+    events,
+    threshold_seconds = delay_threshold_secs) {
   # find login events
   login_events <- events[
     events$event_type == "login",
@@ -122,10 +137,10 @@ find_delayed_sessions <- function(events, threshold_seconds = 30) {
 
   # determine if there are issues
   if (
-    result$no_action_rate > 0.1 ||
+    result$no_action_rate > no_action_rate_threshold ||
       (!is.na(result$median_delay) &&
         result$median_delay > threshold_seconds) ||
-      result$rate_over_threshold > 0.2
+      result$rate_over_threshold > delay_rate_threshold
   ) {
     result$has_issues <- TRUE
   }
@@ -138,7 +153,7 @@ find_delayed_sessions <- function(events, threshold_seconds = 30) {
 #' @param threshold_rate Error rate threshold
 #' @return List of error patterns
 #' @keywords internal
-find_error_patterns <- function(events, threshold_rate = 0.1) {
+find_error_patterns <- function(events, threshold_rate = error_rate_threshold) {
   # filter to error events
   error_events <- events[events$event_type == "error", ]
 
@@ -159,7 +174,7 @@ find_error_patterns <- function(events, threshold_rate = 0.1) {
     dplyr::mutate(
       session_rate = sessions_affected / total_sessions
     ) |>
-    dplyr::filter(session_rate >= threshold_rate | count >= 5) |>
+    dplyr::filter(session_rate >= threshold_rate | count >= min_error_count) |>
     dplyr::arrange(dplyr::desc(count))
 
   if (nrow(error_patterns) == 0) {
@@ -182,7 +197,7 @@ find_error_patterns <- function(events, threshold_rate = 0.1) {
       c("session_id", "timestamp")
     ]
 
-    # look for inputs changed within 5 seconds before error
+    # look for inputs changed within error_lookback_secs before error
     associated_inputs <- character(0)
     for (j in seq_len(nrow(error_sessions))) {
       session <- error_sessions$session_id[j]
@@ -191,7 +206,7 @@ find_error_patterns <- function(events, threshold_rate = 0.1) {
       recent_inputs <- events[
         events$session_id == session &
           events$event_type == "input" &
-          events$timestamp >= (error_time - 5) &
+          events$timestamp >= (error_time - error_lookback_secs) &
           events$timestamp < error_time,
         "input_id",
         drop = FALSE
@@ -228,7 +243,9 @@ find_error_patterns <- function(events, threshold_rate = 0.1) {
 #' @param threshold Minimum visit rate threshold
 #' @return List of navigation issues
 #' @keywords internal
-find_navigation_dropoffs <- function(events, threshold = 0.2) {
+find_navigation_dropoffs <- function(
+    events,
+    threshold = nav_dropoff_threshold) {
   # filter navigation events
   nav_events <- events[events$event_type == "navigation", ]
 
@@ -306,7 +323,10 @@ find_navigation_dropoffs <- function(events, threshold = 0.2) {
 #' @param min_changes Minimum changes to flag as confusion
 #' @return List of confusion patterns
 #' @keywords internal
-find_confusion_patterns <- function(events, window_seconds = 10, min_changes = 5) {
+find_confusion_patterns <- function(
+    events,
+    window_seconds = confusion_window_secs,
+    min_changes = confusion_min_changes) {
   # filter to input events
   input_events <- events[events$event_type == "input", ]
 
@@ -368,7 +388,7 @@ find_confusion_patterns <- function(events, window_seconds = 10, min_changes = 5
 
   # only return inputs with multiple confused sessions
   systematic_inputs <- names(input_confusion_counts)[
-    input_confusion_counts >= 2
+    input_confusion_counts >= confusion_min_sessions
   ]
 
   if (length(systematic_inputs) == 0) {

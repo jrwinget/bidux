@@ -4,7 +4,7 @@
 \alias{find_delayed_sessions}
 \title{Find sessions with delayed first interaction}
 \usage{
-find_delayed_sessions(events, threshold_seconds = 30)
+find_delayed_sessions(events, threshold_seconds = delay_threshold_secs)
 }
 \arguments{
 \item{events}{Telemetry events data frame}
