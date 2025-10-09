@@ -27,13 +27,11 @@ Imports:
     dplyr,
     glue,
     jsonlite,
-    purrr,
     readr (>= 2.1.5),
     rlang,
     RSQLite,
     stats,
     stringdist (>= 0.9.15),
-    stringr (>= 1.5.1),
     tibble (>= 3.2.1),
     tools,
     utils

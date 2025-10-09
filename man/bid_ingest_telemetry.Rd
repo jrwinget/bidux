@@ -24,7 +24,7 @@ If NULL, auto-detects standard table names (event_data, events).}
 \item{thresholds}{Optional list of threshold parameters:
 - unused_input_threshold: percentage of sessions below which input is
 considered unused (default: 0.05)
-- delay_threshold_seconds: seconds of delay considered problematic
+- delay_threshold_secs: seconds of delay considered problematic
 (default: 30)
 - error_rate_threshold: percentage of sessions with errors considered
 problematic (default: 0.1)
@@ -59,13 +59,19 @@ tidy tibble access and flags extraction.
 # Analyze SQLite telemetry database
 issues <- bid_ingest_telemetry("telemetry.sqlite")
 
+# Use sensitivity presets for easier configuration
+strict_issues <- bid_ingest_telemetry(
+  "telemetry.sqlite",
+  thresholds = bid_telemetry_presets("strict")
+)
+
 # Analyze JSON log with custom thresholds
 issues <- bid_ingest_telemetry(
   "telemetry.log",
   format = "json",
   thresholds = list(
     unused_input_threshold = 0.1,
-    delay_threshold_seconds = 60
+    delay_threshold_secs = 60
   )
 )
 

@@ -42,29 +42,7 @@ is_empty <- function(x) {
   return(FALSE)
 }
 
-#' Validate that required parameters are not missing
-#'
-#' @param ... Named parameters to check
-#'
-#' @return NULL invisibly if all checks pass, otherwise stops with an error
-#'
-#' @keywords internal
-#' @noRd
-validate_required_params <- function(...) {
-  args <- list(...)
-
-  for (param_name in names(args)) {
-    val <- args[[param_name]]
-    if (is.null(val) || (is.character(val) && nchar(trimws(val)) == 0)) {
-      cli::cli_abort(c(
-        "x" = glue::glue("Required parameter '{param_name}' is missing or empty"),
-        "i" = "This parameter must be provided and cannot be an empty string"
-      ))
-    }
-  }
-
-  invisible(NULL)
-}
+# note: validate_required_params() is defined in utils_validation.R (canonical version)
 
 #' Time wrapper for test stubbing
 #'

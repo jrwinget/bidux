@@ -1,3 +1,70 @@
+#' Get predefined telemetry sensitivity presets
+#'
+#' @description
+#' Returns predefined threshold configurations for telemetry analysis with different
+#' sensitivity levels. Use these presets with [bid_ingest_telemetry()] to easily
+#' adjust how aggressively the analysis identifies UX friction points.
+#'
+#' @param preset Character string specifying the sensitivity level:
+#'   \describe{
+#'     \item{strict}{Detects even minor issues - use for critical applications or new dashboards}
+#'     \item{moderate}{Balanced default - appropriate for most applications (default)}
+#'     \item{relaxed}{Only detects major issues - use for mature, stable dashboards}
+#'   }
+#'
+#' @return Named list of threshold parameters suitable for passing to
+#'   [bid_ingest_telemetry()] thresholds parameter.
+#'
+#' @examples
+#' # Get strict sensitivity thresholds
+#' strict_thresholds <- bid_telemetry_presets("strict")
+#'
+#' # Use with telemetry analysis
+#' \dontrun{
+#' issues <- bid_ingest_telemetry(
+#'   "telemetry.sqlite",
+#'   thresholds = bid_telemetry_presets("strict")
+#' )
+#' }
+#'
+#' # Compare different presets
+#' moderate <- bid_telemetry_presets("moderate")
+#' relaxed <- bid_telemetry_presets("relaxed")
+#'
+#' @export
+bid_telemetry_presets <- function(preset = c("moderate", "strict", "relaxed")) {
+  preset <- match.arg(preset)
+
+  presets <- list(
+    strict = list(
+      unused_input_threshold = 0.02,      # flag if used by < 2% of sessions
+      delay_threshold_secs = 20,       # flag if > 20s to first action
+      error_rate_threshold = 0.05,        # flag if errors in > 5% of sessions
+      navigation_threshold = 0.1,         # flag if page visited by < 10%
+      rapid_change_window = 15,           # check 15s windows for confusion
+      rapid_change_count = 4              # 4+ changes in window = confusion
+    ),
+    moderate = list(
+      unused_input_threshold = 0.05,      # flag if used by < 5% of sessions
+      delay_threshold_secs = 30,       # flag if > 30s to first action
+      error_rate_threshold = 0.1,         # flag if errors in > 10% of sessions
+      navigation_threshold = 0.2,         # flag if page visited by < 20%
+      rapid_change_window = 10,           # check 10s windows for confusion
+      rapid_change_count = 5              # 5+ changes in window = confusion
+    ),
+    relaxed = list(
+      unused_input_threshold = 0.1,       # flag if used by < 10% of sessions
+      delay_threshold_secs = 60,       # flag if > 60s to first action
+      error_rate_threshold = 0.2,         # flag if errors in > 20% of sessions
+      navigation_threshold = 0.3,         # flag if page visited by < 30%
+      rapid_change_window = 5,            # check 5s windows for confusion
+      rapid_change_count = 7              # 7+ changes in window = confusion
+    )
+  )
+
+  return(presets[[preset]])
+}
+
 #' Ingest telemetry data and identify UX friction points
 #'
 #' @description
@@ -16,7 +83,7 @@
 #' @param thresholds Optional list of threshold parameters:
 #'        - unused_input_threshold: percentage of sessions below which input is
 #'          considered unused (default: 0.05)
-#'        - delay_threshold_seconds: seconds of delay considered problematic
+#'        - delay_threshold_secs: seconds of delay considered problematic
 #'          (default: 30)
 #'        - error_rate_threshold: percentage of sessions with errors considered
 #'          problematic (default: 0.1)
@@ -42,13 +109,19 @@
 #' # Analyze SQLite telemetry database
 #' issues <- bid_ingest_telemetry("telemetry.sqlite")
 #'
+#' # Use sensitivity presets for easier configuration
+#' strict_issues <- bid_ingest_telemetry(
+#'   "telemetry.sqlite",
+#'   thresholds = bid_telemetry_presets("strict")
+#' )
+#'
 #' # Analyze JSON log with custom thresholds
 #' issues <- bid_ingest_telemetry(
 #'   "telemetry.log",
 #'   format = "json",
 #'   thresholds = list(
 #'     unused_input_threshold = 0.1,
-#'     delay_threshold_seconds = 60
+#'     delay_threshold_secs = 60
 #'   )
 #' )
 #'
@@ -86,8 +159,10 @@ bid_ingest_telemetry <- function(
 
   # validate events_table parameter
   if (!is.null(events_table)) {
-    validate_data_frame(events_table, "events_table",
-                       required_columns = c("event_id", "timestamp", "event_type", "user_id"))
+    validate_data_frame(
+      events_table, "events_table",
+      required_columns = c("event_id", "timestamp", "event_type", "user_id")
+    )
   }
 
   # validate thresholds parameter
@@ -108,7 +183,7 @@ bid_ingest_telemetry <- function(
 
   default_thresholds <- list(
     unused_input_threshold = 0.05,
-    delay_threshold_seconds = 30,
+    delay_threshold_secs = 30,
     error_rate_threshold = 0.1,
     navigation_threshold = 0.2,
     rapid_change_window = 10,
@@ -151,13 +226,13 @@ bid_ingest_telemetry <- function(
   # find delayed interactions
   delay_info <- find_delayed_sessions(
     events,
-    thresholds$delay_threshold_seconds
+    thresholds$delay_threshold_secs
   )
   if (!is.null(delay_info) && delay_info$has_issues) {
     notice_issues[["delayed_interaction"]] <- create_delay_notice(
       delay_info,
       total_sessions,
-      thresholds$delay_threshold_seconds
+      thresholds$delay_threshold_secs
     )
   }
 
@@ -239,12 +314,16 @@ bid_ingest_telemetry <- function(
 
   # validate that notice_issues is a proper list before creating hybrid object
   if (!is.list(notice_issues)) {
-    cli::cli_abort("Internal error: notice_issues must be a list for hybrid object creation")
+    cli::cli_abort(
+      "Internal error: notice_issues must be a list for hybrid object creation"
+    )
   }
 
   # validate that issues_tbl is a proper tibble
   if (!tibble::is_tibble(issues_tbl)) {
-    cli::cli_abort("Internal error: issues_tbl must be a tibble for hybrid object creation")
+    cli::cli_abort(
+      "Internal error: issues_tbl must be a tibble for hybrid object creation"
+    )
   }
 
   # validate that flags is a proper list

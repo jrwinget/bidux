@@ -4,7 +4,7 @@
 \alias{find_unused_inputs}
 \title{Find unused or under-used inputs}
 \usage{
-find_unused_inputs(events, threshold = 0.05)
+find_unused_inputs(events, threshold = unused_input_threshold)
 }
 \arguments{
 \item{events}{Telemetry events data frame}

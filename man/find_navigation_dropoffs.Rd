@@ -4,7 +4,7 @@
 \alias{find_navigation_dropoffs}
 \title{Find navigation drop-offs or underused pages}
 \usage{
-find_navigation_dropoffs(events, threshold = 0.2)
+find_navigation_dropoffs(events, threshold = nav_dropoff_threshold)
 }
 \arguments{
 \item{events}{Telemetry events data frame}

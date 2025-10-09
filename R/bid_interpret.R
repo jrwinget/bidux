@@ -395,9 +395,9 @@ bid_interpret <- function(
       is.null(central_question)
   ) {
     "Please provide a central question to guide your dashboard design."
-  } else if (stringr::str_length(central_question) > 100) {
+  } else if (nchar(central_question) > 100) {
     "Consider simplifying your central question for more focus."
-  } else if (stringr::str_length(central_question) < 20) {
+  } else if (nchar(central_question) < 20) {
     "Your central question might benefit from more specificity."
   } else {
     "Your central question is appropriately scoped."
