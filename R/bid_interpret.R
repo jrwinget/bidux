@@ -605,49 +605,24 @@ bid_interpret <- function(
     NA_character_
   }
 
-  personas_formatted <- if (!is.null(user_personas)) {
-    persona_count <- if (inherits(user_personas, "bid_user_personas")) {
-      nrow(user_personas)
-    } else if (is.list(user_personas)) {
-      length(user_personas)
-    } else {
-      0
-    }
-
-    if (persona_count > 0) {
-      tryCatch(
-        {
-          # for tibble format, convert to list structure that's JSON-friendly
-          if (inherits(user_personas, "bid_user_personas")) {
-            # convert tibble rows to list of objects for JSON serialization
-            persona_list <- lapply(seq_len(nrow(user_personas)), function(i) {
-              list(
-                name = user_personas$name[i],
-                goals = user_personas$goals[i],
-                pain_points = user_personas$pain_points[i],
-                technical_level = user_personas$technical_level[i]
-              )
-            })
-            jsonlite::toJSON(persona_list, auto_unbox = TRUE)
-          } else {
-            # legacy list format
-            jsonlite::toJSON(user_personas, auto_unbox = TRUE)
-          }
-        },
-        error = function(e) {
-          cli::cli_warn(c(
-            "Could not convert user_personas to JSON format",
-            "i" = "Using default NA value instead",
-            "x" = paste0(e$message)
-          ))
-          NA_character_
-        }
-      )
-    } else {
-      NA_character_
-    }
-  } else {
+  personas_formatted <- if (is.null(user_personas)) {
     NA_character_
+  } else {
+    tryCatch(
+      {
+        # jsonlite handles both data frames and lists natively
+        # dataframe = "rows" converts tibbles to array of objects
+        jsonlite::toJSON(user_personas, auto_unbox = TRUE, dataframe = "rows")
+      },
+      error = function(e) {
+        cli::cli_warn(c(
+          "Could not convert user_personas to JSON format",
+          "i" = "Using default NA value instead",
+          "x" = paste0(e$message)
+        ))
+        NA_character_
+      }
+    )
   }
 
   # normalize previous stage to ensure field name consistency

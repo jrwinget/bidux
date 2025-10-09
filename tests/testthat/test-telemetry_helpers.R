@@ -189,8 +189,15 @@ test_that(".create_issues_tibble handles empty and malformed data", {
 })
 
 test_that(".calculate_severity_metrics handles zero sessions correctly", {
+  # create mock notice
+  notice <- tibble::tibble(
+    stage = "Notice",
+    problem = "Users are not interacting with the 'test' input control",
+    evidence = "Test"
+  )
+
   # test with zero total sessions (our recent fix)
-  result <- .calculate_severity_metrics("unused_input_test", data.frame(), 0)
+  result <- .calculate_severity_metrics("unused_input_test", notice, data.frame(), 0)
 
   expect_true(is.list(result))
   expect_true("severity" %in% names(result))
@@ -210,10 +217,17 @@ test_that(".calculate_severity_metrics covers all issue types", {
     error_message = "err"
   )
 
+  # create mock notice
+  notice <- tibble::tibble(
+    stage = "Notice",
+    problem = "Users are not interacting with the 'x' input control",
+    evidence = "Test"
+  )
+
   # force each branch
-  expect_true(.calculate_severity_metrics("unused_input_x", events, 1)$severity %in% c("low", "medium", "high", "critical"))
-  expect_true(.calculate_severity_metrics("delayed_interaction", events, 1)$severity %in% c("low", "medium", "high", "critical"))
-  expect_true(.calculate_severity_metrics("error_1", events, 1)$severity %in% c("low", "medium", "high", "critical"))
-  expect_true(.calculate_severity_metrics("navigation_page", events, 1)$severity %in% c("low", "medium", "high", "critical"))
-  expect_true(.calculate_severity_metrics("confusion_input", events, 1)$severity %in% c("low", "medium", "high", "critical"))
+  expect_true(.calculate_severity_metrics("unused_input_x", notice, events, 1)$severity %in% c("low", "medium", "high", "critical"))
+  expect_true(.calculate_severity_metrics("delayed_interaction", notice, events, 1)$severity %in% c("low", "medium", "high", "critical"))
+  expect_true(.calculate_severity_metrics("error_1", notice, events, 1)$severity %in% c("low", "medium", "high", "critical"))
+  expect_true(.calculate_severity_metrics("navigation_page", notice, events, 1)$severity %in% c("low", "medium", "high", "critical"))
+  expect_true(.calculate_severity_metrics("confusion_input", notice, events, 1)$severity %in% c("low", "medium", "high", "critical"))
 })

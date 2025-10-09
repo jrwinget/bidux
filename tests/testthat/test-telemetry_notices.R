@@ -213,17 +213,46 @@ test_that(".calculate_severity_metrics handles unused input issues", {
   events_df <- data.frame(
     session_id = c("s1", "s2", "s3", "s4", "s5"),
     event_type = c("input", "input", "click", "click", "click"),
-    input_id = c("filter x", "filter x", NA, NA, NA), # note: spaces, not underscores
+    input_id = c("filter_x", "filter_x", NA, NA, NA),
     stringsAsFactors = FALSE
   )
 
-  # only 2 of 5 sessions used "filter x", so 3 sessions didn't use it
-  # issue_key "unused_input_filter_x" converts to input_id "filter x"
-  result <- bidux:::.calculate_severity_metrics("unused_input_filter_x", events_df, total_sessions = 5)
+  # create mock notice with proper problem format
+  notice <- tibble::tibble(
+    stage = "Notice",
+    problem = "Users are not interacting with the 'filter_x' input control",
+    evidence = "Test evidence"
+  )
+
+  # only 2 of 5 sessions used "filter_x", so 3 sessions didn't use it
+  result <- bidux:::.calculate_severity_metrics("unused_input_filter_x", notice, events_df, total_sessions = 5)
 
   expect_equal(result$severity, "critical") # 60% impact >= 30% = critical
   expect_equal(result$affected_sessions, 3L)
   expect_equal(result$impact_rate, 0.6, tolerance = 0.01)
+})
+
+test_that(".calculate_severity_metrics preserves underscores in input_id", {
+  # regression test for lossy conversion bug fix
+  events_df <- data.frame(
+    session_id = c("s1", "s2", "s3"),
+    event_type = c("input", "input", "click"),
+    input_id = c("multi_word_filter", "multi_word_filter", NA),
+    stringsAsFactors = FALSE
+  )
+
+  notice <- tibble::tibble(
+    stage = "Notice",
+    problem = "Users are not interacting with the 'multi_word_filter' input control",
+    evidence = "Test evidence"
+  )
+
+  # 2 sessions used it, 1 didn't
+  result <- bidux:::.calculate_severity_metrics("unused_input_multi_word_filter", notice, events_df, total_sessions = 3)
+
+  # verify underscores were preserved (not converted to spaces)
+  expect_equal(result$affected_sessions, 1L)
+  expect_equal(result$impact_rate, 1/3, tolerance = 0.01)
 })
 
 test_that(".calculate_severity_metrics handles error patterns", {
@@ -233,7 +262,10 @@ test_that(".calculate_severity_metrics handles error patterns", {
     stringsAsFactors = FALSE
   )
 
-  result <- bidux:::.calculate_severity_metrics("error_pattern_1", events_df, total_sessions = 3)
+  # create mock notice (not used for error patterns, but required parameter)
+  notice <- tibble::tibble(stage = "Notice", problem = "Test error", evidence = "Test")
+
+  result <- bidux:::.calculate_severity_metrics("error_pattern_1", notice, events_df, total_sessions = 3)
 
   expect_equal(result$severity, "critical") # 2/3 = 66% >= 30% threshold = critical
   expect_equal(result$affected_sessions, 2L)
@@ -243,13 +275,16 @@ test_that(".calculate_severity_metrics handles error patterns", {
 test_that(".calculate_severity_metrics returns correct severity levels", {
   events_df <- data.frame(session_id = character(0), event_type = character(0))
 
+  # create mock notice (not used for delay/navigation patterns, but required parameter)
+  notice <- tibble::tibble(stage = "Notice", problem = "Test", evidence = "Test")
+
   # test critical (>= 30%)
-  result_critical <- bidux:::.calculate_severity_metrics("delayed_01", events_df, total_sessions = 100)
+  result_critical <- bidux:::.calculate_severity_metrics("delayed_01", notice, events_df, total_sessions = 100)
   expect_equal(result_critical$severity, "critical")
   expect_equal(result_critical$impact_rate, 0.3)
 
   # test high (20% = high since >= 10%)
-  result_high <- bidux:::.calculate_severity_metrics("navigation_page1", events_df, total_sessions = 100)
+  result_high <- bidux:::.calculate_severity_metrics("navigation_page1", notice, events_df, total_sessions = 100)
   expect_equal(result_high$severity, "high") # 20% >= 10% threshold = high
   expect_equal(result_high$impact_rate, 0.2)
 })
@@ -261,8 +296,15 @@ test_that(".calculate_severity_metrics handles invalid input_id safely", {
     input_id = c("valid", "valid")
   )
 
-  # test with malformed issue_key that would extract invalid input_id
-  result <- bidux:::.calculate_severity_metrics("unused_input_", events_df, total_sessions = 10)
+  # create notice with missing/invalid problem format
+  notice_bad <- tibble::tibble(
+    stage = "Notice",
+    problem = "Malformed problem text without quotes",
+    evidence = "Test"
+  )
+
+  # test with notice that doesn't have extractable input_id
+  result <- bidux:::.calculate_severity_metrics("unused_input_", notice_bad, events_df, total_sessions = 10)
 
   # should fallback to conservative estimate
   expect_equal(result$affected_sessions, 1L) # 10% of 10

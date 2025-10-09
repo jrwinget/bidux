@@ -265,7 +265,7 @@ create_confusion_notice <- function(confusion_info, total_sessions) {
     issue_type <- .classify_issue_type(issue_key)
 
     # calculate severity and impact metrics
-    severity_info <- .calculate_severity_metrics(issue_key, events, total_sessions)
+    severity_info <- .calculate_severity_metrics(issue_key, notice, events, total_sessions)
 
     tibble::tibble(
       issue_id = issue_key,
@@ -336,29 +336,39 @@ create_confusion_notice <- function(confusion_info, total_sessions) {
 
 #' Calculate severity metrics for an issue
 #' @param issue_key String identifier for the issue
+#' @param notice Bid_stage notice object containing problem description
 #' @param events Raw events data frame
 #' @param total_sessions Total number of sessions
 #' @return List with severity, affected_sessions, and impact_rate
 #' @keywords internal
-.calculate_severity_metrics <- function(issue_key, events, total_sessions) {
+.calculate_severity_metrics <- function(issue_key, notice, events, total_sessions) {
   # default values
   affected_sessions <- 0
   impact_rate <- 0.0
 
   # calculate metrics based on issue type
   if (grepl("^unused_input", issue_key)) {
-    # for unused inputs, count sessions that never used the input
-    input_id <- gsub("unused_input_", "", issue_key)
-    input_id <- gsub("_", " ", input_id) # simple conversion back
+    # for unused inputs, extract input_id from problem text to avoid lossy conversion
+    # problem format: "Users are not interacting with the 'INPUT_ID' input control"
+    input_id <- NA_character_
 
-    # validate extracted input_id for security
-    if (!is.character(input_id) || length(input_id) != 1 || nchar(trimws(input_id)) == 0) {
-      cli::cli_warn("Invalid input_id extracted from issue_key, using fallback metrics")
+    if (is.data.frame(notice) && "problem" %in% names(notice) && !is.na(notice$problem[1])) {
+      # extract input_id from between single quotes in problem text
+      extracted <- sub(".*'([^']+)'.*", "\\1", notice$problem[1])
+      if (!is.na(extracted) && extracted != notice$problem[1]) {
+        input_id <- extracted
+      }
+    }
+
+    # validate extracted input_id
+    if (is.na(input_id) || !is.character(input_id) || length(input_id) != 1 || nchar(trimws(input_id)) == 0) {
+      cli::cli_warn("Could not extract valid input_id from notice, using fallback metrics")
       affected_sessions <- round(total_sessions * 0.1) # conservative estimate
       impact_rate <- 0.1
     } else {
-      # secure comparison using exact match instead of regex pattern matching with user input
+      # secure comparison using exact match
       input_events <- events[events$event_type == "input" &
+        !is.na(events$input_id) &
         events$input_id == input_id, ]
       affected_sessions <- max(0, total_sessions - length(unique(input_events$session_id)))
       impact_rate <- if (total_sessions > 0) affected_sessions / total_sessions else 0.0

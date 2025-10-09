@@ -389,7 +389,7 @@ validate_logical_param <- function(value, param_name, allow_null = FALSE) {
 #' @param context Optional context information
 #' @param suggestions Optional suggestions for fixing the error
 #' @param call Optional call context
-#' @return Character string with formatted error message
+#' @return Named character vector for structured cli error formatting
 #' @keywords internal
 #' @noRd
 standard_error_msg <- function(message, context = NULL, suggestions = NULL, call = NULL) {
@@ -397,29 +397,26 @@ standard_error_msg <- function(message, context = NULL, suggestions = NULL, call
     stop("message must be a single character string", call. = FALSE)
   }
 
-  # build a single character string instead of a list
-  error_parts <- c(message)
+  # build named character vector for cli formatting
+  # "x" = error message, "i" = informational context/suggestions
+  error_parts <- c("x" = message)
 
   if (!is.null(context)) {
     if (is.character(context) && length(context) == 1) {
-      error_parts <- c(error_parts, paste("Context:", context))
+      error_parts <- c(error_parts, "i" = context)
     }
   }
 
   if (!is.null(suggestions)) {
     if (is.character(suggestions) && length(suggestions) > 0) {
-      if (length(suggestions) == 1) {
-        error_parts <- c(error_parts, paste("Suggestion:", suggestions))
-      } else {
-        for (i in seq_along(suggestions)) {
-          error_parts <- c(error_parts, paste("Suggestion", i, ":", suggestions[i]))
-        }
-      }
+      # add each suggestion as an info line
+      names(suggestions) <- rep("i", length(suggestions))
+      error_parts <- c(error_parts, suggestions)
     }
   }
 
-  # return a single character string
-  return(paste(error_parts, collapse = ". "))
+  # return named character vector for cli
+  return(error_parts)
 }
 
 #' Enhanced validate_character_param with glue support
