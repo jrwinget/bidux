@@ -23,6 +23,7 @@ in the BID framework."><meta property="og:image" content="https://jrwinget.githu
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/advanced-workflows.html">Advanced BID Workflows: Power User Techniques</a></li>
+    <li><a class="dropdown-item" href="../articles/api-modernization.html">bidux API Modernization Features</a></li>
     <li><a class="dropdown-item" href="../articles/behavioral-science-primer.html">Behavioral Science for Data Scientists: Why Your Dashboard Users Think Differently Than You Do</a></li>
     <li><a class="dropdown-item" href="../articles/concepts-reference.html">BID Framework Concepts: Practical Implementation</a></li>
     <li><a class="dropdown-item" href="../articles/getting-started.html">Getting Started with bidux</a></li>
@@ -114,9 +115,12 @@ stage.</p>
 <span class="r-in"><span>    resolution <span class="op">=</span> <span class="st">"Investigate new UI changes"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> Using deprecated list format for data_story parameter</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Please use new_data_story() constructor for new code</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Legacy format will be automatically migrated</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Stage 1 (Interpret) completed.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Central question: What drives the decline in user engagement?</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Your data story has all key elements. Focus on making each component compelling and relevant.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Your data story is incomplete (25%). Consider adding these missing elements: hook, tension, resolution.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Your central question is appropriately scoped.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - No user personas defined </span>
 <span class="r-in"><span></span></span>
@@ -134,21 +138,27 @@ stage.</p>
 <span class="r-in"><span>      name <span class="op">=</span> <span class="st">"Sara, Data Analyst"</span>,</span></span>
 <span class="r-in"><span>      goals <span class="op">=</span> <span class="st">"Needs to quickly find patterns in data"</span>,</span></span>
 <span class="r-in"><span>      pain_points <span class="op">=</span> <span class="st">"Gets overwhelmed by too many visualizations"</span>,</span></span>
-<span class="r-in"><span>      technical_level <span class="op">=</span> <span class="st">"Advanced"</span></span></span>
+<span class="r-in"><span>      technical_level <span class="op">=</span> <span class="st">"advanced"</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span>,</span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>      name <span class="op">=</span> <span class="st">"Marcus, Executive"</span>,</span></span>
 <span class="r-in"><span>      goals <span class="op">=</span> <span class="st">"Wants high-level insights at a glance"</span>,</span></span>
 <span class="r-in"><span>      pain_points <span class="op">=</span> <span class="st">"Limited time to analyze detailed reports"</span>,</span></span>
-<span class="r-in"><span>      technical_level <span class="op">=</span> <span class="st">"Basic"</span></span></span>
+<span class="r-in"><span>      technical_level <span class="op">=</span> <span class="st">"beginner"</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> Using deprecated list format for data_story parameter</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Please use new_data_story() constructor for new code</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Legacy format will be automatically migrated</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> Using deprecated list format for user_personas parameter</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Please use new_user_personas() constructor for new code</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Legacy format will be automatically migrated</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Stage 1 (Interpret) completed.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Central question: How can we improve data discovery?</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Your data story has all key elements. Focus on making each component compelling and relevant.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Your data story is incomplete (25%). Consider adding these missing elements: hook, tension, resolution.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Your central question is appropriately scoped.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - User personas: 2 defined </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - User personas: 4 defined </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">interpret_personas</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB; font-weight: bold;">=== BID Framework:</span> <span style="font-weight: bold;">Interpret</span> <span style="font-weight: bold;">Stage Summary ===</span></span>
@@ -158,8 +168,8 @@ stage.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    total_stages : 5 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    validation_status : completed </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    has_central_question : Yes </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    story_completeness : 1 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    personas_count : 2 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    story_completeness : 25% </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    personas_count : 4 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    auto_generated_question : No </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    auto_generated_story : No </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -170,10 +180,10 @@ stage.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    context : Critical data is available but overlooked </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    tension : Time-sensitive decisions are delayed </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    resolution : Highlight key metrics more effectively </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    personas : [{"name":["Sara, Data Analyst"],"goals":["Needs to quickly find patterns in d... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    suggestions : Your data story has all key elements. Focus on making each component compelli... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    personas : [{"name":"Sara, Data Analyst","goals":"Needs to quickly find patterns in data... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    suggestions : Your data story is incomplete (25%). Consider adding these missing elements: ... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-09-23 23:04:51 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-10-09 02:51:00 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

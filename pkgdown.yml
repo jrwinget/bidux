@@ -3,13 +3,14 @@ pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   advanced-workflows: advanced-workflows.html
+  api-modernization: api-modernization.html
   behavioral-science-primer: behavioral-science-primer.html
   concepts-reference: concepts-reference.html
   getting-started: getting-started.html
   introduction-to-bid: introduction-to-bid.html
   practical-examples: practical-examples.html
   telemetry-integration: telemetry-integration.html
-last_built: 2025-09-23T23:04Z
+last_built: 2025-10-09T02:50Z
 urls:
   reference: https://jrwinget.github.io/bidux/reference
   article: https://jrwinget.github.io/bidux/articles

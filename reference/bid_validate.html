@@ -21,6 +21,7 @@ refines the dashboard. It represents stage 5 in the BID framework."><meta proper
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/advanced-workflows.html">Advanced BID Workflows: Power User Techniques</a></li>
+    <li><a class="dropdown-item" href="../articles/api-modernization.html">bidux API Modernization Features</a></li>
     <li><a class="dropdown-item" href="../articles/behavioral-science-primer.html">Behavioral Science for Data Scientists: Why Your Dashboard Users Think Differently Than You Do</a></li>
     <li><a class="dropdown-item" href="../articles/concepts-reference.html">BID Framework Concepts: Practical Implementation</a></li>
     <li><a class="dropdown-item" href="../articles/getting-started.html">Getting Started with bidux</a></li>
@@ -147,9 +148,12 @@ stage.</p>
 <span class="r-in"><span>    include_telemetry <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>    include_empower_tools <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> Using deprecated list format for data_story parameter</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Please use new_data_story() constructor for new code</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Legacy format will be automatically migrated</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Stage 1 (Interpret) completed.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Central question: How can we improve delivery efficiency?</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Your data story has all key elements. Focus on making each component compelling and relevant.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Your data story is incomplete (25%). Consider adding these missing elements: hook, tension, resolution.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Your central question is appropriately scoped.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - No user personas defined </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Auto-suggested theory: Hick's Law (confidence: 90%)</span>
@@ -159,14 +163,18 @@ stage.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Evidence: User testing indicated delays</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Theory confidence: 90%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Next: Use bid_anticipate() for Stage 3 </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> Using deprecated list format for bias_mitigations parameter</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Please use new_bias_mitigations() constructor for new code</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Legacy format will be automatically migrated</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Added accessibility mitigation based on layout context.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Anchoring Effect</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Framing &amp; Loss Aversion</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Concept 'bias_type' not found</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Concept 'mitigation_strategy' not found</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Concept 'confidence_level' not found</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Accessibility Contrast</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Stage 3 (Anticipate) completed.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Bias mitigations: 3 defined</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Bias mitigations: 4 defined</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Accessibility considerations included</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Key suggestions: Anchoring mitigation: Always show reference points like previous period, budget, or industry average, Framing mitigation: Toggle between progress (65% complete) and gap (35% remaining) framing, Accessibility mitigation: Test color combinations with WebAIM's contrast checker to meet WCAG standards </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Key suggestions: Bias_type mitigation: Consider how this bias affects user decisions, Mitigation_strategy mitigation: Consider how this bias affects user decisions, Confidence_level mitigation: Consider how this bias affects user decisions </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Auto-selected layout: breathable</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Selected 'breathable' as safe default to ensure clean, uncluttered layout.</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Layout auto-selection is deprecated and will be removed in bidux 0.4.0. The BID framework will focus on concept-based suggestions instead. Existing code will continue to work until 0.4.0.</span>
@@ -212,12 +220,12 @@ stage.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    summary_panel : Dashboard provides clear summary of key insights with actionable recommendations </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    collaboration : Enable team sharing and collaborative decision-making features </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    next_steps : Conduct user testing with target audience to validate design decisions; Imple... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    previous_bias : anchoring: Provide reference points; framing: Use gain-framed messaging; acce... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    previous_bias : anchoring: Provide reference points; framing: Use gain-framed messaging </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    previous_layout : breathable </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    previous_concepts : Cognitive Load Theory, Visual Hierarchy, Progressive Disclosure </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    suggestions : Consider adding user empowerment tools to enhance collaboration </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-09-23 23:04:53 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-10-09 02:51:02 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

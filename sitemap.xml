@@ -5,6 +5,7 @@
 <url><loc>https://jrwinget.github.io/bidux/LICENSE-text.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/LICENSE.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/articles/advanced-workflows.html</loc></url>
+<url><loc>https://jrwinget.github.io/bidux/articles/api-modernization.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/articles/behavioral-science-primer.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/articles/concepts-reference.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/articles/getting-started.html</loc></url>
@@ -72,6 +73,7 @@
 <url><loc>https://jrwinget.github.io/bidux/reference/get_default_layout_mappings.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/get_default_theory_mappings.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/get_dual_processing_suggestions.html</loc></url>
+<url><loc>https://jrwinget.github.io/bidux/reference/get_fallback_concepts_data.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/get_fallback_suggestion.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/get_generic_suggestions.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/get_information_scent_suggestions.html</loc></url>
@@ -89,14 +91,21 @@
 <url><loc>https://jrwinget.github.io/bidux/reference/layout_rationale.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/load_accessibility_guidelines.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/load_concept_bias_mappings.html</loc></url>
+<url><loc>https://jrwinget.github.io/bidux/reference/load_concepts_data.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/load_layout_mappings.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/load_theory_mappings.html</loc></url>
+<url><loc>https://jrwinget.github.io/bidux/reference/new_bias_mitigations.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/new_bid_result.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/new_bid_stage.html</loc></url>
+<url><loc>https://jrwinget.github.io/bidux/reference/new_data_story.html</loc></url>
+<url><loc>https://jrwinget.github.io/bidux/reference/new_user_personas.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/normalize_telemetry_columns.html</loc></url>
+<url><loc>https://jrwinget.github.io/bidux/reference/print.bid_bias_mitigations.html</loc></url>
+<url><loc>https://jrwinget.github.io/bidux/reference/print.bid_data_story.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/print.bid_issues.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/print.bid_result.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/print.bid_stage.html</loc></url>
+<url><loc>https://jrwinget.github.io/bidux/reference/print.bid_user_personas.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/rank_and_sort_suggestions.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/read_telemetry_data.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/read_telemetry_json.html</loc></url>
@@ -110,5 +119,7 @@
 <url><loc>https://jrwinget.github.io/bidux/reference/summary.bid_stage.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/validate_bid_result.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/validate_bid_stage.html</loc></url>
+<url><loc>https://jrwinget.github.io/bidux/reference/validate_concepts_data_structure.html</loc></url>
+<url><loc>https://jrwinget.github.io/bidux/reference/validate_param.html</loc></url>
 </urlset>
 
