@@ -91,7 +91,7 @@ If NULL, auto-detects standard table names (event_data, events).</p></dd>
 <dd><p>Optional list of threshold parameters:
 - unused_input_threshold: percentage of sessions below which input is
 considered unused (default: 0.05)
-- delay_threshold_seconds: seconds of delay considered problematic
+- delay_threshold_secs: seconds of delay considered problematic
 (default: 30)
 - error_rate_threshold: percentage of sessions with errors considered
 problematic (default: 0.1)
@@ -130,13 +130,19 @@ for each identified issue in the "Notice" stage. The object includes:</p>
 <span class="r-in"><span><span class="co"># Analyze SQLite telemetry database</span></span></span>
 <span class="r-in"><span><span class="va">issues</span> <span class="op">&lt;-</span> <span class="fu">bid_ingest_telemetry</span><span class="op">(</span><span class="st">"telemetry.sqlite"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Use sensitivity presets for easier configuration</span></span></span>
+<span class="r-in"><span><span class="va">strict_issues</span> <span class="op">&lt;-</span> <span class="fu">bid_ingest_telemetry</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"telemetry.sqlite"</span>,</span></span>
+<span class="r-in"><span>  thresholds <span class="op">=</span> <span class="fu"><a href="bid_telemetry_presets.html">bid_telemetry_presets</a></span><span class="op">(</span><span class="st">"strict"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Analyze JSON log with custom thresholds</span></span></span>
 <span class="r-in"><span><span class="va">issues</span> <span class="op">&lt;-</span> <span class="fu">bid_ingest_telemetry</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"telemetry.log"</span>,</span></span>
 <span class="r-in"><span>  format <span class="op">=</span> <span class="st">"json"</span>,</span></span>
 <span class="r-in"><span>  thresholds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    unused_input_threshold <span class="op">=</span> <span class="fl">0.1</span>,</span></span>
-<span class="r-in"><span>    delay_threshold_seconds <span class="op">=</span> <span class="fl">60</span></span></span>
+<span class="r-in"><span>    delay_threshold_secs <span class="op">=</span> <span class="fl">60</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
