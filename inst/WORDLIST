@@ -28,6 +28,7 @@ mitigations
 pak
 pkgdown
 plotly
+pre
 reactable
 repo
 roxygen2
