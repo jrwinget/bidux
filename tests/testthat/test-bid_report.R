@@ -34,7 +34,7 @@ test_that("bid_report generates text report with expected content", {
   expect_match(report, "Stage 5: Validate & Empower the User")
   expect_match(report, "Dashboard simplified for quicker insights")
   expect_match(report, "Added team annotation features")
-  expect_match(report, "Stage 4: Anticipate User Behavior")
+  expect_match(report, "Stage 3: Anticipate User Behavior")
   expect_match(report, "anchoring: Provide reference points")
   # Changed from "Recommended Next Steps" to "Next Steps"
   expect_match(report, "Next Steps")

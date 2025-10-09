@@ -9,9 +9,9 @@ new_data_story(
   context = NULL,
   tension = NULL,
   resolution = NULL,
-  ...,
   variables = NULL,
-  relationships = NULL
+  relationships = NULL,
+  ...
 )
 }
 \arguments{
@@ -23,11 +23,11 @@ new_data_story(
 
 \item{resolution}{Character string describing the resolution or next steps}
 
-\item{...}{Optional additional fields (audience, metrics, visual_approach, etc.)}
-
 \item{variables}{DEPRECATED. List of variable descriptions (use flat arguments instead)}
 
 \item{relationships}{DEPRECATED. List describing data relationships (use flat arguments instead)}
+
+\item{...}{Optional additional fields (audience, metrics, visual_approach, etc.)}
 }
 \value{
 A bid_data_story S3 object
