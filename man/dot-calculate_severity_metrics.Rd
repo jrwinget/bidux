@@ -4,10 +4,12 @@
 \alias{.calculate_severity_metrics}
 \title{Calculate severity metrics for an issue}
 \usage{
-.calculate_severity_metrics(issue_key, events, total_sessions)
+.calculate_severity_metrics(issue_key, notice, events, total_sessions)
 }
 \arguments{
 \item{issue_key}{String identifier for the issue}
+
+\item{notice}{Bid_stage notice object containing problem description}
 
 \item{events}{Raw events data frame}
 
