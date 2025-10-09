@@ -32,27 +32,22 @@ if (requireNamespace("tibble", quietly = TRUE)) {
 The enhanced `new_data_story` function provides a structured way to create behavioral insights with comprehensive validation and modern S3 methods.
 
 ```{r data_story}
-# Create a structured data story
+# Create a structured data story using the modern flat API
 story <- new_data_story(
-  context = "User Interface Cognitive Load Analysis for complex form layouts",
-  variables = list(
-    cognitive_load = "Users struggle with complex form layouts",
-    completion_rate = "Simplified design improved completion rates by 40%",
-    ux_principle = "Cognitive load reduction critical for UX",
-    design_pattern = "Progressive disclosure pattern effective"
-  ),
-  relationships = list(
-    improvement_strategy = "Implement step-by-step form progression",
-    visual_guidance = "Add visual progress indicators"
-  )
+  hook = "Users struggle with complex form layouts leading to abandonment",
+  context = "User Interface Cognitive Load Analysis for complex form layouts with 40% improvement potential",
+  tension = "Current forms overwhelm users with cognitive load and lack clear guidance",
+  resolution = "Implement step-by-step form progression with visual progress indicators"
 )
 
 # Enhanced print method
 print(story)
 
-# Access story elements
+# Access story elements directly using the flat API
+story$hook
 story$context
-story$variables$cognitive_load
+story$tension
+story$resolution
 
 # Story is automatically structured for further BID framework usage
 ```
@@ -197,21 +192,12 @@ validation_analysis <- bid_validate(
   quiet = TRUE
 )
 
-# Step 6: Create comprehensive data story from complete workflow
+# Step 6: Create comprehensive data story from complete workflow using flat API
 optimization_story <- new_data_story(
-  context = "Complete BID Framework Analysis: Landing Page Trust-Based Conversion Optimization",
-  variables = list(
-    framework_stages = "All 5 BID stages completed: Interpret → Notice → Anticipate → Structure → Validate",
-    current_state = "High-pressure persuasive elements present",
-    user_response = "Trust concerns impacting conversion",
-    optimization_target = "Balance conversion with user trust"
-  ),
-  relationships = list(
-    design_strategy = paste("Auto-selected layout:", recommendations$layout),
-    validation_outcome = paste("Validation method:", validation_analysis$validation_method),
-    implementation = "Apply validated BID framework recommendations",
-    measurement = "Monitor both conversion rates and user trust metrics"
-  )
+  hook = "High-pressure persuasive elements creating user trust concerns",
+  context = "Complete BID Framework Analysis: Landing Page Trust-Based Conversion Optimization across all 5 stages",
+  tension = "Need to balance conversion goals with user trust - current approach damages long-term relationships",
+  resolution = "Apply validated BID framework recommendations balancing persuasion with trust-building, monitoring both conversion rates and user trust metrics"
 )
 
 # View complete analysis results
@@ -228,13 +214,13 @@ The modernized API provides clear, descriptive error messages for better debuggi
 
 ```{r validation, error = TRUE}
 # Clear error messages for invalid inputs
-try(bid_interpret())  # Missing required parameter
-try(bid_interpret(central_question = 123))  # Wrong type for central_question
-try(bid_interpret(central_question = "test", data_story = "invalid"))  # Invalid data_story
+try(bid_interpret()) # Missing required parameter
+try(bid_interpret(central_question = 123)) # Wrong type for central_question
+try(bid_interpret(central_question = "test", data_story = "invalid")) # Invalid data_story
 
 # Descriptive validation errors for data story creation
-try(new_data_story())  # Missing required parameters
-try(new_data_story("", list(), list()))  # Invalid empty context
+try(new_data_story()) # Missing required parameters
+try(new_data_story("", list(), list())) # Invalid empty context
 ```
 
 ## Tibble Integration

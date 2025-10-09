@@ -93,31 +93,31 @@ Let's walk through a complete example of using the BID framework to document and
 Start by clarifying the central question your dashboard needs to answer and structure the data story:
 
 ```{r interpret}
-# Document the user's need
+# Document the user's need using new_data_story() with flat API (recommended)
 interpret_result <- bid_interpret(
   central_question = "How are our marketing campaigns performing across different channels?",
-  data_story = list(
+  data_story = new_data_story(
     hook = "Recent campaign performance varies significantly across channels",
     context = "We've invested in 6 different marketing channels over the past quarter",
     tension = "ROI metrics show inconsistent results, with some channels underperforming",
     resolution = "Identify top-performing channels and key performance drivers",
     audience = "Marketing team and executives",
-    metrics = c("Channel ROI", "Conversion Rate", "Cost per Acquisition"),
+    metrics = "Channel ROI, Conversion Rate, Cost per Acquisition",
     visual_approach = "Comparative analysis with historical benchmarks"
   ),
-  user_personas = list(
-    list(
-      name = "Marketing Manager",
-      goals = "Optimize marketing spend across channels",
-      pain_points = "Difficulty comparing performance across different metrics",
-      technical_level = "Intermediate"
+  # Recommended: use data.frame for personas (cleaner, more explicit)
+  user_personas = data.frame(
+    name = c("Marketing Manager", "CMO"),
+    goals = c(
+      "Optimize marketing spend across channels",
+      "Strategic oversight of marketing effectiveness"
     ),
-    list(
-      name = "CMO",
-      goals = "Strategic oversight of marketing effectiveness",
-      pain_points = "Needs high-level insights without technical details",
-      technical_level = "Basic"
-    )
+    pain_points = c(
+      "Difficulty comparing performance across different metrics",
+      "Needs high-level insights without technical details"
+    ),
+    technical_level = c("intermediate", "basic"),
+    stringsAsFactors = FALSE
   )
 )
 

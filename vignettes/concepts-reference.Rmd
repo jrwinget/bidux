@@ -205,7 +205,7 @@ ui <- page_fillable(
   ),
   # Story Context: Provide background
   layout_column_wrap(
-    width = 1 / 2,
+    width = 1/2,
     card(
       card_header("Sales Channel Trend"),
       card_body(
