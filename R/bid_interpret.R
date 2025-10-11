@@ -133,6 +133,9 @@ bid_interpret <- function(
           suggestions = "Use new_user_personas() constructor to create valid objects"
         ))
       }
+    } else if (is.data.frame(user_personas)) {
+      # data.frame provided directly - convert to bid_user_personas
+      user_personas <- new_user_personas(user_personas)
     } else if (is.list(user_personas)) {
       # legacy list format - migrate to new s3 class with deprecation warning
       cli::cli_warn(c(
@@ -143,10 +146,11 @@ bid_interpret <- function(
       user_personas <- migrate_user_personas(user_personas)
     } else {
       cli::cli_abort(standard_error_msg(
-        "user_personas must be a bid_user_personas object or list",
+        "user_personas must be a bid_user_personas object, data.frame, or list",
         context = glue::glue("You provided: {class(user_personas)[1]}"),
         suggestions = c(
           "Use new_user_personas() constructor",
+          "Or provide a data.frame with required columns",
           "Or provide a list of persona objects"
         )
       ))
