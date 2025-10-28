@@ -1,4 +1,4 @@
-# bidux (development version)
+# bidux 0.3.2
 
 # bidux 0.3.2 (2025-10-09)
 ==========================

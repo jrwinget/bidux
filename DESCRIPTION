@@ -1,6 +1,6 @@
 Package: bidux
 Title: Behavioral Insight Design: A Toolkit for Integrating Behavioral Science in UI/UX Design
-Version: 0.3.1.9000
+Version: 0.3.2
 Authors@R:
     person(
         given = "Jeremy",
