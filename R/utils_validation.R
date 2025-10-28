@@ -293,6 +293,19 @@ validate_user_personas <- function(user_personas) {
     return(invisible(NULL))
   }
 
+  # handle new S3 class format (bid_user_personas)
+  if (inherits(user_personas, "bid_user_personas")) {
+    required_cols <- c("name", "goals", "pain_points", "technical_level")
+    if (!all(required_cols %in% names(user_personas))) {
+      return(FALSE)
+    }
+    if (nrow(user_personas) == 0) {
+      return(FALSE)
+    }
+    return(TRUE)
+  }
+
+  # handle legacy list format
   if (!is.list(user_personas)) {
     cli::cli_abort(c(
       "x" = "user_personas must be a list",

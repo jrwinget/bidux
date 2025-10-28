@@ -370,7 +370,7 @@ test_that("bid_interpret works with new_data_story() constructor", {
   expect_equal(result$context[1], "Dashboard has grown over time")
 })
 
-test_that("bid_interpret works with new_user_personas() constructor", {
+test_that("bid_interpret validates user_personas S3 class structure", {
   personas_df <- data.frame(
     name = "Test Persona",
     goals = "Test goals",
