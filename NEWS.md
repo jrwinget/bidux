@@ -1,6 +1,4 @@
-# bidux (development version)
-
-# bidux 0.3.2 (2025-10-09)
+# bidux 0.3.2 (2025-10-28)
 ==========================
 
 ### NEW FEATURES
@@ -9,9 +7,21 @@
 
 * **Telemetry sensitivity presets.** New `bid_telemetry_presets()` function provides pre-configured threshold sets (`strict`, `moderate`, `relaxed`) for easier telemetry analysis configuration without manual threshold tuning.
 
+* **Quiet mode for cleaner output.** New `quiet` parameter added to all BID stage functions to suppress informational messages. Includes global configuration via `bid_set_quiet()`, `bid_get_quiet()`, and `bid_with_quiet()` for controlling message verbosity across entire workflows.
+
+* **New S3 constructors for modern API.** Added `new_user_personas()` and `new_bias_mitigations()` constructors to complement the S3 class system, providing type-safe alternatives to legacy list-based formats.
+
+* **Enhanced print methods for S3 classes.** Improved `print()` methods for `bid_data_story`, `bid_user_personas`, and `bid_bias_mitigations` classes provide clearer, more informative console output.
+
 ### IMPROVEMENTS
 
 * **Reduced package footprint.** Removed unused dependencies `purrr` and `stringr`, reducing install size and dependency overhead. Base R equivalents are used instead (e.g., `nchar()` instead of `stringr::str_length()`).
+
+* **Enhanced error handling with glue dependency.** Added `glue` package to dependencies for improved error message formatting. Migrated from `stop()` to `cli::cli_abort()` with `standard_error_msg()` helper for more informative, context-rich error messages.
+
+* **Text normalization improvements.** Enhanced text processing utilities with better handling of whitespace, special characters, and edge cases in suggestion generation and matching.
+
+* **Code organization and modularity improvements.** Refactored utilities into domain-specific files (`utils_messaging.R`, `utils_validation.R`, `utils_stage.R`, `utils_safe_access.R`) for better maintainability and testability.
 
 * **Cleaner telemetry constants.** Extracted all magic numbers from telemetry analysis functions to named constants at the top of `telemetry_analysis.R`, improving maintainability and making thresholds self-documenting.
 
@@ -25,11 +35,15 @@
 
 ### DOCUMENTATION UPDATES
 
+* **New API Modernization vignette** providing comprehensive guidance on migrating from legacy list-based APIs to modern S3 class system, including examples for `data_story`, `user_personas`, and `bias_mitigations`.
+
+* **Simplified Advanced Workflows vignette** with clearer examples of complex BID pipeline patterns, quiet mode usage, and telemetry integration workflows.
+
 * **Updated Getting Started vignette** to show recommended flat `new_data_story()` API and `data.frame` format for personas.
 
 * **Enhanced function examples** in `bid_interpret()` and other stage functions to demonstrate both modern and legacy formats.
 
-* **Comprehensive test coverage** for new flat data_story API, backward compatibility with nested format, telemetry presets, and safe accessor functions.
+* **Comprehensive test coverage** for new flat data_story API, backward compatibility with nested format, telemetry presets, safe accessor functions, and quiet mode functionality.
 
 ### DEPRECATIONS
 
