@@ -66,7 +66,7 @@ library(bidux)
 # Document a complete BID process
 process <- bid_interpret(
   central_question = "How are our marketing campaigns performing across different channels?",
-  data_story = list(
+  data_story = new_data_story(
     hook = "Recent campaign performance varies significantly across channels",
     context = "We've invested in 6 different marketing channels over the past quarter",
     tension = "ROI metrics show inconsistent results, with some channels underperforming",
@@ -104,22 +104,31 @@ bid_report(process, format = "markdown")
 
 ## Data-Driven UX with Telemetry
 
-**New in 0.3.1**: Enhanced telemetry workflow transforms real user
+**New in 0.3.2**: Enhanced telemetry workflow transforms real user
 behavior data into actionable BID insights.
 
 ``` r
-# Modern approach: analyze telemetry data
+# Modern approach: analyze telemetry data with bid_telemetry()
+# Returns a clean tibble of issues (without legacy list structure)
 issues <- bid_telemetry("telemetry.sqlite")
 print(issues)  # Shows organized issue summary with severity levels
 
+# Adjust sensitivity with presets
+strict_issues <- bid_telemetry(
+  "telemetry.sqlite",
+  thresholds = bid_telemetry_presets("strict")    # or "moderate", "relaxed"
+)
+
 # Focus on critical issues using tidy workflows
+library(dplyr)
+
 critical_issues <- issues |>
   filter(severity == "critical") |>
-  arrange(desc(user_impact))
+  arrange(desc(impact_rate))
 
 # Convert high-priority issues to BID Notice stages
 notices <- bid_notices(
-  issues = critical_issues,
+  critical_issues,
   previous_stage = interpret_result
 )
 
@@ -141,9 +150,10 @@ friction indicators:
 - **Confusion Patterns**: Rapid repeated changes indicating user
   uncertainty
 
-Legacy `bid_ingest_telemetry()` function maintains full backward
-compatibility while providing enhanced functionality through hybrid
-objects.
+**Function comparison:** - `bid_telemetry()`: Modern API returning a
+clean tibble (recommended for new code) - `bid_ingest_telemetry()`:
+Legacy API returning hybrid object with list structure (for backward
+compatibility)
 
 ## Key Features
 
