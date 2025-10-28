@@ -102,25 +102,24 @@ Let's apply the systematic BID approach:
 # Stage 1: Interpret - Understand the real user need
 interpret_result <- bid_interpret(
   central_question = "How is our user engagement trending, and what needs attention?",
-  data_story = list(
+  data_story = new_data_story(
     hook = "User engagement metrics are spread across multiple systems",
     context = "Leadership needs quick insights for weekly business reviews",
     tension = "Current dashboards take too long to interpret",
     resolution = "Provide immediate key insights with drill-down capability"
   ),
-  user_personas = list(
-    list(
-      name = "Sarah (Product Manager)",
-      goals = "Quickly spot concerning trends and dive deeper when needed",
-      pain_points = "Too many metrics to process in limited meeting time",
-      technical_level = "Intermediate"
+  user_personas = data.frame(
+    name = c("Sarah (Product Manager)", "Mike (Executive)"),
+    goals = c(
+      "Quickly spot concerning trends and dive deeper when needed",
+      "Understand overall health at a glance"
     ),
-    list(
-      name = "Mike (Executive)",
-      goals = "Understand overall health at a glance",
-      pain_points = "Gets lost in details when just needs the big picture",
-      technical_level = "Basic"
-    )
+    pain_points = c(
+      "Too many metrics to process in limited meeting time",
+      "Gets lost in details when just needs the big picture"
+    ),
+    technical_level = c("intermediate", "basic"),
+    stringsAsFactors = FALSE
   )
 )
 
@@ -339,19 +338,18 @@ ui_sales_before <- fluidPage(
 # Apply BID framework focusing on sales manager workflow
 sales_interpret <- bid_interpret(
   central_question = "What deals need my attention this week?",
-  data_story = list(
+  data_story = new_data_story(
     hook = "Sales managers spend 2+ hours weekly creating status reports",
     context = "They need to quickly identify at-risk deals and top opportunities",
     tension = "Current data requires extensive filtering and analysis",
     resolution = "Provide intelligent prioritization with drill-down capability"
   ),
-  user_personas = list(
-    list(
-      name = "Jennifer (Regional Sales Manager)",
-      goals = "Identify at-risk deals, spot top opportunities, prepare for team meetings",
-      pain_points = "Too much filtering required to find actionable insights",
-      technical_level = "Intermediate"
-    )
+  user_personas = data.frame(
+    name = "Jennifer (Regional Sales Manager)",
+    goals = "Identify at-risk deals, spot top opportunities, prepare for team meetings",
+    pain_points = "Too much filtering required to find actionable insights",
+    technical_level = "intermediate",
+    stringsAsFactors = FALSE
   )
 )
 
@@ -515,25 +513,26 @@ You're monitoring application performance with detailed technical metrics. Your 
 # Interpret stage: Understand different user needs
 technical_interpret <- bid_interpret(
   central_question = "How is our application performing and what needs attention?",
-  user_personas = list(
-    list(
-      name = "DevOps Engineer",
-      goals = "Identify performance bottlenecks and system issues",
-      pain_points = "Needs detailed metrics and historical trends",
-      technical_level = "Expert"
+  data_story = new_data_story(
+    hook = "Application performance directly impacts user satisfaction and revenue",
+    context = "Different stakeholders need different views of system health",
+    tension = "Technical metrics are critical but overwhelming for non-engineers",
+    resolution = "Provide role-appropriate views while maintaining data integrity"
+  ),
+  user_personas = data.frame(
+    name = c("DevOps Engineer", "Engineering Manager", "Executive"),
+    goals = c(
+      "Identify performance bottlenecks and system issues",
+      "Understand overall system health and team priorities",
+      "Understand business impact of technical issues"
     ),
-    list(
-      name = "Engineering Manager",
-      goals = "Understand overall system health and team priorities",
-      pain_points = "Needs summary view but ability to drill down",
-      technical_level = "Advanced"
+    pain_points = c(
+      "Needs detailed metrics and historical trends",
+      "Needs summary view but ability to drill down",
+      "Technical details are overwhelming"
     ),
-    list(
-      name = "Executive",
-      goals = "Understand business impact of technical issues",
-      pain_points = "Technical details are overwhelming",
-      technical_level = "Basic"
-    )
+    technical_level = c("expert", "advanced", "beginner"),
+    stringsAsFactors = FALSE
   )
 )
 ```
@@ -625,6 +624,188 @@ ui_technical_after <- page_sidebar(
 ```
 
 **Key insight**: Same data, different presentations based on user cognitive needs and technical expertise.
+
+## Example 4: The Telemetry-Driven Improvement
+
+### The Scenario
+
+You've deployed a dashboard that looks great, but you're getting vague complaints about "usability issues." Rather than guessing, you instrument your Shiny app with telemetry to understand real user behavior.
+
+### Discovering Problems with Data
+
+```{r telemetry-analysis}
+# Analyze telemetry data to identify real friction points
+library(bidux)
+
+# Example telemetry data structure (your actual data would come from shinymetrics, etc.)
+telemetry_data <- data.frame(
+  session_id = c(rep("s1", 10), rep("s2", 8), rep("s3", 12)),
+  input_id = c(
+    "date_filter", "region_filter", "product_filter", "date_filter",
+    "region_filter", "date_filter", "region_filter", "date_filter",
+    "advanced_options", "advanced_options",
+    "date_filter", "export_btn", "export_btn", "export_btn",
+    "date_filter", "date_filter", "date_filter", "date_filter",
+    "date_filter", "region_filter", "date_filter", "date_filter",
+    "help_btn", "export_btn", "export_btn", "export_btn",
+    "date_filter", "date_filter", "date_filter", "date_filter"
+  ),
+  timestamp = Sys.time() + 1:30,
+  error_occurred = c(rep(FALSE, 8), TRUE, TRUE, rep(FALSE, 20)),
+  stringsAsFactors = FALSE
+)
+
+# Use bidux telemetry analysis
+issues <- bid_telemetry(
+  telemetry_data,
+  session_col = "session_id",
+  input_col = "input_id",
+  time_col = "timestamp"
+)
+
+# Convert telemetry issues to Notice stage
+telemetry_notices <- bid_notices(issues)
+
+print(telemetry_notices)
+```
+
+### BID Framework with Data-Driven Insights
+
+```{r telemetry-bid-solution}
+# Start with telemetry-discovered problems
+interpret_telemetry <- bid_interpret(
+  central_question = "Why are users struggling with the date filter interface?",
+  data_story = new_data_story(
+    hook = "Telemetry reveals 60% of user interactions involve date filter adjustments",
+    context = "Users are repeatedly changing date filters, suggesting confusion or poor defaults",
+    tension = "The date filter is creating friction rather than helping users",
+    resolution = "Redesign date filtering with smarter defaults and clearer feedback"
+  ),
+  user_personas = data.frame(
+    name = "Data Analyst",
+    goals = "Quickly analyze trends for specific time periods",
+    pain_points = "Spends too much time adjusting date ranges to see relevant data",
+    technical_level = "intermediate",
+    stringsAsFactors = FALSE
+  )
+)
+
+# Use telemetry findings in Notice stage
+notice_telemetry <- bid_notice(
+  previous_stage = interpret_telemetry,
+  problem = "Users make excessive date filter adjustments (avg 8 per session)",
+  theory = "Choice Architecture",
+  evidence = paste(
+    "Telemetry shows 60% of interactions are date-related,",
+    "suggesting poor default choices and unclear time period options"
+  )
+)
+
+# Address cognitive biases revealed by behavior
+anticipate_telemetry <- bid_anticipate(
+  previous_stage = notice_telemetry,
+  bias_mitigations = list(
+    status_quo_bias = "Users stick with default settings - provide smarter defaults",
+    choice_overload = "Too many date options confuse users - offer common presets",
+    analysis_paralysis = "Users repeatedly adjust - provide clear visual feedback on data coverage"
+  )
+)
+
+# Get layout and UI suggestions
+structure_telemetry <- bid_structure(previous_stage = anticipate_telemetry)
+
+# Document validation approach
+validate_telemetry <- bid_validate(
+  previous_stage = structure_telemetry,
+  summary_panel = "Redesigned date filtering with smart defaults and preset options",
+  collaboration = "Share telemetry insights with team; A/B test new design",
+  next_steps = c(
+    "Implement intelligent date defaults based on data recency",
+    "Add quick-select presets: 'Last 7 days', 'Last 30 days', 'Year to date'",
+    "Provide visual feedback showing data coverage for selected range",
+    "Monitor telemetry to validate improvements"
+  )
+)
+```
+
+### After: Data-Driven Date Filter Redesign
+
+```{r telemetry-improved-ui}
+# Before: Generic date picker with no guidance
+ui_date_before <- dateRangeInput(
+  "date_range",
+  "Select Date Range:",
+  start = "2024-01-01",
+  end = Sys.Date()
+)
+
+# After: Smart defaults + quick presets based on telemetry insights
+ui_date_after <- div(
+  # Quick presets (addresses choice overload from telemetry)
+  div(
+    style = "margin-bottom: 10px;",
+    radioButtons(
+      "date_preset",
+      "Quick Select:",
+      choices = c(
+        "Last 7 days" = "7d",
+        "Last 30 days" = "30d",
+        "Year to date" = "ytd",
+        "Custom range" = "custom"
+      ),
+      selected = "30d",  # Smart default based on most common usage
+      inline = TRUE
+    )
+  ),
+
+  # Custom date range (only shown when needed)
+  conditionalPanel(
+    condition = "input.date_preset == 'custom'",
+    dateRangeInput(
+      "date_range_custom",
+      NULL,
+      start = Sys.Date() - 30,
+      end = Sys.Date()
+    )
+  ),
+
+  # Data coverage indicator (provides feedback on selection)
+  uiOutput("data_coverage_info")
+)
+
+# Server logic for data coverage feedback
+server_date_feedback <- function(input, output, session) {
+  output$data_coverage_info <- renderUI({
+    # Calculate based on selected date range
+    coverage_pct <- 95  # Example: 95% of data falls in selected range
+
+    div(
+      class = "alert alert-info",
+      style = "margin-top: 10px; padding: 8px;",
+      icon("info-circle"),
+      " This date range covers ",
+      strong(paste0(coverage_pct, "%")),
+      " of your available data"
+    )
+  })
+}
+```
+
+**Key improvements based on telemetry:**
+
+- **Smart defaults**: Most users want recent data, so default to "Last 30 days"
+- **Quick presets**: Reduce 60% of date interactions by providing common choices
+- **Progressive disclosure**: Hide complex date picker unless custom range needed
+- **Clear feedback**: Show data coverage to prevent empty-result confusion
+- **Measurable impact**: Can validate improvements with follow-up telemetry
+
+**The telemetry-driven workflow:**
+
+1. **Measure**: Instrument dashboard to capture real user behavior
+2. **Analyze**: Use `bid_telemetry()` to identify friction patterns
+3. **Understand**: Apply BID framework to interpret findings systematically
+4. **Redesign**: Make evidence-based improvements targeting real problems
+5. **Validate**: Monitor telemetry to confirm improvements worked
 
 ## Best Practices Summary
 

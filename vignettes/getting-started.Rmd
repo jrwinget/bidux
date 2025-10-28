@@ -282,47 +282,240 @@ Future versions of `{bidux}` will include:
 
 ## Integrating Telemetry Data (New in 0.3.1)
 
-If you have telemetry data from user interactions, `{bidux}` can help transform it into actionable BID insights:
+If you have telemetry data from user interactions (e.g., from the `{shiny.telemetry}` package), `{bidux}` can help transform it into actionable BID insights by automatically detecting UX friction patterns.
 
-```{r telemetry_workflow}
-# Modern telemetry workflow (0.3.1+)
-# Process telemetry data into organized issues
-issues <- bid_telemetry("path/to/telemetry.sqlite")
+### Understanding the Two Telemetry Functions
 
-# Triage and review issues
-print(issues) # Shows organized issue summary
+`{bidux}` provides two complementary approaches to telemetry analysis:
 
-# Convert high-priority issues to Notice stages
-critical_issues <- issues |>
-  filter(severity == "critical") |>
-  slice_head(n = 3)
+**`bid_telemetry()` - Modern Tidy API (Recommended)**
+- Returns a clean tibble of issues for analysis
+- Best for new workflows and data exploration
+- Integrates seamlessly with `dplyr` pipelines
+- Introduced in version 0.3.1
 
-notices <- bid_notices(
-  issues = critical_issues,
-  previous_stage = interpret_result
+**`bid_ingest_telemetry()` - Legacy Compatible API**
+- Returns a hybrid object that works as both a list and enhanced object
+- Maintains backward compatibility with pre-0.3.1 code
+- Provides same analysis as `bid_telemetry()` with additional list interface
+- Will be soft-deprecated in 0.4.0
+
+Both functions analyze the same telemetry patterns:
+- **Unused inputs** - UI controls rarely or never used
+- **Delayed interactions** - Users taking too long to engage
+- **Error patterns** - Recurring errors affecting users
+- **Navigation drop-offs** - Pages/tabs with low visit rates
+- **Confusion patterns** - Rapid repeated changes suggesting uncertainty
+
+### Using Sensitivity Presets (New in 0.3.2)
+
+The `bid_telemetry_presets()` function provides three pre-configured sensitivity levels, making it easy to adjust how aggressively issues are detected without manually tuning thresholds:
+
+```{r telemetry_presets}
+# STRICT: Detects even minor issues - use for critical applications
+strict_issues <- bid_telemetry(
+  "path/to/telemetry.sqlite",
+  thresholds = bid_telemetry_presets("strict")
+)
+# - Flags inputs used by < 2% of sessions
+# - Flags delays > 20 seconds to first action
+# - Flags errors in > 5% of sessions
+# - Flags pages visited by < 10% of users
+
+# MODERATE: Balanced default - appropriate for most applications
+moderate_issues <- bid_telemetry(
+  "path/to/telemetry.sqlite",
+  thresholds = bid_telemetry_presets("moderate")
+)
+# - Flags inputs used by < 5% of sessions (default)
+# - Flags delays > 30 seconds to first action (default)
+# - Flags errors in > 10% of sessions (default)
+# - Flags pages visited by < 20% of users (default)
+
+# RELAXED: Only detects major issues - use for mature, stable dashboards
+relaxed_issues <- bid_telemetry(
+  "path/to/telemetry.sqlite",
+  thresholds = bid_telemetry_presets("relaxed")
+)
+# - Flags inputs used by < 10% of sessions
+# - Flags delays > 60 seconds to first action
+# - Flags errors in > 20% of sessions
+# - Flags pages visited by < 30% of users
+```
+
+### Comparing Preset Sensitivities
+
+Different presets can identify different numbers of issues from the same data:
+
+```{r preset_comparison}
+# Analyze with all three presets
+strict <- bid_telemetry(
+  "path/to/telemetry.sqlite",
+  thresholds = bid_telemetry_presets("strict")
 )
 
-# Extract telemetry flags for structure optimization
-flags <- bid_flags(issues)
+moderate <- bid_telemetry(
+  "path/to/telemetry.sqlite",
+  thresholds = bid_telemetry_presets("moderate")
+)
 
-# Use flags to inform layout selection
+relaxed <- bid_telemetry(
+  "path/to/telemetry.sqlite",
+  thresholds = bid_telemetry_presets("relaxed")
+)
+
+# Compare issue counts
+data.frame(
+  preset = c("strict", "moderate", "relaxed"),
+  total_issues = c(nrow(strict), nrow(moderate), nrow(relaxed)),
+  critical_issues = c(
+    sum(strict$severity == "critical"),
+    sum(moderate$severity == "critical"),
+    sum(relaxed$severity == "critical")
+  )
+)
+
+# Strict preset typically finds 2-3x more issues than relaxed
+# Use strict during initial development, relaxed for stable dashboards
+```
+
+### Modern Telemetry Workflow with `bid_telemetry()`
+
+The recommended approach for new projects:
+
+```{r telemetry_workflow_modern}
+# 1. Analyze telemetry with appropriate sensitivity
+issues <- bid_telemetry(
+  "path/to/telemetry.sqlite",
+  thresholds = bid_telemetry_presets("moderate")
+)
+
+# 2. Triage and review issues (returns organized summary)
+print(issues)
+
+# 3. Filter to high-priority issues using dplyr
+library(dplyr)
+critical_issues <- issues |>
+  filter(severity %in% c("critical", "high")) |>
+  arrange(desc(impact_rate))
+
+# 4. Convert top issues to Notice stages for BID workflow
+notices <- bid_notices(
+  issues = critical_issues,
+  previous_stage = interpret_result,
+  max_issues = 3
+)
+
+# 5. Extract telemetry flags for informed decisions
+flags <- bid_flags(issues)
+flags$has_critical_issues  # TRUE/FALSE
+flags$has_navigation_issues  # TRUE/FALSE
+flags$session_count  # Number of sessions analyzed
+
+# 6. Use flags to inform Structure stage
 structure_result <- bid_structure(
   previous_stage = anticipate_result,
   telemetry_flags = flags
 )
 ```
 
-The hybrid object returned by `bid_ingest_telemetry()` maintains backward compatibility while providing enhanced functionality:
+### Legacy Workflow with `bid_ingest_telemetry()`
 
-```{r legacy_compatibility}
-# Legacy approach still works
-legacy_notices <- bid_ingest_telemetry("path/to/telemetry.sqlite")
-length(legacy_notices) # Behaves like list of Notice stages
+For backward compatibility with existing code:
 
-# But now also provides enhanced features
-as_tibble(legacy_notices) # Tidy issues view
-bid_flags(legacy_notices) # Extract global flags
+```{r telemetry_workflow_legacy}
+# Returns hybrid object that works as both list and enhanced object
+legacy_issues <- bid_ingest_telemetry(
+  "path/to/telemetry.sqlite",
+  thresholds = bid_telemetry_presets("moderate")
+)
+
+# Legacy list interface (backward compatible)
+length(legacy_issues)  # Number of issues as list length
+legacy_issues[[1]]  # First issue as bid_stage object
+names(legacy_issues)  # Issue identifiers
+
+# Enhanced features (new in 0.3.1)
+as_tibble(legacy_issues)  # Get tidy issues view
+bid_flags(legacy_issues)  # Extract global flags
+print(legacy_issues)  # Shows organized triage summary
+
+# Both interfaces work on same object
 ```
+
+### Complete Telemetry-Informed BID Example
+
+Here's a full example showing how telemetry analysis integrates with the BID framework:
+
+```{r complete_telemetry_example}
+# Step 1: Analyze telemetry to identify friction points
+issues <- bid_telemetry(
+  "path/to/telemetry.sqlite",
+  thresholds = bid_telemetry_presets("strict")  # Catch everything during development
+)
+
+# Step 2: Start BID workflow with central question
+interpret_result <- bid_interpret(
+  central_question = "How can we reduce user friction identified in telemetry?",
+  data_story = new_data_story(
+    hook = "Telemetry shows multiple UX friction points",
+    context = glue::glue("Analysis of {bid_flags(issues)$session_count} user sessions"),
+    tension = "Users struggling with specific UI elements and workflows",
+    resolution = "Systematically address high-impact issues using BID framework"
+  )
+)
+
+# Step 3: Address highest-impact issue first
+top_issue <- issues |>
+  arrange(desc(impact_rate)) |>
+  slice(1)
+
+notice_result <- bid_notices(
+  issues = top_issue,
+  previous_stage = interpret_result
+)[[1]]
+
+# Step 4: Anticipate biases related to the issue
+anticipate_result <- bid_anticipate(
+  previous_stage = notice_result,
+  bias_mitigations = list(
+    anchoring = "Provide clear default values based on common use cases",
+    confirmation_bias = "Show data that challenges user assumptions"
+  )
+)
+
+# Step 5: Structure with telemetry-informed decisions
+structure_result <- bid_structure(
+  previous_stage = anticipate_result,
+  telemetry_flags = bid_flags(issues)  # Informs layout selection
+)
+
+# Step 6: Validate with telemetry references
+validate_result <- bid_validate(
+  previous_stage = structure_result,
+  summary_panel = "Dashboard improvements based on analysis of real user behavior patterns",
+  next_steps = c(
+    "Address remaining high-severity telemetry issues",
+    "Re-run telemetry analysis after changes to measure improvement",
+    "Monitor key metrics: time-to-first-action, error rates, navigation patterns"
+  )
+)
+```
+
+### When to Use Which Function
+
+**Use `bid_telemetry()`** when you:
+- Are starting a new project or workflow
+- Want clean, tidy data for analysis and visualization
+- Prefer working with tibbles and `dplyr`
+- Don't need backward compatibility
+
+**Use `bid_ingest_telemetry()`** when you:
+- Have existing code from bidux < 0.3.1
+- Need the legacy list interface for compatibility
+- Want both list and tibble access in the same object
+
+**Note:** Both functions perform identical telemetry analysis and support the same presets and thresholds. The only difference is the return format.
 
 Visit [github.com/jrwinget/bidux](https://github.com/jrwinget/bidux) for updates and to contribute to the package development. We welcome feedback and suggestions to help make the BID framework even more effective for Shiny developers.
 

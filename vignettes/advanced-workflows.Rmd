@@ -39,7 +39,10 @@ You maintain 20+ dashboards across different business units. Manually applying t
 
 ```{r automated-bid-pipeline}
 # Create a comprehensive BID analysis function
-analyze_dashboard_ux <- function(dashboard_config, telemetry_path = NULL) {
+analyze_dashboard_ux <- function(
+    dashboard_config,
+    telemetry_path = NULL,
+    telemetry_sensitivity = "moderate") {
   # Stage 1: Interpret (from configuration)
   interpret_stage <- bid_interpret(
     central_question = dashboard_config$central_question,
@@ -49,8 +52,13 @@ analyze_dashboard_ux <- function(dashboard_config, telemetry_path = NULL) {
 
   # If telemetry exists, integrate it into the workflow
   if (!is.null(telemetry_path) && file.exists(telemetry_path)) {
-    # Ingest telemetry and identify issues
-    telemetry_issues <- bid_telemetry(telemetry_path)
+    # Ingest telemetry with sensitivity preset (new in 0.3.2)
+    # Choose "strict" for new dashboards, "moderate" for established ones,
+    # or "relaxed" for mature, stable dashboards
+    telemetry_issues <- bid_telemetry(
+      telemetry_path,
+      thresholds = bid_telemetry_presets(telemetry_sensitivity)
+    )
 
     # Convert top issues to Notice stages
     notice_stages <- bid_notices(
@@ -179,6 +187,127 @@ dashboard_portfolio <- list(
 
 # Run portfolio analysis
 portfolio_results <- analyze_dashboard_portfolio(dashboard_portfolio)
+```
+
+### Telemetry Sensitivity Presets for Different Contexts
+
+The `bid_telemetry_presets()` function (new in 0.3.2) provides pre-configured threshold sets that eliminate manual threshold tuning. Choose the appropriate sensitivity based on your dashboard's maturity and criticality:
+
+```{r telemetry-presets}
+# STRICT: For critical applications or new dashboards
+# Flags even minor issues (e.g., inputs used by < 2% of sessions)
+critical_dashboard_analysis <- function(telemetry_path) {
+  # Use strict thresholds for critical business dashboards
+  issues <- bid_telemetry(
+    telemetry_path,
+    thresholds = bid_telemetry_presets("strict")
+  )
+
+  # Strict preset catches early warning signs
+  # Example thresholds:
+  #   - unused_input_threshold: 0.02 (2% usage)
+  #   - delay_threshold_secs: 20 seconds
+  #   - error_rate_threshold: 0.05 (5% of sessions)
+
+  return(issues)
+}
+
+# MODERATE: Default balanced approach for most applications
+standard_dashboard_analysis <- function(telemetry_path) {
+  # Balanced sensitivity for established dashboards
+  issues <- bid_telemetry(
+    telemetry_path,
+    thresholds = bid_telemetry_presets("moderate")
+  )
+
+  # Moderate preset provides good signal-to-noise ratio
+  # Example thresholds:
+  #   - unused_input_threshold: 0.05 (5% usage)
+  #   - delay_threshold_secs: 30 seconds
+  #   - error_rate_threshold: 0.1 (10% of sessions)
+
+  return(issues)
+}
+
+# RELAXED: For mature, stable dashboards
+mature_dashboard_analysis <- function(telemetry_path) {
+  # Only flag major issues in stable production dashboards
+  issues <- bid_telemetry(
+    telemetry_path,
+    thresholds = bid_telemetry_presets("relaxed")
+  )
+
+  # Relaxed preset focuses on severe problems
+  # Example thresholds:
+  #   - unused_input_threshold: 0.1 (10% usage)
+  #   - delay_threshold_secs: 60 seconds
+  #   - error_rate_threshold: 0.2 (20% of sessions)
+
+  return(issues)
+}
+
+# Adaptive sensitivity based on dashboard lifecycle
+adaptive_telemetry_analysis <- function(
+    telemetry_path,
+    dashboard_age_days,
+    is_critical = FALSE) {
+  # Choose sensitivity based on dashboard maturity and criticality
+  sensitivity <- if (is_critical) {
+    "strict"
+  } else if (dashboard_age_days < 30) {
+    "strict" # New dashboards need close monitoring
+  } else if (dashboard_age_days < 180) {
+    "moderate" # Maturing dashboards
+  } else {
+    "relaxed" # Stable, mature dashboards
+  }
+
+  issues <- bid_telemetry(
+    telemetry_path,
+    thresholds = bid_telemetry_presets(sensitivity)
+  )
+
+  cli::cli_alert_info(
+    "Using {sensitivity} sensitivity for {dashboard_age_days}-day-old dashboard"
+  )
+
+  return(issues)
+}
+
+# Compare findings across different sensitivity levels
+compare_sensitivity_levels <- function(telemetry_path) {
+  strict_issues <- bid_telemetry(
+    telemetry_path,
+    thresholds = bid_telemetry_presets("strict")
+  )
+
+  moderate_issues <- bid_telemetry(
+    telemetry_path,
+    thresholds = bid_telemetry_presets("moderate")
+  )
+
+  relaxed_issues <- bid_telemetry(
+    telemetry_path,
+    thresholds = bid_telemetry_presets("relaxed")
+  )
+
+  # Compare issue counts at different sensitivity levels
+  comparison <- data.frame(
+    sensitivity = c("strict", "moderate", "relaxed"),
+    total_issues = c(
+      nrow(strict_issues),
+      nrow(moderate_issues),
+      nrow(relaxed_issues)
+    ),
+    critical_issues = c(
+      nrow(filter(strict_issues, severity == "critical")),
+      nrow(filter(moderate_issues, severity == "critical")),
+      nrow(filter(relaxed_issues, severity == "critical"))
+    )
+  )
+
+  return(comparison)
+}
 ```
 
 ## Advanced Pattern 2: Custom Behavioral Science Extensions
@@ -451,17 +580,42 @@ define_ux_health_checks <- function() {
 }
 
 # Automated UX health reporting
-generate_ux_health_report <- function(monitoring_system, time_period = "week") {
+generate_ux_health_report <- function(
+    monitoring_system,
+    time_period = "week",
+    use_adaptive_sensitivity = TRUE) {
   health_data <- map(
     monitoring_system$telemetry_sources,
     function(source) {
-      issues <- bid_telemetry(source$path, time_filter = time_period)
+      # Use adaptive sensitivity based on dashboard maturity
+      if (use_adaptive_sensitivity && !is.null(source$dashboard_age_days)) {
+        sensitivity <- if (source$is_critical %||% FALSE) {
+          "strict"
+        } else if (source$dashboard_age_days < 30) {
+          "strict"
+        } else if (source$dashboard_age_days < 180) {
+          "moderate"
+        } else {
+          "relaxed"
+        }
+        thresholds <- bid_telemetry_presets(sensitivity)
+      } else {
+        # Default to moderate sensitivity
+        thresholds <- bid_telemetry_presets("moderate")
+        sensitivity <- "moderate"
+      }
+
+      issues <- bid_telemetry(
+        source$path,
+        thresholds = thresholds
+      )
 
       health_scores <- calculate_ux_health_scores(issues)
       trend_analysis <- calculate_ux_trends(issues, source$historical_data)
 
       list(
         dashboard = source$dashboard_name,
+        sensitivity_used = sensitivity,
         current_health = health_scores,
         trends = trend_analysis,
         recommendations = generate_health_recommendations(
@@ -543,18 +697,35 @@ monitor_dashboard_portfolio <- function() {
       list(
         dashboard_name = "Executive Dashboard",
         path = "exec_dashboard_telemetry.sqlite",
-        historical_data = "exec_dashboard_history.rds"
+        historical_data = "exec_dashboard_history.rds",
+        dashboard_age_days = 365, # Mature dashboard
+        is_critical = TRUE # Executive-facing = critical
       ),
       list(
         dashboard_name = "Sales Analytics",
         path = "sales_dashboard_telemetry.sqlite",
-        historical_data = "sales_dashboard_history.rds"
+        historical_data = "sales_dashboard_history.rds",
+        dashboard_age_days = 45, # Recently launched
+        is_critical = FALSE
+      ),
+      list(
+        dashboard_name = "Marketing Performance",
+        path = "marketing_dashboard_telemetry.sqlite",
+        historical_data = "marketing_dashboard_history.rds",
+        dashboard_age_days = 15, # Brand new
+        is_critical = FALSE
       )
     )
   )
 
-  # Generate weekly health report
-  weekly_report <- generate_ux_health_report(portfolio_monitoring)
+  # Generate weekly health report with adaptive sensitivity
+  # Executive Dashboard: uses "strict" (critical = TRUE)
+  # Sales Analytics: uses "moderate" (45 days old)
+  # Marketing Performance: uses "strict" (15 days old, new dashboard)
+  weekly_report <- generate_ux_health_report(
+    portfolio_monitoring,
+    use_adaptive_sensitivity = TRUE
+  )
 
   return(weekly_report)
 }
@@ -874,17 +1045,175 @@ build_bid_knowledge_base <- function(completed_projects) {
 }
 ```
 
+## Practical Example: End-to-End Workflow with Presets
+
+Here's a complete real-world example combining automated analysis with telemetry presets:
+
+```{r complete-workflow-example}
+# Real-world scenario: Quarterly UX review for multiple dashboards
+quarterly_ux_review <- function() {
+  # Dashboard portfolio with different maturity levels
+  dashboards <- list(
+    list(
+      name = "C-Suite Executive Dashboard",
+      telemetry_path = "data/exec_telemetry.sqlite",
+      age_days = 450,
+      is_critical = TRUE,
+      central_question = "Are executives getting insights efficiently?",
+      data_story = new_data_story(
+        hook = "Board meetings consume excessive time on data interpretation",
+        context = "Executive team needs faster decision support",
+        tension = "Current dashboard has too many options",
+        resolution = "Streamline to key metrics with progressive disclosure"
+      )
+    ),
+    list(
+      name = "Sales Team Analytics",
+      telemetry_path = "data/sales_telemetry.sqlite",
+      age_days = 60,
+      is_critical = FALSE,
+      central_question = "Why are sales reps abandoning the dashboard?",
+      data_story = new_data_story(
+        hook = "Sales dashboard usage dropped 40% in last month",
+        context = "Recently redesigned with new features",
+        tension = "Unclear if design or data quality issue",
+        resolution = "Use telemetry to identify friction points"
+      )
+    ),
+    list(
+      name = "Marketing Campaign Tracker",
+      telemetry_path = "data/marketing_telemetry.sqlite",
+      age_days = 10,
+      is_critical = FALSE,
+      central_question = "Is the new campaign dashboard intuitive?",
+      data_story = new_data_story(
+        hook = "Brand new dashboard for campaign tracking",
+        context = "Marketing team transitioning from Excel",
+        tension = "Need to catch UX issues early",
+        resolution = "Aggressive monitoring for first 30 days"
+      )
+    )
+  )
+
+  # Process each dashboard with appropriate sensitivity
+  results <- lapply(dashboards, function(dashboard) {
+    # Choose sensitivity based on criticality and maturity
+    sensitivity <- if (dashboard$is_critical) {
+      "strict"
+    } else if (dashboard$age_days < 30) {
+      "strict" # New dashboards
+    } else if (dashboard$age_days < 180) {
+      "moderate" # Maturing
+    } else {
+      "relaxed" # Stable
+    }
+
+    cli::cli_h2("Analyzing: {dashboard$name}")
+    cli::cli_alert_info(
+      "Dashboard age: {dashboard$age_days} days | Sensitivity: {sensitivity}"
+    )
+
+    # Run telemetry analysis with appropriate preset
+    issues <- bid_telemetry(
+      dashboard$telemetry_path,
+      thresholds = bid_telemetry_presets(sensitivity)
+    )
+
+    if (nrow(issues) == 0) {
+      cli::cli_alert_success("No significant UX issues detected")
+      return(NULL)
+    }
+
+    # Run full BID pipeline on top issues
+    interpret_stage <- bid_interpret(
+      central_question = dashboard$central_question,
+      data_story = dashboard$data_story
+    )
+
+    # Convert critical issues to Notice stages
+    critical_issues <- issues |>
+      filter(severity %in% c("critical", "high")) |>
+      slice_head(n = 3)
+
+    if (nrow(critical_issues) > 0) {
+      notices <- bid_notices(
+        issues = critical_issues,
+        previous_stage = interpret_stage
+      )
+
+      # Work through BID stages for primary issue
+      primary_notice <- notices[[1]]
+
+      anticipate_stage <- bid_anticipate(
+        previous_stage = primary_notice
+      )
+
+      # Use telemetry flags to inform structure
+      flags <- bid_flags(issues)
+      structure_stage <- bid_structure(
+        previous_stage = anticipate_stage,
+        telemetry_flags = flags
+      )
+
+      validate_stage <- bid_validate(
+        previous_stage = structure_stage
+      )
+
+      return(
+        list(
+          dashboard = dashboard$name,
+          sensitivity = sensitivity,
+          total_issues = nrow(issues),
+          critical_issues = nrow(critical_issues),
+          bid_analysis = validate_stage,
+          recommendations = extract_recommendations(validate_stage)
+        )
+      )
+    }
+
+    return(NULL)
+  })
+
+  # Filter out NULL results
+  results <- results[!sapply(results, is.null)]
+
+  # Generate executive summary
+  cli::cli_h1("Quarterly UX Review Summary")
+  cli::cli_alert_info("Analyzed {length(dashboards)} dashboards")
+  cli::cli_alert_warning(
+    "{length(results)} dashboards have critical UX issues requiring attention"
+  )
+
+  return(results)
+}
+
+# Helper to extract recommendations from validate stage
+extract_recommendations <- function(validate_stage) {
+  # This is a simplified example - customize based on your needs
+  if (inherits(validate_stage, "bid_stage")) {
+    suggestions <- safe_column_access(validate_stage, "suggestions")
+    if (!is.null(suggestions)) {
+      return(suggestions)
+    }
+  }
+  return("See full BID analysis for recommendations")
+}
+```
+
 ## Conclusion
 
 These advanced patterns enable you to:
 
-1. **Automate BID analysis** across dashboard portfolios
+1. **Automate BID analysis** across dashboard portfolios with intelligent sensitivity tuning
 2. **Extend the framework** with domain-specific concepts and stages
 3. **Integrate UX testing** with the same rigor as statistical analysis
-4. **Monitor UX health** continuously with data-driven alerts
+4. **Monitor UX health** continuously with data-driven alerts and adaptive thresholds
 5. **Embed behavioral science** systematically into data science workflows
+6. **Scale telemetry analysis** using presets that adapt to dashboard maturity and criticality
 
 **Key principle for advanced users**: Apply the same systematic, evidence-based approach you use for data analysis to user experience design. The BID framework provides the structure—your analytical skills provide the rigor.
+
+**New in v0.3.2**: The `bid_telemetry_presets()` function eliminates the need for manual threshold tuning, making it easier to scale UX analysis across multiple dashboards with varying maturity levels.
 
 For questions about advanced implementations, custom extensions, or enterprise deployment patterns, consider contributing to the package development at [github.com/jrwinget/bidux](https://github.com/jrwinget/bidux).
 
