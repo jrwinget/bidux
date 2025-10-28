@@ -42,7 +42,7 @@ bid_concepts <- function(search = NULL, fuzzy_match = TRUE, max_distance = 2) {
           tolower(concepts_data$concept),
           method = "jw"
         )
-        fuzzy_matches <- which(distances <= max_distance/10)
+        fuzzy_matches <- which(distances <= max_distance / 10)
         matches <- c(matches, fuzzy_matches)
       }
     }

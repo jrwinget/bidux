@@ -363,9 +363,10 @@ create_confusion_notice <- function(confusion_info, total_sessions) {
       impact_rate <- 0.1
     } else {
       # secure comparison using exact match
-      input_events <- events[events$event_type == "input" &
-        !is.na(events$input_id) &
-        events$input_id == input_id, ]
+      input_events <- events[events$event_type == "input" & !is.na(
+        events$input_id
+      ) & events$input_id == input_id,
+      ]
       affected_sessions <- max(0, total_sessions - length(unique(input_events$session_id)))
       impact_rate <- if (total_sessions > 0) affected_sessions / total_sessions else 0.0
     }
@@ -457,10 +458,10 @@ print.bid_issues <- function(x, ...) {
     top_issues <- issues_tbl[order(
       -match(issues_tbl$severity, c("critical", "high", "medium", "low")),
       -issues_tbl$impact_rate
-    ), ][1:min(3, nrow(issues_tbl)), ]
+    ), ][seq_len(min(3, nrow(issues_tbl))), ]
 
     cli::cli_h3("Top Priority Issues:")
-    for (i in 1:nrow(top_issues)) {
+    for (i in seq_len(nrow(top_issues))) {
       issue <- top_issues[i, ]
       impact_pct <- round(issue$impact_rate * 100, 1)
 

@@ -144,10 +144,9 @@ find_delayed_sessions <- function(
 
   # determine if there are issues
   if (
-    result$no_action_rate > no_action_rate_threshold ||
-      (!is.na(result$median_delay) &&
-        result$median_delay > threshold_seconds) ||
-      result$rate_over_threshold > delay_rate_threshold
+    result$no_action_rate > no_action_rate_threshold || (
+      !is.na(result$median_delay) && result$median_delay > threshold_seconds
+    ) || result$rate_over_threshold > delay_rate_threshold
   ) {
     result$has_issues <- TRUE
   }

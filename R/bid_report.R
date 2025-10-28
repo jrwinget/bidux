@@ -284,7 +284,7 @@ generate_text_report <- function(validate_stage, format, include_diagrams) {
 
         report <- c(report, prefix)
 
-        for (i in 1:min(3, nrow(bslib_suggestions))) {
+        for (i in seq_len(min(3, nrow(bslib_suggestions)))) {
           report <- c(
             report,
             paste0(
@@ -320,7 +320,7 @@ generate_text_report <- function(validate_stage, format, include_diagrams) {
 
         report <- c(report, prefix)
 
-        for (i in 1:min(3, nrow(shiny_suggestions))) {
+        for (i in seq_len(min(3, nrow(shiny_suggestions)))) {
           report <- c(
             report,
             paste0(

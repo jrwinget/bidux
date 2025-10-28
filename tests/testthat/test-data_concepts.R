@@ -74,8 +74,9 @@ test_that("bid_concept recommendations parameter works", {
 
     # With recommendations
     result_with_rec <- bid_concept(test_concept, add_recommendations = TRUE)
-    expect_true("recommendations" %in% names(result_with_rec) ||
-      length(result_with_rec) > 2)
+    expect_true("recommendations" %in% names(result_with_rec) || length(
+      result_with_rec) > 2
+    )
 
     # Without recommendations
     result_without_rec <- bid_concept(test_concept, add_recommendations = FALSE)

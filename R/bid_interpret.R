@@ -227,9 +227,10 @@ bid_interpret <- function(
         quiet = quiet
       )
     } else if (
-      !is.null(previous_stage) &&
-        (previous_stage$stage[1] == "Structure" ||
-          previous_stage$stage[1] == "Anticipate")
+      !is.null(previous_stage) && (
+        previous_stage$stage[1] == "Structure" ||
+          previous_stage$stage[1] == "Anticipate"
+      )
     ) {
       central_question <- paste0(
         "How can we refine our understanding of user needs for this dashboard?"
@@ -331,9 +332,10 @@ bid_interpret <- function(
         quiet = quiet
       )
     } else if (
-      !is.null(previous_stage) &&
-        (previous_stage$stage[1] == "Structure" ||
-          previous_stage$stage[1] == "Anticipate")
+      !is.null(previous_stage) && (
+        previous_stage$stage[1] == "Structure" ||
+          previous_stage$stage[1] == "Anticipate"
+      )
     ) {
       # iteration cycle data story
       data_story <- new_data_story(
