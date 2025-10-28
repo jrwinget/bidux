@@ -158,16 +158,19 @@ get_concepts_data <- function() {
 #' @keywords internal
 get_default_concepts_data <- function() {
   # use lazy loading with fallback
-  tryCatch({
-    load_concepts_data()
-  }, error = function(e) {
-    cli::cli_warn(c(
-      "!" = "Failed to load external concepts data",
-      "i" = "Using fallback concepts data",
-      "x" = e$message
-    ))
-    get_fallback_concepts_data()
-  })
+  tryCatch(
+    {
+      load_concepts_data()
+    },
+    error = function(e) {
+      cli::cli_warn(c(
+        "!" = "Failed to load external concepts data",
+        "i" = "Using fallback concepts data",
+        "x" = e$message
+      ))
+      get_fallback_concepts_data()
+    }
+  )
 }
 
 #' Validate loaded concepts data structure
@@ -176,11 +179,14 @@ get_default_concepts_data <- function() {
 #' @return Invisible NULL if valid, throws error otherwise
 #' @keywords internal
 validate_concepts_data_structure <- function(concepts_data) {
-  required_columns <- c("concept", "description", "category", "reference",
-                       "example", "implementation_tips", "related_concepts")
+  required_columns <- c(
+    "concept", "description", "category", "reference",
+    "example", "implementation_tips", "related_concepts"
+  )
 
   validate_data_frame(concepts_data, "concepts_data",
-                     required_columns = required_columns)
+    required_columns = required_columns
+  )
 
   if (nrow(concepts_data) == 0) {
     cli::cli_abort(standard_error_msg(

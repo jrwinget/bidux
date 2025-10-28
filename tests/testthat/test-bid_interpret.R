@@ -90,7 +90,7 @@ test_that("bid_interpret works with user personas", {
 # ==============================================================================
 
 test_that("bid_interpret validates data_story parameter", {
-expect_error(
+  expect_error(
     bid_interpret(
       central_question = "Test question",
       data_story = "not a list"
@@ -103,7 +103,7 @@ expect_error(
       central_question = "Test question",
       data_story = 123
     ),
-regexp = "data_story must be a bid_data_story object or list"
+    regexp = "data_story must be a bid_data_story object or list"
   )
 })
 
@@ -309,4 +309,244 @@ test_that("bid_interpret generates suggestions", {
   expect_true("suggestions" %in% names(result))
   expect_true(!is.na(result$suggestions[1]))
   expect_true(nchar(result$suggestions[1]) > 0)
+})
+
+# ==============================================================================
+# ADDITIONAL EDGE CASE COVERAGE TESTS
+# ==============================================================================
+
+test_that("bid_interpret handles user_personas as data.frame", {
+  personas_df <- data.frame(
+    name = c("Alice", "Bob"),
+    goals = c("Quick insights", "Deep analysis"),
+    pain_points = c("Complex UI", "Slow loading"),
+    technical_level = c("intermediate", "advanced"),
+    stringsAsFactors = FALSE
+  )
+
+  result <- bid_interpret(
+    central_question = "How to serve different user types?",
+    user_personas = personas_df
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_true("personas" %in% names(result))
+  expect_false(is.na(result$personas[1]))
+})
+
+test_that("bid_interpret handles persona data with missing names", {
+  expect_warning(
+    result <- bid_interpret(
+      central_question = "Test question",
+      user_personas = list(list(
+        goals = "Test goals",
+        pain_points = "Test pain points",
+        technical_level = "intermediate"
+      ))
+    ),
+    "deprecated list format"
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_true("personas" %in% names(result))
+})
+
+test_that("bid_interpret works with new_data_story() constructor", {
+  story <- new_data_story(
+    hook = "Users struggling with complexity",
+    context = "Dashboard has grown over time",
+    tension = "Features buried in menus",
+    resolution = "Simplify navigation",
+    audience = "Product managers"
+  )
+
+  result <- bid_interpret(
+    central_question = "How to simplify navigation?",
+    data_story = story
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_equal(result$hook[1], "Users struggling with complexity")
+  expect_equal(result$context[1], "Dashboard has grown over time")
+})
+
+test_that("bid_interpret validates user_personas S3 class structure", {
+  personas_df <- data.frame(
+    name = "Test Persona",
+    goals = "Test goals",
+    pain_points = "Test pain points",
+    technical_level = "beginner",
+    stringsAsFactors = FALSE
+  )
+  personas <- new_user_personas(personas_df)
+
+  result <- bid_interpret(
+    central_question = "Test question",
+    user_personas = personas
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_true("personas" %in% names(result))
+  expect_false(is.na(result$personas[1]))
+})
+
+test_that("bid_interpret handles various central_question lengths", {
+  # very short question
+  result_short <- bid_interpret(central_question = "How to improve?")
+  expect_s3_class(result_short, "bid_stage")
+  expect_match(result_short$suggestions[1], "specificity")
+
+  # very long question
+  long_question <- paste(rep("How can we improve the user experience?", 10), collapse = " ")
+  result_long <- bid_interpret(central_question = long_question)
+  expect_s3_class(result_long, "bid_stage")
+  expect_match(result_long$suggestions[1], "simplifying")
+
+  # appropriate length question
+  result_good <- bid_interpret(central_question = "How can we improve dashboard navigation for new users?")
+  expect_s3_class(result_good, "bid_stage")
+  expect_match(result_good$suggestions[1], "appropriately scoped")
+})
+
+test_that("bid_interpret handles data_story with different completeness levels", {
+  # complete story (100%) - has all elements
+  complete_story <- new_data_story(
+    hook = "Hook text",
+    context = "Context text",
+    tension = "Tension text",
+    resolution = "Resolution text"
+  )
+  result_complete <- bid_interpret(
+    central_question = "Test?",
+    data_story = complete_story
+  )
+  expect_s3_class(result_complete, "bid_stage")
+  expect_equal(result_complete$hook[1], "Hook text")
+  expect_equal(result_complete$tension[1], "Tension text")
+  expect_equal(result_complete$resolution[1], "Resolution text")
+
+  # minimal story (only context required)
+  minimal_story <- new_data_story(
+    context = "Context only"
+  )
+  result_minimal <- bid_interpret(
+    central_question = "Test?",
+    data_story = minimal_story
+  )
+  expect_s3_class(result_minimal, "bid_stage")
+  expect_equal(result_minimal$context[1], "Context only")
+})
+
+test_that("bid_interpret auto-generates personas from audience info", {
+  # test with executive audience
+  story_exec <- new_data_story(
+    hook = "Test hook",
+    context = "Test context",
+    audience = "Executive leadership team"
+  )
+  result_exec <- bid_interpret(
+    central_question = "Test?",
+    data_story = story_exec
+  )
+  expect_false(is.na(result_exec$personas[1]))
+
+  # test with analyst audience
+  story_analyst <- new_data_story(
+    hook = "Test hook",
+    context = "Test context",
+    audience = "Data analysts and scientists"
+  )
+  result_analyst <- bid_interpret(
+    central_question = "Test?",
+    data_story = story_analyst
+  )
+  expect_false(is.na(result_analyst$personas[1]))
+
+  # test with sales audience
+  story_sales <- new_data_story(
+    hook = "Test hook",
+    context = "Test context",
+    audience = "Sales representatives"
+  )
+  result_sales <- bid_interpret(
+    central_question = "Test?",
+    data_story = story_sales
+  )
+  expect_false(is.na(result_sales$personas[1]))
+})
+
+test_that("bid_interpret extracts audience from previous_stage", {
+  previous <- create_sample_previous_stage()
+  previous$target_audience <- "Marketing team"
+
+  result <- bid_interpret(
+    previous_stage = previous,
+    central_question = "Test question"
+  )
+
+  expect_s3_class(result, "bid_stage")
+  # should create persona from target_audience if no user_personas provided
+  expect_false(is.na(result$personas[1]))
+})
+
+test_that("bid_interpret handles invalid user_personas gracefully", {
+  expect_error(
+    bid_interpret(
+      central_question = "Test?",
+      user_personas = "not a list or data frame"
+    ),
+    "user_personas must be"
+  )
+
+  expect_error(
+    bid_interpret(
+      central_question = "Test?",
+      user_personas = 123
+    ),
+    "user_personas must be"
+  )
+})
+
+test_that("bid_interpret quiet parameter suppresses info messages", {
+  # quiet parameter should work - just verify the function runs
+  result1 <- bid_interpret(
+    central_question = "Test question",
+    quiet = TRUE
+  )
+  expect_s3_class(result1, "bid_stage")
+
+  result2 <- bid_interpret(
+    central_question = "Test question",
+    quiet = FALSE
+  )
+  expect_s3_class(result2, "bid_stage")
+})
+
+test_that("bid_interpret works with different previous_stage types", {
+  # from Structure stage
+  structure_stage <- tibble::tibble(
+    stage = "Structure",
+    layout = "grid",
+    concepts = "Visual Hierarchy",
+    timestamp = Sys.time()
+  )
+
+  result_structure <- bid_interpret(
+    previous_stage = structure_stage,
+    central_question = "Refine understanding?"
+  )
+  expect_s3_class(result_structure, "bid_stage")
+
+  # from Anticipate stage
+  anticipate_stage <- tibble::tibble(
+    stage = "Anticipate",
+    bias_mitigations = "anchoring: test",
+    timestamp = Sys.time()
+  )
+
+  result_anticipate <- bid_interpret(
+    previous_stage = anticipate_stage,
+    central_question = "Refine understanding?"
+  )
+  expect_s3_class(result_anticipate, "bid_stage")
 })

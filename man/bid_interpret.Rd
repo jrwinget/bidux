@@ -43,10 +43,10 @@ central question and the data storytelling narrative. It represents stage 1
 in the BID framework.
 }
 \examples{
-# Basic usage
+# Recommended: use new_data_story() with flat API
 interpret_result <- bid_interpret(
   central_question = "What drives the decline in user engagement?",
-  data_story = list(
+  data_story = new_data_story(
     hook = "Declining trend in engagement",
     context = "Previous high engagement levels",
     tension = "Unexpected drop",
@@ -54,31 +54,44 @@ interpret_result <- bid_interpret(
   )
 )
 
-# With user personas
+# With user personas (using data.frame)
 interpret_personas <- bid_interpret(
   central_question = "How can we improve data discovery?",
-  data_story = list(
+  data_story = new_data_story(
     hook = "Users are missing key insights",
     context = "Critical data is available but overlooked",
     tension = "Time-sensitive decisions are delayed",
-    resolution = "Highlight key metrics more effectively"
+    resolution = "Highlight key metrics more effectively",
+    audience = "Data analysts and executives"
   ),
-  user_personas = list(
-    list(
-      name = "Sara, Data Analyst",
-      goals = "Needs to quickly find patterns in data",
-      pain_points = "Gets overwhelmed by too many visualizations",
-      technical_level = "advanced"
+  user_personas = data.frame(
+    name = c("Sara, Data Analyst", "Marcus, Executive"),
+    goals = c(
+      "Needs to quickly find patterns in data",
+      "Wants high-level insights at a glance"
     ),
-    list(
-      name = "Marcus, Executive",
-      goals = "Wants high-level insights at a glance",
-      pain_points = "Limited time to analyze detailed reports",
-      technical_level = "beginner"
-    )
+    pain_points = c(
+      "Gets overwhelmed by too many visualizations",
+      "Limited time to analyze detailed reports"
+    ),
+    technical_level = c("advanced", "beginner"),
+    stringsAsFactors = FALSE
   )
 )
 
 summary(interpret_personas)
+
+# Legacy list format still works (with deprecation warning)
+\dontrun{
+interpret_legacy <- bid_interpret(
+  central_question = "How can we improve UX?",
+  data_story = list(
+    hook = "Users struggling",
+    context = "Dashboard complexity",
+    tension = "High abandonment rate",
+    resolution = "Simplify interface"
+  )
+)
+}
 
 }

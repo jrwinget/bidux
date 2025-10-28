@@ -252,7 +252,7 @@ test_that(".calculate_severity_metrics preserves underscores in input_id", {
 
   # verify underscores were preserved (not converted to spaces)
   expect_equal(result$affected_sessions, 1L)
-  expect_equal(result$impact_rate, 1/3, tolerance = 0.01)
+  expect_equal(result$impact_rate, 1 / 3, tolerance = 0.01)
 })
 
 test_that(".calculate_severity_metrics handles error patterns", {

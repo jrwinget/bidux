@@ -1,11 +1,3 @@
-# ==============================================================================
-# SHARED TELEMETRY UTILITIES
-# ==============================================================================
-#
-# Shared helper functions for telemetry analysis to reduce code duplication
-# and improve maintainability across telemetry modules.
-#
-
 #' Calculate total unique sessions from events
 #'
 #' @param events Data frame of telemetry events with session_id column
@@ -67,7 +59,6 @@ calculate_severity <- function(
     critical_threshold = 0.3,
     high_threshold = 0.1,
     medium_threshold = 0.05) {
-
   if (!is.numeric(impact_rate) || length(impact_rate) != 1) {
     return("unknown")
   }

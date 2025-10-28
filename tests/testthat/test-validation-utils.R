@@ -97,8 +97,9 @@ test_that("create_bid_result creates consistent result structures", {
   # with attributes
   attributes <- list(method = "test", context = "example")
   result_with_attrs <- create_bid_result(data_list, "test_class",
-                                        attributes = attributes,
-                                        return_tibble = FALSE)
+    attributes = attributes,
+    return_tibble = FALSE
+  )
 
   expect_equal(attr(result_with_attrs, "method"), "test")
   expect_equal(attr(result_with_attrs, "context"), "example")
@@ -106,7 +107,8 @@ test_that("create_bid_result creates consistent result structures", {
   # preserves existing timestamp
   data_with_timestamp <- list(text = "a", timestamp = Sys.time())
   result_with_time <- create_bid_result(data_with_timestamp, "test_class",
-                                       return_tibble = FALSE)
+    return_tibble = FALSE
+  )
 
   expect_true("timestamp" %in% names(result_with_time))
   expect_equal(length(unique(result_with_time$timestamp)), 1)

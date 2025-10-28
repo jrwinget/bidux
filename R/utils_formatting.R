@@ -1,10 +1,3 @@
-# ==============================================================================
-# FORMATTING UTILITIES
-# ==============================================================================
-#
-# Functions for text truncation, data formatting, and serialization.
-#
-
 #' Function for truncating text in messages
 #'
 #' @param text Object to check

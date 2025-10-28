@@ -2,7 +2,7 @@
 % Please edit documentation in R/suggest_rules.R
 \name{get_consolidated_suggestion_rules}
 \alias{get_consolidated_suggestion_rules}
-\title{Centralized Suggestion Rules for BID Framework}
+\title{Get consolidated suggestion rules for all BID stages}
 \usage{
 get_consolidated_suggestion_rules()
 }
@@ -10,11 +10,6 @@ get_consolidated_suggestion_rules()
 Named list of suggestion rules by stage
 }
 \description{
-This file consolidates simple suggestion rules for Interpret, Notice, and
-Validate stages to reduce duplication and provide consistent messaging
-across the BID framework.
-Get consolidated suggestion rules for all BID stages
-
 Returns a structured list of suggestion rules for each BID stage.
 These rules help generate consistent, context-aware suggestions
 based on user input patterns and common issues.

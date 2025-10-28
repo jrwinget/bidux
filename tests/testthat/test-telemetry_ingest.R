@@ -157,10 +157,10 @@ test_that("read_telemetry_json handles different JSON formats", {
   # Test JSON array format
   json_array_file <- file.path(temp_dir, "test_array.json")
   writeLines(c(
-    '[',
+    "[",
     '  {"timestamp": "2023-01-01 10:00:00", "session_id": "s1", "event_type": "input"},',
     '  {"timestamp": "2023-01-01 10:01:00", "session_id": "s2", "event_type": "login"}',
-    ']'
+    "]"
   ), json_array_file)
 
   result_array <- read_telemetry_json(json_array_file)
@@ -185,7 +185,7 @@ test_that("read_telemetry_json handles invalid JSON", {
   # Test invalid JSON
   invalid_json_file <- file.path(temp_dir, "invalid.json")
   writeLines(c(
-    '{"timestamp": "2023-01-01 10:00:00", "session_id": "s1"',  # missing closing brace
+    '{"timestamp": "2023-01-01 10:00:00", "session_id": "s1"', # missing closing brace
     '{"invalid": "json"}'
   ), invalid_json_file)
 
@@ -205,14 +205,14 @@ test_that("read_telemetry_json filters events without required fields", {
   # Test JSON with missing required fields
   incomplete_json_file <- file.path(temp_dir, "incomplete.json")
   writeLines(c(
-    '{"timestamp": "2023-01-01 10:00:00", "session_id": "s1", "event_type": "input"}',  # valid
-    '{"timestamp": "2023-01-01 10:01:00", "session_id": "s2"}',  # missing event_type
-    '{"session_id": "s3", "event_type": "login"}'  # missing timestamp
+    '{"timestamp": "2023-01-01 10:00:00", "session_id": "s1", "event_type": "input"}', # valid
+    '{"timestamp": "2023-01-01 10:01:00", "session_id": "s2"}', # missing event_type
+    '{"session_id": "s3", "event_type": "login"}' # missing timestamp
   ), incomplete_json_file)
 
   result <- read_telemetry_json(incomplete_json_file)
   expect_true(is.data.frame(result))
-  expect_equal(nrow(result), 1)  # Only one valid event
+  expect_equal(nrow(result), 1) # Only one valid event
   expect_equal(result$session_id[1], "s1")
 
   # Clean up
@@ -356,4 +356,111 @@ test_that("bid_ingest_telemetry handles custom events_table parameter", {
   )
 
   unlink(temp_db2)
+})
+
+test_that("bid_telemetry_presets returns correct structure", {
+  # test default (moderate)
+  presets_default <- bid_telemetry_presets()
+  expect_type(presets_default, "list")
+  expect_named(presets_default, c(
+    "unused_input_threshold",
+    "delay_threshold_secs",
+    "error_rate_threshold",
+    "navigation_threshold",
+    "rapid_change_window",
+    "rapid_change_count"
+  ))
+
+  # test all three preset types
+  presets_strict <- bid_telemetry_presets("strict")
+  presets_moderate <- bid_telemetry_presets("moderate")
+  presets_relaxed <- bid_telemetry_presets("relaxed")
+
+  expect_type(presets_strict, "list")
+  expect_type(presets_moderate, "list")
+  expect_type(presets_relaxed, "list")
+})
+
+test_that("bid_telemetry_presets has correct threshold ordering", {
+  strict <- bid_telemetry_presets("strict")
+  moderate <- bid_telemetry_presets("moderate")
+  relaxed <- bid_telemetry_presets("relaxed")
+
+  # strict should be more sensitive (lower thresholds for detection)
+  expect_lt(strict$unused_input_threshold, moderate$unused_input_threshold)
+  expect_lt(moderate$unused_input_threshold, relaxed$unused_input_threshold)
+
+  # strict should have shorter delay threshold
+  expect_lt(strict$delay_threshold_secs, moderate$delay_threshold_secs)
+  expect_lt(moderate$delay_threshold_secs, relaxed$delay_threshold_secs)
+
+  # strict should have lower error rate threshold
+  expect_lt(strict$error_rate_threshold, moderate$error_rate_threshold)
+  expect_lt(moderate$error_rate_threshold, relaxed$error_rate_threshold)
+
+  # strict should have lower navigation threshold
+  expect_lt(strict$navigation_threshold, moderate$navigation_threshold)
+  expect_lt(moderate$navigation_threshold, relaxed$navigation_threshold)
+
+  # strict should have longer confusion window
+  expect_gt(strict$rapid_change_window, relaxed$rapid_change_window)
+
+  # strict should have lower confusion change count
+  expect_lt(strict$rapid_change_count, moderate$rapid_change_count)
+  expect_lt(moderate$rapid_change_count, relaxed$rapid_change_count)
+})
+
+test_that("bid_telemetry_presets validates input", {
+  # test invalid preset name
+  expect_error(
+    bid_telemetry_presets("invalid"),
+    "'arg' should be one of"
+  )
+})
+
+test_that("bid_telemetry_presets works with bid_ingest_telemetry", {
+  # create minimal valid telemetry data
+  temp_file <- tempfile(fileext = ".json")
+  sample_events <- c(
+    '{"timestamp": "2023-01-01 10:00:00", "session_id": "s1", "event_type": "login"}',
+    '{"timestamp": "2023-01-01 10:00:05", "session_id": "s1", "event_type": "input", "input_id": "btn1"}'
+  )
+  writeLines(sample_events, temp_file)
+
+  # test that presets can be passed to bid_ingest_telemetry
+  strict_presets <- bid_telemetry_presets("strict")
+  expect_no_error({
+    result <- bid_ingest_telemetry(temp_file, thresholds = strict_presets)
+  })
+
+  relaxed_presets <- bid_telemetry_presets("relaxed")
+  expect_no_error({
+    result <- bid_ingest_telemetry(temp_file, thresholds = relaxed_presets)
+  })
+
+  unlink(temp_file)
+})
+
+test_that("bid_telemetry_presets thresholds are reasonable", {
+  strict <- bid_telemetry_presets("strict")
+  moderate <- bid_telemetry_presets("moderate")
+  relaxed <- bid_telemetry_presets("relaxed")
+
+  # all thresholds should be numeric
+  expect_true(all(sapply(strict, is.numeric)))
+  expect_true(all(sapply(moderate, is.numeric)))
+  expect_true(all(sapply(relaxed, is.numeric)))
+
+  # percentage thresholds should be between 0 and 1
+  expect_true(strict$unused_input_threshold >= 0 && strict$unused_input_threshold <= 1)
+  expect_true(moderate$error_rate_threshold >= 0 && moderate$error_rate_threshold <= 1)
+  expect_true(relaxed$navigation_threshold >= 0 && relaxed$navigation_threshold <= 1)
+
+  # time thresholds should be positive
+  expect_gt(strict$delay_threshold_secs, 0)
+  expect_gt(moderate$rapid_change_window, 0)
+
+  # count thresholds should be positive integers
+  expect_gt(strict$rapid_change_count, 0)
+  expect_equal(strict$rapid_change_count, round(strict$rapid_change_count))
 })

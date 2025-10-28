@@ -78,7 +78,10 @@ bid_validate <- function(
 
   if (is.null(summary_panel)) {
     summary_panel <- generate_summary_panel_suggestion(previous_stage)
-    bid_alert_info(paste0("Suggested summary panel: ", summary_panel), quiet = quiet)
+    bid_alert_info(
+      paste0("Suggested summary panel: ", summary_panel),
+      quiet = quiet
+    )
   }
 
   if (is.null(collaboration)) {
@@ -502,146 +505,26 @@ generate_validation_suggestions <- function(
 }
 
 extract_previous_stage_info <- function(previous_stage) {
-  info <- list()
+  # use consolidated DRY helper from utils_stage.R
+  fields <- c(
+    "central_question",
+    "hook",
+    "problem",
+    "theory",
+    "audience",
+    "personas",
+    "bias_mitigations",
+    "layout",
+    "concepts",
+    "accessibility"
+  )
 
-  stage_name <- previous_stage$stage[1]
+  info <- extract_previous_stage_fields(previous_stage, fields)
 
-  if (stage_name == "Anticipate") {
-    info$bias <- safe_column_access(
-      previous_stage,
-      "bias_mitigations",
-      NA_character_
-    )
-    info$interaction <- safe_column_access(
-      previous_stage,
-      "interaction_principles",
-      NA_character_
-    )
-
-    # get information from any previous stages
-    info$layout <- safe_column_access(
-      previous_stage,
-      "previous_layout",
-      NA_character_
-    )
-    info$concepts <- safe_column_access(
-      previous_stage,
-      "previous_concepts",
-      NA_character_
-    )
-    info$accessibility <- safe_column_access(
-      previous_stage,
-      "previous_accessibility",
-      NA_character_
-    )
-    info$central_question <- safe_column_access(
-      previous_stage,
-      "previous_central_question",
-      NA_character_
-    )
-    info$problem <- safe_column_access(
-      previous_stage,
-      "previous_problem",
-      NA_character_
-    )
-    info$theory <- safe_column_access(
-      previous_stage,
-      "previous_theory",
-      NA_character_
-    )
-  } else if (stage_name == "Structure") {
-    info$layout <- safe_column_access(previous_stage, "layout", NA_character_)
-    info$concepts <- safe_column_access(
-      previous_stage,
-      "concepts",
-      NA_character_
-    )
-    info$bias <- safe_column_access(
-      previous_stage,
-      "previous_bias",
-      NA_character_
-    )
-    info$accessibility <- safe_column_access(
-      previous_stage,
-      "accessibility",
-      NA_character_
-    )
-
-    # get information from previous stages
-    info$central_question <- safe_column_access(
-      previous_stage,
-      "previous_central_question",
-      NA_character_
-    )
-    info$hook <- safe_column_access(
-      previous_stage,
-      "previous_hook",
-      NA_character_
-    )
-    info$problem <- safe_column_access(
-      previous_stage,
-      "previous_problem",
-      NA_character_
-    )
-    info$theory <- safe_column_access(
-      previous_stage,
-      "previous_theory",
-      NA_character_
-    )
-    info$audience <- safe_column_access(
-      previous_stage,
-      "previous_audience",
-      NA_character_
-    )
-    info$personas <- safe_column_access(
-      previous_stage,
-      "previous_personas",
-      NA_character_
-    )
-  } else if (stage_name == "Interpret") {
-    info$central_question <- safe_column_access(
-      previous_stage,
-      "central_question",
-      NA_character_
-    )
-    info$hook <- safe_column_access(
-      previous_stage,
-      "hook",
-      NA_character_
-    )
-    info$audience <- safe_column_access(
-      previous_stage,
-      "audience",
-      NA_character_
-    )
-    info$personas <- safe_column_access(
-      previous_stage,
-      "personas",
-      NA_character_
-    )
-
-    # get information from previous stages
-    info$problem <- safe_column_access(
-      previous_stage,
-      "previous_problem",
-      NA_character_
-    )
-    info$theory <- safe_column_access(
-      previous_stage,
-      "previous_theory",
-      NA_character_
-    )
-  } else if (stage_name == "Notice") {
-    info$problem <- safe_column_access(
-      previous_stage,
-      "problem",
-      NA_character_
-    )
-    info$theory <- safe_column_access(
-      previous_stage,
-      "theory",
-      NA_character_
-    )
+  # rename bias_mitigations to bias for backward compatibility
+  if ("bias_mitigations" %in% names(info)) {
+    info$bias <- info$bias_mitigations
+    info$bias_mitigations <- NULL
   }
 
   return(info)

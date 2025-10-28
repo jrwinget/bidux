@@ -1,5 +1,3 @@
-# ===== PARAMETER VALIDATION UTILITIES =====
-
 #' Validate required parameters are provided
 #' @param ... Named parameters to validate
 #' @return NULL invisibly if valid, stops with error otherwise
@@ -178,8 +176,9 @@ validate_previous_stage <- function(previous_stage = NULL, current_stage) {
   # 1) check current_stage is exactly 1 stage
   if (
     !(is.character(current_stage) &&
-      length(current_stage) == 1 &&
-      current_stage %in% valid_stages)
+        length(current_stage) == 1 &&
+        current_stage %in% valid_stages
+    )
   ) {
     cli::cli_abort(c(
       "x" = glue::glue("Invalid current stage: {current_stage}"),
@@ -273,8 +272,8 @@ validate_previous_stage <- function(previous_stage = NULL, current_stage) {
     )
 
     if (current_stage %in% names(discouraged_transitions) &&
-      prev_stage_name %in% discouraged_transitions[[current_stage]] &&
-      (!in_test_env || calling_test)) {
+          prev_stage_name %in% discouraged_transitions[[current_stage]] &&
+          (!in_test_env || calling_test)) {
       cli::cli_warn(c(
         "!" = glue::glue("Discouraged stage progression: {prev_stage_name} -> {current_stage}"),
         "i" = "Consider using Notice and/or Anticipate stages first for better workflow"
@@ -295,6 +294,19 @@ validate_user_personas <- function(user_personas) {
     return(invisible(NULL))
   }
 
+  # handle new S3 class format (bid_user_personas)
+  if (inherits(user_personas, "bid_user_personas")) {
+    required_cols <- c("name", "goals", "pain_points", "technical_level")
+    if (!all(required_cols %in% names(user_personas))) {
+      return(FALSE)
+    }
+    if (nrow(user_personas) == 0) {
+      return(FALSE)
+    }
+    return(TRUE)
+  }
+
+  # handle legacy list format
   if (!is.list(user_personas)) {
     cli::cli_abort(c(
       "x" = "user_personas must be a list",
@@ -381,8 +393,6 @@ validate_logical_param <- function(value, param_name, allow_null = FALSE) {
 
   invisible(TRUE)
 }
-
-# ===== ENHANCED VALIDATION FUNCTIONS =====
 
 #' Create standardized error messages with context and suggestions
 #' @param message Main error message
@@ -573,9 +583,14 @@ validate_choice <- function(value, choices, param_name, allow_null = FALSE) {
 #' @param allow_na Whether NA values are allowed
 #' @param choices Valid choices for character parameters
 #' @keywords internal
-validate_param <- function(value, arg_name, type = "character", min_length = 1,
-                          max_length = Inf, allow_na = FALSE, choices = NULL) {
-
+validate_param <- function(
+    value,
+    arg_name,
+    type = "character",
+    min_length = 1,
+    max_length = Inf,
+    allow_na = FALSE,
+    choices = NULL) {
   # check if missing
   if (missing(value)) {
     stop(sprintf("Argument '%s' is missing with no default", arg_name), call. = FALSE)
@@ -621,7 +636,3 @@ validate_param <- function(value, arg_name, type = "character", min_length = 1,
 
   invisible(value)
 }
-
-# Removed duplicate create_bid_result function (moved to s3_classes.R)
-
-# note: %||% operator is defined in utils_core.R (canonical version)

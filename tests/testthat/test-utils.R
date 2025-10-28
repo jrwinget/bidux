@@ -521,7 +521,7 @@ test_that("get_accessibility_advice works correctly", {
   expect_gt(nchar(result_null), 0)
 })
 
-test_that("safe_data_story_access works correctly", {
+test_that("safe_data_story_access works with legacy plain list", {
   data_story <- list(
     hook = "Test hook",
     context = "Test context",
@@ -533,6 +533,41 @@ test_that("safe_data_story_access works correctly", {
   expect_true(is.na(safe_data_story_access(data_story, "resolution"))) # empty
   expect_true(is.na(safe_data_story_access(data_story, "missing")))
   expect_true(is.na(safe_data_story_access(NULL, "hook")))
+})
+
+test_that("safe_data_story_access works with new flat format", {
+  # create new flat format data_story
+  data_story_flat <- new_data_story(
+    hook = "Flat hook",
+    context = "Flat context",
+    tension = "Flat tension",
+    resolution = "Flat resolution",
+    audience = "test audience",
+    metrics = "metric1, metric2"
+  )
+
+  expect_equal(safe_data_story_access(data_story_flat, "hook"), "Flat hook")
+  expect_equal(safe_data_story_access(data_story_flat, "context"), "Flat context")
+  expect_equal(safe_data_story_access(data_story_flat, "tension"), "Flat tension")
+  expect_equal(safe_data_story_access(data_story_flat, "resolution"), "Flat resolution")
+  expect_equal(safe_data_story_access(data_story_flat, "audience"), "test audience")
+  expect_equal(safe_data_story_access(data_story_flat, "metrics"), "metric1, metric2")
+})
+
+test_that("safe_data_story_access works with old nested format", {
+  # create old nested format data_story with deprecation warning suppression
+  suppressWarnings({
+    data_story_nested <- new_data_story(
+      context = "Nested context",
+      variables = list(hook = "Nested hook", tension = "Nested tension"),
+      relationships = list(resolution = "Nested resolution")
+    )
+  })
+
+  expect_equal(safe_data_story_access(data_story_nested, "context"), "Nested context")
+  expect_equal(safe_data_story_access(data_story_nested, "hook"), "Nested hook")
+  expect_equal(safe_data_story_access(data_story_nested, "tension"), "Nested tension")
+  expect_equal(safe_data_story_access(data_story_nested, "resolution"), "Nested resolution")
 })
 
 # ==============================================================================

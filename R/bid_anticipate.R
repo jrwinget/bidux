@@ -62,15 +62,24 @@ bid_anticipate <- function(
     quiet = NULL,
     ...) {
   if (missing(previous_stage) || is.null(previous_stage)) {
-    stop("Required parameter 'previous_stage' must be provided", call. = FALSE)
+    cli::cli_abort(standard_error_msg(
+      "Required parameter 'previous_stage' must be provided",
+      suggestions = "Provide the output from a previous BID stage function"
+    ))
   }
 
   # handle deprecated interaction_principles parameter via ...
   dots <- list(...)
   if ("interaction_principles" %in% names(dots)) {
     cli::cli_warn(c(
-      "!" = "The 'interaction_principles' parameter has been deprecated and removed.",
-      "i" = "Interaction principles are no longer explicitly tracked in the Anticipate stage.",
+      "!" = paste(
+        "The 'interaction_principles' parameter has been",
+        "deprecated and removed."
+      ),
+      "i" = paste(
+        "Interaction principles are no longer explicitly tracked",
+        "in the Anticipate stage."
+      ),
       "i" = "This parameter will be ignored in this version."
     ))
     # remove from dots to avoid issues
@@ -81,7 +90,10 @@ bid_anticipate <- function(
   if (length(dots) > 0) {
     unexpected_params <- names(dots)
     cli::cli_warn(c(
-      "!" = "Unexpected parameters provided: {paste(unexpected_params, collapse = ', ')}",
+      "!" = paste(
+        "Unexpected parameters provided:",
+        paste(unexpected_params, collapse = ", ")
+      ),
       "i" = "These will be ignored."
     ))
   }
@@ -95,7 +107,10 @@ bid_anticipate <- function(
       if (!validate_bias_mitigations(bias_mitigations)) {
         cli::cli_abort(standard_error_msg(
           "Invalid bid_bias_mitigations object",
-          suggestions = "Use new_bias_mitigations() constructor to create valid objects"
+          suggestions = paste(
+            "Use new_bias_mitigations() constructor to",
+            "create valid objects"
+          )
         ))
       }
     } else if (is.list(bias_mitigations)) {
@@ -446,7 +461,10 @@ bid_anticipate <- function(
       implementation <- paste(
         tools::toTitleCase(bias_name),
         "mitigation:",
-        normalize_text(bias_info$implementation_tips, remove_trailing_punct = TRUE)
+        normalize_text(
+          bias_info$implementation_tips,
+          remove_trailing_punct = TRUE
+        )
       )
     } else {
       implementation <- paste(

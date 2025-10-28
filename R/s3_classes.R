@@ -2,52 +2,132 @@
 #'
 #' @description
 #' Creates a structured data story object for use in bid_interpret() and other
-#' bidux functions. Replaces nested list structures with a validated S3 class.
+#' bidux functions. The flattened API (hook, context, tension, resolution) is
+#' recommended for most users. The nested format (variables, relationships) is
+#' still supported for backward compatibility.
 #'
+#' @param hook Character string for the story hook (attention-grabbing opening)
 #' @param context Character string describing the data context
-#' @param variables List of variable descriptions or relationships
-#' @param relationships List describing data relationships
-#' @param metadata Optional metadata list
+#' @param tension Character string describing the problem or tension
+#' @param resolution Character string describing the resolution or next steps
+#' @param ... Optional additional fields (audience, metrics, visual_approach, etc.)
+#' @param variables DEPRECATED. List of variable descriptions (use flat arguments instead)
+#' @param relationships DEPRECATED. List describing data relationships (use flat arguments instead)
 #'
 #' @return A bid_data_story S3 object
 #'
 #' @examples
-#' \dontrun{
+#' # Recommended: flat API
 #' story <- new_data_story(
-#'   context = "user engagement analysis",
-#'   variables = list(clicks = "number of clicks", sessions = "session count"),
-#'   relationships = list(engagement = "clicks per session")
+#'   hook = "User engagement is declining",
+#'   context = "Our dashboard usage has dropped 30% this quarter",
+#'   tension = "We don't know if it's UX issues or changing user needs",
+#'   resolution = "Analyze telemetry to identify friction points"
 #' )
-#' }
+#'
+#' # With optional fields
+#' story_detailed <- new_data_story(
+#'   hook = "Revenue dashboards are underutilized",
+#'   context = "Only 40% of sales team uses the new revenue dashboard",
+#'   tension = "Critical metrics are being missed",
+#'   resolution = "Redesign with behavioral science principles",
+#'   audience = "Sales team",
+#'   metrics = "adoption_rate, time_to_insight"
+#' )
 #'
 #' @export
-new_data_story <- function(context, variables = list(), relationships = list(), metadata = NULL) {
-  validate_character_param(context, "context", required = TRUE)
+new_data_story <- function(
+    hook = NULL,
+    context = NULL,
+    tension = NULL,
+    resolution = NULL,
+    variables = NULL,
+    relationships = NULL,
+    ...) {
+  # detect if using deprecated nested format
+  using_nested_format <- !is.null(variables) || !is.null(relationships)
 
-  if (!is.list(variables)) {
-    cli::cli_abort(standard_error_msg(
-      "Parameter 'variables' must be a list",
-      context = glue::glue("You provided: {class(variables)[1]}")
+  if (using_nested_format) {
+    # backward compatibility: user provided variables/relationships
+    cli::cli_warn(c(
+      "!" = "Using deprecated nested format for data_story",
+      "i" = "The flat API is now recommended: new_data_story(hook, context, tension, resolution)",
+      "i" = "Nested format (variables, relationships) will be removed in bidux 0.4.0"
     ))
-  }
 
-  if (!is.list(relationships)) {
-    cli::cli_abort(standard_error_msg(
-      "Parameter 'relationships' must be a list",
-      context = glue::glue("You provided: {class(relationships)[1]}")
-    ))
-  }
+    # validate old parameters
+    if (is.null(context)) {
+      cli::cli_abort(standard_error_msg(
+        "Parameter 'context' is required",
+        suggestions = "Provide context even when using nested format"
+      ))
+    }
+    validate_character_param(context, "context", required = TRUE)
 
-  structure(
-    list(
-      context = context,
-      variables = variables,
-      relationships = relationships,
-      metadata = metadata,
-      created_at = Sys.time()
-    ),
-    class = c("bid_data_story", "list")
-  )
+    if (!is.null(variables) && !is.list(variables)) {
+      cli::cli_abort(standard_error_msg(
+        "Parameter 'variables' must be a list",
+        context = glue::glue("You provided: {class(variables)[1]}")
+      ))
+    }
+
+    if (!is.null(relationships) && !is.list(relationships)) {
+      cli::cli_abort(standard_error_msg(
+        "Parameter 'relationships' must be a list",
+        context = glue::glue("You provided: {class(relationships)[1]}")
+      ))
+    }
+
+    # preserve old structure for backward compatibility
+    variables <- variables %||% list()
+    relationships <- relationships %||% list()
+
+    structure(
+      list(
+        context = context,
+        variables = variables,
+        relationships = relationships,
+        metadata = list(...),
+        created_at = Sys.time()
+      ),
+      class = c("bid_data_story", "list")
+    )
+  } else {
+    # new flat format: hook, context, tension, resolution
+    # at least context is required
+    if (is.null(context)) {
+      cli::cli_abort(standard_error_msg(
+        "Parameter 'context' is required",
+        suggestions = c(
+          "Provide context: new_data_story(context = 'your context')",
+          "Or provide full story: new_data_story(hook, context, tension, resolution)"
+        )
+      ))
+    }
+
+    validate_character_param(context, "context", required = TRUE)
+
+    # validate other fields if provided
+    if (!is.null(hook)) validate_character_param(hook, "hook", required = FALSE)
+    if (!is.null(tension)) validate_character_param(tension, "tension", required = FALSE)
+    if (!is.null(resolution)) validate_character_param(resolution, "resolution", required = FALSE)
+
+    # capture additional fields from ...
+    additional_fields <- list(...)
+
+    # create flat structure stored internally as before but exposed as flat
+    structure(
+      list(
+        hook = hook,
+        context = context,
+        tension = tension,
+        resolution = resolution,
+        metadata = additional_fields,
+        created_at = Sys.time()
+      ),
+      class = c("bid_data_story", "list")
+    )
+  }
 }
 
 #' Validate data story object
@@ -63,8 +143,22 @@ validate_data_story <- function(x) {
     return(FALSE)
   }
 
-  required_fields <- c("context", "variables", "relationships")
-  if (!all(required_fields %in% names(x))) {
+  # check for new flat format (hook, context, tension, resolution)
+  has_flat_format <- "hook" %in% names(x) ||
+    "tension" %in% names(x) ||
+    "resolution" %in% names(x)
+
+  # check for old nested format (variables, relationships)
+  has_nested_format <- "variables" %in% names(x) &&
+    "relationships" %in% names(x)
+
+  # must have at least one valid format
+  if (!has_flat_format && !has_nested_format) {
+    return(FALSE)
+  }
+
+  # context is always required
+  if (!"context" %in% names(x)) {
     return(FALSE)
   }
 
@@ -72,8 +166,30 @@ validate_data_story <- function(x) {
     return(FALSE)
   }
 
-  if (!is.list(x$variables) || !is.list(x$relationships)) {
-    return(FALSE)
+  # validate flat format fields if present
+  if (has_flat_format) {
+    if (!is.null(x$hook) && (!is.character(x$hook) || length(x$hook) != 1)) {
+      return(FALSE)
+    }
+    if (
+      !is.null(x$tension) &&
+        (!is.character(x$tension) || length(x$tension) != 1)
+    ) {
+      return(FALSE)
+    }
+    if (
+      !is.null(x$resolution) &&
+        (!is.character(x$resolution) || length(x$resolution) != 1)
+    ) {
+      return(FALSE)
+    }
+  }
+
+  # validate nested format fields if present
+  if (has_nested_format) {
+    if (!is.list(x$variables) || !is.list(x$relationships)) {
+      return(FALSE)
+    }
   }
 
   return(TRUE)
@@ -87,9 +203,30 @@ validate_data_story <- function(x) {
 #' @export
 print.bid_data_story <- function(x, ...) {
   cat("bidux data story:\n")
-  cat("  context:", x$context, "\n")
-  cat("  variables:", length(x$variables), "defined\n")
-  cat("  relationships:", length(x$relationships), "defined\n")
+
+  # check which format is being used
+  using_flat_format <- !is.null(x$hook) ||
+    !is.null(x$tension) ||
+    !is.null(x$resolution) ||
+    (is.null(x$variables) && is.null(x$relationships))
+
+  if (using_flat_format) {
+    # new flat format display
+    if (!is.null(x$hook)) cat("  hook:", x$hook, "\n")
+    cat("  context:", x$context, "\n")
+    if (!is.null(x$tension)) cat("  tension:", x$tension, "\n")
+    if (!is.null(x$resolution)) cat("  resolution:", x$resolution, "\n")
+    if (!is.null(x$metadata) && length(x$metadata) > 0) {
+      cat("  additional fields:", length(x$metadata), "defined\n")
+    }
+  } else {
+    # old nested format display (deprecated)
+    cat("  context:", x$context, "\n")
+    cat("  variables:", length(x$variables), "defined\n")
+    cat("  relationships:", length(x$relationships), "defined\n")
+    cat("  (using deprecated nested format)\n")
+  }
+
   if (!is.null(x$created_at)) {
     cat("  created:", format(x$created_at), "\n")
   }
@@ -101,7 +238,8 @@ print.bid_data_story <- function(x, ...) {
 #' Creates a structured user personas tibble for use in bidux functions.
 #' Replaces nested list structures with a validated data.frame structure.
 #'
-#' @param personas_df Data.frame with required columns: name, goals, pain_points, technical_level
+#' @param personas_df Data.frame with required columns: name, goals,
+#'        pain_points, technical_level
 #'
 #' @return A bid_user_personas S3 object (inherits from data.frame)
 #'
@@ -120,7 +258,11 @@ new_user_personas <- function(personas_df) {
   validate_data_frame(personas_df, "personas_df")
 
   required_cols <- c("name", "goals", "pain_points", "technical_level")
-  validate_data_frame(personas_df, "personas_df", required_columns = required_cols)
+  validate_data_frame(
+    personas_df,
+    "personas_df",
+    required_columns = required_cols
+  )
 
   # validate technical_level values (case-insensitive)
   valid_levels <- c("beginner", "intermediate", "advanced", "expert")
@@ -187,7 +329,8 @@ print.bid_user_personas <- function(x, ...) {
 #' Creates a structured bias mitigations tibble for use in bidux functions.
 #' Replaces nested list structures with a validated data.frame structure.
 #'
-#' @param mitigations_df Data.frame with required columns: bias_type, mitigation_strategy, confidence_level
+#' @param mitigations_df Data.frame with required columns: bias_type,
+#'        mitigation_strategy, confidence_level
 #'
 #' @return A bid_bias_mitigations S3 object (inherits from data.frame)
 #'
@@ -219,7 +362,9 @@ new_bias_mitigations <- function(mitigations_df) {
   if (any(invalid_confidence)) {
     cli::cli_abort(standard_error_msg(
       "confidence_level values must be between 0 and 1",
-      context = glue::glue("Invalid values found: {paste(mitigations_df$confidence_level[invalid_confidence], collapse = ', ')}")
+      context = glue::glue(
+        "Invalid values found: {paste(mitigations_df$confidence_level[invalid_confidence], collapse = ', ')}"
+      )
     ))
   }
 
@@ -295,7 +440,8 @@ migrate_data_story <- function(old_list) {
     context <- "Legacy data story migration"
   }
 
-  # map old structure to new structure, preserving legacy fields in variables/relationships
+  # map old structure to new structure,
+  # preserving legacy fields in variables/relationships
   variables <- old_list$variables %||% list()
   relationships <- old_list$relationships %||% list()
 
@@ -311,7 +457,14 @@ migrate_data_story <- function(old_list) {
   }
 
   # preserve other fields in metadata
-  excluded_fields <- c("context", "variables", "relationships", "hook", "tension", "resolution")
+  excluded_fields <- c(
+    "context",
+    "variables",
+    "relationships",
+    "hook",
+    "tension",
+    "resolution"
+  )
   metadata <- old_list[!names(old_list) %in% excluded_fields]
 
   new_data_story(
@@ -403,8 +556,11 @@ migrate_bias_mitigations <- function(old_list) {
 #'
 #' @keywords internal
 #' @noRd
-create_bid_result <- function(data_list, class_name, attributes = list(), return_tibble = TRUE) {
-
+create_bid_result <- function(
+    data_list,
+    class_name,
+    attributes = list(),
+    return_tibble = TRUE) {
   # add timestamp if not present
   if (!"timestamp" %in% names(data_list)) {
     data_list$timestamp <- rep(Sys.time(), length(data_list[[1]]))

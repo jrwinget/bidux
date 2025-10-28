@@ -1,7 +1,3 @@
-# ==============================================================================
-# TELEMETRY NOTICE CREATION FUNCTIONS
-# ==============================================================================
-
 #' Create notice stage for unused input
 #' @param input_info List with input usage information
 #' @param total_sessions Total number of sessions
@@ -367,9 +363,10 @@ create_confusion_notice <- function(confusion_info, total_sessions) {
       impact_rate <- 0.1
     } else {
       # secure comparison using exact match
-      input_events <- events[events$event_type == "input" &
-        !is.na(events$input_id) &
-        events$input_id == input_id, ]
+      input_events <- events[events$event_type == "input" & !is.na(
+        events$input_id
+      ) & events$input_id == input_id,
+      ]
       affected_sessions <- max(0, total_sessions - length(unique(input_events$session_id)))
       impact_rate <- if (total_sessions > 0) affected_sessions / total_sessions else 0.0
     }
@@ -461,10 +458,10 @@ print.bid_issues <- function(x, ...) {
     top_issues <- issues_tbl[order(
       -match(issues_tbl$severity, c("critical", "high", "medium", "low")),
       -issues_tbl$impact_rate
-    ), ][1:min(3, nrow(issues_tbl)), ]
+    ), ][seq_len(min(3, nrow(issues_tbl))), ]
 
     cli::cli_h3("Top Priority Issues:")
-    for (i in 1:nrow(top_issues)) {
+    for (i in seq_len(nrow(top_issues))) {
       issue <- top_issues[i, ]
       impact_pct <- round(issue$impact_rate * 100, 1)
 
@@ -651,21 +648,27 @@ bid_notice_issue <- function(issue, previous_stage = NULL, override = list()) {
 
   affected_sessions <- safe_column_access(issue, "affected_sessions")
   if (!is.na(affected_sessions) && is.numeric(affected_sessions)) {
-    evidence_parts <- c(evidence_parts,
-                       glue::glue("Affects {affected_sessions} user sessions"))
+    evidence_parts <- c(
+      evidence_parts,
+      glue::glue("Affects {affected_sessions} user sessions")
+    )
   }
 
   impact_rate <- safe_column_access(issue, "impact_rate")
   if (!is.na(impact_rate) && is.numeric(impact_rate)) {
     impact_pct <- round(impact_rate * 100, 1)
-    evidence_parts <- c(evidence_parts,
-                       glue::glue("Impact rate: {impact_pct}%"))
+    evidence_parts <- c(
+      evidence_parts,
+      glue::glue("Impact rate: {impact_pct}%")
+    )
   }
 
   severity <- safe_column_access(issue, "severity")
   if (!is.na(severity)) {
-    evidence_parts <- c(evidence_parts,
-                       glue::glue("Severity level: {severity}"))
+    evidence_parts <- c(
+      evidence_parts,
+      glue::glue("Severity level: {severity}")
+    )
   }
 
   default_evidence <- if (length(evidence_parts) > 0) {
@@ -801,7 +804,7 @@ bid_notices <- function(
   # iterate over rows, not columns
   notices <- lapply(seq_len(nrow(filtered_issues)), function(i) {
     row <- filtered_issues[i, , drop = FALSE]
-    id  <- row$issue_id %||% paste0("issue_", i)
+    id <- row$issue_id %||% paste0("issue_", i)
     bid_notice_issue(row, previous_stage = previous_stage, ...)
   })
 

@@ -1,21 +1,60 @@
-test_that("new_data_story creates valid objects", {
-  # Basic creation
-  story <- new_data_story(
-    context = "Test context",
-    variables = list(hook = "Test hook", metric = "engagement"),
-    relationships = list(impact = "User satisfaction increases")
+test_that("new_data_story creates valid objects with flat API", {
+  # recommended flat API
+  story_flat <- new_data_story(
+    hook = "User engagement declining",
+    context = "Dashboard usage dropped 30%",
+    tension = "Don't know if UX or user needs",
+    resolution = "Analyze telemetry"
   )
 
-  expect_s3_class(story, "bid_data_story")
-  expect_equal(story$context, "Test context")
-  expect_equal(story$variables$hook, "Test hook")
-  expect_equal(story$relationships$impact, "User satisfaction increases")
-  expect_true("created_at" %in% names(story))
+  expect_s3_class(story_flat, "bid_data_story")
+  expect_equal(story_flat$hook, "User engagement declining")
+  expect_equal(story_flat$context, "Dashboard usage dropped 30%")
+  expect_equal(story_flat$tension, "Don't know if UX or user needs")
+  expect_equal(story_flat$resolution, "Analyze telemetry")
+  expect_true("created_at" %in% names(story_flat))
 
-  # Creation with metadata
-  story_meta <- new_data_story(
-    context = "Test with metadata",
-    metadata = list(source = "survey", confidence = 0.9)
+  # flat API with additional fields
+  story_extended <- new_data_story(
+    hook = "Revenue dashboards underutilized",
+    context = "Only 40% of sales team uses dashboard",
+    tension = "Critical metrics missed",
+    resolution = "Redesign with behavioral science",
+    audience = "Sales team",
+    metrics = "adoption_rate, time_to_insight"
+  )
+
+  expect_equal(story_extended$metadata$audience, "Sales team")
+  expect_equal(story_extended$metadata$metrics, "adoption_rate, time_to_insight")
+})
+
+test_that("new_data_story backward compatible with nested API", {
+  # deprecated nested API with warning
+  expect_warning(
+    story_nested <- new_data_story(
+      context = "Test context",
+      variables = list(hook = "Test hook", metric = "engagement"),
+      relationships = list(impact = "User satisfaction increases")
+    ),
+    "deprecated nested format"
+  )
+
+  expect_s3_class(story_nested, "bid_data_story")
+  expect_equal(story_nested$context, "Test context")
+  expect_equal(story_nested$variables$hook, "Test hook")
+  expect_equal(story_nested$relationships$impact, "User satisfaction increases")
+  expect_true("created_at" %in% names(story_nested))
+
+  # nested API with metadata
+  expect_warning(
+    story_meta <- new_data_story(
+      context = "Test with metadata",
+      variables = list(),
+      relationships = list(),
+      source = "survey",
+      confidence = 0.9
+    ),
+    "deprecated nested format"
   )
 
   expect_equal(story_meta$metadata$source, "survey")
@@ -249,8 +288,8 @@ test_that("migrate_user_personas handles legacy formats", {
     ),
     list(
       name = "Bob",
-      background = "Strategic overview",  # old field name
-      concerns = "Too much detail",       # old field name
+      background = "Strategic overview", # old field name
+      concerns = "Too much detail", # old field name
       technical_level = "beginner"
     )
   )
@@ -260,8 +299,8 @@ test_that("migrate_user_personas handles legacy formats", {
   expect_s3_class(migrated, "bid_user_personas")
   expect_equal(nrow(migrated), 2)
   expect_equal(migrated$name[1], "Alice")
-  expect_equal(migrated$goals[2], "Strategic overview")  # mapped from background
-  expect_equal(migrated$pain_points[2], "Too much detail")  # mapped from concerns
+  expect_equal(migrated$goals[2], "Strategic overview") # mapped from background
+  expect_equal(migrated$pain_points[2], "Too much detail") # mapped from concerns
 
   # Test with invalid input
   expect_error(
@@ -284,7 +323,7 @@ test_that("migrate_bias_mitigations handles legacy formats", {
   expect_equal(nrow(migrated), 3)
   expect_true("anchoring" %in% migrated$bias_type)
   expect_true("Show multiple reference points" %in% migrated$mitigation_strategy)
-  expect_true(all(migrated$confidence_level == 0.7))  # default confidence
+  expect_true(all(migrated$confidence_level == 0.7)) # default confidence
 
   # Test with unnamed list (should error)
   expect_error(

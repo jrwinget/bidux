@@ -103,7 +103,10 @@ bid_structure <- function(
       "Existing code will continue to work until 0.4.0.",
       call. = FALSE
     )
-    try(assign(".bid_layout_selection_warned", TRUE, envir = pkg_env), silent = TRUE)
+    try(
+      assign(".bid_layout_selection_warned", TRUE, envir = pkg_env),
+      silent = TRUE
+    )
   }
 
   # generate ranked, concept-grouped suggestions

@@ -67,9 +67,11 @@ suggest_layout_from_previous <- function(previous_stage, telemetry_flags = NULL)
     grepl(
       "\\boverload|overwhelmed|too many|confus|clutter|busy|noise|cognitive load|whitespace\\b",
       txt
-    ) ||
-      (!is.null(telemetry_flags) &&
-        isTRUE(telemetry_flags$has_confusion_patterns))
+    ) || (
+      !is.null(telemetry_flags) && isTRUE(
+        telemetry_flags$has_confusion_patterns
+      )
+    )
   ) {
     return("breathable")
   }

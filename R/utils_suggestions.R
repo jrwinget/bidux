@@ -1,10 +1,3 @@
-# ==============================================================================
-# SUGGESTION UTILITIES
-# ==============================================================================
-#
-# Functions for generating and evaluating contextual suggestions.
-#
-
 #' Generate contextual suggestions based on stage and content
 #'
 #' @param stage_name Current BID stage name

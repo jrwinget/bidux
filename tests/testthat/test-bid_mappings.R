@@ -270,3 +270,246 @@ test_that("mapping system handles large datasets efficiently", {
   )
   expect_equal(result, "Theory 50")
 })
+
+# ==============================================================================
+# ADDITIONAL COVERAGE TESTS FOR MAPPINGS.R
+# ==============================================================================
+
+test_that(".suggest_theory_from_text internal helper works correctly", {
+  result <- bidux:::.suggest_theory_from_text(
+    "Users are overwhelmed with too many dropdown options",
+    "Decision paralysis observed in testing",
+    show_message = FALSE
+  )
+
+  expect_type(result, "list")
+  expect_true("theory" %in% names(result))
+  expect_true("confidence" %in% names(result))
+  expect_true("auto_suggested" %in% names(result))
+  expect_equal(result$theory, "Hick's Law")
+  expect_true(result$confidence > 0)
+  expect_true(result$confidence <= 1)
+  expect_true(result$auto_suggested)
+})
+
+test_that(".suggest_theory_from_text shows messages when requested", {
+  expect_output(
+    result <- bidux:::.suggest_theory_from_text(
+      "Complex interface design",
+      "Users report confusion",
+      show_message = TRUE
+    ),
+    "Auto-suggested theory"
+  )
+  expect_type(result, "list")
+})
+
+test_that("get_concept_bias_mappings returns empty df for empty concepts", {
+  result <- get_concept_bias_mappings(character(0))
+
+  expect_s3_class(result, "data.frame")
+  expect_equal(nrow(result), 0)
+  expect_true(all(c("concept", "bias_type", "mitigation_strategy") %in% names(result)))
+})
+
+test_that("get_concept_bias_mappings works with custom mappings", {
+  custom_mappings <- data.frame(
+    concept = c("Test Concept A", "Test Concept B"),
+    bias_type = c("test_bias_1", "test_bias_2"),
+    mitigation_strategy = c("Strategy 1", "Strategy 2"),
+    stringsAsFactors = FALSE
+  )
+
+  result <- get_concept_bias_mappings(
+    c("Test Concept A"),
+    mappings = custom_mappings
+  )
+
+  expect_s3_class(result, "data.frame")
+  expect_equal(nrow(result), 1)
+  expect_equal(result$concept[1], "Test Concept A")
+  expect_equal(result$mitigation_strategy[1], "Strategy 1")
+})
+
+test_that("get_concept_bias_mappings handles partial matches", {
+  custom_mappings <- data.frame(
+    concept = c("Visual Hierarchy Principle", "Cognitive Load Management"),
+    bias_type = c("bias_a", "bias_b"),
+    mitigation_strategy = c("Strategy A", "Strategy B"),
+    stringsAsFactors = FALSE
+  )
+
+  # partial match should work
+  result <- get_concept_bias_mappings(
+    c("Visual Hierarchy"),
+    mappings = custom_mappings
+  )
+
+  expect_s3_class(result, "data.frame")
+  expect_true(nrow(result) >= 1)
+})
+
+test_that("load_concept_bias_mappings works with default empty data", {
+  result <- bidux:::load_concept_bias_mappings()
+
+  expect_s3_class(result, "data.frame")
+  expect_true(all(c("concept", "bias_type", "mitigation_strategy") %in% names(result)))
+})
+
+test_that("get_layout_concepts works with valid layouts", {
+  result_dual <- get_layout_concepts("dual_process")
+  expect_type(result_dual, "character")
+  expect_true(length(result_dual) > 0)
+  expect_true("Dual-Processing Theory" %in% result_dual)
+
+  result_grid <- get_layout_concepts("grid")
+  expect_type(result_grid, "character")
+  expect_true("Principle of Proximity" %in% result_grid)
+
+  result_breathable <- get_layout_concepts("breathable")
+  expect_type(result_breathable, "character")
+  expect_true("Breathable Layouts" %in% result_breathable)
+})
+
+test_that("get_layout_concepts handles NULL and empty inputs", {
+  result_null <- get_layout_concepts(NULL)
+  expect_type(result_null, "character")
+  expect_true(length(result_null) > 0)
+  expect_true("Visual Hierarchy" %in% result_null)
+
+  result_empty <- get_layout_concepts("")
+  expect_type(result_empty, "character")
+  expect_true(length(result_empty) > 0)
+})
+
+test_that("get_layout_concepts handles unknown layouts with partial match", {
+  result_unknown <- get_layout_concepts("unknown_layout_type")
+  expect_type(result_unknown, "character")
+  expect_true(length(result_unknown) > 0)
+})
+
+test_that("get_layout_concepts handles custom mappings", {
+  custom_layout_mappings <- data.frame(
+    layout = c("custom_layout"),
+    primary_concepts = c("Custom Concept A,Custom Concept B"),
+    description = c("Custom layout description"),
+    stringsAsFactors = FALSE
+  )
+
+  result <- get_layout_concepts("custom_layout", mappings = custom_layout_mappings)
+  expect_type(result, "character")
+  expect_true("Custom Concept A" %in% result)
+  expect_true("Custom Concept B" %in% result)
+})
+
+test_that("get_accessibility_recommendations works with different contexts", {
+  result_visual <- get_accessibility_recommendations("visual chart design")
+  expect_type(result_visual, "character")
+  expect_true(length(result_visual) > 0)
+
+  result_interactive <- get_accessibility_recommendations("interactive button forms")
+  expect_type(result_interactive, "character")
+  expect_true(length(result_interactive) > 0)
+
+  result_data <- get_accessibility_recommendations("data visualization chart")
+  expect_type(result_data, "character")
+  expect_true(length(result_data) > 0)
+})
+
+test_that("get_accessibility_recommendations handles empty context", {
+  result_empty <- get_accessibility_recommendations("")
+  expect_type(result_empty, "character")
+  expect_true(length(result_empty) > 0)
+})
+
+test_that("get_accessibility_recommendations works with custom guidelines", {
+  custom_guidelines <- data.frame(
+    guideline = c("custom_guideline_1", "custom_guideline_2"),
+    requirement = c("Custom requirement 1", "Custom requirement 2"),
+    wcag_level = c("AA", "AAA"),
+    stringsAsFactors = FALSE
+  )
+
+  result <- get_accessibility_recommendations(
+    "test context",
+    guidelines = custom_guidelines
+  )
+  expect_type(result, "character")
+  expect_true(length(result) > 0)
+})
+
+test_that("get_default_layout_mappings returns correct structure", {
+  result <- bidux:::get_default_layout_mappings()
+
+  expect_s3_class(result, "data.frame")
+  expect_true(all(c("layout", "primary_concepts", "description") %in% names(result)))
+  expect_true(nrow(result) >= 5)
+  expect_true("dual_process" %in% result$layout)
+  expect_true("grid" %in% result$layout)
+  expect_true("card" %in% result$layout)
+  expect_true("tabs" %in% result$layout)
+  expect_true("breathable" %in% result$layout)
+})
+
+test_that("load_layout_mappings works with custom mappings", {
+  custom_mappings <- data.frame(
+    layout = "test_layout",
+    primary_concepts = "Test Concept",
+    description = "Test description",
+    stringsAsFactors = FALSE
+  )
+
+  result <- bidux:::load_layout_mappings(custom_mappings)
+  expect_equal(result, custom_mappings)
+})
+
+test_that("load_accessibility_guidelines returns correct structure", {
+  result <- bidux:::load_accessibility_guidelines()
+
+  expect_s3_class(result, "data.frame")
+  expect_true(all(c("guideline", "requirement", "wcag_level") %in% names(result)))
+  expect_true(nrow(result) >= 3)
+})
+
+test_that("load_external_data validates custom data correctly", {
+  # test with invalid custom data (missing required columns)
+  invalid_data <- data.frame(
+    wrong_column = c("test"),
+    stringsAsFactors = FALSE
+  )
+
+  expect_error(
+    bidux:::load_external_data(
+      "test.csv",
+      c("required_col_1", "required_col_2"),
+      function() data.frame(),
+      custom_data = invalid_data
+    ),
+    "Custom data must contain columns"
+  )
+})
+
+test_that("suggest_theory_from_mappings handles regex vs literal keywords correctly", {
+  # test that default mappings are treated as regex
+  regex_match <- suggest_theory_from_mappings(
+    "Users overwhelmed with too many options",
+    "Multiple dropdown choices",
+    mappings = NULL
+  )
+  expect_equal(regex_match, "Hick's Law")
+
+  # test with custom mappings containing literal tokens
+  literal_mappings <- data.frame(
+    keywords = c("mobile", "desktop"),
+    theory = c("Mobile Theory", "Desktop Theory"),
+    confidence = c(0.9, 0.9),
+    stringsAsFactors = FALSE
+  )
+
+  literal_match <- suggest_theory_from_mappings(
+    "mobile interface issues",
+    "users report problems",
+    mappings = literal_mappings
+  )
+  expect_equal(literal_match, "Mobile Theory")
+})

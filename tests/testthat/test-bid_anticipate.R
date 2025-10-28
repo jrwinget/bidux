@@ -151,8 +151,9 @@ test_that(
     expect_s3_class(result, "bid_stage")
     # when include_accessibility is FALSE, accessibility field may be NA/absent
     if ("accessibility" %in% names(result)) {
-      expect_true(is.na(result$accessibility[1]) ||
-        nchar(result$accessibility[1]) == 0)
+      expect_true(is.na(result$accessibility[1]) || nchar(
+        result$accessibility[1]) == 0
+      )
     }
   }
 )
@@ -182,7 +183,7 @@ test_that("bid_anticipate validates bias_mitigations parameter", {
         "Use positive framing"
       )
     ),
-"bias_mitigations must be a non-empty named list"
+    "bias_mitigations must be a non-empty named list"
   )
 })
 

@@ -1,10 +1,3 @@
-# ==============================================================================
-# DOMAIN-SPECIFIC UTILITIES
-# ==============================================================================
-#
-# BID framework-specific business logic and domain utilities.
-#
-
 #' Generic fuzzy matching function for concepts
 #'
 #' @param concept Concept name to match

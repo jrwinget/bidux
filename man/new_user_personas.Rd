@@ -7,7 +7,8 @@
 new_user_personas(personas_df)
 }
 \arguments{
-\item{personas_df}{Data.frame with required columns: name, goals, pain_points, technical_level}
+\item{personas_df}{Data.frame with required columns: name, goals,
+pain_points, technical_level}
 }
 \value{
 A bid_user_personas S3 object (inherits from data.frame)

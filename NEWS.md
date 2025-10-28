@@ -1,5 +1,69 @@
 # bidux (development version)
 
+# bidux 0.3.2 (2025-10-09)
+==========================
+
+### NEW FEATURES
+
+* **Flattened data_story API for improved ergonomics.** `new_data_story()` now accepts flat arguments (`hook`, `context`, `tension`, `resolution`) making it more intuitive for the 80% use case. The nested format (`variables`, `relationships`) is still supported with deprecation warnings and will be removed in 0.4.0.
+
+* **Telemetry sensitivity presets.** New `bid_telemetry_presets()` function provides pre-configured threshold sets (`strict`, `moderate`, `relaxed`) for easier telemetry analysis configuration without manual threshold tuning.
+
+### IMPROVEMENTS
+
+* **Reduced package footprint.** Removed unused dependencies `purrr` and `stringr`, reducing install size and dependency overhead. Base R equivalents are used instead (e.g., `nchar()` instead of `stringr::str_length()`).
+
+* **Cleaner telemetry constants.** Extracted all magic numbers from telemetry analysis functions to named constants at the top of `telemetry_analysis.R`, improving maintainability and making thresholds self-documenting.
+
+* **Improved data.frame API documentation.** Updated examples and vignettes to show `data.frame` as the recommended API for `user_personas` and `bias_mitigations`, with clearer migration paths from legacy list format.
+
+* **Backward-compatible enhancements.** All API changes maintain full backward compatibility through migration functions with helpful deprecation warnings guiding users to modern patterns.
+
+### BUG FIXES
+
+* Removed duplicate utility functions (`%||%` operator and `validate_required_params()`) that were defined in multiple files.
+
+### DOCUMENTATION UPDATES
+
+* **Updated Getting Started vignette** to show recommended flat `new_data_story()` API and `data.frame` format for personas.
+
+* **Enhanced function examples** in `bid_interpret()` and other stage functions to demonstrate both modern and legacy formats.
+
+* **Comprehensive test coverage** for new flat data_story API, backward compatibility with nested format, telemetry presets, and safe accessor functions.
+
+### DEPRECATIONS
+
+* **Nested data_story format (variables/relationships)** is deprecated and will be removed in bidux 0.4.0. Use the flat API instead: `new_data_story(hook, context, tension, resolution)`.
+
+### MIGRATION NOTES
+
+For users upgrading from 0.3.1:
+
+```r
+# OLD: Nested format (deprecated)
+story <- new_data_story(
+  context = "Dashboard usage dropped",
+  variables = list(hook = "User engagement declining"),
+  relationships = list(resolution = "Analyze telemetry")
+)
+
+# NEW: Flat format (recommended)
+story <- new_data_story(
+  hook = "User engagement declining",
+  context = "Dashboard usage dropped 30%",
+  tension = "Don't know if UX or user needs",
+  resolution = "Analyze telemetry"
+)
+
+# Telemetry presets for easier configuration
+issues <- bid_ingest_telemetry(
+  "telemetry.sqlite",
+  thresholds = bid_telemetry_presets("strict")  # or "moderate", "relaxed"
+)
+```
+
+**Note:** All legacy formats continue to work with deprecation warnings. See function documentation for detailed migration guidance.
+
 # bidux 0.3.1 (2025-09-07)
 ==========================
 

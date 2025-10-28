@@ -25,10 +25,10 @@
 #'         stage.
 #'
 #' @examples
-#' # Basic usage
+#' # Recommended: use new_data_story() with flat API
 #' interpret_result <- bid_interpret(
 #'   central_question = "What drives the decline in user engagement?",
-#'   data_story = list(
+#'   data_story = new_data_story(
 #'     hook = "Declining trend in engagement",
 #'     context = "Previous high engagement levels",
 #'     tension = "Unexpected drop",
@@ -36,32 +36,45 @@
 #'   )
 #' )
 #'
-#' # With user personas
+#' # With user personas (using data.frame)
 #' interpret_personas <- bid_interpret(
 #'   central_question = "How can we improve data discovery?",
-#'   data_story = list(
+#'   data_story = new_data_story(
 #'     hook = "Users are missing key insights",
 #'     context = "Critical data is available but overlooked",
 #'     tension = "Time-sensitive decisions are delayed",
-#'     resolution = "Highlight key metrics more effectively"
+#'     resolution = "Highlight key metrics more effectively",
+#'     audience = "Data analysts and executives"
 #'   ),
-#'   user_personas = list(
-#'     list(
-#'       name = "Sara, Data Analyst",
-#'       goals = "Needs to quickly find patterns in data",
-#'       pain_points = "Gets overwhelmed by too many visualizations",
-#'       technical_level = "advanced"
+#'   user_personas = data.frame(
+#'     name = c("Sara, Data Analyst", "Marcus, Executive"),
+#'     goals = c(
+#'       "Needs to quickly find patterns in data",
+#'       "Wants high-level insights at a glance"
 #'     ),
-#'     list(
-#'       name = "Marcus, Executive",
-#'       goals = "Wants high-level insights at a glance",
-#'       pain_points = "Limited time to analyze detailed reports",
-#'       technical_level = "beginner"
-#'     )
+#'     pain_points = c(
+#'       "Gets overwhelmed by too many visualizations",
+#'       "Limited time to analyze detailed reports"
+#'     ),
+#'     technical_level = c("advanced", "beginner"),
+#'     stringsAsFactors = FALSE
 #'   )
 #' )
 #'
 #' summary(interpret_personas)
+#'
+#' # Legacy list format still works (with deprecation warning)
+#' \dontrun{
+#' interpret_legacy <- bid_interpret(
+#'   central_question = "How can we improve UX?",
+#'   data_story = list(
+#'     hook = "Users struggling",
+#'     context = "Dashboard complexity",
+#'     tension = "High abandonment rate",
+#'     resolution = "Simplify interface"
+#'   )
+#' )
+#' }
 #'
 #' @export
 bid_interpret <- function(
@@ -120,6 +133,9 @@ bid_interpret <- function(
           suggestions = "Use new_user_personas() constructor to create valid objects"
         ))
       }
+    } else if (is.data.frame(user_personas)) {
+      # data.frame provided directly - convert to bid_user_personas
+      user_personas <- new_user_personas(user_personas)
     } else if (is.list(user_personas)) {
       # legacy list format - migrate to new s3 class with deprecation warning
       cli::cli_warn(c(
@@ -130,10 +146,11 @@ bid_interpret <- function(
       user_personas <- migrate_user_personas(user_personas)
     } else {
       cli::cli_abort(standard_error_msg(
-        "user_personas must be a bid_user_personas object or list",
+        "user_personas must be a bid_user_personas object, data.frame, or list",
         context = glue::glue("You provided: {class(user_personas)[1]}"),
         suggestions = c(
           "Use new_user_personas() constructor",
+          "Or provide a data.frame with required columns",
           "Or provide a list of persona objects"
         )
       ))
@@ -210,9 +227,10 @@ bid_interpret <- function(
         quiet = quiet
       )
     } else if (
-      !is.null(previous_stage) &&
-        (previous_stage$stage[1] == "Structure" ||
-          previous_stage$stage[1] == "Anticipate")
+      !is.null(previous_stage) && (
+        previous_stage$stage[1] == "Structure" ||
+          previous_stage$stage[1] == "Anticipate"
+      )
     ) {
       central_question <- paste0(
         "How can we refine our understanding of user needs for this dashboard?"
@@ -314,9 +332,10 @@ bid_interpret <- function(
         quiet = quiet
       )
     } else if (
-      !is.null(previous_stage) &&
-        (previous_stage$stage[1] == "Structure" ||
-          previous_stage$stage[1] == "Anticipate")
+      !is.null(previous_stage) && (
+        previous_stage$stage[1] == "Structure" ||
+          previous_stage$stage[1] == "Anticipate"
+      )
     ) {
       # iteration cycle data story
       data_story <- new_data_story(
@@ -404,120 +423,36 @@ bid_interpret <- function(
   }
 
   if (is.null(user_personas)) {
+    # try to extract audience from data_story or previous_stage
     audience <- NULL
 
-    if (
-      # try to get audience from data_story (both s3 and legacy formats)
-      !is.null(data_story)
-    ) {
+    if (!is.null(data_story)) {
       if (inherits(data_story, "bid_data_story")) {
         audience <- safe_list_access(data_story$metadata, "audience", NULL)
       } else if (is.list(data_story) && "audience" %in% names(data_story)) {
         audience <- data_story$audience
       }
-
-      if (!is.null(audience) && !is.na(audience)) {
-        # audience found, continue with this value
-      } else {
-        audience <- NULL  # reset if no valid audience found
-      }
-    } else if (
-      # try to get audience from previous_stage
-      !is.null(previous_stage) &&
-        previous_stage$stage[1] == "Notice" &&
-        "target_audience" %in% names(previous_stage) &&
-        !is.na(previous_stage$target_audience[1])
-    ) {
-      audience <- previous_stage$target_audience[1]
     }
 
-    if (!is.null(audience) && !is.na(audience)) {
-      audience_lower <- tolower(audience)
+    # fallback to previous_stage if no audience in data_story
+    if (is.null(audience) || is.na(audience)) {
+      audience <- get_audience_from_previous(previous_stage)
+    }
 
-      # nuanced user type
-      user_type <- if (
-        grepl(
-          "analyst|data scientist|technical|developer|engineer",
-          audience_lower
+    # generate persona from audience using DRY helper
+    if (!is.null(audience) && !is.na(audience) && nchar(trimws(audience)) > 0) {
+      user_personas <- generate_persona_from_audience(audience)
+
+      if (!is.null(user_personas)) {
+        bid_alert_info(
+          paste0(
+            "Created user persona '",
+            user_personas$name[1],
+            "' based on audience information"
+          ),
+          quiet = quiet
         )
-      ) {
-        "Data Analyst"
-      } else if (
-        grepl(
-          "executive|manager|director|leadership|ceo|cfo|cto|vp",
-          audience_lower
-        )
-      ) {
-        "Executive"
-      } else if (grepl("market|advertis|campaign|brand", audience_lower)) {
-        "Marketing Professional"
-      } else if (grepl("sales|account|business develop", audience_lower)) {
-        "Sales Representative"
-      } else if (grepl("customer|client|user|consumer", audience_lower)) {
-        "End User"
-      } else {
-        "Dashboard User"
       }
-
-      # technical level
-      technical_level <- if (
-        grepl(
-          "analyst|data scientist|technical|developer|engineer",
-          audience_lower
-        )
-      ) {
-        "Advanced"
-      } else if (grepl("executive|leadership|ceo|cfo", audience_lower)) {
-        "Basic"
-      } else {
-        "Intermediate"
-      }
-
-      # specific goals based on role
-      goals <- if (grepl("executive|leadership", audience_lower)) {
-        "Needs quick insights for strategic decisions"
-      } else if (grepl("analyst|data", audience_lower)) {
-        "Needs to explore data in depth to find patterns"
-      } else if (grepl("market", audience_lower)) {
-        "Needs to track campaign performance metrics"
-      } else if (grepl("sales", audience_lower)) {
-        "Needs to identify sales opportunities and track performance"
-      } else {
-        "Needs to extract relevant insights efficiently"
-      }
-
-      # specific pain points based on role
-      pain_points <- if (grepl("executive|leadership", audience_lower)) {
-        "Limited time to analyze detailed reports"
-      } else if (grepl("analyst|data", audience_lower)) {
-        "Frustrated by interfaces that limit data exploration"
-      } else if (grepl("market", audience_lower)) {
-        "Struggles to connect multiple data sources for complete picture"
-      } else if (grepl("sales", audience_lower)) {
-        "Needs mobile-friendly dashboards for client meetings"
-      } else {
-        "Gets overwhelmed by complex dashboards with too many options"
-      }
-
-      # create persona using new s3 class
-      persona_df <- data.frame(
-        name = paste(user_type, "Persona"),
-        goals = goals,
-        pain_points = pain_points,
-        technical_level = technical_level,
-        stringsAsFactors = FALSE
-      )
-
-      user_personas <- new_user_personas(persona_df)
-
-      bid_alert_info(
-        paste0(
-          "Created user persona '",
-          persona_df$name,
-          "' based on audience information"
-        ),
-        quiet = quiet
-      )
     }
   }
 

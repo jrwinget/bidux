@@ -1,10 +1,3 @@
-# ==============================================================================
-# SAFE ACCESS UTILITIES
-# ==============================================================================
-#
-# Defensive programming utilities for safe data access with defaults.
-#
-
 #' Safe conditional checking
 #'
 #' @param obj The object to check
@@ -148,19 +141,40 @@ safe_data_story_access <- function(data_story, element) {
 
   # handle new bid_data_story S3 class
   if (inherits(data_story, "bid_data_story")) {
-    # for new S3 class, map elements to the appropriate structure
-    value <- switch(element,
-      "hook" = safe_list_access(data_story$variables, "hook", NA_character_),
-      "context" = data_story$context %||% NA_character_,
-      "tension" = safe_list_access(data_story$variables, "tension", NA_character_),
-      "resolution" = safe_list_access(data_story$relationships, "resolution", NA_character_),
-      "audience" = safe_list_access(data_story$metadata, "audience", NA_character_),
-      "metrics" = safe_list_access(data_story$metadata, "metrics", NA_character_),
-      "visual_approach" = safe_list_access(data_story$metadata, "visual_approach", NA_character_),
-      NA_character_
-    )
+    # check if using new flat format (has hook/tension/resolution at top level)
+    # or old nested format (has variables/relationships)
+    using_flat_format <- !is.null(data_story$hook) ||
+      !is.null(data_story$tension) ||
+      !is.null(data_story$resolution) ||
+      (is.null(data_story$variables) && is.null(data_story$relationships))
+
+    if (using_flat_format) {
+      # new flat format: elements are at top level
+      value <- switch(element,
+        "hook" = data_story$hook %||% NA_character_,
+        "context" = data_story$context %||% NA_character_,
+        "tension" = data_story$tension %||% NA_character_,
+        "resolution" = data_story$resolution %||% NA_character_,
+        "audience" = safe_list_access(data_story$metadata, "audience", NA_character_),
+        "metrics" = safe_list_access(data_story$metadata, "metrics", NA_character_),
+        "visual_approach" = safe_list_access(data_story$metadata, "visual_approach", NA_character_),
+        NA_character_
+      )
+    } else {
+      # old nested format: hook/tension/resolution in variables/relationships
+      value <- switch(element,
+        "hook" = safe_list_access(data_story$variables, "hook", NA_character_),
+        "context" = data_story$context %||% NA_character_,
+        "tension" = safe_list_access(data_story$variables, "tension", NA_character_),
+        "resolution" = safe_list_access(data_story$relationships, "resolution", NA_character_),
+        "audience" = safe_list_access(data_story$metadata, "audience", NA_character_),
+        "metrics" = safe_list_access(data_story$metadata, "metrics", NA_character_),
+        "visual_approach" = safe_list_access(data_story$metadata, "visual_approach", NA_character_),
+        NA_character_
+      )
+    }
   } else if (is.list(data_story) && element %in% names(data_story)) {
-    # handle legacy list format
+    # handle legacy plain list format
     value <- data_story[[element]]
   } else {
     return(NA_character_)
