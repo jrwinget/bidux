@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">bidux</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,24 +79,101 @@
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
 <p>The bidux package has been modernized with enhanced API consistency,
-better error handling, and optional tibble support. This vignette
-demonstrates the new features and modern R patterns implemented in the
-package.</p>
+better error handling, and optional tibble support. <strong>This
+vignette is the definitive guide to modern API usage in bidux
+0.3.2+</strong>.</p>
+<div class="section level3">
+<h3 id="whats-new-in-0-3-2">What’s New in 0.3.2<a class="anchor" aria-label="anchor" href="#whats-new-in-0-3-2"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="34%">
+<col width="30%">
+<col width="34%">
+</colgroup>
+<thead><tr class="header">
+<th>Feature</th>
+<th>Status</th>
+<th>Details</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><strong>Flat data_story API</strong></td>
+<td>✅ <strong>RECOMMENDED</strong>
+</td>
+<td>Use
+<code>new_data_story(hook, context, tension, resolution)</code>
+</td>
+</tr>
+<tr class="even">
+<td><strong>Nested data_story format</strong></td>
+<td>⚠️ <strong>DEPRECATED</strong>
+</td>
+<td>
+<code>variables</code>/<code>relationships</code> parameters removed
+in 0.4.0</td>
+</tr>
+<tr class="odd">
+<td><strong>Telemetry presets</strong></td>
+<td>✅ <strong>NEW</strong>
+</td>
+<td>Use <code>bid_telemetry_presets("moderate")</code> for easier
+configuration</td>
+</tr>
+<tr class="even">
+<td><strong>S3 classes and methods</strong></td>
+<td>✅ <strong>STABLE</strong>
+</td>
+<td>Enhanced print, summary, and conversion methods</td>
+</tr>
+<tr class="odd">
+<td><strong>Tibble integration</strong></td>
+<td>✅ <strong>OPTIONAL</strong>
+</td>
+<td>Automatic tibble output when package available</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="quick-migration-guide">Quick Migration Guide<a class="anchor" aria-label="anchor" href="#quick-migration-guide"></a>
+</h3>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># DEPRECATED (will be removed in 0.4.0)</span></span>
+<span><span class="va">story</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span></span>
+<span>  context <span class="op">=</span> <span class="st">"Dashboard usage dropped"</span>,</span>
+<span>  variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>hook <span class="op">=</span> <span class="st">"Engagement declining"</span><span class="op">)</span>,</span>
+<span>  relationships <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>resolution <span class="op">=</span> <span class="st">"Analyze telemetry"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># RECOMMENDED (0.3.2+)</span></span>
+<span><span class="va">story</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span></span>
+<span>  hook <span class="op">=</span> <span class="st">"Engagement declining"</span>,</span>
+<span>  context <span class="op">=</span> <span class="st">"Dashboard usage dropped 30%"</span>,</span>
+<span>  tension <span class="op">=</span> <span class="st">"Unknown if UX or user needs"</span>,</span>
+<span>  resolution <span class="op">=</span> <span class="st">"Analyze telemetry to identify friction"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://jrwinget.github.io/bidux/">bidux</a></span><span class="op">)</span></span>
 <span><span class="co"># Optional tibble support</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"tibble"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 </div>
+</div>
 <div class="section level2">
 <h2 id="enhanced-data-story-creation">Enhanced Data Story Creation<a class="anchor" aria-label="anchor" href="#enhanced-data-story-creation"></a>
 </h2>
-<p>The enhanced <code>new_data_story</code> function provides a
-structured way to create behavioral insights with comprehensive
-validation and modern S3 methods.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Create a structured data story using the modern flat API</span></span>
+<p>The <code><a href="../reference/new_data_story.html">new_data_story()</a></code> function provides a structured way
+to create behavioral insights. <strong>As of bidux 0.3.2, the flat API
+is the RECOMMENDED approach</strong> for creating data stories.</p>
+<div class="section level3">
+<h3 id="recommended-flat-api-0-3-2">Recommended: Flat API (0.3.2+)<a class="anchor" aria-label="anchor" href="#recommended-flat-api-0-3-2"></a>
+</h3>
+<p>The flat API accepts four intuitive arguments that map directly to
+storytelling elements:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># RECOMMENDED: Create a structured data story using the modern flat API</span></span>
 <span><span class="va">story</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span></span>
 <span>  hook <span class="op">=</span> <span class="st">"Users struggle with complex form layouts leading to abandonment"</span>,</span>
 <span>  context <span class="op">=</span> <span class="st">"User Interface Cognitive Load Analysis for complex form layouts with 40% improvement potential"</span>,</span>
@@ -115,17 +192,63 @@ validation and modern S3 methods.</p>
 <span></span>
 <span><span class="co"># Story is automatically structured for further BID framework usage</span></span></code></pre></div>
 </div>
+<div class="section level3">
+<h3 id="deprecated-nested-format-removal-in-0-4-0">Deprecated: Nested Format (Removal in 0.4.0)<a class="anchor" aria-label="anchor" href="#deprecated-nested-format-removal-in-0-4-0"></a>
+</h3>
+<p>The nested format using <code>variables</code> and
+<code>relationships</code> parameters is <strong>DEPRECATED</strong> and
+will be removed in bidux 0.4.0.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># DEPRECATED: Nested format (will be removed in 0.4.0)</span></span>
+<span><span class="co"># This will trigger a deprecation warning</span></span>
+<span><span class="va">story_old</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span></span>
+<span>  context <span class="op">=</span> <span class="st">"Dashboard usage analysis"</span>,</span>
+<span>  variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    metric <span class="op">=</span> <span class="st">"engagement"</span>,</span>
+<span>    trend <span class="op">=</span> <span class="st">"declining"</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  relationships <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    correlation <span class="op">=</span> <span class="st">"negative_with_complexity"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co"># Warning: Using deprecated nested format for data_story</span></span>
+<span><span class="co"># The flat API is now recommended: new_data_story(hook, context, tension, resolution)</span></span>
+<span><span class="co"># Nested format (variables, relationships) will be removed in bidux 0.4.0</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="migration-guide">Migration Guide<a class="anchor" aria-label="anchor" href="#migration-guide"></a>
+</h3>
+<p><strong>Old nested format:</strong></p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># OLD (deprecated)</span></span>
+<span><span class="va">story</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span></span>
+<span>  context <span class="op">=</span> <span class="st">"Dashboard usage dropped"</span>,</span>
+<span>  variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>hook <span class="op">=</span> <span class="st">"User engagement declining"</span><span class="op">)</span>,</span>
+<span>  relationships <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>resolution <span class="op">=</span> <span class="st">"Analyze telemetry"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><strong>New flat format:</strong></p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># NEW (recommended)</span></span>
+<span><span class="va">story</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span></span>
+<span>  hook <span class="op">=</span> <span class="st">"User engagement declining"</span>,</span>
+<span>  context <span class="op">=</span> <span class="st">"Dashboard usage dropped 30%"</span>,</span>
+<span>  tension <span class="op">=</span> <span class="st">"Don't know if UX or user needs"</span>,</span>
+<span>  resolution <span class="op">=</span> <span class="st">"Analyze telemetry"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
 <div class="section level2">
 <h2 id="modern-bid-framework-interpretation">Modern BID Framework Interpretation<a class="anchor" aria-label="anchor" href="#modern-bid-framework-interpretation"></a>
 </h2>
-<p>The enhanced <code>bid_interpret</code> function captures user needs
-and central questions with comprehensive validation and modern S3
-methods.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Basic interpretation with modern API</span></span>
+<p>The enhanced <code><a href="../reference/bid_interpret.html">bid_interpret()</a></code> function captures user
+needs and central questions with comprehensive validation and modern S3
+methods. <strong>Always use the recommended flat API for data_story
+objects.</strong></p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Basic interpretation with modern flat API (RECOMMENDED)</span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span>
 <span>  central_question <span class="op">=</span> <span class="st">"How can we reduce cognitive load in our signup form?"</span>,</span>
-<span>  data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  data_story <span class="op">=</span> <span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span></span>
 <span>    hook <span class="op">=</span> <span class="st">"Users abandon signup forms at 60% rate"</span>,</span>
 <span>    context <span class="op">=</span> <span class="st">"Current form has 15 required fields"</span>,</span>
 <span>    tension <span class="op">=</span> <span class="st">"Users feel overwhelmed and leave"</span>,</span>
@@ -140,7 +263,7 @@ methods.</p>
 <span><span class="co"># Enhanced interpretation with user personas</span></span>
 <span><span class="va">interpretation</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span>
 <span>  central_question <span class="op">=</span> <span class="st">"What drives user engagement in our dashboard?"</span>,</span>
-<span>  data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  data_story <span class="op">=</span> <span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span></span>
 <span>    hook <span class="op">=</span> <span class="st">"Daily active users declining despite new features"</span>,</span>
 <span>    context <span class="op">=</span> <span class="st">"Rich dashboard with multiple visualizations"</span>,</span>
 <span>    tension <span class="op">=</span> <span class="st">"Users aren't discovering valuable insights"</span>,</span>
@@ -159,6 +282,10 @@ methods.</p>
 <span></span>
 <span><span class="co"># Enhanced S3 print method shows summary</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">interpretation</span><span class="op">)</span></span></code></pre></div>
+<p><strong>Note:</strong> While <code><a href="../reference/bid_interpret.html">bid_interpret()</a></code> still
+accepts plain list format for <code>data_story</code> for backward
+compatibility, using <code><a href="../reference/new_data_story.html">new_data_story()</a></code> with the flat API is
+recommended for clarity and consistency.</p>
 </div>
 <div class="section level2">
 <h2 id="structured-dashboard-layout-with-bid_structure">Structured Dashboard Layout with bid_structure<a class="anchor" aria-label="anchor" href="#structured-dashboard-layout-with-bid_structure"></a>
@@ -166,7 +293,7 @@ methods.</p>
 <p>Transform insights into actionable dashboard structure with the
 enhanced <code>bid_structure</code> function that automatically selects
 optimal layout.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Follow correct BID framework order: Interpret → Notice → Anticipate → Structure</span></span>
 <span><span class="va">notice_result</span> <span class="op">&lt;-</span> <span class="va">result</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/bid_notice.html">bid_notice</a></span><span class="op">(</span></span>
@@ -204,12 +331,13 @@ optimal layout.</p>
 <h2 id="complete-workflow-example">Complete Workflow Example<a class="anchor" aria-label="anchor" href="#complete-workflow-example"></a>
 </h2>
 <p>Demonstrate the full modernized BID framework workflow with
-consistent API patterns.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Step 1: Interpret user needs and context</span></span>
+consistent API patterns using the <strong>RECOMMENDED flat API
+throughout</strong>.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Step 1: Interpret user needs and context (using RECOMMENDED flat API)</span></span>
 <span><span class="va">ui_analysis</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span>
 <span>  central_question <span class="op">=</span> <span class="st">"How can we improve landing page conversion without damaging user trust?"</span>,</span>
-<span>  data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  data_story <span class="op">=</span> <span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span></span>
 <span>    hook <span class="op">=</span> <span class="st">"High-pressure sales tactics may be reducing user trust"</span>,</span>
 <span>    context <span class="op">=</span> <span class="st">"Landing page with multiple persuasive elements"</span>,</span>
 <span>    tension <span class="op">=</span> <span class="st">"Need conversions but not at expense of user experience"</span>,</span>
@@ -278,28 +406,167 @@ consistent API patterns.</p>
 </h2>
 <p>The modernized API provides clear, descriptive error messages for
 better debugging.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Clear error messages for invalid inputs</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="../reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="co"># Missing required parameter</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="../reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span>central_question <span class="op">=</span> <span class="fl">123</span><span class="op">)</span><span class="op">)</span> <span class="co"># Wrong type for central_question</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="../reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span>central_question <span class="op">=</span> <span class="st">"test"</span>, data_story <span class="op">=</span> <span class="st">"invalid"</span><span class="op">)</span><span class="op">)</span> <span class="co"># Invalid data_story</span></span>
 <span></span>
-<span><span class="co"># Descriptive validation errors for data story creation</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="co"># Missing required parameters</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span><span class="st">""</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="co"># Invalid empty context</span></span></code></pre></div>
+<span><span class="co"># Descriptive validation errors for data story creation (flat API)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="co"># Missing required parameter (context)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span>context <span class="op">=</span> <span class="st">""</span><span class="op">)</span><span class="op">)</span> <span class="co"># Invalid empty context</span></span>
+<span></span>
+<span><span class="co"># Deprecated format still validates (but triggers warnings)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span></span>
+<span>  context <span class="op">=</span> <span class="st">"Valid context"</span>,</span>
+<span>  variables <span class="op">=</span> <span class="st">"invalid_type"</span>  <span class="co"># Must be a list</span></span>
+<span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="deprecation-warnings">Deprecation Warnings<a class="anchor" aria-label="anchor" href="#deprecation-warnings"></a>
+</h3>
+<p>When using the deprecated nested format, you’ll see helpful
+warnings:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Using deprecated nested format triggers warning</span></span>
+<span><span class="va">story</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span></span>
+<span>  context <span class="op">=</span> <span class="st">"Dashboard analysis"</span>,</span>
+<span>  variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>metric <span class="op">=</span> <span class="st">"engagement"</span><span class="op">)</span>,</span>
+<span>  relationships <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>trend <span class="op">=</span> <span class="st">"declining"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co"># Warning message:</span></span>
+<span><span class="co"># ! Using deprecated nested format for data_story</span></span>
+<span><span class="co"># ℹ The flat API is now recommended: new_data_story(hook, context, tension, resolution)</span></span>
+<span><span class="co"># ℹ Nested format (variables, relationships) will be removed in bidux 0.4.0</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="telemetry-sensitivity-presets-new-in-0-3-2">Telemetry Sensitivity Presets (New in 0.3.2)<a class="anchor" aria-label="anchor" href="#telemetry-sensitivity-presets-new-in-0-3-2"></a>
+</h2>
+<p>The <code><a href="../reference/bid_telemetry_presets.html">bid_telemetry_presets()</a></code> function provides
+pre-configured threshold sets for easier telemetry analysis
+configuration, eliminating the need for manual threshold tuning.</p>
+<div class="section level3">
+<h3 id="available-presets">Available Presets<a class="anchor" aria-label="anchor" href="#available-presets"></a>
+</h3>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Three sensitivity levels available:</span></span>
+<span><span class="co"># - "strict": Detects even minor issues (for critical apps or new dashboards)</span></span>
+<span><span class="co"># - "moderate": Balanced default (appropriate for most applications)</span></span>
+<span><span class="co"># - "relaxed": Only detects major issues (for mature, stable dashboards)</span></span>
+<span></span>
+<span><span class="co"># Get strict sensitivity thresholds</span></span>
+<span><span class="va">strict_thresholds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_telemetry_presets.html">bid_telemetry_presets</a></span><span class="op">(</span><span class="st">"strict"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">strict_thresholds</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Get moderate sensitivity (default)</span></span>
+<span><span class="va">moderate_thresholds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_telemetry_presets.html">bid_telemetry_presets</a></span><span class="op">(</span><span class="st">"moderate"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Get relaxed sensitivity</span></span>
+<span><span class="va">relaxed_thresholds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_telemetry_presets.html">bid_telemetry_presets</a></span><span class="op">(</span><span class="st">"relaxed"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="using-presets-with-telemetry-analysis">Using Presets with Telemetry Analysis<a class="anchor" aria-label="anchor" href="#using-presets-with-telemetry-analysis"></a>
+</h3>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Use strict preset for critical application</span></span>
+<span><span class="va">issues</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry</a></span><span class="op">(</span></span>
+<span>  <span class="st">"telemetry.sqlite"</span>,</span>
+<span>  thresholds <span class="op">=</span> <span class="fu"><a href="../reference/bid_telemetry_presets.html">bid_telemetry_presets</a></span><span class="op">(</span><span class="st">"strict"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Use relaxed preset for mature dashboard</span></span>
+<span><span class="va">issues</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry</a></span><span class="op">(</span></span>
+<span>  <span class="st">"telemetry.sqlite"</span>,</span>
+<span>  thresholds <span class="op">=</span> <span class="fu"><a href="../reference/bid_telemetry_presets.html">bid_telemetry_presets</a></span><span class="op">(</span><span class="st">"relaxed"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Override specific thresholds while using a preset as base</span></span>
+<span><span class="va">custom_thresholds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_telemetry_presets.html">bid_telemetry_presets</a></span><span class="op">(</span><span class="st">"moderate"</span><span class="op">)</span></span>
+<span><span class="va">custom_thresholds</span><span class="op">$</span><span class="va">unused_input_threshold</span> <span class="op">&lt;-</span> <span class="fl">0.03</span>  <span class="co"># More sensitive to unused inputs</span></span>
+<span><span class="va">issues</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry</a></span><span class="op">(</span><span class="st">"telemetry.sqlite"</span>, thresholds <span class="op">=</span> <span class="va">custom_thresholds</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="threshold-comparison">Threshold Comparison<a class="anchor" aria-label="anchor" href="#threshold-comparison"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="21%">
+<col width="15%">
+<col width="19%">
+<col width="17%">
+<col width="25%">
+</colgroup>
+<thead><tr class="header">
+<th>Threshold</th>
+<th>Strict</th>
+<th>Moderate</th>
+<th>Relaxed</th>
+<th>Description</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>unused_input_threshold</td>
+<td>0.02</td>
+<td>0.05</td>
+<td>0.10</td>
+<td>Min usage rate to flag input</td>
+</tr>
+<tr class="even">
+<td>delay_threshold_secs</td>
+<td>20</td>
+<td>30</td>
+<td>60</td>
+<td>Seconds before flagging delay</td>
+</tr>
+<tr class="odd">
+<td>error_rate_threshold</td>
+<td>0.05</td>
+<td>0.10</td>
+<td>0.20</td>
+<td>Error rate to flag problems</td>
+</tr>
+<tr class="even">
+<td>navigation_threshold</td>
+<td>0.10</td>
+<td>0.20</td>
+<td>0.30</td>
+<td>Min visit rate for pages</td>
+</tr>
+<tr class="odd">
+<td>rapid_change_window</td>
+<td>15</td>
+<td>10</td>
+<td>5</td>
+<td>Time window for confusion detection (sec)</td>
+</tr>
+<tr class="even">
+<td>rapid_change_count</td>
+<td>4</td>
+<td>5</td>
+<td>7</td>
+<td>Changes in window to flag confusion</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Recommendation:</strong> Start with <code>"moderate"</code>
+preset and adjust based on your application’s maturity and criticality.
+Use <code>"strict"</code> for new features or critical workflows, and
+<code>"relaxed"</code> for well-established interfaces.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="tibble-integration">Tibble Integration<a class="anchor" aria-label="anchor" href="#tibble-integration"></a>
 </h2>
 <p>When the tibble package is available, all functions can return modern
 tibble objects.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Check if tibble is available</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"tibble"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># BID framework functions return tibbles by default when available</span></span>
+<span>  <span class="co"># Using RECOMMENDED flat API</span></span>
 <span>  <span class="va">result_tbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span>
 <span>    central_question <span class="op">=</span> <span class="st">"How can we test tibble integration?"</span>,</span>
-<span>    data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    data_story <span class="op">=</span> <span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span></span>
 <span>      hook <span class="op">=</span> <span class="st">"Package supports modern tibble output"</span>,</span>
 <span>      context <span class="op">=</span> <span class="st">"Enhanced data handling with tibble package"</span>,</span>
 <span>      tension <span class="op">=</span> <span class="st">"Need to verify integration works correctly"</span>,</span>
@@ -330,7 +597,7 @@ tibble objects.</p>
 </h2>
 <p>All core functions now follow consistent patterns for better
 usability.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Consistent parameter patterns across functions</span></span>
 <span><span class="va">bid_interpret_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"text"</span>, <span class="st">"method"</span>, <span class="st">"context"</span>, <span class="st">"return_tibble"</span>, <span class="st">"quiet"</span><span class="op">)</span></span>
 <span><span class="va">bid_structure_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"insights"</span>, <span class="st">"format"</span>, <span class="st">"priority"</span>, <span class="st">"context"</span>, <span class="st">"return_tibble"</span>, <span class="st">"quiet"</span><span class="op">)</span></span>
@@ -350,27 +617,101 @@ usability.</p>
 <h2 id="backward-compatibility">Backward Compatibility<a class="anchor" aria-label="anchor" href="#backward-compatibility"></a>
 </h2>
 <p>All enhancements maintain full backward compatibility - existing code
-continues to work unchanged.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Existing code patterns still work</span></span>
-<span><span class="va">old_style_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span><span class="st">"Legacy usage"</span>, <span class="st">"emotion"</span><span class="op">)</span></span>
+continues to work with deprecation warnings where appropriate.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Legacy nested format still works (with deprecation warning)</span></span>
+<span><span class="va">old_style_story</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span></span>
+<span>  context <span class="op">=</span> <span class="st">"Dashboard analysis"</span>,</span>
+<span>  variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>metric <span class="op">=</span> <span class="st">"engagement"</span><span class="op">)</span>,</span>
+<span>  relationships <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>trend <span class="op">=</span> <span class="st">"declining"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co"># Triggers deprecation warning but functions correctly</span></span>
 <span></span>
-<span><span class="co"># New features are optional with sensible defaults</span></span>
-<span><span class="va">new_style_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span>
-<span>  <span class="st">"Modern usage"</span>,</span>
-<span>  <span class="st">"emotion"</span>,</span>
-<span>  return_tibble <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span><span class="co"># Modern flat API is recommended</span></span>
+<span><span class="va">new_style_story</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span></span>
+<span>  hook <span class="op">=</span> <span class="st">"Engagement metrics show concerning trends"</span>,</span>
+<span>  context <span class="op">=</span> <span class="st">"Dashboard analysis of Q3 2024 usage patterns"</span>,</span>
+<span>  tension <span class="op">=</span> <span class="st">"User engagement declining despite new features"</span>,</span>
+<span>  resolution <span class="op">=</span> <span class="st">"Implement BID framework to identify UX friction"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Both can be used with bid_interpret()</span></span>
+<span><span class="va">result_old</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span>
+<span>  central_question <span class="op">=</span> <span class="st">"How to improve engagement?"</span>,</span>
+<span>  data_story <span class="op">=</span> <span class="va">old_style_story</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">result_new</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span>
+<span>  central_question <span class="op">=</span> <span class="st">"How to improve engagement?"</span>,</span>
+<span>  data_story <span class="op">=</span> <span class="va">new_style_story</span>,</span>
 <span>  quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Both return compatible structures</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">old_style_result</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">new_style_result</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">result_old</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">result_new</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="migration-strategy">Migration Strategy<a class="anchor" aria-label="anchor" href="#migration-strategy"></a>
+</h3>
+<p>For codebases with existing nested data_story usage:</p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>Immediate (0.3.2)</strong>: Code continues to work with
+deprecation warnings</li>
+<li>
+<strong>Short-term</strong>: Update to flat API following warning
+guidance</li>
+<li>
+<strong>Before 0.4.0</strong>: Complete migration required (nested
+format will be removed)</li>
+</ol>
+<p>Example migration:</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Step 1: Identify all new_data_story() calls with variables/relationships</span></span>
+<span><span class="co"># Step 2: Extract nested values and flatten</span></span>
+<span></span>
+<span><span class="co"># OLD CODE</span></span>
+<span><span class="va">story</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span></span>
+<span>  context <span class="op">=</span> <span class="st">"User study results"</span>,</span>
+<span>  variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    hook <span class="op">=</span> <span class="st">"Users struggle with feature discovery"</span>,</span>
+<span>    metric <span class="op">=</span> <span class="st">"task_completion_rate"</span>,</span>
+<span>    value <span class="op">=</span> <span class="fl">0.42</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  relationships <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    resolution <span class="op">=</span> <span class="st">"Redesign navigation with progressive disclosure"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># NEW CODE (flattened)</span></span>
+<span><span class="va">story</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span></span>
+<span>  hook <span class="op">=</span> <span class="st">"Users struggle with feature discovery"</span>,</span>
+<span>  context <span class="op">=</span> <span class="st">"User study results: 42% task completion rate"</span>,</span>
+<span>  tension <span class="op">=</span> <span class="st">"Low discoverability preventing user success"</span>,</span>
+<span>  resolution <span class="op">=</span> <span class="st">"Redesign navigation with progressive disclosure"</span>,</span>
+<span>  <span class="co"># Optional metadata for extra fields</span></span>
+<span>  metric <span class="op">=</span> <span class="st">"task_completion_rate"</span>,</span>
+<span>  value <span class="op">=</span> <span class="fl">0.42</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
 </h2>
-<p>The modernized bidux API provides:</p>
+<p>The modernized bidux API (0.3.2+) provides:</p>
+<div class="section level3">
+<h3 id="core-modernizations">Core Modernizations<a class="anchor" aria-label="anchor" href="#core-modernizations"></a>
+</h3>
 <ul>
+<li>
+<strong>Flat data_story API (RECOMMENDED)</strong>: Intuitive
+<code>new_data_story(hook, context, tension, resolution)</code> replaces
+nested format</li>
+<li>
+<strong>Telemetry sensitivity presets</strong>: Pre-configured
+threshold sets (<code>strict</code>, <code>moderate</code>,
+<code>relaxed</code>) via <code><a href="../reference/bid_telemetry_presets.html">bid_telemetry_presets()</a></code>
+</li>
 <li>
 <strong>Enhanced S3 classes</strong> with comprehensive method
 implementations</li>
@@ -383,14 +724,55 @@ messages</li>
 <li>
 <strong>Consistent function interfaces</strong> across all core
 functions</li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="deprecation-timeline">Deprecation Timeline<a class="anchor" aria-label="anchor" href="#deprecation-timeline"></a>
+</h3>
+<ul>
 <li>
-<strong>Full backward compatibility</strong> with existing code</li>
+<strong>Nested data_story format</strong> (variables/relationships):
+Deprecated in 0.3.2, removal in 0.4.0</li>
+<li>Clear migration warnings guide users to recommended patterns</li>
+<li>All legacy formats continue to work during deprecation period</li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="best-practices-for-0-3-2">Best Practices for 0.3.2+<a class="anchor" aria-label="anchor" href="#best-practices-for-0-3-2"></a>
+</h3>
+<ol style="list-style-type: decimal">
 <li>
-<strong>Modern R patterns</strong> following best practices</li>
+<strong>Always use flat API for data stories</strong>:
+<code>new_data_story(hook, context, tension, resolution)</code>
+</li>
+<li>
+<strong>Use telemetry presets</strong>: Start with
+<code>bid_telemetry_presets("moderate")</code> instead of manual
+thresholds</li>
+<li>
+<strong>Leverage S3 methods</strong>: Use <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>,
+<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>, and <code><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble()</a></code> for enhanced
+output</li>
+<li>
+<strong>Follow modern patterns</strong>: Embrace pipe workflows and
+tidy data principles</li>
+</ol>
+</div>
+<div class="section level3">
+<h3 id="backward-compatibility-1">Backward Compatibility<a class="anchor" aria-label="anchor" href="#backward-compatibility-1"></a>
+</h3>
+<ul>
+<li>
+<strong>Full backward compatibility</strong> maintained for all
+existing code</li>
+<li>Legacy formats trigger helpful deprecation warnings</li>
+<li>Migration examples provided throughout documentation</li>
+<li>Smooth transition path to modern patterns</li>
 </ul>
 <p>These improvements make the package more robust, user-friendly, and
 suitable for modern R workflows while maintaining all existing
-functionality.</p>
+functionality during the transition period.</p>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">bidux</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,18 +42,21 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="bidux-development-version">bidux (development version)<a class="anchor" aria-label="anchor" href="#bidux-development-version"></a></h2>
-</div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.3.2" id="id_-bidux-032-2025-10-09"># bidux 0.3.2 (2025-10-09)<a class="anchor" aria-label="anchor" href="#id_-bidux-032-2025-10-09"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.3.2" id="id_-bidux-032-2025-10-28"># bidux 0.3.2 (2025-10-28)<a class="anchor" aria-label="anchor" href="#id_-bidux-032-2025-10-28"></a></h2>
 <div class="section level4">
 <h4 id="new-features-0-3-2">NEW FEATURES<a class="anchor" aria-label="anchor" href="#new-features-0-3-2"></a></h4>
 <ul><li><p><strong>Flattened data_story API for improved ergonomics.</strong> <code><a href="../reference/new_data_story.html">new_data_story()</a></code> now accepts flat arguments (<code>hook</code>, <code>context</code>, <code>tension</code>, <code>resolution</code>) making it more intuitive for the 80% use case. The nested format (<code>variables</code>, <code>relationships</code>) is still supported with deprecation warnings and will be removed in 0.4.0.</p></li>
 <li><p><strong>Telemetry sensitivity presets.</strong> New <code><a href="../reference/bid_telemetry_presets.html">bid_telemetry_presets()</a></code> function provides pre-configured threshold sets (<code>strict</code>, <code>moderate</code>, <code>relaxed</code>) for easier telemetry analysis configuration without manual threshold tuning.</p></li>
+<li><p><strong>Quiet mode for cleaner output.</strong> New <code>quiet</code> parameter added to all BID stage functions to suppress informational messages. Includes global configuration via <code><a href="../reference/bid_set_quiet.html">bid_set_quiet()</a></code>, <code><a href="../reference/bid_get_quiet.html">bid_get_quiet()</a></code>, and <code><a href="../reference/bid_with_quiet.html">bid_with_quiet()</a></code> for controlling message verbosity across entire workflows.</p></li>
+<li><p><strong>New S3 constructors for modern API.</strong> Added <code><a href="../reference/new_user_personas.html">new_user_personas()</a></code> and <code><a href="../reference/new_bias_mitigations.html">new_bias_mitigations()</a></code> constructors to complement the S3 class system, providing type-safe alternatives to legacy list-based formats.</p></li>
+<li><p><strong>Enhanced print methods for S3 classes.</strong> Improved <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> methods for <code>bid_data_story</code>, <code>bid_user_personas</code>, and <code>bid_bias_mitigations</code> classes provide clearer, more informative console output.</p></li>
 </ul></div>
 <div class="section level4">
 <h4 id="improvements-0-3-2">IMPROVEMENTS<a class="anchor" aria-label="anchor" href="#improvements-0-3-2"></a></h4>
 <ul><li><p><strong>Reduced package footprint.</strong> Removed unused dependencies <code>purrr</code> and <code>stringr</code>, reducing install size and dependency overhead. Base R equivalents are used instead (e.g., <code><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nchar()</a></code> instead of <code><a href="https://stringr.tidyverse.org/reference/str_length.html" class="external-link">stringr::str_length()</a></code>).</p></li>
+<li><p><strong>Enhanced error handling with glue dependency.</strong> Added <code>glue</code> package to dependencies for improved error message formatting. Migrated from <code><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop()</a></code> to <code><a href="https://cli.r-lib.org/reference/cli_abort.html" class="external-link">cli::cli_abort()</a></code> with <code>standard_error_msg()</code> helper for more informative, context-rich error messages.</p></li>
+<li><p><strong>Text normalization improvements.</strong> Enhanced text processing utilities with better handling of whitespace, special characters, and edge cases in suggestion generation and matching.</p></li>
+<li><p><strong>Code organization and modularity improvements.</strong> Refactored utilities into domain-specific files (<code>utils_messaging.R</code>, <code>utils_validation.R</code>, <code>utils_stage.R</code>, <code>utils_safe_access.R</code>) for better maintainability and testability.</p></li>
 <li><p><strong>Cleaner telemetry constants.</strong> Extracted all magic numbers from telemetry analysis functions to named constants at the top of <code>telemetry_analysis.R</code>, improving maintainability and making thresholds self-documenting.</p></li>
 <li><p><strong>Improved data.frame API documentation.</strong> Updated examples and vignettes to show <code>data.frame</code> as the recommended API for <code>user_personas</code> and <code>bias_mitigations</code>, with clearer migration paths from legacy list format.</p></li>
 <li><p><strong>Backward-compatible enhancements.</strong> All API changes maintain full backward compatibility through migration functions with helpful deprecation warnings guiding users to modern patterns.</p></li>
@@ -64,9 +67,11 @@
 </ul></div>
 <div class="section level4">
 <h4 id="documentation-updates-0-3-2">DOCUMENTATION UPDATES<a class="anchor" aria-label="anchor" href="#documentation-updates-0-3-2"></a></h4>
-<ul><li><p><strong>Updated Getting Started vignette</strong> to show recommended flat <code><a href="../reference/new_data_story.html">new_data_story()</a></code> API and <code>data.frame</code> format for personas.</p></li>
+<ul><li><p><strong>New API Modernization vignette</strong> providing comprehensive guidance on migrating from legacy list-based APIs to modern S3 class system, including examples for <code>data_story</code>, <code>user_personas</code>, and <code>bias_mitigations</code>.</p></li>
+<li><p><strong>Simplified Advanced Workflows vignette</strong> with clearer examples of complex BID pipeline patterns, quiet mode usage, and telemetry integration workflows.</p></li>
+<li><p><strong>Updated Getting Started vignette</strong> to show recommended flat <code><a href="../reference/new_data_story.html">new_data_story()</a></code> API and <code>data.frame</code> format for personas.</p></li>
 <li><p><strong>Enhanced function examples</strong> in <code><a href="../reference/bid_interpret.html">bid_interpret()</a></code> and other stage functions to demonstrate both modern and legacy formats.</p></li>
-<li><p><strong>Comprehensive test coverage</strong> for new flat data_story API, backward compatibility with nested format, telemetry presets, and safe accessor functions.</p></li>
+<li><p><strong>Comprehensive test coverage</strong> for new flat data_story API, backward compatibility with nested format, telemetry presets, safe accessor functions, and quiet mode functionality.</p></li>
 </ul></div>
 <div class="section level4">
 <h4 id="deprecations-0-3-2">DEPRECATIONS<a class="anchor" aria-label="anchor" href="#deprecations-0-3-2"></a></h4>

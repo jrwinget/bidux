@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="index.html">bidux</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -111,7 +111,7 @@
 <span><span class="co"># Document a complete BID process</span></span>
 <span><span class="va">process</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span>
 <span>  central_question <span class="op">=</span> <span class="st">"How are our marketing campaigns performing across different channels?"</span>,</span>
-<span>  data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  data_story <span class="op">=</span> <span class="fu"><a href="reference/new_data_story.html">new_data_story</a></span><span class="op">(</span></span>
 <span>    hook <span class="op">=</span> <span class="st">"Recent campaign performance varies significantly across channels"</span>,</span>
 <span>    context <span class="op">=</span> <span class="st">"We've invested in 6 different marketing channels over the past quarter"</span>,</span>
 <span>    tension <span class="op">=</span> <span class="st">"ROI metrics show inconsistent results, with some channels underperforming"</span>,</span>
@@ -149,20 +149,29 @@
 <div class="section level2">
 <h2 id="data-driven-ux-with-telemetry">Data-Driven UX with Telemetry<a class="anchor" aria-label="anchor" href="#data-driven-ux-with-telemetry"></a>
 </h2>
-<p><strong>New in 0.3.1</strong>: Enhanced telemetry workflow transforms real user behavior data into actionable BID insights.</p>
+<p><strong>New in 0.3.2</strong>: Enhanced telemetry workflow transforms real user behavior data into actionable BID insights.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Modern approach: analyze telemetry data</span></span>
+<code class="sourceCode R"><span><span class="co"># Modern approach: analyze telemetry data with bid_telemetry()</span></span>
+<span><span class="co"># Returns a clean tibble of issues (without legacy list structure)</span></span>
 <span><span class="va">issues</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_telemetry.html">bid_telemetry</a></span><span class="op">(</span><span class="st">"telemetry.sqlite"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span>  <span class="co"># Shows organized issue summary with severity levels</span></span>
 <span></span>
+<span><span class="co"># Adjust sensitivity with presets</span></span>
+<span><span class="va">strict_issues</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_telemetry.html">bid_telemetry</a></span><span class="op">(</span></span>
+<span>  <span class="st">"telemetry.sqlite"</span>,</span>
+<span>  thresholds <span class="op">=</span> <span class="fu"><a href="reference/bid_telemetry_presets.html">bid_telemetry_presets</a></span><span class="op">(</span><span class="st">"strict"</span><span class="op">)</span>    <span class="co"># or "moderate", "relaxed"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># Focus on critical issues using tidy workflows</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span></span>
 <span><span class="va">critical_issues</span> <span class="op">&lt;-</span> <span class="va">issues</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">severity</span> <span class="op">==</span> <span class="st">"critical"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">arrange</span><span class="op">(</span><span class="fu">desc</span><span class="op">(</span><span class="va">user_impact</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">severity</span> <span class="op">==</span> <span class="st">"critical"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">impact_rate</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Convert high-priority issues to BID Notice stages</span></span>
 <span><span class="va">notices</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_notices.html">bid_notices</a></span><span class="op">(</span></span>
-<span>  issues <span class="op">=</span> <span class="va">critical_issues</span>,</span>
+<span>  <span class="va">critical_issues</span>,</span>
 <span>  previous_stage <span class="op">=</span> <span class="va">interpret_result</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -185,7 +194,7 @@
 <li>
 <strong>Confusion Patterns</strong>: Rapid repeated changes indicating user uncertainty</li>
 </ul>
-<p>Legacy <code><a href="reference/bid_ingest_telemetry.html">bid_ingest_telemetry()</a></code> function maintains full backward compatibility while providing enhanced functionality through hybrid objects.</p>
+<p><strong>Function comparison:</strong> - <code><a href="reference/bid_telemetry.html">bid_telemetry()</a></code>: Modern API returning a clean tibble (recommended for new code) - <code><a href="reference/bid_ingest_telemetry.html">bid_ingest_telemetry()</a></code>: Legacy API returning hybrid object with list structure (for backward compatibility)</p>
 </div>
 <div class="section level2">
 <h2 id="key-features">Key Features<a class="anchor" aria-label="anchor" href="#key-features"></a>
@@ -234,7 +243,7 @@
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Browse all available concepts</span></span>
 <span><span class="fu"><a href="reference/bid_concepts.html">bid_concepts</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">concept</span>, <span class="va">category</span>, <span class="va">description</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">concept</span>, <span class="va">category</span>, <span class="va">description</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Get detailed information about specific concepts</span></span>
 <span><span class="fu"><a href="reference/bid_concept.html">bid_concept</a></span><span class="op">(</span><span class="st">"Processing Fluency"</span><span class="op">)</span></span>
@@ -242,7 +251,7 @@
 <span></span>
 <span><span class="co"># Search for concepts by keyword</span></span>
 <span><span class="fu"><a href="reference/bid_concepts.html">bid_concepts</a></span><span class="op">(</span><span class="st">"cognitive"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">concept</span>, <span class="va">implementation_tips</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">concept</span>, <span class="va">implementation_tips</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="getting-help">Getting Help<a class="anchor" aria-label="anchor" href="#getting-help"></a>

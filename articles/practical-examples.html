@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">bidux</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -173,25 +173,24 @@ options</p>
 <code class="sourceCode R"><span><span class="co"># Stage 1: Interpret - Understand the real user need</span></span>
 <span><span class="va">interpret_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span>
 <span>  central_question <span class="op">=</span> <span class="st">"How is our user engagement trending, and what needs attention?"</span>,</span>
-<span>  data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  data_story <span class="op">=</span> <span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span></span>
 <span>    hook <span class="op">=</span> <span class="st">"User engagement metrics are spread across multiple systems"</span>,</span>
 <span>    context <span class="op">=</span> <span class="st">"Leadership needs quick insights for weekly business reviews"</span>,</span>
 <span>    tension <span class="op">=</span> <span class="st">"Current dashboards take too long to interpret"</span>,</span>
 <span>    resolution <span class="op">=</span> <span class="st">"Provide immediate key insights with drill-down capability"</span></span>
 <span>  <span class="op">)</span>,</span>
-<span>  user_personas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>      name <span class="op">=</span> <span class="st">"Sarah (Product Manager)"</span>,</span>
-<span>      goals <span class="op">=</span> <span class="st">"Quickly spot concerning trends and dive deeper when needed"</span>,</span>
-<span>      pain_points <span class="op">=</span> <span class="st">"Too many metrics to process in limited meeting time"</span>,</span>
-<span>      technical_level <span class="op">=</span> <span class="st">"Intermediate"</span></span>
+<span>  user_personas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>    name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Sarah (Product Manager)"</span>, <span class="st">"Mike (Executive)"</span><span class="op">)</span>,</span>
+<span>    goals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>      <span class="st">"Quickly spot concerning trends and dive deeper when needed"</span>,</span>
+<span>      <span class="st">"Understand overall health at a glance"</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>      name <span class="op">=</span> <span class="st">"Mike (Executive)"</span>,</span>
-<span>      goals <span class="op">=</span> <span class="st">"Understand overall health at a glance"</span>,</span>
-<span>      pain_points <span class="op">=</span> <span class="st">"Gets lost in details when just needs the big picture"</span>,</span>
-<span>      technical_level <span class="op">=</span> <span class="st">"Basic"</span></span>
-<span>    <span class="op">)</span></span>
+<span>    pain_points <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>      <span class="st">"Too many metrics to process in limited meeting time"</span>,</span>
+<span>      <span class="st">"Gets lost in details when just needs the big picture"</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    technical_level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"intermediate"</span>, <span class="st">"basic"</span><span class="op">)</span>,</span>
+<span>    stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -425,19 +424,18 @@ and “I just export to Excel instead”</p>
 <code class="sourceCode R"><span><span class="co"># Apply BID framework focusing on sales manager workflow</span></span>
 <span><span class="va">sales_interpret</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span>
 <span>  central_question <span class="op">=</span> <span class="st">"What deals need my attention this week?"</span>,</span>
-<span>  data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  data_story <span class="op">=</span> <span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span></span>
 <span>    hook <span class="op">=</span> <span class="st">"Sales managers spend 2+ hours weekly creating status reports"</span>,</span>
 <span>    context <span class="op">=</span> <span class="st">"They need to quickly identify at-risk deals and top opportunities"</span>,</span>
 <span>    tension <span class="op">=</span> <span class="st">"Current data requires extensive filtering and analysis"</span>,</span>
 <span>    resolution <span class="op">=</span> <span class="st">"Provide intelligent prioritization with drill-down capability"</span></span>
 <span>  <span class="op">)</span>,</span>
-<span>  user_personas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>      name <span class="op">=</span> <span class="st">"Jennifer (Regional Sales Manager)"</span>,</span>
-<span>      goals <span class="op">=</span> <span class="st">"Identify at-risk deals, spot top opportunities, prepare for team meetings"</span>,</span>
-<span>      pain_points <span class="op">=</span> <span class="st">"Too much filtering required to find actionable insights"</span>,</span>
-<span>      technical_level <span class="op">=</span> <span class="st">"Intermediate"</span></span>
-<span>    <span class="op">)</span></span>
+<span>  user_personas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>    name <span class="op">=</span> <span class="st">"Jennifer (Regional Sales Manager)"</span>,</span>
+<span>    goals <span class="op">=</span> <span class="st">"Identify at-risk deals, spot top opportunities, prepare for team meetings"</span>,</span>
+<span>    pain_points <span class="op">=</span> <span class="st">"Too much filtering required to find actionable insights"</span>,</span>
+<span>    technical_level <span class="op">=</span> <span class="st">"intermediate"</span>,</span>
+<span>    stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -614,25 +612,26 @@ lost.</p>
 <code class="sourceCode R"><span><span class="co"># Interpret stage: Understand different user needs</span></span>
 <span><span class="va">technical_interpret</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span>
 <span>  central_question <span class="op">=</span> <span class="st">"How is our application performing and what needs attention?"</span>,</span>
-<span>  user_personas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>      name <span class="op">=</span> <span class="st">"DevOps Engineer"</span>,</span>
-<span>      goals <span class="op">=</span> <span class="st">"Identify performance bottlenecks and system issues"</span>,</span>
-<span>      pain_points <span class="op">=</span> <span class="st">"Needs detailed metrics and historical trends"</span>,</span>
-<span>      technical_level <span class="op">=</span> <span class="st">"Expert"</span></span>
+<span>  data_story <span class="op">=</span> <span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span></span>
+<span>    hook <span class="op">=</span> <span class="st">"Application performance directly impacts user satisfaction and revenue"</span>,</span>
+<span>    context <span class="op">=</span> <span class="st">"Different stakeholders need different views of system health"</span>,</span>
+<span>    tension <span class="op">=</span> <span class="st">"Technical metrics are critical but overwhelming for non-engineers"</span>,</span>
+<span>    resolution <span class="op">=</span> <span class="st">"Provide role-appropriate views while maintaining data integrity"</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  user_personas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>    name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DevOps Engineer"</span>, <span class="st">"Engineering Manager"</span>, <span class="st">"Executive"</span><span class="op">)</span>,</span>
+<span>    goals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>      <span class="st">"Identify performance bottlenecks and system issues"</span>,</span>
+<span>      <span class="st">"Understand overall system health and team priorities"</span>,</span>
+<span>      <span class="st">"Understand business impact of technical issues"</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>      name <span class="op">=</span> <span class="st">"Engineering Manager"</span>,</span>
-<span>      goals <span class="op">=</span> <span class="st">"Understand overall system health and team priorities"</span>,</span>
-<span>      pain_points <span class="op">=</span> <span class="st">"Needs summary view but ability to drill down"</span>,</span>
-<span>      technical_level <span class="op">=</span> <span class="st">"Advanced"</span></span>
+<span>    pain_points <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>      <span class="st">"Needs detailed metrics and historical trends"</span>,</span>
+<span>      <span class="st">"Needs summary view but ability to drill down"</span>,</span>
+<span>      <span class="st">"Technical details are overwhelming"</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>      name <span class="op">=</span> <span class="st">"Executive"</span>,</span>
-<span>      goals <span class="op">=</span> <span class="st">"Understand business impact of technical issues"</span>,</span>
-<span>      pain_points <span class="op">=</span> <span class="st">"Technical details are overwhelming"</span>,</span>
-<span>      technical_level <span class="op">=</span> <span class="st">"Basic"</span></span>
-<span>    <span class="op">)</span></span>
+<span>    technical_level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"expert"</span>, <span class="st">"advanced"</span>, <span class="st">"beginner"</span><span class="op">)</span>,</span>
+<span>    stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -726,12 +725,220 @@ based on user cognitive needs and technical expertise.</p>
 </div>
 </div>
 <div class="section level2">
+<h2 id="example-4-the-telemetry-driven-improvement">Example 4: The Telemetry-Driven Improvement<a class="anchor" aria-label="anchor" href="#example-4-the-telemetry-driven-improvement"></a>
+</h2>
+<div class="section level3">
+<h3 id="the-scenario-3">The Scenario<a class="anchor" aria-label="anchor" href="#the-scenario-3"></a>
+</h3>
+<p>You’ve deployed a dashboard that looks great, but you’re getting
+vague complaints about “usability issues.” Rather than guessing, you
+instrument your Shiny app with telemetry to understand real user
+behavior.</p>
+</div>
+<div class="section level3">
+<h3 id="discovering-problems-with-data">Discovering Problems with Data<a class="anchor" aria-label="anchor" href="#discovering-problems-with-data"></a>
+</h3>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Analyze telemetry data to identify real friction points</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://jrwinget.github.io/bidux/">bidux</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Example telemetry data structure (your actual data would come from shinymetrics, etc.)</span></span>
+<span><span class="va">telemetry_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  session_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"s1"</span>, <span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"s2"</span>, <span class="fl">8</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"s3"</span>, <span class="fl">12</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  input_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">"date_filter"</span>, <span class="st">"region_filter"</span>, <span class="st">"product_filter"</span>, <span class="st">"date_filter"</span>,</span>
+<span>    <span class="st">"region_filter"</span>, <span class="st">"date_filter"</span>, <span class="st">"region_filter"</span>, <span class="st">"date_filter"</span>,</span>
+<span>    <span class="st">"advanced_options"</span>, <span class="st">"advanced_options"</span>,</span>
+<span>    <span class="st">"date_filter"</span>, <span class="st">"export_btn"</span>, <span class="st">"export_btn"</span>, <span class="st">"export_btn"</span>,</span>
+<span>    <span class="st">"date_filter"</span>, <span class="st">"date_filter"</span>, <span class="st">"date_filter"</span>, <span class="st">"date_filter"</span>,</span>
+<span>    <span class="st">"date_filter"</span>, <span class="st">"region_filter"</span>, <span class="st">"date_filter"</span>, <span class="st">"date_filter"</span>,</span>
+<span>    <span class="st">"help_btn"</span>, <span class="st">"export_btn"</span>, <span class="st">"export_btn"</span>, <span class="st">"export_btn"</span>,</span>
+<span>    <span class="st">"date_filter"</span>, <span class="st">"date_filter"</span>, <span class="st">"date_filter"</span>, <span class="st">"date_filter"</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  timestamp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">:</span><span class="fl">30</span>,</span>
+<span>  error_occurred <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">FALSE</span>, <span class="fl">8</span><span class="op">)</span>, <span class="cn">TRUE</span>, <span class="cn">TRUE</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">FALSE</span>, <span class="fl">20</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Use bidux telemetry analysis</span></span>
+<span><span class="va">issues</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_telemetry.html">bid_telemetry</a></span><span class="op">(</span></span>
+<span>  <span class="va">telemetry_data</span>,</span>
+<span>  session_col <span class="op">=</span> <span class="st">"session_id"</span>,</span>
+<span>  input_col <span class="op">=</span> <span class="st">"input_id"</span>,</span>
+<span>  time_col <span class="op">=</span> <span class="st">"timestamp"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Convert telemetry issues to Notice stage</span></span>
+<span><span class="va">telemetry_notices</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_notices.html">bid_notices</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">telemetry_notices</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="bid-framework-with-data-driven-insights">BID Framework with Data-Driven Insights<a class="anchor" aria-label="anchor" href="#bid-framework-with-data-driven-insights"></a>
+</h3>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Start with telemetry-discovered problems</span></span>
+<span><span class="va">interpret_telemetry</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span>
+<span>  central_question <span class="op">=</span> <span class="st">"Why are users struggling with the date filter interface?"</span>,</span>
+<span>  data_story <span class="op">=</span> <span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span></span>
+<span>    hook <span class="op">=</span> <span class="st">"Telemetry reveals 60% of user interactions involve date filter adjustments"</span>,</span>
+<span>    context <span class="op">=</span> <span class="st">"Users are repeatedly changing date filters, suggesting confusion or poor defaults"</span>,</span>
+<span>    tension <span class="op">=</span> <span class="st">"The date filter is creating friction rather than helping users"</span>,</span>
+<span>    resolution <span class="op">=</span> <span class="st">"Redesign date filtering with smarter defaults and clearer feedback"</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  user_personas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>    name <span class="op">=</span> <span class="st">"Data Analyst"</span>,</span>
+<span>    goals <span class="op">=</span> <span class="st">"Quickly analyze trends for specific time periods"</span>,</span>
+<span>    pain_points <span class="op">=</span> <span class="st">"Spends too much time adjusting date ranges to see relevant data"</span>,</span>
+<span>    technical_level <span class="op">=</span> <span class="st">"intermediate"</span>,</span>
+<span>    stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Use telemetry findings in Notice stage</span></span>
+<span><span class="va">notice_telemetry</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_notice.html">bid_notice</a></span><span class="op">(</span></span>
+<span>  previous_stage <span class="op">=</span> <span class="va">interpret_telemetry</span>,</span>
+<span>  problem <span class="op">=</span> <span class="st">"Users make excessive date filter adjustments (avg 8 per session)"</span>,</span>
+<span>  theory <span class="op">=</span> <span class="st">"Choice Architecture"</span>,</span>
+<span>  evidence <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span></span>
+<span>    <span class="st">"Telemetry shows 60% of interactions are date-related,"</span>,</span>
+<span>    <span class="st">"suggesting poor default choices and unclear time period options"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Address cognitive biases revealed by behavior</span></span>
+<span><span class="va">anticipate_telemetry</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_anticipate.html">bid_anticipate</a></span><span class="op">(</span></span>
+<span>  previous_stage <span class="op">=</span> <span class="va">notice_telemetry</span>,</span>
+<span>  bias_mitigations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    status_quo_bias <span class="op">=</span> <span class="st">"Users stick with default settings - provide smarter defaults"</span>,</span>
+<span>    choice_overload <span class="op">=</span> <span class="st">"Too many date options confuse users - offer common presets"</span>,</span>
+<span>    analysis_paralysis <span class="op">=</span> <span class="st">"Users repeatedly adjust - provide clear visual feedback on data coverage"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Get layout and UI suggestions</span></span>
+<span><span class="va">structure_telemetry</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_structure.html">bid_structure</a></span><span class="op">(</span>previous_stage <span class="op">=</span> <span class="va">anticipate_telemetry</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Document validation approach</span></span>
+<span><span class="va">validate_telemetry</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_validate.html">bid_validate</a></span><span class="op">(</span></span>
+<span>  previous_stage <span class="op">=</span> <span class="va">structure_telemetry</span>,</span>
+<span>  summary_panel <span class="op">=</span> <span class="st">"Redesigned date filtering with smart defaults and preset options"</span>,</span>
+<span>  collaboration <span class="op">=</span> <span class="st">"Share telemetry insights with team; A/B test new design"</span>,</span>
+<span>  next_steps <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">"Implement intelligent date defaults based on data recency"</span>,</span>
+<span>    <span class="st">"Add quick-select presets: 'Last 7 days', 'Last 30 days', 'Year to date'"</span>,</span>
+<span>    <span class="st">"Provide visual feedback showing data coverage for selected range"</span>,</span>
+<span>    <span class="st">"Monitor telemetry to validate improvements"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="after-data-driven-date-filter-redesign">After: Data-Driven Date Filter Redesign<a class="anchor" aria-label="anchor" href="#after-data-driven-date-filter-redesign"></a>
+</h3>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Before: Generic date picker with no guidance</span></span>
+<span><span class="va">ui_date_before</span> <span class="op">&lt;-</span> <span class="fu">dateRangeInput</span><span class="op">(</span></span>
+<span>  <span class="st">"date_range"</span>,</span>
+<span>  <span class="st">"Select Date Range:"</span>,</span>
+<span>  start <span class="op">=</span> <span class="st">"2024-01-01"</span>,</span>
+<span>  end <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># After: Smart defaults + quick presets based on telemetry insights</span></span>
+<span><span class="va">ui_date_after</span> <span class="op">&lt;-</span> <span class="fu">div</span><span class="op">(</span></span>
+<span>  <span class="co"># Quick presets (addresses choice overload from telemetry)</span></span>
+<span>  <span class="fu">div</span><span class="op">(</span></span>
+<span>    style <span class="op">=</span> <span class="st">"margin-bottom: 10px;"</span>,</span>
+<span>    <span class="fu">radioButtons</span><span class="op">(</span></span>
+<span>      <span class="st">"date_preset"</span>,</span>
+<span>      <span class="st">"Quick Select:"</span>,</span>
+<span>      choices <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>        <span class="st">"Last 7 days"</span> <span class="op">=</span> <span class="st">"7d"</span>,</span>
+<span>        <span class="st">"Last 30 days"</span> <span class="op">=</span> <span class="st">"30d"</span>,</span>
+<span>        <span class="st">"Year to date"</span> <span class="op">=</span> <span class="st">"ytd"</span>,</span>
+<span>        <span class="st">"Custom range"</span> <span class="op">=</span> <span class="st">"custom"</span></span>
+<span>      <span class="op">)</span>,</span>
+<span>      selected <span class="op">=</span> <span class="st">"30d"</span>,  <span class="co"># Smart default based on most common usage</span></span>
+<span>      inline <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span></span>
+<span>  <span class="co"># Custom date range (only shown when needed)</span></span>
+<span>  <span class="fu">conditionalPanel</span><span class="op">(</span></span>
+<span>    condition <span class="op">=</span> <span class="st">"input.date_preset == 'custom'"</span>,</span>
+<span>    <span class="fu">dateRangeInput</span><span class="op">(</span></span>
+<span>      <span class="st">"date_range_custom"</span>,</span>
+<span>      <span class="cn">NULL</span>,</span>
+<span>      start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-</span> <span class="fl">30</span>,</span>
+<span>      end <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span></span>
+<span>  <span class="co"># Data coverage indicator (provides feedback on selection)</span></span>
+<span>  <span class="fu">uiOutput</span><span class="op">(</span><span class="st">"data_coverage_info"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Server logic for data coverage feedback</span></span>
+<span><span class="va">server_date_feedback</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">output</span><span class="op">$</span><span class="va">data_coverage_info</span> <span class="op">&lt;-</span> <span class="fu">renderUI</span><span class="op">(</span><span class="op">{</span></span>
+<span>    <span class="co"># Calculate based on selected date range</span></span>
+<span>    <span class="va">coverage_pct</span> <span class="op">&lt;-</span> <span class="fl">95</span>  <span class="co"># Example: 95% of data falls in selected range</span></span>
+<span></span>
+<span>    <span class="fu">div</span><span class="op">(</span></span>
+<span>      class <span class="op">=</span> <span class="st">"alert alert-info"</span>,</span>
+<span>      style <span class="op">=</span> <span class="st">"margin-top: 10px; padding: 8px;"</span>,</span>
+<span>      <span class="fu">icon</span><span class="op">(</span><span class="st">"info-circle"</span><span class="op">)</span>,</span>
+<span>      <span class="st">" This date range covers "</span>,</span>
+<span>      <span class="fu">strong</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">coverage_pct</span>, <span class="st">"%"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>      <span class="st">" of your available data"</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">}</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p><strong>Key improvements based on telemetry:</strong></p>
+<ul>
+<li>
+<strong>Smart defaults</strong>: Most users want recent data, so
+default to “Last 30 days”</li>
+<li>
+<strong>Quick presets</strong>: Reduce 60% of date interactions by
+providing common choices</li>
+<li>
+<strong>Progressive disclosure</strong>: Hide complex date picker
+unless custom range needed</li>
+<li>
+<strong>Clear feedback</strong>: Show data coverage to prevent
+empty-result confusion</li>
+<li>
+<strong>Measurable impact</strong>: Can validate improvements with
+follow-up telemetry</li>
+</ul>
+<p><strong>The telemetry-driven workflow:</strong></p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>Measure</strong>: Instrument dashboard to capture real user
+behavior</li>
+<li>
+<strong>Analyze</strong>: Use <code><a href="../reference/bid_telemetry.html">bid_telemetry()</a></code> to
+identify friction patterns</li>
+<li>
+<strong>Understand</strong>: Apply BID framework to interpret
+findings systematically</li>
+<li>
+<strong>Redesign</strong>: Make evidence-based improvements
+targeting real problems</li>
+<li>
+<strong>Validate</strong>: Monitor telemetry to confirm improvements
+worked</li>
+</ol>
+</div>
+</div>
+<div class="section level2">
 <h2 id="best-practices-summary">Best Practices Summary<a class="anchor" aria-label="anchor" href="#best-practices-summary"></a>
 </h2>
 <div class="section level3">
 <h3 id="start-with-user-intent-not-data-structure">1. Start with User Intent, Not Data Structure<a class="anchor" aria-label="anchor" href="#start-with-user-intent-not-data-structure"></a>
 </h3>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># ❌ Data-structure driven</span></span>
 <span><span class="va">ui_wrong</span> <span class="op">&lt;-</span> <span class="fu">tabPanel</span><span class="op">(</span></span>
 <span>  <span class="st">"Database Tables"</span>,</span>
@@ -752,7 +959,7 @@ based on user cognitive needs and technical expertise.</p>
 <div class="section level3">
 <h3 id="progressive-disclosure-over-information-density">2. Progressive Disclosure Over Information Density<a class="anchor" aria-label="anchor" href="#progressive-disclosure-over-information-density"></a>
 </h3>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># ❌ Everything visible at once</span></span>
 <span><span class="va">ui_dense</span> <span class="op">&lt;-</span> <span class="fu">fluidRow</span><span class="op">(</span></span>
 <span>  <span class="fu">column</span><span class="op">(</span><span class="fl">2</span>, <span class="va">metric1</span><span class="op">)</span>,</span>
@@ -776,7 +983,7 @@ based on user cognitive needs and technical expertise.</p>
 <div class="section level3">
 <h3 id="context-over-raw-numbers">3. Context Over Raw Numbers<a class="anchor" aria-label="anchor" href="#context-over-raw-numbers"></a>
 </h3>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># ❌ Raw number without meaning</span></span>
 <span><span class="fu">valueBox</span><span class="op">(</span><span class="st">"Revenue"</span>, <span class="st">"$127,432"</span><span class="op">)</span></span>
 <span></span>
