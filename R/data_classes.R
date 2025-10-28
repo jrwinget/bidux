@@ -6,7 +6,10 @@
 #' @keywords internal
 new_bid_stage <- function(stage, data, metadata = list()) {
   if (!tibble::is_tibble(data)) {
-    stop("data must be a tibble", call. = FALSE)
+    cli::cli_abort(standard_error_msg(
+      "data must be a tibble",
+      context = glue::glue("You provided: {class(data)[1]}")
+    ))
   }
 
   structure(
@@ -25,7 +28,9 @@ new_bid_stage <- function(stage, data, metadata = list()) {
 validate_bid_stage <- function(x) {
   stage <- attr(x, "stage")
   if (is.null(stage) || !is.character(stage) || length(stage) != 1) {
-    stop("BID stage object must have a single 'stage' attribute", call. = FALSE)
+    cli::cli_abort(standard_error_msg(
+      "BID stage object must have a single 'stage' attribute"
+    ))
   }
 
   valid_stages <- c(
@@ -36,23 +41,29 @@ validate_bid_stage <- function(x) {
     "Validate"
   )
   if (!stage %in% valid_stages) {
-    stop(
-      "Stage must be one of: ",
-      paste(valid_stages, collapse = ", "),
-      call. = FALSE
-    )
+    cli::cli_abort(standard_error_msg(
+      glue::glue("Invalid stage: {stage}"),
+      suggestions = glue::glue("Stage must be one of: {paste(valid_stages, collapse = ', ')}")
+    ))
   }
 
   if (!"stage" %in% names(x)) {
-    stop("BID stage object must contain a 'stage' column", call. = FALSE)
+    cli::cli_abort(standard_error_msg(
+      "BID stage object must contain a 'stage' column"
+    ))
   }
 
   if (x$stage[1] != stage) {
-    stop("Stage attribute must match stage column value", call. = FALSE)
+    cli::cli_abort(standard_error_msg(
+      "Stage attribute must match stage column value",
+      context = glue::glue("Attribute: {stage}, Column: {x$stage[1]}")
+    ))
   }
 
   if (!"timestamp" %in% names(x)) {
-    stop("BID stage object must contain a 'timestamp' column", call. = FALSE)
+    cli::cli_abort(standard_error_msg(
+      "BID stage object must contain a 'timestamp' column"
+    ))
   }
 
   TRUE
@@ -84,7 +95,10 @@ is_bid_stage <- function(x) {
 #' @export
 get_stage <- function(x) {
   if (!is_bid_stage(x)) {
-    stop("Object is not a bid_stage", call. = FALSE)
+    cli::cli_abort(standard_error_msg(
+      "Object is not a bid_stage",
+      context = glue::glue("You provided: {class(x)[1]}")
+    ))
   }
   attr(x, "stage")
 }
@@ -95,7 +109,10 @@ get_stage <- function(x) {
 #' @export
 get_metadata <- function(x) {
   if (!is_bid_stage(x)) {
-    stop("Object is not a bid_stage", call. = FALSE)
+    cli::cli_abort(standard_error_msg(
+      "Object is not a bid_stage",
+      context = glue::glue("You provided: {class(x)[1]}")
+    ))
   }
   attr(x, "metadata")
 }
@@ -471,7 +488,10 @@ as_tibble.bid_stage <- function(x, ...) {
 #' @keywords internal
 new_bid_result <- function(stages) {
   if (!is.list(stages)) {
-    stop("stages must be a list", call. = FALSE)
+    cli::cli_abort(standard_error_msg(
+      "stages must be a list",
+      context = glue::glue("You provided: {class(stages)[1]}")
+    ))
   }
 
   structure(
@@ -487,15 +507,18 @@ new_bid_result <- function(stages) {
 #' @keywords internal
 validate_bid_result <- function(x) {
   if (!is.list(x)) {
-    stop("BID result object must be a list", call. = FALSE)
+    cli::cli_abort(standard_error_msg(
+      "BID result object must be a list",
+      context = glue::glue("You provided: {class(x)[1]}")
+    ))
   }
 
   for (i in seq_along(x)) {
     if (!is_bid_stage(x[[i]])) {
-      stop(
-        "All elements in BID result must be bid_stage objects",
-        call. = FALSE
-      )
+      cli::cli_abort(standard_error_msg(
+        glue::glue("All elements in BID result must be bid_stage objects"),
+        context = glue::glue("Element {i} is: {class(x[[i]])[1]}")
+      ))
     }
   }
 
@@ -519,7 +542,10 @@ bid_result <- function(stages) {
 #' @export
 extract_stage <- function(workflow, stage) {
   if (!inherits(workflow, "bid_result")) {
-    stop("workflow must be a bid_result object", call. = FALSE)
+    cli::cli_abort(standard_error_msg(
+      "workflow must be a bid_result object",
+      context = glue::glue("You provided: {class(workflow)[1]}")
+    ))
   }
 
   for (stage_obj in workflow) {

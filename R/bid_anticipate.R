@@ -62,7 +62,10 @@ bid_anticipate <- function(
     quiet = NULL,
     ...) {
   if (missing(previous_stage) || is.null(previous_stage)) {
-    stop("Required parameter 'previous_stage' must be provided", call. = FALSE)
+    cli::cli_abort(standard_error_msg(
+      "Required parameter 'previous_stage' must be provided",
+      suggestions = "Provide the output from a previous BID stage function"
+    ))
   }
 
   # handle deprecated interaction_principles parameter via ...
