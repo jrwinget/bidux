@@ -45,6 +45,62 @@
 <h2 class="pkg-version" data-toc-text="development version" id="bidux-development-version">bidux (development version)<a class="anchor" aria-label="anchor" href="#bidux-development-version"></a></h2>
 </div>
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.2" id="id_-bidux-032-2025-10-09"># bidux 0.3.2 (2025-10-09)<a class="anchor" aria-label="anchor" href="#id_-bidux-032-2025-10-09"></a></h2>
+<div class="section level4">
+<h4 id="new-features-0-3-2">NEW FEATURES<a class="anchor" aria-label="anchor" href="#new-features-0-3-2"></a></h4>
+<ul><li><p><strong>Flattened data_story API for improved ergonomics.</strong> <code><a href="../reference/new_data_story.html">new_data_story()</a></code> now accepts flat arguments (<code>hook</code>, <code>context</code>, <code>tension</code>, <code>resolution</code>) making it more intuitive for the 80% use case. The nested format (<code>variables</code>, <code>relationships</code>) is still supported with deprecation warnings and will be removed in 0.4.0.</p></li>
+<li><p><strong>Telemetry sensitivity presets.</strong> New <code><a href="../reference/bid_telemetry_presets.html">bid_telemetry_presets()</a></code> function provides pre-configured threshold sets (<code>strict</code>, <code>moderate</code>, <code>relaxed</code>) for easier telemetry analysis configuration without manual threshold tuning.</p></li>
+</ul></div>
+<div class="section level4">
+<h4 id="improvements-0-3-2">IMPROVEMENTS<a class="anchor" aria-label="anchor" href="#improvements-0-3-2"></a></h4>
+<ul><li><p><strong>Reduced package footprint.</strong> Removed unused dependencies <code>purrr</code> and <code>stringr</code>, reducing install size and dependency overhead. Base R equivalents are used instead (e.g., <code><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nchar()</a></code> instead of <code><a href="https://stringr.tidyverse.org/reference/str_length.html" class="external-link">stringr::str_length()</a></code>).</p></li>
+<li><p><strong>Cleaner telemetry constants.</strong> Extracted all magic numbers from telemetry analysis functions to named constants at the top of <code>telemetry_analysis.R</code>, improving maintainability and making thresholds self-documenting.</p></li>
+<li><p><strong>Improved data.frame API documentation.</strong> Updated examples and vignettes to show <code>data.frame</code> as the recommended API for <code>user_personas</code> and <code>bias_mitigations</code>, with clearer migration paths from legacy list format.</p></li>
+<li><p><strong>Backward-compatible enhancements.</strong> All API changes maintain full backward compatibility through migration functions with helpful deprecation warnings guiding users to modern patterns.</p></li>
+</ul></div>
+<div class="section level4">
+<h4 id="bug-fixes-0-3-2">BUG FIXES<a class="anchor" aria-label="anchor" href="#bug-fixes-0-3-2"></a></h4>
+<ul><li>Removed duplicate utility functions (<code>%||%</code> operator and <code>validate_required_params()</code>) that were defined in multiple files.</li>
+</ul></div>
+<div class="section level4">
+<h4 id="documentation-updates-0-3-2">DOCUMENTATION UPDATES<a class="anchor" aria-label="anchor" href="#documentation-updates-0-3-2"></a></h4>
+<ul><li><p><strong>Updated Getting Started vignette</strong> to show recommended flat <code><a href="../reference/new_data_story.html">new_data_story()</a></code> API and <code>data.frame</code> format for personas.</p></li>
+<li><p><strong>Enhanced function examples</strong> in <code><a href="../reference/bid_interpret.html">bid_interpret()</a></code> and other stage functions to demonstrate both modern and legacy formats.</p></li>
+<li><p><strong>Comprehensive test coverage</strong> for new flat data_story API, backward compatibility with nested format, telemetry presets, and safe accessor functions.</p></li>
+</ul></div>
+<div class="section level4">
+<h4 id="deprecations-0-3-2">DEPRECATIONS<a class="anchor" aria-label="anchor" href="#deprecations-0-3-2"></a></h4>
+<ul><li>
+<strong>Nested data_story format (variables/relationships)</strong> is deprecated and will be removed in bidux 0.4.0. Use the flat API instead: <code>new_data_story(hook, context, tension, resolution)</code>.</li>
+</ul></div>
+<div class="section level4">
+<h4 id="migration-notes-0-3-2">MIGRATION NOTES<a class="anchor" aria-label="anchor" href="#migration-notes-0-3-2"></a></h4>
+<p>For users upgrading from 0.3.1:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># OLD: Nested format (deprecated)</span></span>
+<span><span class="va">story</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span></span>
+<span>  context <span class="op">=</span> <span class="st">"Dashboard usage dropped"</span>,</span>
+<span>  variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>hook <span class="op">=</span> <span class="st">"User engagement declining"</span><span class="op">)</span>,</span>
+<span>  relationships <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>resolution <span class="op">=</span> <span class="st">"Analyze telemetry"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># NEW: Flat format (recommended)</span></span>
+<span><span class="va">story</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span></span>
+<span>  hook <span class="op">=</span> <span class="st">"User engagement declining"</span>,</span>
+<span>  context <span class="op">=</span> <span class="st">"Dashboard usage dropped 30%"</span>,</span>
+<span>  tension <span class="op">=</span> <span class="st">"Don't know if UX or user needs"</span>,</span>
+<span>  resolution <span class="op">=</span> <span class="st">"Analyze telemetry"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Telemetry presets for easier configuration</span></span>
+<span><span class="va">issues</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry</a></span><span class="op">(</span></span>
+<span>  <span class="st">"telemetry.sqlite"</span>,</span>
+<span>  thresholds <span class="op">=</span> <span class="fu"><a href="../reference/bid_telemetry_presets.html">bid_telemetry_presets</a></span><span class="op">(</span><span class="st">"strict"</span><span class="op">)</span>  <span class="co"># or "moderate", "relaxed"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><strong>Note:</strong> All legacy formats continue to work with deprecation warnings. See function documentation for detailed migration guidance.</p>
+</div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.1" id="id_-bidux-031-2025-09-07"># bidux 0.3.1 (2025-09-07)<a class="anchor" aria-label="anchor" href="#id_-bidux-031-2025-09-07"></a></h2><p class="text-muted">CRAN release: 2025-09-07</p>
 <div class="section level4">
 <h4 id="new-features-0-3-1">NEW FEATURES<a class="anchor" aria-label="anchor" href="#new-features-0-3-1"></a></h4>
@@ -90,7 +146,7 @@
 <div class="section level4">
 <h4 id="migration-notes-0-3-1">MIGRATION NOTES<a class="anchor" aria-label="anchor" href="#migration-notes-0-3-1"></a></h4>
 <p>For users upgrading from 0.3.0:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Legacy telemetry code continues to work</span></span>
 <span><span class="va">legacy_notices</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry</a></span><span class="op">(</span><span class="st">"telemetry.sqlite"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">legacy_notices</span><span class="op">)</span>  <span class="co"># Still works as before</span></span>
@@ -162,7 +218,7 @@
 <div class="section level4">
 <h4 id="migration-guide-0-3-0">MIGRATION GUIDE<a class="anchor" aria-label="anchor" href="#migration-guide-0-3-0"></a></h4>
 <p>To update existing code for bidux 0.3.0:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># OLD (0.2.x)</span></span>
 <span><span class="va">notice</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_notice.html">bid_notice</a></span><span class="op">(</span></span>
 <span>  problem <span class="op">=</span> <span class="st">"Users confused"</span>,</span>

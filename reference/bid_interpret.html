@@ -105,58 +105,49 @@ stage.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Basic usage</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Recommended: use new_data_story() with flat API</span></span></span>
 <span class="r-in"><span><span class="va">interpret_result</span> <span class="op">&lt;-</span> <span class="fu">bid_interpret</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  central_question <span class="op">=</span> <span class="st">"What drives the decline in user engagement?"</span>,</span></span>
-<span class="r-in"><span>  data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  data_story <span class="op">=</span> <span class="fu"><a href="new_data_story.html">new_data_story</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    hook <span class="op">=</span> <span class="st">"Declining trend in engagement"</span>,</span></span>
 <span class="r-in"><span>    context <span class="op">=</span> <span class="st">"Previous high engagement levels"</span>,</span></span>
 <span class="r-in"><span>    tension <span class="op">=</span> <span class="st">"Unexpected drop"</span>,</span></span>
 <span class="r-in"><span>    resolution <span class="op">=</span> <span class="st">"Investigate new UI changes"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> Using deprecated list format for data_story parameter</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Please use new_data_story() constructor for new code</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Legacy format will be automatically migrated</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Stage 1 (Interpret) completed.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Central question: What drives the decline in user engagement?</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Your data story is incomplete (25%). Consider adding these missing elements: hook, tension, resolution.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Your data story has all key elements. Focus on making each component compelling and relevant.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Your central question is appropriately scoped.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - No user personas defined </span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># With user personas</span></span></span>
+<span class="r-in"><span><span class="co"># With user personas (using data.frame)</span></span></span>
 <span class="r-in"><span><span class="va">interpret_personas</span> <span class="op">&lt;-</span> <span class="fu">bid_interpret</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  central_question <span class="op">=</span> <span class="st">"How can we improve data discovery?"</span>,</span></span>
-<span class="r-in"><span>  data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  data_story <span class="op">=</span> <span class="fu"><a href="new_data_story.html">new_data_story</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    hook <span class="op">=</span> <span class="st">"Users are missing key insights"</span>,</span></span>
 <span class="r-in"><span>    context <span class="op">=</span> <span class="st">"Critical data is available but overlooked"</span>,</span></span>
 <span class="r-in"><span>    tension <span class="op">=</span> <span class="st">"Time-sensitive decisions are delayed"</span>,</span></span>
-<span class="r-in"><span>    resolution <span class="op">=</span> <span class="st">"Highlight key metrics more effectively"</span></span></span>
+<span class="r-in"><span>    resolution <span class="op">=</span> <span class="st">"Highlight key metrics more effectively"</span>,</span></span>
+<span class="r-in"><span>    audience <span class="op">=</span> <span class="st">"Data analysts and executives"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span>,</span></span>
-<span class="r-in"><span>  user_personas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>      name <span class="op">=</span> <span class="st">"Sara, Data Analyst"</span>,</span></span>
-<span class="r-in"><span>      goals <span class="op">=</span> <span class="st">"Needs to quickly find patterns in data"</span>,</span></span>
-<span class="r-in"><span>      pain_points <span class="op">=</span> <span class="st">"Gets overwhelmed by too many visualizations"</span>,</span></span>
-<span class="r-in"><span>      technical_level <span class="op">=</span> <span class="st">"advanced"</span></span></span>
+<span class="r-in"><span>  user_personas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Sara, Data Analyst"</span>, <span class="st">"Marcus, Executive"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    goals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>      <span class="st">"Needs to quickly find patterns in data"</span>,</span></span>
+<span class="r-in"><span>      <span class="st">"Wants high-level insights at a glance"</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span>,</span></span>
-<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>      name <span class="op">=</span> <span class="st">"Marcus, Executive"</span>,</span></span>
-<span class="r-in"><span>      goals <span class="op">=</span> <span class="st">"Wants high-level insights at a glance"</span>,</span></span>
-<span class="r-in"><span>      pain_points <span class="op">=</span> <span class="st">"Limited time to analyze detailed reports"</span>,</span></span>
-<span class="r-in"><span>      technical_level <span class="op">=</span> <span class="st">"beginner"</span></span></span>
-<span class="r-in"><span>    <span class="op">)</span></span></span>
+<span class="r-in"><span>    pain_points <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>      <span class="st">"Gets overwhelmed by too many visualizations"</span>,</span></span>
+<span class="r-in"><span>      <span class="st">"Limited time to analyze detailed reports"</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span>,</span></span>
+<span class="r-in"><span>    technical_level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"advanced"</span>, <span class="st">"beginner"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> Using deprecated list format for data_story parameter</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Please use new_data_story() constructor for new code</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Legacy format will be automatically migrated</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> Using deprecated list format for user_personas parameter</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Please use new_user_personas() constructor for new code</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Legacy format will be automatically migrated</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Stage 1 (Interpret) completed.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Central question: How can we improve data discovery?</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Your data story is incomplete (25%). Consider adding these missing elements: hook, tension, resolution.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Your data story has all key elements. Focus on making each component compelling and relevant.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Your central question is appropriately scoped.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - User personas: 4 defined </span>
 <span class="r-in"><span></span></span>
@@ -168,7 +159,7 @@ stage.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    total_stages : 5 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    validation_status : completed </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    has_central_question : Yes </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    story_completeness : 25% </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    story_completeness : 1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    personas_count : 4 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    auto_generated_question : No </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    auto_generated_story : No </span>
@@ -180,10 +171,24 @@ stage.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    context : Critical data is available but overlooked </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    tension : Time-sensitive decisions are delayed </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    resolution : Highlight key metrics more effectively </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    audience : Data analysts and executives </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    personas : [{"name":"Sara, Data Analyst","goals":"Needs to quickly find patterns in data... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    suggestions : Your data story is incomplete (25%). Consider adding these missing elements: ... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    suggestions : Your data story has all key elements. Focus on making each component compelli... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-10-09 16:45:13 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-10-28 17:58:13 </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Legacy list format still works (with deprecation warning)</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="va">interpret_legacy</span> <span class="op">&lt;-</span> <span class="fu">bid_interpret</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  central_question <span class="op">=</span> <span class="st">"How can we improve UX?"</span>,</span></span>
+<span class="r-in"><span>  data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    hook <span class="op">=</span> <span class="st">"Users struggling"</span>,</span></span>
+<span class="r-in"><span>    context <span class="op">=</span> <span class="st">"Dashboard complexity"</span>,</span></span>
+<span class="r-in"><span>    tension <span class="op">=</span> <span class="st">"High abandonment rate"</span>,</span></span>
+<span class="r-in"><span>    resolution <span class="op">=</span> <span class="st">"Simplify interface"</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
