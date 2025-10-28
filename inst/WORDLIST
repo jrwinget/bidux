@@ -38,3 +38,6 @@ sqlite
 tbl
 testthat
 tibble
+codebases
+ggplot2
+v0
