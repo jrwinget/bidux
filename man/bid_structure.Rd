@@ -36,7 +36,9 @@ function will abort with a helpful error message.}
 A bid_stage object containing:
 \item{stage}{"Structure"}
 \item{layout}{Auto-selected layout type}
-\item{suggestions}{List of concept groups with ranked suggestions}
+\item{suggestions}{List of concept groups with ranked suggestions (nested format)}
+\item{suggestions_tbl}{Flattened tibble with all suggestions, includes columns:
+concept, title, details, components, rationale, score, difficulty, category}
 \item{concepts}{Comma-separated string of all concepts used}
 }
 \description{
@@ -81,7 +83,17 @@ notice_result <- bid_interpret(
 # Auto-selected layout with concept-grouped suggestions
 structure_result <- bid_structure(previous_stage = notice_result)
 print(structure_result$layout) # Auto-selected layout
-print(structure_result$suggestions) # Ranked suggestions by concept
+print(structure_result$suggestions) # Ranked suggestions by concept (nested)
+
+# Access flattened tibble format for easier manipulation
+suggestions_flat <- structure_result$suggestions_tbl[[1]]
+print(suggestions_flat)
+
+# Filter by difficulty
+easy_suggestions <- suggestions_flat[suggestions_flat$difficulty == "Easy", ]
+
+# Filter by category
+layout_suggestions <- suggestions_flat[suggestions_flat$category == "Layout", ]
 
 summary(structure_result)
 

@@ -839,3 +839,166 @@ adjust_suggestion_score <- function(
   suggestion$score <- max(0, min(1, score))
   return(suggestion)
 }
+
+# ==============================================================================
+# TIBBLE CONVERSION UTILITIES
+# ==============================================================================
+
+#' Assign difficulty rating based on components and suggestion complexity
+#'
+#' @description
+#' Analyzes suggestion details and component count to assign a difficulty rating.
+#' Considers complexity patterns in the suggestion text and number of components.
+#'
+#' @param suggestion Suggestion object with title, details, and components
+#' @return Character string: "Easy", "Medium", or "Hard"
+#' @keywords internal
+assign_difficulty <- function(suggestion) {
+  # count number of components
+  num_components <- length(suggestion$components)
+
+  # check for complexity indicators in details
+  details_lower <- tolower(suggestion$details)
+
+  # hard indicators
+  is_hard <- grepl("complex|multiple.*step|advanced|implement.*system|integrate", details_lower) ||
+    num_components >= 4
+
+  # easy indicators
+  is_easy <- grepl("^(add|use|show|display|provide)\\s", details_lower) &&
+    num_components <= 2 &&
+    !grepl("conditional|dynamic|multiple", details_lower)
+
+  if (is_hard) {
+    return("Hard")
+  } else if (is_easy) {
+    return("Easy")
+  } else {
+    return("Medium")
+  }
+}
+
+#' Assign category based on suggestion content and concept
+#'
+#' @description
+#' Categorizes suggestions into high-level groupings based on their focus area.
+#'
+#' @param suggestion Suggestion object with title and details
+#' @param concept The behavioral science concept this suggestion relates to
+#' @return Character string representing the category
+#' @keywords internal
+assign_category <- function(suggestion, concept) {
+  title_lower <- tolower(suggestion$title)
+  details_lower <- tolower(suggestion$details)
+  concept_lower <- tolower(concept)
+  combined_text <- paste(title_lower, details_lower)
+
+  # check for visual patterns first (more specific)
+  if (grepl("visual|color|size|priority|emphasis|style", combined_text)) {
+    return("Visual Design")
+  }
+
+  # check for help/guidance patterns (before content to avoid false positives)
+  if (grepl("help|guidance|tutorial|onboarding|tooltip|hint|example", combined_text)) {
+    return("Guidance")
+  }
+
+  # check for navigation/structure patterns
+  if (grepl("navigation|\\btab\\b|menu|header|footer", combined_text)) {
+    return("Navigation")
+  }
+
+  # check for layout patterns
+  if (grepl("layout|spacing|group|position|arrange|column|row|container", combined_text)) {
+    return("Layout")
+  }
+
+  # check for content patterns
+  if (grepl("content|text|label|description|message|information|data", combined_text)) {
+    return("Content")
+  }
+
+  # check for interaction patterns
+  if (grepl("filter|control|input|button|click|interact|action", combined_text)) {
+    return("Interaction")
+  }
+
+  # check for hierarchy last (can be in multiple contexts)
+  if (grepl("hierarchy", combined_text)) {
+    return("Visual Design")
+  }
+
+  # fallback to concept-based categorization
+  if (grepl("cognitive load", concept_lower)) {
+    return("Complexity Management")
+  } else if (grepl("progressive disclosure", concept_lower)) {
+    return("Information Architecture")
+  } else if (grepl("visual hierarchy", concept_lower)) {
+    return("Visual Design")
+  } else if (grepl("onboarding", concept_lower)) {
+    return("Guidance")
+  } else if (grepl("proximity", concept_lower)) {
+    return("Layout")
+  } else {
+    return("General")
+  }
+}
+
+#' Convert nested suggestion groups to flat tibble
+#'
+#' @description
+#' Transforms the nested list structure of suggestions (grouped by concept)
+#' into a flat tibble with one row per suggestion. Maintains backward
+#' compatibility by keeping the nested structure available.
+#'
+#' @param suggestion_groups List of concept groups with suggestions
+#' @return Tibble with columns: concept, title, details, components,
+#'         rationale, score, difficulty, category
+#' @keywords internal
+flatten_suggestions_to_tibble <- function(suggestion_groups) {
+  if (length(suggestion_groups) == 0) {
+    # return empty tibble with correct structure
+    return(tibble::tibble(
+      concept = character(0),
+      title = character(0),
+      details = character(0),
+      components = character(0),
+      rationale = character(0),
+      score = numeric(0),
+      difficulty = character(0),
+      category = character(0)
+    ))
+  }
+
+  # flatten nested structure
+  rows <- list()
+  for (group in suggestion_groups) {
+    concept <- group$concept
+    for (suggestion in group$suggestions) {
+      # assign difficulty and category
+      difficulty <- assign_difficulty(suggestion)
+      category <- assign_category(suggestion, concept)
+
+      # create row
+      row <- tibble::tibble(
+        concept = concept,
+        title = suggestion$title,
+        details = suggestion$details,
+        components = paste(suggestion$components, collapse = ", "),
+        rationale = suggestion$rationale,
+        score = suggestion$score,
+        difficulty = difficulty,
+        category = category
+      )
+      rows <- append(rows, list(row))
+    }
+  }
+
+  # combine all rows
+  result <- do.call(rbind, rows)
+
+  # ensure proper ordering by score (descending)
+  result <- result[order(result$score, decreasing = TRUE), ]
+
+  return(result)
+}
