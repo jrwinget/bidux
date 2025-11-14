@@ -1,0 +1,108 @@
+# Ingest telemetry data and identify UX friction points
+
+This function ingests telemetry data from shiny.telemetry output (SQLite
+or JSON) and automatically identifies potential UX issues, translating
+them into BID framework Notice stages. It returns a hybrid object that
+is backward-compatible as a list of Notice stages while also providing
+enhanced functionality with tidy tibble access and flags extraction.
+
+## Usage
+
+``` r
+bid_ingest_telemetry(
+  path,
+  format = NULL,
+  events_table = NULL,
+  thresholds = list()
+)
+```
+
+## Arguments
+
+- path:
+
+  File path to telemetry data (SQLite database or JSON log file)
+
+- format:
+
+  Optional format specification ("sqlite" or "json"). If NULL,
+  auto-detected from file extension.
+
+- events_table:
+
+  Optional data.frame specifying custom events table when reading from
+  SQLite. Must have columns: event_id, timestamp, event_type, user_id.
+  If NULL, auto-detects standard table names (event_data, events).
+
+- thresholds:
+
+  Optional list of threshold parameters: - unused_input_threshold:
+  percentage of sessions below which input is considered unused
+  (default: 0.05) - delay_threshold_secs: seconds of delay considered
+  problematic (default: 30) - error_rate_threshold: percentage of
+  sessions with errors considered problematic (default: 0.1) -
+  navigation_threshold: percentage of sessions visiting a page below
+  which it's considered underused (default: 0.2) - rapid_change_window:
+  seconds within which multiple changes indicate confusion
+  (default: 10) - rapid_change_count: number of changes within window to
+  flag as confusion (default: 5)
+
+## Value
+
+A hybrid object of class c("bid_issues", "list") containing bid_stage
+objects for each identified issue in the "Notice" stage. The object
+includes:
+
+- Legacy list:
+
+  Named list of bid_stage objects (e.g., "unused_input_region",
+  "delayed_interaction")
+
+- issues_tbl:
+
+  Attached tidy tibble with issue metadata
+
+- flags:
+
+  Global telemetry flags as named list
+
+- created_at:
+
+  Timestamp when object was created
+
+        Use as_tibble() to access the tidy issues data, bid_flags() to extract flags,
+        and legacy list access for backward compatibility.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+# Analyze SQLite telemetry database
+issues <- bid_ingest_telemetry("telemetry.sqlite")
+
+# Use sensitivity presets for easier configuration
+strict_issues <- bid_ingest_telemetry(
+  "telemetry.sqlite",
+  thresholds = bid_telemetry_presets("strict")
+)
+
+# Analyze JSON log with custom thresholds
+issues <- bid_ingest_telemetry(
+  "telemetry.log",
+  format = "json",
+  thresholds = list(
+    unused_input_threshold = 0.1,
+    delay_threshold_secs = 60
+  )
+)
+
+# Use results in BID workflow
+if (length(issues) > 0) {
+  # Take first issue and continue with BID process
+  interpret_result <- bid_interpret(
+    previous_stage = issues[[1]],
+    central_question = "How can we improve user engagement?"
+  )
+}
+} # }
+```

@@ -11,7 +11,7 @@ It also supports adding interaction hints and visual feedback elements."><meta p
 
     <a class="navbar-brand me-2" href="../index.html">bidux</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -29,6 +29,7 @@ It also supports adding interaction hints and visual feedback elements."><meta p
     <li><a class="dropdown-item" href="../articles/getting-started.html">Getting Started with bidux</a></li>
     <li><a class="dropdown-item" href="../articles/introduction-to-bid.html">Introduction to the BID Framework</a></li>
     <li><a class="dropdown-item" href="../articles/practical-examples.html">Practical Examples: Before and After Dashboard Transformations</a></li>
+    <li><a class="dropdown-item" href="../articles/quick-start.html">Quick Start: Improve Your Shiny Dashboard in 15 Minutes</a></li>
     <li><a class="dropdown-item" href="../articles/telemetry-integration.html">Integrating shiny.telemetry with bidux</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -153,7 +154,7 @@ stage.</p>
 <span class="r-in"><span><span class="co"># Let the function suggest bias mitigations based on previous stages</span></span></span>
 <span class="r-in"><span><span class="fu">bid_anticipate</span><span class="op">(</span>previous_stage <span class="op">=</span> <span class="va">structure_info</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Layout-specific bias mitigations are deprecated and will be removed in bidux 0.4.0. Consider using concept-based bias mitigations instead.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Automatically suggested bias mitigations: attention bias, belief perseverance, cognitive load, accessibility.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Automatically suggested bias mitigations: attention bias, belief perseverance, cognitive load, accessibility</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Concept 'attention bias' not found</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Cognitive Load Theory</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Accessibility Contrast</span>
@@ -162,12 +163,12 @@ stage.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Accessibility considerations included</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Key suggestions: Attention Bias mitigation: Consider how this bias affects user decisions, Belief Perseverance mitigation: Proactively show content that might disprove initial assumptions, Cognitive Load mitigation: Use tabs or collapsible sections to organize complex information </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB; font-weight: bold;">BID Framework</span> - <span style="font-weight: bold;">Anticipate</span> Stage</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-10-29 17:17:35 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-11-14 18:06:06 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Progress: 60 % (3/5) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Bias Mitigations:</span> 3 strategies defined </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="font-style: italic;">Suggestions:</span> Attention Bias mitigation: Consider how this bias affects user decisions Belief Perseverance mitigation: Proactively show content that might disprove initial assumptions Cognitive Load mitigation: Use tabs or collapsible sections to organize complex information Accessibility mitigation: Test color combinations with WebAIM's contrast checker to meet WCAG standards Consider also addressing these common biases: anchoring, framing, confirmation accessibility considerations have been included in bias mitigations. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="font-style: italic;">Suggestions:</span> Attention Bias mitigation: Consider how this bias affects user decisions Belief Perseverance mitigation: Proactively show content that might disprove initial assumptions Cognitive Load mitigation: Use tabs or collapsible sections to organize complex information Accessibility mitigation: Test color combinations with WebAIM's contrast checker to meet WCAG standards Consider also addressing these common biases: anchoring, framing, confirmation Accessibility considerations have been included in bias mitigations </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="font-weight: 100;">Use summary() for detailed information</span> </span>
 <span class="r-in"><span></span></span>
@@ -183,7 +184,7 @@ stage.</p>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> Using deprecated list format for bias_mitigations parameter</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Please use new_bias_mitigations() constructor for new code</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Legacy format will be automatically migrated</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Added accessibility mitigation based on layout context.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Added accessibility mitigation based on layout context</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Concept 'bias_type' not found</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Concept 'mitigation_strategy' not found</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Concept 'confidence_level' not found</span>
@@ -215,7 +216,7 @@ stage.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    previous_concepts : Cognitive Load Theory, Visual Hierarchy, Progressive Disclosure, Hick's Law </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    suggestions : Bias_type mitigation: Consider how this bias affects user decisions Mitigatio... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-10-29 17:17:35 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-11-14 18:06:06 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -228,7 +229,7 @@ stage.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

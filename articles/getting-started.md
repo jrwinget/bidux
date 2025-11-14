@@ -1,0 +1,644 @@
+# Getting Started with bidux
+
+## Introduction
+
+The [bidux](https://jrwinget.github.io/bidux/) package helps Shiny
+developers create more effective dashboards using the **Behavioral
+Insight Design (BID) Framework**. If you’ve ever wondered why users
+struggle with your carefully crafted dashboards, or why your beautifully
+visualized data doesn’t drive the decisions you expected, this package
+is for you.
+
+**The core insight**: Technical excellence ≠ User success. Even the most
+sophisticated analysis can fail if users can’t quickly understand and
+act on it.
+
+The BID framework bridges this gap by integrating behavioral science, UX
+best practices, and data storytelling techniques into a systematic
+5-stage process. Think of it as applying the same rigor you use for data
+validation to user experience design.
+
+``` r
+library(bidux)
+library(dplyr)
+```
+
+## The BID Framework: A Data-Driven Approach to UX
+
+The BID framework consists of 5 sequential stages that mirror how you
+might approach a data analysis project:
+
+1.  **Interpret** the User’s Need - Like defining your research question
+    and understanding your data
+2.  **Notice** the Problem - Like identifying data quality issues or
+    analytical bottlenecks
+3.  **Anticipate** User Behavior - Like checking for statistical biases
+    that could skew results
+4.  **Structure** the Dashboard - Like choosing the right visualization
+    or model architecture
+5.  **Validate** & Empower the User - Like testing your model and
+    ensuring stakeholders can act on results
+
+**Key insight for data professionals**: Just as you wouldn’t skip
+exploratory data analysis before modeling, don’t skip understanding user
+cognition before building interfaces.
+
+Each stage builds on insights from previous stages, creating a
+systematic approach to dashboard design that’s both evidence-based and
+user-centered.
+
+## Exploring the Concept Dictionary
+
+The BID framework is built on established science and design principles.
+To explore these concepts, use
+[`bid_concepts()`](https://jrwinget.github.io/bidux/reference/bid_concepts.md)
+to list all available concepts, or search for specific terms:
+
+``` r
+# List all concepts
+all_concepts <- bid_concepts()
+head(select(all_concepts, concept, category, description), 3)
+
+# Search for specific concepts
+bid_concepts("cognitive") |>
+  select(concept, description, implementation_tips)
+```
+
+For detailed information about a specific concept, use
+[`bid_concept()`](https://jrwinget.github.io/bidux/reference/bid_concept.md):
+
+``` r
+# Get information about a specific concept
+bid_concept("Processing Fluency") |>
+  select(concept, description, implementation_tips)
+```
+
+The
+[`bid_concept()`](https://jrwinget.github.io/bidux/reference/bid_concept.md)
+function supports case-insensitive and partial matching:
+
+``` r
+# Case-insensitive matching
+bid_concept("hick's law") |>
+  select(concept, description)
+
+# Partial matching
+bid_concept("proximity") |>
+  select(concept, description)
+```
+
+You can also explore concepts that are new to the BID framework:
+
+``` r
+# Explore new concepts from user-centric design
+bid_concepts("visual hierarchy|breathable|gherkin") |>
+  select(concept, description)
+```
+
+## Documenting a Dashboard Project with BID
+
+Let’s walk through a complete example of using the BID framework to
+document and improve a dashboard project.
+
+### Stage 1: Interpret the User’s Need
+
+Start by clarifying the central question your dashboard needs to answer
+and structure the data story:
+
+``` r
+# Document the user's need using new_data_story() with flat API (recommended)
+interpret_result <- bid_interpret(
+  central_question = "How are our marketing campaigns performing across different channels?",
+  data_story = new_data_story(
+    hook = "Recent campaign performance varies significantly across channels",
+    context = "We've invested in 6 different marketing channels over the past quarter",
+    tension = "ROI metrics show inconsistent results, with some channels underperforming",
+    resolution = "Identify top-performing channels and key performance drivers",
+    audience = "Marketing team and executives",
+    metrics = "Channel ROI, Conversion Rate, Cost per Acquisition",
+    visual_approach = "Comparative analysis with historical benchmarks"
+  ),
+  # Recommended: use data.frame for personas (cleaner, more explicit)
+  user_personas = data.frame(
+    name = c("Marketing Manager", "CMO"),
+    goals = c(
+      "Optimize marketing spend across channels",
+      "Strategic oversight of marketing effectiveness"
+    ),
+    pain_points = c(
+      "Difficulty comparing performance across different metrics",
+      "Needs high-level insights without technical details"
+    ),
+    technical_level = c("intermediate", "basic"),
+    stringsAsFactors = FALSE
+  )
+)
+
+interpret_result |>
+  select(central_question, hook, tension, resolution)
+```
+
+The function evaluates our data story elements and provides suggestions
+for improvement (in the `suggestions` column). We’ve also added user
+personas to better target our design.
+
+### Stage 2: Notice the Problem
+
+Now identify the specific problems users are encountering with your
+dashboard or interface:
+
+``` r
+# Document the problem
+notice_result <- bid_notice(
+  previous_stage = interpret_result,
+  problem = "Users are overwhelmed by too many filter options and struggle to find relevant insights",
+  evidence = "User testing shows 65% of first-time users fail to complete their intended task within 2 minutes"
+)
+
+notice_result |>
+  select(problem, theory, evidence)
+```
+
+Notice that the function automatically selected an appropriate theory
+based on our problem description. It also provides suggestions for
+addressing cognitive load which you can access from the `suggestions`
+column.
+
+### Stage 3: Anticipate User Behavior
+
+Next, identify potential cognitive biases that might affect how users
+interpret your dashboard:
+
+``` r
+# Document bias mitigation strategies
+anticipate_result <- bid_anticipate(
+  previous_stage = notice_result,
+  bias_mitigations = list(
+    anchoring = "Include previous period performance as reference points",
+    framing = "Provide toggle between ROI improvement vs. ROI gap views",
+    confirmation_bias = "Highlight unexpected patterns that contradict common assumptions"
+  )
+)
+
+anticipate_result |>
+  select(bias_mitigations)
+```
+
+The function evaluates our bias mitigation strategies, providing
+implementation suggestions.
+
+### Stage 4: Structure the Dashboard
+
+Now determine the layout and key design principles to implement:
+
+``` r
+# Document the dashboard structure
+structure_result <- bid_structure(previous_stage = anticipate_result)
+
+structure_result |>
+  select(layout, concepts, suggestions)
+```
+
+The function automatically selects an appropriate layout based on the
+content from previous stages and provides ranked, actionable suggestions
+organized by UX concepts. The layout selection is transparent with clear
+rationale for why a particular layout was chosen.
+
+#### Working with Suggestions: Nested vs Flattened Format
+
+The
+[`bid_structure()`](https://jrwinget.github.io/bidux/reference/bid_structure.md)
+function returns suggestions in two formats for maximum flexibility:
+
+**Nested Format** (`$suggestions`): Organized by behavioral science
+concepts, ideal for understanding the theoretical foundation:
+
+``` r
+# Access nested suggestions (grouped by concept)
+structure_result$suggestions[[1]]$concept
+structure_result$suggestions[[1]]$suggestions[[1]]$title
+```
+
+**Flattened Tibble Format** (`$suggestions_tbl`): A tidy tibble with one
+row per suggestion, ideal for filtering and analysis:
+
+``` r
+# Access flattened tibble format
+suggestions_flat <- structure_result$suggestions_tbl[[1]]
+
+# View all suggestions sorted by score
+suggestions_flat |>
+  select(concept, title, score, difficulty, category) |>
+  head(5)
+
+# Filter by implementation difficulty
+easy_wins <- suggestions_flat |>
+  filter(difficulty == "Easy") |>
+  select(title, details, components)
+
+# Filter by category
+layout_suggestions <- suggestions_flat |>
+  filter(category == "Layout") |>
+  select(title, details, rationale)
+
+# Find high-impact suggestions
+high_impact <- suggestions_flat |>
+  filter(score >= 0.85, difficulty %in% c("Easy", "Medium")) |>
+  arrange(desc(score)) |>
+  select(title, score, difficulty, components)
+```
+
+The tibble format includes these columns:
+
+- `concept`: Behavioral science concept (e.g., “Cognitive Load Theory”)
+- `title`: Brief actionable description
+- `details`: Specific implementation guidance
+- `components`: Comma-separated Shiny/bslib component names
+- `rationale`: Why this suggestion is relevant
+- `score`: Relevance score (0-1, higher is more relevant)
+- `difficulty`: Implementation difficulty (“Easy”, “Medium”, “Hard”)
+- `category`: Category grouping (“Layout”, “Navigation”, “Content”,
+  etc.)
+
+### Stage 5: Validate & Empower the User
+
+Finally, document how you’ll ensure users leave with clear insights and
+the ability to collaborate:
+
+``` r
+# Document validation approach
+validate_result <- bid_validate(
+  previous_stage = structure_result,
+  summary_panel = "Executive summary highlighting top and bottom performers, key trends, and recommended actions for the next marketing cycle",
+  collaboration = "Team annotation capability allowing marketing team members to add context and insights to specific data points",
+  next_steps = c(
+    "Review performance of bottom 2 channels",
+    "Increase budget for top-performing channel",
+    "Schedule team meeting to discuss optimization strategy",
+    "Export findings for quarterly marketing review"
+  )
+)
+
+validate_result |>
+  select(summary_panel, collaboration, next_steps)
+```
+
+The validate function acknowledges our implementation of the Peak-End
+Rule through next steps and provides suggestions for refining our
+approach.
+
+## Generating Implementation Suggestions
+
+Once you’ve documented your dashboard with the BID framework, you can
+generate concrete suggestions for implementing the principles using
+common R packages:
+
+``` r
+# Get {bslib} component suggestions
+bid_suggest_components(structure_result, package = "bslib") |>
+  select(component, description) |>
+  head(2)
+
+# Get {reactable} suggestions for showing data
+bid_suggest_components(structure_result, package = "reactable") |>
+  select(component, description) |>
+  head(2)
+
+# Get suggestions from all supported packages
+all_suggestions <- bid_suggest_components(validate_result, package = "all")
+table(all_suggestions$package)
+```
+
+## Creating a Complete BID Report
+
+You can generate a complete report summarizing all stages of your BID
+process:
+
+``` r
+# Generate a text report (default)
+report <- bid_report(validate_result)
+cat(report)
+
+# Generate an HTML report
+html_report <- bid_report(validate_result, format = "html")
+
+# Generate a markdown report
+md_report <- bid_report(validate_result, format = "markdown")
+```
+
+## Using BID in Your Shiny Development Workflow
+
+Here’s how to integrate the BID framework into your development process:
+
+1.  **Planning Phase**
+
+- Use the BID framework to document your design decisions before writing
+  code
+- Identify key user needs and potential friction points
+- Define user personas to guide your design choices
+- Consider accessibility requirements early
+
+2.  **Development Phase**
+
+- Reference your BID documentation to implement appropriate UI patterns
+- Use
+  [`bid_suggest_components()`](https://jrwinget.github.io/bidux/reference/bid_suggest_components.md)
+  to get package-specific implementation ideas
+- Implement bias mitigation strategies in your interface
+- Build in progressive disclosure for complex interfaces
+
+3.  **Testing Phase**
+
+- Validate that your implementation addresses the issues identified in
+  Stage 1
+- Test with actual users representing your defined personas
+- Specifically test bias mitigation strategies and accessibility
+  features
+- Gather feedback on the effectiveness of your validation approach
+
+4.  **Iteration Phase**
+
+- Update your BID documentation as you refine the dashboard
+- Use
+  [`bid_report()`](https://jrwinget.github.io/bidux/reference/bid_report.md)
+  to maintain comprehensive documentation
+- Focus improvements on areas with the greatest impact on user
+  experience
+- Continue to apply BID principles as you add new features
+
+## Conclusion
+
+The [bidux](https://jrwinget.github.io/bidux/) package makes it easier
+to apply behavioral science and UX best practices to your Shiny
+dashboards. By following the 5-stage BID framework, you can create
+applications that are more intuitive, engaging, and effective for your
+users.
+
+Future versions of [bidux](https://jrwinget.github.io/bidux/) will
+include:
+
+- User stories workflow integration following the Gherkin method
+- Enhanced design patterns library
+- Accessibility framework integration with WCAG guidelines
+- A UI component library implementing BID principles
+- Testing and validation tools for dashboard evaluation
+
+## Integrating Telemetry Data (New in 0.3.1)
+
+If you have telemetry data from user interactions (e.g., from the
+[shiny.telemetry](https://appsilon.github.io/shiny.telemetry/) package),
+[bidux](https://jrwinget.github.io/bidux/) can help transform it into
+actionable BID insights by automatically detecting UX friction patterns.
+
+### Understanding the Two Telemetry Functions
+
+[bidux](https://jrwinget.github.io/bidux/) provides two complementary
+approaches to telemetry analysis:
+
+**[`bid_telemetry()`](https://jrwinget.github.io/bidux/reference/bid_telemetry.md) -
+Modern Tidy API (Recommended)** - Returns a clean tibble of issues for
+analysis - Best for new workflows and data exploration - Integrates
+seamlessly with `dplyr` pipelines - Introduced in version 0.3.1
+
+**[`bid_ingest_telemetry()`](https://jrwinget.github.io/bidux/reference/bid_ingest_telemetry.md) -
+Legacy Compatible API** - Returns a hybrid object that works as both a
+list and enhanced object - Maintains backward compatibility with
+pre-0.3.1 code - Provides same analysis as
+[`bid_telemetry()`](https://jrwinget.github.io/bidux/reference/bid_telemetry.md)
+with additional list interface - Will be soft-deprecated in 0.4.0
+
+Both functions analyze the same telemetry patterns: - **Unused
+inputs** - UI controls rarely or never used - **Delayed interactions** -
+Users taking too long to engage - **Error patterns** - Recurring errors
+affecting users - **Navigation drop-offs** - Pages/tabs with low visit
+rates - **Confusion patterns** - Rapid repeated changes suggesting
+uncertainty
+
+### Using Sensitivity Presets (New in 0.3.2)
+
+The
+[`bid_telemetry_presets()`](https://jrwinget.github.io/bidux/reference/bid_telemetry_presets.md)
+function provides three pre-configured sensitivity levels, making it
+easy to adjust how aggressively issues are detected without manually
+tuning thresholds:
+
+``` r
+# STRICT: Detects even minor issues - use for critical applications
+strict_issues <- bid_telemetry(
+  "path/to/telemetry.sqlite",
+  thresholds = bid_telemetry_presets("strict")
+)
+# - Flags inputs used by < 2% of sessions
+# - Flags delays > 20 seconds to first action
+# - Flags errors in > 5% of sessions
+# - Flags pages visited by < 10% of users
+
+# MODERATE: Balanced default - appropriate for most applications
+moderate_issues <- bid_telemetry(
+  "path/to/telemetry.sqlite",
+  thresholds = bid_telemetry_presets("moderate")
+)
+# - Flags inputs used by < 5% of sessions (default)
+# - Flags delays > 30 seconds to first action (default)
+# - Flags errors in > 10% of sessions (default)
+# - Flags pages visited by < 20% of users (default)
+
+# RELAXED: Only detects major issues - use for mature, stable dashboards
+relaxed_issues <- bid_telemetry(
+  "path/to/telemetry.sqlite",
+  thresholds = bid_telemetry_presets("relaxed")
+)
+# - Flags inputs used by < 10% of sessions
+# - Flags delays > 60 seconds to first action
+# - Flags errors in > 20% of sessions
+# - Flags pages visited by < 30% of users
+```
+
+### Comparing Preset Sensitivities
+
+Different presets can identify different numbers of issues from the same
+data:
+
+``` r
+# Analyze with all three presets
+strict <- bid_telemetry(
+  "path/to/telemetry.sqlite",
+  thresholds = bid_telemetry_presets("strict")
+)
+
+moderate <- bid_telemetry(
+  "path/to/telemetry.sqlite",
+  thresholds = bid_telemetry_presets("moderate")
+)
+
+relaxed <- bid_telemetry(
+  "path/to/telemetry.sqlite",
+  thresholds = bid_telemetry_presets("relaxed")
+)
+
+# Compare issue counts
+data.frame(
+  preset = c("strict", "moderate", "relaxed"),
+  total_issues = c(nrow(strict), nrow(moderate), nrow(relaxed)),
+  critical_issues = c(
+    sum(strict$severity == "critical"),
+    sum(moderate$severity == "critical"),
+    sum(relaxed$severity == "critical")
+  )
+)
+
+# Strict preset typically finds 2-3x more issues than relaxed
+# Use strict during initial development, relaxed for stable dashboards
+```
+
+### Modern Telemetry Workflow with `bid_telemetry()`
+
+The recommended approach for new projects:
+
+``` r
+# 1. Analyze telemetry with appropriate sensitivity
+issues <- bid_telemetry(
+  "path/to/telemetry.sqlite",
+  thresholds = bid_telemetry_presets("moderate")
+)
+
+# 2. Triage and review issues (returns organized summary)
+print(issues)
+
+# 3. Filter to high-priority issues using dplyr
+library(dplyr)
+critical_issues <- issues |>
+  filter(severity %in% c("critical", "high")) |>
+  arrange(desc(impact_rate))
+
+# 4. Convert top issues to Notice stages for BID workflow
+notices <- bid_notices(
+  issues = critical_issues,
+  previous_stage = interpret_result,
+  max_issues = 3
+)
+
+# 5. Extract telemetry flags for informed decisions
+flags <- bid_flags(issues)
+flags$has_critical_issues  # TRUE/FALSE
+flags$has_navigation_issues  # TRUE/FALSE
+flags$session_count  # Number of sessions analyzed
+
+# 6. Use flags to inform Structure stage
+structure_result <- bid_structure(
+  previous_stage = anticipate_result,
+  telemetry_flags = flags
+)
+```
+
+### Legacy Workflow with `bid_ingest_telemetry()`
+
+For backward compatibility with existing code:
+
+``` r
+# Returns hybrid object that works as both list and enhanced object
+legacy_issues <- bid_ingest_telemetry(
+  "path/to/telemetry.sqlite",
+  thresholds = bid_telemetry_presets("moderate")
+)
+
+# Legacy list interface (backward compatible)
+length(legacy_issues)  # Number of issues as list length
+legacy_issues[[1]]  # First issue as bid_stage object
+names(legacy_issues)  # Issue identifiers
+
+# Enhanced features (new in 0.3.1)
+as_tibble(legacy_issues)  # Get tidy issues view
+bid_flags(legacy_issues)  # Extract global flags
+print(legacy_issues)  # Shows organized triage summary
+
+# Both interfaces work on same object
+```
+
+### Complete Telemetry-Informed BID Example
+
+Here’s a full example showing how telemetry analysis integrates with the
+BID framework:
+
+``` r
+# Step 1: Analyze telemetry to identify friction points
+issues <- bid_telemetry(
+  "path/to/telemetry.sqlite",
+  thresholds = bid_telemetry_presets("strict")  # Catch everything during development
+)
+
+# Step 2: Start BID workflow with central question
+interpret_result <- bid_interpret(
+  central_question = "How can we reduce user friction identified in telemetry?",
+  data_story = new_data_story(
+    hook = "Telemetry shows multiple UX friction points",
+    context = glue::glue("Analysis of {bid_flags(issues)$session_count} user sessions"),
+    tension = "Users struggling with specific UI elements and workflows",
+    resolution = "Systematically address high-impact issues using BID framework"
+  )
+)
+
+# Step 3: Address highest-impact issue first
+top_issue <- issues |>
+  arrange(desc(impact_rate)) |>
+  slice(1)
+
+notice_result <- bid_notices(
+  issues = top_issue,
+  previous_stage = interpret_result
+)[[1]]
+
+# Step 4: Anticipate biases related to the issue
+anticipate_result <- bid_anticipate(
+  previous_stage = notice_result,
+  bias_mitigations = list(
+    anchoring = "Provide clear default values based on common use cases",
+    confirmation_bias = "Show data that challenges user assumptions"
+  )
+)
+
+# Step 5: Structure with telemetry-informed decisions
+structure_result <- bid_structure(
+  previous_stage = anticipate_result,
+  telemetry_flags = bid_flags(issues)  # Informs layout selection
+)
+
+# Step 6: Validate with telemetry references
+validate_result <- bid_validate(
+  previous_stage = structure_result,
+  summary_panel = "Dashboard improvements based on analysis of real user behavior patterns",
+  next_steps = c(
+    "Address remaining high-severity telemetry issues",
+    "Re-run telemetry analysis after changes to measure improvement",
+    "Monitor key metrics: time-to-first-action, error rates, navigation patterns"
+  )
+)
+```
+
+### When to Use Which Function
+
+**Use
+[`bid_telemetry()`](https://jrwinget.github.io/bidux/reference/bid_telemetry.md)**
+when you: - Are starting a new project or workflow - Want clean, tidy
+data for analysis and visualization - Prefer working with tibbles and
+`dplyr` - Don’t need backward compatibility
+
+**Use
+[`bid_ingest_telemetry()`](https://jrwinget.github.io/bidux/reference/bid_ingest_telemetry.md)**
+when you: - Have existing code from bidux \< 0.3.1 - Need the legacy
+list interface for compatibility - Want both list and tibble access in
+the same object
+
+**Note:** Both functions perform identical telemetry analysis and
+support the same presets and thresholds. The only difference is the
+return format.
+
+Visit [github.com/jrwinget/bidux](https://github.com/jrwinget/bidux) for
+updates and to contribute to the package development. We welcome
+feedback and suggestions to help make the BID framework even more
+effective for Shiny developers.
+
+Remember that good dashboard design is an iterative process that
+benefits from continuous user feedback. The BID framework provides
+structure to this process while ensuring common principles are
+incorporated throughout your development workflow.

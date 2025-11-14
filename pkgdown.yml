@@ -1,5 +1,5 @@
 pandoc: 3.1.11
-pkgdown: 2.1.3
+pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   advanced-workflows: advanced-workflows.html
@@ -9,8 +9,9 @@ articles:
   getting-started: getting-started.html
   introduction-to-bid: introduction-to-bid.html
   practical-examples: practical-examples.html
+  quick-start: quick-start.html
   telemetry-integration: telemetry-integration.html
-last_built: 2025-10-29T17:17Z
+last_built: 2025-11-14T18:05Z
 urls:
   reference: https://jrwinget.github.io/bidux/reference
   article: https://jrwinget.github.io/bidux/articles

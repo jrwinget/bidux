@@ -1,0 +1,223 @@
+# bidux
+
+## Overview
+
+The [bidux](https://jrwinget.github.io/bidux/) package helps Shiny
+developers create more effective dashboards using the **Behavioral
+Insight Design (BID) Framework**. If you’ve ever wondered why users
+struggle with your carefully crafted dashboards, or why your beautifully
+visualized data doesn’t drive the decisions you expected, this package
+is for you.
+
+**The core insight**: Technical excellence ≠ User success. Even the most
+sophisticated analysis can fail if users can’t quickly understand and
+act on it.
+
+The BID framework bridges this gap by integrating behavioral science, UX
+best practices, and data storytelling techniques into a systematic
+5-stage process:
+
+1.  **Interpret** the User’s Need - Like defining your research question
+    and understanding your data
+2.  **Notice** the Problem - Like identifying data quality issues or
+    analytical bottlenecks
+3.  **Anticipate** User Behavior - Like checking for statistical biases
+    that could skew results
+4.  **Structure** the Dashboard - Like choosing the right visualization
+    or model architecture
+5.  **Validate** & Empower the User - Like testing your model and
+    ensuring stakeholders can act on results
+
+## Installation
+
+You can install the released version of bidux from
+[CRAN](https://CRAN.R-project.org) with:
+
+``` r
+install.packages("bidux")
+```
+
+And the development version from this repo with:
+
+``` r
+# install.packages("pak")
+pak::pak("jrwinget/bidux")
+```
+
+## Usage
+
+``` r
+library(bidux)
+
+# Document a complete BID process
+process <- bid_interpret(
+  central_question = "How are our marketing campaigns performing across different channels?",
+  data_story = new_data_story(
+    hook = "Recent campaign performance varies significantly across channels",
+    context = "We've invested in 6 different marketing channels over the past quarter",
+    tension = "ROI metrics show inconsistent results, with some channels underperforming",
+    resolution = "Identify top-performing channels and key performance drivers"
+  )
+) |>
+  bid_notice(
+    problem = "Users are overwhelmed by too many filter options and struggle to find relevant insights",
+    evidence = "User testing shows 65% of first-time users fail to complete their intended task within 2 minutes"
+  ) |>
+  bid_anticipate(
+    bias_mitigations = list(
+      anchoring = "Include previous period performance as reference points",
+      framing = "Provide toggle between ROI improvement vs. ROI gap views"
+    )
+  ) |>
+  bid_structure() |>
+  bid_validate(
+    summary_panel = "Executive summary highlighting top and bottom performers, key trends, and recommended actions",
+    next_steps = c(
+      "Review performance of bottom 2 channels",
+      "Increase budget for top-performing channel",
+      "Schedule team meeting to discuss optimization strategy"
+    )
+  )
+
+# View implementation suggestions for specific packages
+bid_suggest_components(process, package = "bslib")
+bid_suggest_components(process, package = "reactable")
+
+# Generate comprehensive reports
+bid_report(process, format = "html")
+bid_report(process, format = "markdown")
+```
+
+## Data-Driven UX with Telemetry
+
+**New in 0.3.2**: Enhanced telemetry workflow transforms real user
+behavior data into actionable BID insights.
+
+``` r
+# Modern approach: analyze telemetry data with bid_telemetry()
+# Returns a clean tibble of issues (without legacy list structure)
+issues <- bid_telemetry("telemetry.sqlite")
+print(issues)  # Shows organized issue summary with severity levels
+
+# Adjust sensitivity with presets
+strict_issues <- bid_telemetry(
+  "telemetry.sqlite",
+  thresholds = bid_telemetry_presets("strict")    # or "moderate", "relaxed"
+)
+
+# Focus on critical issues using tidy workflows
+library(dplyr)
+
+critical_issues <- issues |>
+  filter(severity == "critical") |>
+  arrange(desc(impact_rate))
+
+# Convert high-priority issues to BID Notice stages
+notices <- bid_notices(
+  critical_issues,
+  previous_stage = interpret_result
+)
+
+# Use telemetry flags to inform structure decisions
+flags <- bid_flags(issues)
+structure_result <- bid_structure(
+  previous_stage = anticipate_result,
+  telemetry_flags = flags  # Influences layout selection
+)
+```
+
+The
+[`bid_telemetry()`](https://jrwinget.github.io/bidux/reference/bid_telemetry.md)
+function automatically identifies five key friction indicators:
+
+- **Unused Inputs**: UI controls rarely interacted with
+- **Delayed Interactions**: Long time-to-first-action patterns
+- **Frequent Errors**: Recurring error patterns that disrupt workflows
+- **Navigation Drop-offs**: Pages or tabs users rarely visit
+- **Confusion Patterns**: Rapid repeated changes indicating user
+  uncertainty
+
+**Function comparison:** -
+[`bid_telemetry()`](https://jrwinget.github.io/bidux/reference/bid_telemetry.md):
+Modern API returning a clean tibble (recommended for new code) -
+[`bid_ingest_telemetry()`](https://jrwinget.github.io/bidux/reference/bid_ingest_telemetry.md):
+Legacy API returning hybrid object with list structure (for backward
+compatibility)
+
+## Key Features
+
+### Behavioral Science Integration
+
+- **Bias Mitigation**: Address anchoring, framing, confirmation bias,
+  and choice overload
+- **Cognitive Load Management**: Implement progressive disclosure and
+  visual hierarchy
+- **Peak-End Rule**: Structure experiences for positive, actionable
+  endings
+
+### Implementation Support
+
+- **Component Suggestions**: Get tailored recommendations for
+  [bslib](https://rstudio.github.io/bslib/),
+  [reactable](https://glin.github.io/reactable/),
+  [echarts4r](https://echarts4r.john-coene.com/), and more
+- **Layout Selection**: Automatic layout recommendations based on
+  content and telemetry flags
+- **Concept Dictionary**: Access 50+ behavioral science concepts with
+  implementation tips
+
+### Real User Data Integration
+
+- **Telemetry Analysis**: Transform usage patterns into design insights
+- **Evidence-Based Design**: Ground design decisions in actual user
+  behavior
+- **Iterative Improvement**: Track UX improvements with before/after
+  telemetry comparison
+
+## Learning More
+
+The BID framework is based on established behavioral science and UX
+design principles. Explore the concept dictionary:
+
+``` r
+# Browse all available concepts
+bid_concepts() |>
+  select(concept, category, description)
+
+# Get detailed information about specific concepts
+bid_concept("Processing Fluency")
+bid_concept("Hick's Law")
+
+# Search for concepts by keyword
+bid_concepts("cognitive") |>
+  select(concept, implementation_tips)
+```
+
+## Getting Help
+
+- Browse the documentation:
+  [`help(package = "bidux")`](https://jrwinget.github.io/bidux/reference)
+- Read the vignettes:
+  - [`vignette("behavioral-science-primer")`](https://jrwinget.github.io/bidux/articles/behavioral-science-primer.md):
+    Behavioral science for data scientists
+  - [`vignette("introduction-to-bid")`](https://jrwinget.github.io/bidux/articles/introduction-to-bid.md):
+    Framework overview and core principles
+  - [`vignette("telemetry-integration")`](https://jrwinget.github.io/bidux/articles/telemetry-integration.md):
+    Data-driven UX workflows
+  - [`vignette("practical-examples")`](https://jrwinget.github.io/bidux/articles/practical-examples.md):
+    Practical dashboard examples
+  - [`vignette("getting-started")`](https://jrwinget.github.io/bidux/articles/getting-started.md):
+    Complete walk-through with examples
+  - [`vignette("concepts-reference")`](https://jrwinget.github.io/bidux/articles/concepts-reference.md):
+    Behavioral science concepts with practical implementation
+  - [`vignette("advanced-workflows")`](https://jrwinget.github.io/bidux/articles/advanced-workflows.md):
+    Advanced BID workflows
+- Visit the BID framework repository:
+  <https://github.com/jrwinget/bid-framework>
+
+## Code of Conduct
+
+Please note that the bidux project is released with a [Contributor Code
+of
+Conduct](https://contributor-covenant.org/version/2/1/CODE_OF_CONDUCT.html).
+By contributing to this project, you agree to abide by its terms.

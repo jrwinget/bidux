@@ -1,0 +1,355 @@
+# Behavioral Science for Data Scientists: Why Your Dashboard Users Think Differently Than You Do
+
+``` r
+library(bidux)
+library(dplyr)
+```
+
+## Introduction: The Gap Between Data Creators and Data Users
+
+As data scientists and R developers, we’re trained to think
+systematically, explore data thoroughly, and validate our assumptions.
+But here’s a reality check: your dashboard users don’t think like you
+do.
+
+Consider this scenario: - **You see**: A well-organized dashboard with
+15 filters, 8 visualizations, and comprehensive data coverage - **Your
+users see**: An overwhelming interface where they can’t find what they
+need quickly
+
+This isn’t because your users are less intelligent; it’s because they’re
+human, and humans have predictable cognitive patterns that affect how
+they process information.
+
+## The Core Problem: Cognitive Load vs. Analytical Depth
+
+### What You’re Optimized For (as a data scientist)
+
+``` r
+# Your typical approach to data exploration
+data |>
+  filter(multiple_conditions) |>
+  group_by(several_dimensions) |>
+  summarize(
+    metric_1 = mean(value_1, na.rm = TRUE),
+    metric_2 = sum(value_2),
+    metric_3 = median(value_3),
+    .groups = "drop"
+  ) |>
+  arrange(desc(metric_1))
+```
+
+### What Your Users Need (cognitive efficiency)
+
+- **Quick orientation**: “What am I looking at?”
+- **Immediate value**: “What does this mean for my decision?”
+- **Clear next steps**: “What should I do about it?”
+
+## Key Behavioral Science Concepts for Data People
+
+### 1. Cognitive Load Theory: The Mental RAM Problem
+
+Think of human attention like computer memory: limited and easily
+overloaded.
+
+``` r
+# Explore cognitive load concepts
+cognitive_concepts <- bid_concepts("cognitive")
+
+cognitive_concepts |>
+  select(concept, description, implementation_tips) |>
+  head(3)
+```
+
+**For dashboards, this means:**
+
+- Users can only process 5-9 pieces of information simultaneously
+- Every filter, chart, and button competes for mental resources
+- Progressive disclosure beats comprehensive display
+
+**Practical example:**
+
+``` r
+# Instead of showing all 12 KPIs at once:
+# kpi_grid <- layout_columns(
+#   value_box("Revenue", "$1.2M", icon = "currency-dollar"),
+#   value_box("Customers", "15,432", icon = "people"),
+#   # ... 10 more value boxes
+# )
+
+# Show key metrics first, details on demand:
+kpi_summary <- layout_columns(
+  col_widths = c(8, 4),
+  card(
+    card_header("Key Performance Summary"),
+    value_box("Primary Goal", "$1.2M Revenue", icon = "target"),
+    p("vs. $980K target (+22%)")
+  ),
+  card(
+    card_header("Details"),
+    actionButton(
+      "show_details",
+      "View All Metrics",
+      class = "btn-outline-primary"
+    )
+  )
+)
+```
+
+### 2. Anchoring Bias: The First Number Problem
+
+Humans over-rely on the first piece of information they see. In data
+dashboards, this means the first number shown becomes a reference point
+for everything else.
+
+``` r
+# Learn about anchoring
+bid_concept("anchoring") |>
+  select(description, implementation_tips)
+```
+
+**Dashboard implication:**
+
+If you show “Sales: \$50K” first, users will judge all subsequent
+numbers relative to \$50K, even if it’s not the most important metric.
+
+**Solution pattern:**
+
+``` r
+# Provide context and reference points
+sales_card <- card(
+  card_header("Monthly Sales Performance"),
+  layout_columns(
+    value_box(
+      title = "This Month",
+      value = "$87K",
+      showcase = bs_icon("graph-up"),
+      theme = "success"
+    ),
+    div(
+      p("Previous month: $65K", style = "color: #666; margin: 0;"),
+      p("Target: $80K", style = "color: #666; margin: 0;"),
+      p(strong("vs. Target: +9%"), style = "color: #28a745;")
+    )
+  )
+)
+```
+
+### 3. Framing Effects: How You Say It Matters More Than What You Say
+
+The same data can be interpreted completely differently based on how
+it’s presented.
+
+``` r
+# Explore framing concepts
+bid_concept("framing") |>
+  select(description, implementation_tips)
+```
+
+**Example: Customer satisfaction of 73%**
+
+``` r
+# Negative frame (emphasizes problems)
+satisfaction_negative <- value_box(
+  "Customer Issues",
+  "27% Unsatisfied",
+  icon = "exclamation-triangle",
+  theme = "danger"
+)
+
+# Positive frame (emphasizes success)
+satisfaction_positive <- value_box(
+  "Customer Satisfaction",
+  "73% Satisfied",
+  icon = "heart-fill",
+  theme = "success"
+)
+
+# Balanced frame (shows progress)
+satisfaction_balanced <- card(
+  card_header("Customer Satisfaction Progress"),
+  value_box("Current Level", "73%"),
+  p("Improvement needed: 17 percentage points to reach 90% target")
+)
+```
+
+### 4. Choice Overload: Why More Options Create Worse Outcomes
+
+Research shows that too many choices lead to decision paralysis and user
+dissatisfaction.
+
+**The data scientist instinct:**
+
+“Let’s give them 20 different chart types and 15 filters so they can
+explore any question!”
+
+**The user reality:**
+
+1.  Use defaults and ignore customization options
+2.  Get overwhelmed and abandon the task
+3.  Make suboptimal choices due to cognitive fatigue
+
+**Better approach:**
+
+``` r
+# Instead of 15 filters visible at once
+ui_complex <- div(
+  selectInput("region", "Region", choices = regions),
+  selectInput("product", "Product", choices = products),
+  selectInput("channel", "Channel", choices = channels),
+  # ... 12 more filters
+)
+
+# Use progressive disclosure
+ui_simple <- div(
+  # Show only the most common filters first
+  selectInput("time_period", "Time Period", choices = time_options),
+  selectInput("metric", "Primary Metric", choices = key_metrics),
+
+  # Advanced filters behind a toggle
+  accordion(
+    accordion_panel(
+      "Advanced Filters",
+      icon = bs_icon("sliders"),
+      selectInput("region", "Region", choices = regions),
+      selectInput("product", "Product", choices = products)
+      # Additional filters here
+    )
+  )
+)
+```
+
+## Translating Data Science Skills to UX Thinking
+
+### Your A/B Testing Mindset → UX Validation
+
+You already know how to test hypotheses with data. Apply the same rigor
+to UX decisions:
+
+``` r
+# Your typical A/B test
+results <- t.test(
+  treatment_group$conversion_rate,
+  control_group$conversion_rate
+)
+
+# UX equivalent: Test interface variations
+dashboard_test <- list(
+  control = "Current 5-chart overview page",
+  treatment = "Redesigned with progressive disclosure"
+)
+
+# Measure: task completion time, user satisfaction, error rates
+# Analyze: same statistical rigor you'd apply to any experiment
+```
+
+### Your Data Validation Process → User Mental Model Validation
+
+Just as you validate data quality, validate that your interface matches
+user expectations:
+
+``` r
+# Document user mental models like you document data assumptions
+user_assumptions <- bid_interpret(
+  central_question = "How do sales managers think about performance?",
+  data_story = list(
+    hook = "Sales managers need quick performance insights",
+    context = "They have 15 minutes between meetings",
+    tension = "Current reports take too long to interpret",
+    resolution = "Provide immediate visual context with drill-down capability"
+  )
+)
+
+# Validate these assumptions like you'd validate data quality
+summary(user_assumptions)
+```
+
+## The BID Framework: A Systematic Approach for Data People
+
+The BID framework gives you a systematic way to apply behavioral
+science, similar to how you approach data analysis:
+
+### Stage 1: Interpret (Like defining your research question)
+
+- What specific question does this dashboard answer?
+- Who are the users and what are their constraints?
+
+### Stage 2: Notice (Like identifying data quality issues)
+
+- Where do users get stuck or confused?
+- What cognitive bottlenecks exist?
+
+### Stage 3: Anticipate (Like checking for statistical biases)
+
+- What cognitive biases might affect interpretation?
+- How can design mitigate these biases?
+
+### Stage 4: Structure (Like choosing the right visualization)
+
+- What layout best supports the user’s mental model?
+- How should information be hierarchically organized?
+
+### Stage 5: Validate (Like testing your model)
+
+- Does the user leave with clear insights?
+- Can they take action on what they’ve learned?
+
+## Practical Next Steps
+
+1.  **Start small**: Pick one dashboard and apply the BID framework
+2.  **Measure**: Track user behavior metrics (time to insight, task
+    completion)
+3.  **Iterate**: Use the same experimental mindset you apply to model
+    development
+4.  **Learn progressively**: Use
+    [`bid_concepts()`](https://jrwinget.github.io/bidux/reference/bid_concepts.md)
+    to explore one behavioral principle at a time
+
+``` r
+# Explore available concepts by category
+all_concepts <- bid_concepts()
+table(all_concepts$category)
+
+# Start with these fundamental concepts for data dashboards
+starter_concepts <- c(
+  "Cognitive Load Theory",
+  "Anchoring Effect",
+  "Processing Fluency",
+  "Progressive Disclosure"
+)
+
+for (concept in starter_concepts) {
+  cat("\n### ", concept, "\n")
+  info <- bid_concept(concept)
+  cat(info$description[1], "\n")
+  cat("Implementation:", info$implementation_tips[1], "\n")
+}
+```
+
+## Why This Matters for You
+
+Understanding user cognition makes you a more complete data
+professional:
+
+- **Better adoption**: Your analyses get used instead of ignored
+- **Clearer communication**: Stakeholders understand and act on your
+  insights
+- **Strategic thinking**: You solve business problems, not just
+  technical problems
+- **Competitive advantage**: Most data scientists don’t think about user
+  experience
+
+Remember: The best analysis in the world is worthless if users can’t
+understand and act on it. Behavioral science helps bridge that gap.
+
+## Resources for Further Learning
+
+- Use
+  [`bid_concepts()`](https://jrwinget.github.io/bidux/reference/bid_concepts.md)
+  to explore all available behavioral science concepts
+- Try the `getting-started` vignette for hands-on BID framework practice
+- Check out the `telemetry-integration` vignette to measure the impact
+  of your UX improvements
+
+The goal isn’t to become a UX expert; it’s to apply your analytical
+thinking to user experience and create more effective data products.

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">bidux</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,6 +25,7 @@
     <li><a class="dropdown-item" href="../articles/getting-started.html">Getting Started with bidux</a></li>
     <li><a class="dropdown-item" href="../articles/introduction-to-bid.html">Introduction to the BID Framework</a></li>
     <li><a class="dropdown-item" href="../articles/practical-examples.html">Practical Examples: Before and After Dashboard Transformations</a></li>
+    <li><a class="dropdown-item" href="../articles/quick-start.html">Quick Start: Improve Your Shiny Dashboard in 15 Minutes</a></li>
     <li><a class="dropdown-item" href="../articles/telemetry-integration.html">Integrating shiny.telemetry with bidux</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -41,6 +42,28 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.2.9000" id="id_-bidux-0329000-development-version"># bidux 0.3.2.9000 (development version)<a class="anchor" aria-label="anchor" href="#id_-bidux-0329000-development-version"></a></h2>
+<div class="section level4">
+<h4 id="new-features-0-3-2-9000">NEW FEATURES<a class="anchor" aria-label="anchor" href="#new-features-0-3-2-9000"></a></h4>
+<ul><li>
+<strong>Flattened tibble format for Structure stage suggestions.</strong> <code><a href="../reference/bid_structure.html">bid_structure()</a></code> now returns both the nested suggestion format (<code>$suggestions</code>) and a new flattened tibble format (<code>$suggestions_tbl</code>). The tibble includes columns for <code>concept</code>, <code>title</code>, <code>details</code>, <code>components</code>, <code>rationale</code>, <code>score</code>, <code>difficulty</code>, and <code>category</code>, making it easy to filter and analyze suggestions using standard dplyr operations. Examples include filtering by difficulty (“Easy”, “Medium”, “Hard”), category (“Layout”, “Navigation”, “Content”, etc.), or score thresholds.</li>
+</ul></div>
+<div class="section level4">
+<h4 id="improvements-0-3-2-9000">IMPROVEMENTS<a class="anchor" aria-label="anchor" href="#improvements-0-3-2-9000"></a></h4>
+<ul><li>
+<strong>Enhanced concept citations and accuracy in bid_concepts_data.csv:</strong>
+<ul><li>Updated Beautiful-Is-Good Stereotype with more comprehensive description and added aesthetic-usability reference (Tractinsky et al., 2000) alongside the original social psychology reference (Dion et al., 1972)</li>
+<li>Improved Data Storytelling Framework with clearer description and updated citations to data visualization authorities (Knaflic, 2015; Dykes, 2020)</li>
+<li>Added clarifying note to Gherkin Method explaining that while not a behavioral science concept, it supports clear information processing and scenario-based thinking</li>
+</ul></li>
+</ul></div>
+<div class="section level4">
+<h4 id="documentation-updates-0-3-2-9000">DOCUMENTATION UPDATES<a class="anchor" aria-label="anchor" href="#documentation-updates-0-3-2-9000"></a></h4>
+<ul><li>
+<strong>Getting Started vignette enhanced</strong> with comprehensive examples showing how to work with both nested and flattened suggestion formats, including practical filtering patterns for finding easy-to-implement, high-impact suggestions</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.2" id="id_-bidux-032-2025-10-28"># bidux 0.3.2 (2025-10-28)<a class="anchor" aria-label="anchor" href="#id_-bidux-032-2025-10-28"></a></h2><p class="text-muted">CRAN release: 2025-10-28</p>
 <div class="section level4">
@@ -328,7 +351,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

@@ -12,6 +12,7 @@
 <url><loc>https://jrwinget.github.io/bidux/articles/index.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/articles/introduction-to-bid.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/articles/practical-examples.html</loc></url>
+<url><loc>https://jrwinget.github.io/bidux/articles/quick-start.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/articles/telemetry-integration.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/authors.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/index.html</loc></url>
@@ -20,6 +21,8 @@
 <url><loc>https://jrwinget.github.io/bidux/reference/apply_suggestion_rules.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/as_tibble.bid_issues.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/as_tibble.bid_stage.html</loc></url>
+<url><loc>https://jrwinget.github.io/bidux/reference/assign_category.html</loc></url>
+<url><loc>https://jrwinget.github.io/bidux/reference/assign_difficulty.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/bid_address.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/bid_anticipate.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/bid_concept.html</loc></url>
@@ -32,6 +35,7 @@
 <url><loc>https://jrwinget.github.io/bidux/reference/bid_notice_issue.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/bid_notices.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/bid_pipeline.html</loc></url>
+<url><loc>https://jrwinget.github.io/bidux/reference/bid_quick_suggest.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/bid_report.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/bid_result.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/bid_set_quiet.html</loc></url>
@@ -64,6 +68,7 @@
 <url><loc>https://jrwinget.github.io/bidux/reference/find_error_patterns.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/find_navigation_dropoffs.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/find_unused_inputs.html</loc></url>
+<url><loc>https://jrwinget.github.io/bidux/reference/flatten_suggestions_to_tibble.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/format_label.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/get_accessibility_recommendations.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/get_cognitive_load_suggestions.html</loc></url>
