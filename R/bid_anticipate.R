@@ -430,8 +430,7 @@ bid_anticipate <- function(
     message(
       paste0(
         "Automatically suggested bias mitigations: ",
-        paste(names(bias_mitigations), collapse = ", "),
-        "."
+        paste(names(bias_mitigations), collapse = ", ")
       )
     )
   }
@@ -446,7 +445,7 @@ bid_anticipate <- function(
     accessibility_advice <- get_accessibility_advice(layout_context)
     bias_mitigations$accessibility <- accessibility_advice
 
-    message("Added accessibility mitigation based on layout context.")
+    message("Added accessibility mitigation based on layout context")
   }
 
   bias_suggestions <- character(0)
@@ -496,12 +495,12 @@ bid_anticipate <- function(
     if ("accessibility" %in% names(bias_mitigations)) {
       accessibility_suggestions <- c(
         accessibility_suggestions,
-        "accessibility considerations have been included in bias mitigations."
+        "Accessibility considerations have been included in bias mitigations"
       )
     } else {
       accessibility_suggestions <- c(
         accessibility_suggestions,
-        "consider adding accessibility mitigations for inclusive design."
+        "Consider adding accessibility mitigations for inclusive design"
       )
     }
   }

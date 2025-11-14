@@ -125,7 +125,8 @@ bid_structure <- function(
   suggestion_groups <- structure_suggestions(
     previous_stage,
     chosen_layout,
-    concepts
+    concepts,
+    quiet = quiet
   )
 
   concepts_detected <- sapply(suggestion_groups, function(g) g$concept)

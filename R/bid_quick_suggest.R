@@ -158,7 +158,7 @@ bid_quick_suggest <- function(
   # analyze problem and build context
   # ============================================================================
 
-  bid_alert_info("Analyzing your UX problem...", quiet = quiet)
+  bid_alert_info("Analyzing your UX problem", quiet = quiet)
 
   # clean inputs
   problem_clean <- trimws(problem)
@@ -233,22 +233,24 @@ bid_quick_suggest <- function(
   })
 
   # create structure stage to get suggestions (quietly)
-  structure_result <- bid_with_quiet({
+  structure_result <- suppressWarnings(bid_with_quiet({
     bid_structure(
       previous_stage = notice_result,
-      concepts = detected_concepts
+      concepts = detected_concepts,
+      quiet = TRUE
     )
-  })
+  }))
 
   # ============================================================================
   # extract and process suggestions
   # ============================================================================
 
-  bid_alert_info("Generating actionable suggestions...", quiet = quiet)
+  bid_alert_info("Generating actionable suggestions", quiet = quiet)
 
   # extract suggestion groups from structure stage
-  # suggestions is a list column, need to extract the list from first row
-  suggestion_groups <- structure_result$suggestions[[1]]
+  # suggestions is stored as a list in the tibble
+  # structure_result$suggestions directly gives us the list of groups
+  suggestion_groups <- structure_result$suggestions
 
   # flatten suggestions into tibble format
   all_suggestions <- .flatten_suggestions_to_tibble(
@@ -289,7 +291,7 @@ bid_quick_suggest <- function(
 
   if (n_suggestions == 0) {
     bid_message(
-      "No Suggestions Found",
+      "No suggestions found",
       "Try adjusting parameters:",
       "  - Lower min_score (current: {min_score})",
       "  - Remove package filter",
@@ -315,7 +317,7 @@ bid_quick_suggest <- function(
     )
 
     bid_message(
-      "Quick Suggestions Ready",
+      "Quick suggestions ready",
       summary_msg,
       glue::glue("Top concept: {filtered_suggestions$concept[1]}"),
       "Use bid_concept() to learn more about any concept",

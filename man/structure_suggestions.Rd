@@ -4,7 +4,12 @@
 \alias{structure_suggestions}
 \title{Generate ranked, concept-grouped, actionable UI/UX suggestions}
 \usage{
-structure_suggestions(previous_stage, chosen_layout, concepts = NULL)
+structure_suggestions(
+  previous_stage,
+  chosen_layout,
+  concepts = NULL,
+  quiet = NULL
+)
 }
 \arguments{
 \item{previous_stage}{A tibble or list output from an earlier BID stage}

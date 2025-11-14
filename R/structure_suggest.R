@@ -285,7 +285,8 @@ safe_stage_data_story_access <- function(previous_stage, element) {
 structure_suggestions <- function(
     previous_stage,
     chosen_layout,
-    concepts = NULL) {
+    concepts = NULL,
+    quiet = NULL) {
   # combine concepts from multiple sources
   concepts_final <- unique(c(
     extract_stage1_theory(previous_stage), # from Notice
@@ -306,8 +307,9 @@ structure_suggestions <- function(
   )
   groups <- rank_and_sort_suggestions(groups, previous_stage, chosen_layout)
 
-  cli::cli_alert_info(
-    'Tip: Learn more about any concept via bid_concept("<concept>").'
+  bid_alert_info(
+    'Tip: Learn more about any concept via bid_concept("<concept>").',
+    quiet = quiet
   )
 
   return(groups)
