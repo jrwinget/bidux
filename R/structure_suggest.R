@@ -276,9 +276,15 @@ safe_stage_data_story_access <- function(previous_stage, element) {
 #' Each suggestion includes:
 #' - title: Brief actionable description
 #' - details: Specific implementation guidance
-#' - components: Shiny/bslib component recommendations
+#' - components: R dashboard component recommendations (shiny::, bslib::, etc.)
 #' - rationale: 1-2 sentence explanation
 #' - score: Relevance ranking (0-1)
+#'
+#' **Framework Compatibility:**
+#' Components prefixed with 'shiny::' require Shiny runtime (either a Shiny app
+#' or Quarto dashboard with `server: shiny`). Components from bslib, DT, plotly,
+#' reactable, and leaflet work in both Shiny apps and static/OJS Quarto
+#' dashboards.
 #'
 #' @importFrom cli cli_alert_info
 #' @keywords internal
