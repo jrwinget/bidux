@@ -58,6 +58,10 @@ bid_telemetry_presets <- function(preset = c("moderate", "strict", "relaxed")) {
   return(presets[[preset]])
 }
 
+# TODO: Add support for DBI connection objects with custom table_name parameter
+# to bid_ingest_telemetry to allow users to specify their own table names
+# (GitHub issue #39)
+
 #' Ingest telemetry data and identify UX friction points
 #'
 #' @description
@@ -362,6 +366,10 @@ read_telemetry_data <- function(path, format, events_table = NULL) {
   }
 }
 
+# TODO: Accept DBI connection + table_name as alternative to file path to
+# read_telemetry_sqlite (GitHub issue #39)
+# This would allow: read_telemetry_sqlite(con, table_name = "my_events")
+
 #' Read telemetry from SQLite database
 #' @param path SQLite database path
 #' @param events_table Optional custom events table data.frame
@@ -391,6 +399,9 @@ read_telemetry_sqlite <- function(path, events_table = NULL) {
         tables <- DBI::dbListTables(con)
 
         # look for events table (common {shiny.telemetry} table name)
+        # TODO: Add table_name parameter to allow user-specified table names
+        # (GitHub issue #39). When implemented, check table_name first before
+        # auto-detection
         event_table <- NULL
         if ("event_data" %in% tables) {
           event_table <- "event_data"
