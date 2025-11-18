@@ -2,7 +2,7 @@
 % Please edit documentation in R/bid_quick_suggest.R
 \name{bid_quick_suggest}
 \alias{bid_quick_suggest}
-\title{Quick UX Suggestions for Shiny Developers}
+\title{Quick UX Suggestions for R Dashboard Developers}
 \usage{
 bid_quick_suggest(
   problem,
@@ -14,16 +14,18 @@ bid_quick_suggest(
 )
 }
 \arguments{
-\item{problem}{Required. A character string describing the UX problem. Examples:
-"Users can't find the download button", "Information overload on
-dashboard", "Mobile interface is hard to navigate".}
+\item{problem}{Required. A character string describing the UX problem.
+Examples: "Users can't find the download button", "Information
+overload on dashboard", "Mobile interface is hard to navigate".}
 
 \item{context}{Optional. Additional context about the application or users.
 This helps refine suggestions to your specific situation.}
 
 \item{package}{Optional. Filter suggestions to specific package ("bslib",
-"shiny", "reactable", "DT", etc.). If NULL, returns suggestions for
-all relevant packages.}
+"shiny", "reactable", "DT", "plotly", "leaflet", etc.). If NULL,
+returns suggestions for all relevant packages. Note: bslib, plotly,
+DT, reactable, and leaflet components work in both Shiny apps and
+Quarto dashboards.}
 
 \item{limit}{Optional. Maximum number of suggestions to return (default: 10).
 Set to Inf to return all suggestions.}
@@ -38,17 +40,21 @@ messages. If NULL, uses getOption("bidux.quiet", FALSE).}
 A tibble with columns:
 \item{title}{Brief actionable description of the suggestion}
 \item{details}{Specific implementation guidance}
-\item{components}{Shiny/bslib component recommendations (character vector)}
+\item{components}{R dashboard component recommendations (character vector).
+Components prefixed with 'shiny::' require Shiny runtime; bslib, DT,
+plotly, reactable, and leaflet components work in both Shiny and Quarto
+dashboards.}
 \item{concept}{UX concept the suggestion is based on}
 \item{score}{Relevance score (0-1, higher is more relevant)}
 \item{difficulty}{Implementation difficulty (easy/moderate/advanced)}
 \item{rationale}{1-2 sentence explanation of why this helps}
 }
 \description{
-Provides a streamlined, single-step workflow for Shiny developers who need
-quick UX suggestions without going through the full 5-stage BID framework.
-This function internally leverages the BID framework stages but presents
-results in a simple, actionable format.
+Provides a streamlined, single-step workflow for R dashboard developers who
+need quick UX suggestions without going through the full 5-stage BID
+framework. This function internally leverages the BID framework stages but
+presents results in a simple, actionable format. Works with both Shiny
+applications and Quarto dashboards.
 
 Unlike the full BID workflow (Interpret -> Notice -> Anticipate -> Structure
 -> Validate), this function provides immediate suggestions based on a problem
@@ -81,6 +87,12 @@ semantic analysis to:
 \item Use \code{bid_quick_suggest()}: Quick fixes, prototyping, single issues
 \item Use full workflow: Comprehensive redesigns, complex projects, team collaboration
 }
+
+\strong{Quarto Dashboard Compatibility:}
+Component suggestions include both Shiny-specific (shiny::) and framework-agnostic
+components. For static Quarto dashboards or OJS-based interactivity, focus on
+bslib, DT, plotly, reactable, and leaflet suggestions. Shiny-prefixed components
+require \code{server: shiny} in Quarto dashboards or a traditional Shiny app.
 }
 \examples{
 # Basic usage

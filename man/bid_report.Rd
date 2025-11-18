@@ -24,6 +24,9 @@ A formatted report summarizing the entire BID process
 \description{
 Creates a comprehensive report from a completed BID framework process. This
 report summarizes all stages and provides recommendations for implementation.
+Reports include component suggestions that work with both Shiny applications
+and Quarto dashboards (shiny-prefixed components (i.e., \verb{shiny::}) require
+Shiny runtime).
 }
 \examples{
 if (interactive()) {

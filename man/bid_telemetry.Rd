@@ -13,8 +13,9 @@ bid_telemetry(path, format = NULL, events_table = NULL, thresholds = list())
 auto-detected from file extension.}
 
 \item{events_table}{Optional data.frame specifying custom events table when
-reading from SQLite. Must have columns: event_id, timestamp, event_type, user_id.
-If NULL, auto-detects standard table names (event_data, events).}
+reading from SQLite. Must have columns: event_id, timestamp,
+event_type, user_id. If NULL, auto-detects standard table names
+(event_data, events).}
 
 \item{thresholds}{Optional list of threshold parameters:
 - unused_input_threshold: percentage of sessions below which input is

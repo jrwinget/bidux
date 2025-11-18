@@ -18,8 +18,9 @@ bid_ingest_telemetry(
 auto-detected from file extension.}
 
 \item{events_table}{Optional data.frame specifying custom events table when
-reading from SQLite. Must have columns: event_id, timestamp, event_type, user_id.
-If NULL, auto-detects standard table names (event_data, events).}
+reading from SQLite. Must have columns: event_id, timestamp,
+event_type, user_id. If NULL, auto-detects standard table names
+(event_data, events).}
 
 \item{thresholds}{Optional list of threshold parameters:
 - unused_input_threshold: percentage of sessions below which input is
@@ -53,6 +54,12 @@ JSON) and automatically identifies potential UX issues, translating them into
 BID framework Notice stages. It returns a hybrid object that is backward-compatible
 as a list of Notice stages while also providing enhanced functionality with
 tidy tibble access and flags extraction.
+
+\strong{Note:} This function is designed for Shiny application telemetry. For
+Quarto dashboards, shiny.telemetry only works when using \code{server: shiny} in
+the Quarto YAML. Static Quarto dashboards and OJS-based dashboards do not
+support shiny.telemetry. Consider alternative analytics solutions (e.g.,
+Plausible) for static dashboard usage tracking.
 }
 \examples{
 \dontrun{
