@@ -58,6 +58,17 @@ bid_telemetry_presets <- function(preset = c("moderate", "strict", "relaxed")) {
   return(presets[[preset]])
 }
 
+# TODO: Add support for DBI connection objects with custom table_name parameter
+# to bid_ingest_telemetry to allow users to specify their own table names
+# (GitHub issue #17)
+
+# TODO: Add bid_suggest_analytics() function to recommend alternative telemetry
+# solutions (Plausible, Google Analytics, PostHog) for static Quarto dashboards
+# where shiny.telemetry is not available
+
+# TODO: Document integration patterns for web analytics in static Quarto
+# dashboards to achieve similar UX insights as shiny.telemetry
+
 #' Ingest telemetry data and identify UX friction points
 #'
 #' @description
@@ -67,12 +78,19 @@ bid_telemetry_presets <- function(preset = c("moderate", "strict", "relaxed")) {
 #' as a list of Notice stages while also providing enhanced functionality with
 #' tidy tibble access and flags extraction.
 #'
+#' **Note:** This function is designed for Shiny application telemetry. For
+#' Quarto dashboards, shiny.telemetry only works when using `server: shiny` in
+#' the Quarto YAML. Static Quarto dashboards and OJS-based dashboards do not
+#' support shiny.telemetry. Consider alternative analytics solutions (e.g.,
+#' Plausible) for static dashboard usage tracking.
+#'
 #' @param path File path to telemetry data (SQLite database or JSON log file)
 #' @param format Optional format specification ("sqlite" or "json"). If NULL,
 #'        auto-detected from file extension.
 #' @param events_table Optional data.frame specifying custom events table when
-#'        reading from SQLite. Must have columns: event_id, timestamp, event_type, user_id.
-#'        If NULL, auto-detects standard table names (event_data, events).
+#'        reading from SQLite. Must have columns: event_id, timestamp,
+#'        event_type, user_id. If NULL, auto-detects standard table names
+#'        (event_data, events).
 #' @param thresholds Optional list of threshold parameters:
 #'        - unused_input_threshold: percentage of sessions below which input is
 #'          considered unused (default: 0.05)
@@ -362,6 +380,10 @@ read_telemetry_data <- function(path, format, events_table = NULL) {
   }
 }
 
+# TODO: Accept DBI connection + table_name as alternative to file path to
+# read_telemetry_sqlite (GitHub issue #17)
+# This would allow: read_telemetry_sqlite(con, table_name = "my_events")
+
 #' Read telemetry from SQLite database
 #' @param path SQLite database path
 #' @param events_table Optional custom events table data.frame
@@ -391,6 +413,9 @@ read_telemetry_sqlite <- function(path, events_table = NULL) {
         tables <- DBI::dbListTables(con)
 
         # look for events table (common {shiny.telemetry} table name)
+        # TODO: Add table_name parameter to allow user-specified table names
+        # (GitHub issue #17). When implemented, check table_name first before
+        # auto-detection
         event_table <- NULL
         if ("event_data" %in% tables) {
           event_table <- "event_data"

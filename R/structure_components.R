@@ -1,10 +1,18 @@
+# TODO: Add quarto_compatible column to component database to indicate which
+# components work in static Quarto vs require Shiny runtime
+
+# TODO: Add bid_filter_quarto_compatible() helper to filter suggestions for
+# static Quarto dashboards
+
 #' Suggest UI Components Based on BID Framework Analysis
 #'
 #' @description
 #' This function analyzes the results from BID framework stages and suggests
-#' appropriate UI components from popular R packages like shiny, bslib, DT, etc.
-#' The suggestions are based on the design principles and user needs identified
-#' in the BID process.
+#' appropriate UI components from popular R dashboard packages like shiny,
+#' bslib, DT, plotly, reactable, and htmlwidgets. The suggestions are based on
+#' the design principles and user needs identified in the BID process.
+#' Components work with both Shiny applications and Quarto dashboards
+#' (shiny-prefixed components require Shiny runtime).
 #'
 #' @param bid_stage A tibble output from any BID framework stage function
 #' @param package Optional character string specifying which package to focus

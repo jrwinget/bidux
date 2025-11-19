@@ -1,24 +1,27 @@
-#' Quick UX Suggestions for Shiny Developers
+#' Quick UX Suggestions for R Dashboard Developers
 #'
 #' @description
-#' Provides a streamlined, single-step workflow for Shiny developers who need
-#' quick UX suggestions without going through the full 5-stage BID framework.
-#' This function internally leverages the BID framework stages but presents
-#' results in a simple, actionable format.
+#' Provides a streamlined, single-step workflow for R dashboard developers who
+#' need quick UX suggestions without going through the full 5-stage BID
+#' framework. This function internally leverages the BID framework stages but
+#' presents results in a simple, actionable format. Works with both Shiny
+#' applications and Quarto dashboards.
 #'
 #' Unlike the full BID workflow (Interpret -> Notice -> Anticipate -> Structure
 #' -> Validate), this function provides immediate suggestions based on a problem
 #' description. Use this for rapid prototyping or when you need quick guidance.
 #' For comprehensive UX redesign projects, use the full BID workflow.
 #'
-#' @param problem Required. A character string describing the UX problem. Examples:
-#'        "Users can't find the download button", "Information overload on
-#'        dashboard", "Mobile interface is hard to navigate".
+#' @param problem Required. A character string describing the UX problem.
+#'        Examples: "Users can't find the download button", "Information
+#'        overload on dashboard", "Mobile interface is hard to navigate".
 #' @param context Optional. Additional context about the application or users.
 #'        This helps refine suggestions to your specific situation.
 #' @param package Optional. Filter suggestions to specific package ("bslib",
-#'        "shiny", "reactable", "DT", etc.). If NULL, returns suggestions for
-#'        all relevant packages.
+#'        "shiny", "reactable", "DT", "plotly", "leaflet", etc.). If NULL,
+#'        returns suggestions for all relevant packages. Note: bslib, plotly,
+#'        DT, reactable, and leaflet components work in both Shiny apps and
+#'        Quarto dashboards.
 #' @param limit Optional. Maximum number of suggestions to return (default: 10).
 #'        Set to Inf to return all suggestions.
 #' @param min_score Optional. Minimum relevance score 0-1 (default: 0.7).
@@ -29,7 +32,10 @@
 #' @return A tibble with columns:
 #'   \item{title}{Brief actionable description of the suggestion}
 #'   \item{details}{Specific implementation guidance}
-#'   \item{components}{Shiny/bslib component recommendations (character vector)}
+#'   \item{components}{R dashboard component recommendations (character vector).
+#'     Components prefixed with 'shiny::' require Shiny runtime; bslib, DT,
+#'     plotly, reactable, and leaflet components work in both Shiny and Quarto
+#'     dashboards.}
 #'   \item{concept}{UX concept the suggestion is based on}
 #'   \item{score}{Relevance score (0-1, higher is more relevant)}
 #'   \item{difficulty}{Implementation difficulty (easy/moderate/advanced)}
@@ -55,6 +61,12 @@
 #' **When to use this vs full BID workflow:**
 #' - Use `bid_quick_suggest()`: Quick fixes, prototyping, single issues
 #' - Use full workflow: Comprehensive redesigns, complex projects, team collaboration
+#'
+#' **Quarto Dashboard Compatibility:**
+#' Component suggestions include both Shiny-specific (shiny::) and framework-agnostic
+#' components. For static Quarto dashboards or OJS-based interactivity, focus on
+#' bslib, DT, plotly, reactable, and leaflet suggestions. Shiny-prefixed components
+#' require `server: shiny` in Quarto dashboards or a traditional Shiny app.
 #'
 #' @examples
 #' # Basic usage

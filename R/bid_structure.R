@@ -41,9 +41,12 @@
 #' - **tabs**: For categorical organization (unless telemetry shows issues)
 #'
 #' **Suggestion Engine**: Generates ranked, actionable recommendations grouped
-#' by UX concepts. Each suggestion includes specific Shiny/bslib components,
-#' implementation details, and rationale. Suggestions are scored based on
-#' relevance, layout appropriateness, and contextual factors.
+#' by UX concepts. Each suggestion includes specific R dashboard components
+#' (Shiny, bslib, DT, plotly, etc.), implementation details, and rationale.
+#' Suggestions are scored based on relevance, layout appropriateness, and
+#' contextual factors. Component suggestions work with both Shiny applications
+#' and Quarto dashboards, with shiny-prefixed components (i.e., `shiny::`)
+#' requiring Shiny runtime.
 #'
 #' @examples
 #' notice_result <- bid_interpret(

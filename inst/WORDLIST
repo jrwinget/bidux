@@ -30,6 +30,7 @@ json
 Knaflic
 memoise
 mitigations
+OJS
 pak
 pkgdown
 plotly
@@ -46,3 +47,4 @@ tibble
 Tractinsky
 v0
 walkthrough
+YAML
