@@ -1,6 +1,6 @@
 ## Test environments
 
--   local: R 4.5.1 on Ubuntu 24.04
+-   local: R 4.5.2 on Ubuntu 24.04
 -   GitHub Actions (ubuntu-latest): R-devel, R-release, R-oldrel-1
 -   GitHub Actions (windows-latest): R-release
 -   GitHub Actions (macOS-latest): R-release
@@ -13,35 +13,34 @@
 
 Examples and vignettes run quickly; no long-running examples are included.
 
-## Release summary (0.3.2)
+## Release summary (0.3.3)
 
-This is a maintenance release following 0.3.1, focused on improving API ergonomics and reducing package footprint. Key improvements include a flattened data_story API for better user experience, telemetry sensitivity presets for easier configuration, and removal of unused dependencies. Highlights (see NEWS.md for full details):
+This release adds DBI connection support for telemetry ingestion, a new quick suggestions function, and Quarto dashboard compatibility documentation. Key improvements include:
 
 -   **New features**
-    -   Flattened `new_data_story()` API with `hook`, `context`, `tension`, `resolution` arguments (more intuitive than nested format)
-    -   `bid_telemetry_presets()` for pre-configured sensitivity levels (strict/moderate/relaxed)
--   **Improvements**
-    -   Removed unused dependencies (purrr, stringr); smaller install size and less dependency bloat
-    -   Extracted telemetry magic numbers to named constants for better maintainability
-    -   Improved documentation showing recommended data.frame API for personas
-    -   Full backward compatibility with deprecation warnings for legacy formats
--   **Bug fixes**
-    -   Removed duplicate utility functions that were defined in multiple files
+    -   `bid_quick_suggest()` for immediate UX suggestions without the full 5-stage workflow
+    -   DBI connection support in `bid_ingest_telemetry()` and `bid_telemetry()` with custom `table_name` parameter
+    -   Flattened tibble format for Structure stage suggestions (`$suggestions_tbl`)
+-   **Documentation**
+    -   Quarto dashboard compatibility notes across package documentation
+    -   Enhanced concept citations and accuracy in bid_concepts_data.csv
+-   **Dependencies**
+    -   Added withr to Suggests (used in tests)
 
-This release maintains 100% backward compatibility while providing clearer, more pragmatic APIs for new users.
+This release maintains backward compatibility with all existing APIs.
 
 ## Rationale for version
 
-`0.3.2` is a maintenance release following 0.3.1, focused on API improvements and package optimization. It simplifies the data_story API based on user feedback, adds telemetry configuration presets, and reduces package size by removing unused dependencies. All changes maintain 100% backward compatibility with clear deprecation paths.
+`0.3.3` is a feature release following 0.3.2, adding DBI connection support for flexible telemetry ingestion and a streamlined `bid_quick_suggest()` function for rapid UX guidance. Documentation updates clarify compatibility with both Shiny and Quarto dashboards.
 
 ## Compatibility
 
--   Two dependencies removed (purrr, stringr) - package now lighter and faster
--   No new dependencies added
+-   One test dependency added (withr to Suggests)
+-   No breaking changes to existing APIs
 -   Reverse dependencies: none on CRAN
 
 ## Additional policy notes
 
--   All URLs use HTTPS and were verified at build time.
--   No non-ASCII or unusual encodings in Rd files.
--   No references to external resources are required at runtime.
+-   All URLs use HTTPS and were verified at build time
+-   No non-ASCII or unusual encodings in Rd files
+-   No references to external resources are required at runtime
