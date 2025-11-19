@@ -43,7 +43,9 @@ validate_bid_stage <- function(x) {
   if (!stage %in% valid_stages) {
     cli::cli_abort(standard_error_msg(
       glue::glue("Invalid stage: {stage}"),
-      suggestions = glue::glue("Stage must be one of: {paste(valid_stages, collapse = ', ')}")
+      suggestions = glue::glue(
+        "Stage must be one of: {paste(valid_stages, collapse = ', ')}"
+      )
     ))
   }
 
@@ -154,7 +156,9 @@ print_stage_header <- function(x) {
 
   # progress information
   if (!is.null(metadata$stage_number) && !is.null(metadata$total_stages)) {
-    progress <- round((metadata$stage_number / metadata$total_stages) * 100)
+    progress <- janitor::round_half_up(
+      (metadata$stage_number / metadata$total_stages) * 100
+    )
     cat(
       "Progress:",
       progress,
@@ -319,7 +323,10 @@ format_theory_field <- function(value, metadata) {
 #' @noRd
 format_percentage_field <- function(value, metadata) {
   if (!is.null(metadata$story_completeness)) {
-    paste0(round(metadata$story_completeness * 100), "%")
+    paste0(
+      janitor::round_half_up(metadata$story_completeness * 100),
+      "%"
+    )
   } else {
     NULL
   }
@@ -441,7 +448,7 @@ summary.bid_stage <- function(object, ...) {
       if (is.logical(value)) {
         value <- if (value) "Yes" else "No"
       } else if (is.numeric(value) && value < 1) {
-        value <- paste0(round(value * 100), "%")
+        value <- paste0(janitor::round_half_up(value * 100), "%")
       }
       cat("  ", name, ":", value, "\n")
     }
@@ -598,7 +605,7 @@ print.bid_result <- function(x, ...) {
   if (is_complete(x)) {
     cat(cli::col_green("Workflow Complete\n"))
   } else {
-    completion_pct <- round((length(x) / 5) * 100)
+    completion_pct <- janitor::round_half_up((length(x) / 5) * 100)
     cat("Progress: ", completion_pct, "%\n", sep = "")
   }
 
@@ -666,7 +673,7 @@ summary.bid_result <- function(object, ...) {
     first_stage <- object[[1]]$timestamp[1]
     last_stage <- object[[length(object)]]$timestamp[1]
     duration <- as.numeric(difftime(last_stage, first_stage, units = "mins"))
-    cat("Duration:", round(duration, 1), "minutes\n")
+    cat("Duration:", janitor::round_half_up(duration, 1), "minutes\n")
   }
 
   cat("\n", cli::style_bold("Stage Details:\n"))

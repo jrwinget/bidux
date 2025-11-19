@@ -2,21 +2,23 @@
 % Please edit documentation in R/telemetry_ingest.R
 \name{read_telemetry_data}
 \alias{read_telemetry_data}
-\title{Read telemetry data from file}
+\title{Read telemetry data from file or connection}
 \usage{
-read_telemetry_data(path, format, events_table = NULL)
+read_telemetry_data(source, format, events_table = NULL, table_name = NULL)
 }
 \arguments{
-\item{path}{File path}
+\item{source}{File path or DBI connection object}
 
 \item{format}{Format ("sqlite" or "json")}
 
 \item{events_table}{Optional custom events table for SQLite}
+
+\item{table_name}{Optional table name for SQLite}
 }
 \value{
 Data frame of events
 }
 \description{
-Read telemetry data from file
+Read telemetry data from file or connection
 }
 \keyword{internal}

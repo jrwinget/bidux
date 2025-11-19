@@ -4,18 +4,31 @@
 \alias{bid_telemetry}
 \title{Concise telemetry analysis with tidy output}
 \usage{
-bid_telemetry(path, format = NULL, events_table = NULL, thresholds = list())
+bid_telemetry(
+  source,
+  format = NULL,
+  events_table = NULL,
+  table_name = NULL,
+  thresholds = list()
+)
 }
 \arguments{
-\item{path}{File path to telemetry data (SQLite database or JSON log file)}
+\item{source}{Either a file path to telemetry data (SQLite database or JSON
+log file), or a DBI connection object to an already-open database.
+When a connection is provided, it will not be closed by this function.}
 
 \item{format}{Optional format specification ("sqlite" or "json"). If NULL,
-auto-detected from file extension.}
+auto-detected from file extension (for file paths) or defaults to
+"sqlite" for DBI connections.}
 
 \item{events_table}{Optional data.frame specifying custom events table when
 reading from SQLite. Must have columns: event_id, timestamp,
 event_type, user_id. If NULL, auto-detects standard table names
-(event_data, events).}
+(event_data, events). Cannot be used with \code{table_name}.}
+
+\item{table_name}{Optional character string specifying the table name to read
+from the database. If NULL (default), auto-detects standard table names
+(event_data, events). Cannot be used with \code{events_table}.}
 
 \item{thresholds}{Optional list of threshold parameters:
 - unused_input_threshold: percentage of sessions below which input is
@@ -44,6 +57,11 @@ for new workflows that don't need backward compatibility.
 # Modern workflow
 issues <- bid_telemetry("telemetry.sqlite")
 high_priority <- issues[issues$severity \%in\% c("critical", "high"), ]
+
+# Use DBI connection directly
+con <- DBI::dbConnect(RSQLite::SQLite(), "telemetry.sqlite")
+issues <- bid_telemetry(con, table_name = "my_events")
+DBI::dbDisconnect(con)
 
 # Use with bridges for BID workflow
 top_issue <- issues[1, ]

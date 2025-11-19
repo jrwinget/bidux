@@ -176,8 +176,8 @@ validate_previous_stage <- function(previous_stage = NULL, current_stage) {
   # 1) check current_stage is exactly 1 stage
   if (
     !(is.character(current_stage) &&
-        length(current_stage) == 1 &&
-        current_stage %in% valid_stages
+      length(current_stage) == 1 &&
+      current_stage %in% valid_stages
     )
   ) {
     cli::cli_abort(c(
@@ -272,8 +272,8 @@ validate_previous_stage <- function(previous_stage = NULL, current_stage) {
     )
 
     if (current_stage %in% names(discouraged_transitions) &&
-          prev_stage_name %in% discouraged_transitions[[current_stage]] &&
-          (!in_test_env || calling_test)) {
+      prev_stage_name %in% discouraged_transitions[[current_stage]] &&
+      (!in_test_env || calling_test)) {
       cli::cli_warn(c(
         "!" = glue::glue("Discouraged stage progression: {prev_stage_name} -> {current_stage}"),
         "i" = "Consider using Notice and/or Anticipate stages first for better workflow"

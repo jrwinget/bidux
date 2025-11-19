@@ -462,5 +462,8 @@ test_that("bid_telemetry_presets thresholds are reasonable", {
 
   # count thresholds should be positive integers
   expect_gt(strict$rapid_change_count, 0)
-  expect_equal(strict$rapid_change_count, round(strict$rapid_change_count))
+  expect_equal(
+    strict$rapid_change_count,
+    janitor::round_half_up(strict$rapid_change_count)
+  )
 })

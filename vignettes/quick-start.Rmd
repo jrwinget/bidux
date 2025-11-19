@@ -57,7 +57,7 @@ filter_problem <- bid_notice(
 )
 
 # bidux automatically suggests the right theory
-print(filter_problem$theory)  # "Cognitive Load Theory"
+print(filter_problem$theory) # "Cognitive Load Theory"
 ```
 
 **Get structure suggestions:**
@@ -102,7 +102,6 @@ ui_after <- sidebarPanel(
 
   # Progressive disclosure for advanced options
   actionButton("show_advanced", "More Filters...", class = "btn btn-sm btn-outline-secondary"),
-
   conditionalPanel(
     condition = "input.show_advanced % 2 == 1",
     h5("Advanced Filters", style = "margin-top: 15px;"),
@@ -350,7 +349,7 @@ top_notice <- notices[[1]]
 # Get structure suggestions for this specific issue
 structure_result <- bid_structure(
   previous_stage = top_notice,
-  telemetry_flags = bid_flags(issues)  # Informs layout selection
+  telemetry_flags = bid_flags(issues) # Informs layout selection
 )
 
 # Review suggestions
@@ -554,7 +553,7 @@ print(structure$concepts)
 
 # Apply multiple concepts to one section:
 ui_combined <- card(
-  card_header("Key Metrics"),  # Visual Hierarchy - clear header
+  card_header("Key Metrics"), # Visual Hierarchy - clear header
 
   # Cognitive Load Theory - limit initial choices
   value_box("Primary Metric", "87%", theme = "success"),

@@ -380,7 +380,8 @@ bid_interpret <- function(
     missing_elements <- required_story_elements[!provided_elements]
     story_suggestion <- cli::format_inline(
       paste(
-        "Your data story is incomplete ({round(story_completeness * 100)}%).",
+        "Your data story is incomplete",
+        "({janitor::round_half_up(story_completeness * 100)}%).",
         "Consider adding these missing elements:",
         "{paste(missing_elements, collapse = ', ')}."
       )
@@ -389,7 +390,8 @@ bid_interpret <- function(
     missing_elements <- required_story_elements[!provided_elements]
     story_suggestion <- cli::format_inline(
       paste(
-        "Your data story is taking shape ({round(story_completeness * 100)}%).",
+        "Your data story is taking shape",
+        "({janitor::round_half_up(story_completeness * 100)}%).",
         "Consider adding: {paste(missing_elements, collapse = ', ')}."
       )
     )
@@ -398,8 +400,8 @@ bid_interpret <- function(
     story_suggestion <- cli::format_inline(
       paste(
         "Your data story is almost complete",
-        "({round(story_completeness * 100)}%). Consider adding:",
-        "{paste(missing_elements, collapse = ', ')}."
+        "({janitor::round_half_up(story_completeness * 100)}%).",
+        "Consider adding: {paste(missing_elements, collapse = ', ')}."
       )
     )
   } else {
