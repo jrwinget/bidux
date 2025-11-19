@@ -355,5 +355,5 @@ summary(structure_result)
 #>    suggestions : list(concept = "Cognitive Load Theory", suggestions = list(list(title = "Limi... 
 #>    suggestions_tbl : list(concept = c("Cognitive Load Theory", "Cognitive Load Theory", "Visual Hi... 
 #> 
-#> Generated: 2025-11-19 00:21:59 
+#> Generated: 2025-11-19 19:49:05 
 ```

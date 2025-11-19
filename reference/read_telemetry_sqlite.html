@@ -49,19 +49,23 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">read_telemetry_sqlite</span><span class="op">(</span><span class="va">path</span>, events_table <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">read_telemetry_sqlite</span><span class="op">(</span><span class="va">source</span>, events_table <span class="op">=</span> <span class="cn">NULL</span>, table_name <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-path">path<a class="anchor" aria-label="anchor" href="#arg-path"></a></dt>
-<dd><p>SQLite database path</p></dd>
+<dl><dt id="arg-source">source<a class="anchor" aria-label="anchor" href="#arg-source"></a></dt>
+<dd><p>SQLite database path or DBI connection object</p></dd>
 
 
 <dt id="arg-events-table">events_table<a class="anchor" aria-label="anchor" href="#arg-events-table"></a></dt>
 <dd><p>Optional custom events table data.frame</p></dd>
+
+
+<dt id="arg-table-name">table_name<a class="anchor" aria-label="anchor" href="#arg-table-name"></a></dt>
+<dd><p>Optional character string specifying table name to read</p></dd>
 
 </dl></div>
     <div class="section level2">

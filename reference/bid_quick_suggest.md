@@ -206,7 +206,7 @@ nav_suggestions <- bid_quick_suggest(
 #> ℹ Suggested layout pattern: tabs
 #> ℹ Generating actionable suggestions
 #> Quick suggestions ready
-#>   - Found 8 suggestions (avg relevance: 0.9)
+#>   - Found 8 suggestions (avg relevance: 0.91)
 #>   - Top concept: Cognitive Load Theory
 #>   - Use bid_concept() to learn more about any concept 
 

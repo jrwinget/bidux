@@ -122,7 +122,7 @@ Now your sidebar is a mile long and users are paralyzed.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># bidux automatically suggests the right theory</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">filter_problem</span><span class="op">$</span><span class="va">theory</span><span class="op">)</span>  <span class="co"># "Cognitive Load Theory"</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">filter_problem</span><span class="op">$</span><span class="va">theory</span><span class="op">)</span> <span class="co"># "Cognitive Load Theory"</span></span></code></pre></div>
 <p><strong>Get structure suggestions:</strong></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get layout recommendations</span></span>
@@ -161,7 +161,6 @@ Now your sidebar is a mile long and users are paralyzed.</p>
 <span></span>
 <span>  <span class="co"># Progressive disclosure for advanced options</span></span>
 <span>  <span class="fu">actionButton</span><span class="op">(</span><span class="st">"show_advanced"</span>, <span class="st">"More Filters..."</span>, class <span class="op">=</span> <span class="st">"btn btn-sm btn-outline-secondary"</span><span class="op">)</span>,</span>
-<span></span>
 <span>  <span class="fu">conditionalPanel</span><span class="op">(</span></span>
 <span>    condition <span class="op">=</span> <span class="st">"input.show_advanced % 2 == 1"</span>,</span>
 <span>    <span class="fu">h5</span><span class="op">(</span><span class="st">"Advanced Filters"</span>, style <span class="op">=</span> <span class="st">"margin-top: 15px;"</span><span class="op">)</span>,</span>
@@ -403,7 +402,7 @@ problems from real user behavior.</p>
 <span><span class="co"># Get structure suggestions for this specific issue</span></span>
 <span><span class="va">structure_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_structure.html">bid_structure</a></span><span class="op">(</span></span>
 <span>  previous_stage <span class="op">=</span> <span class="va">top_notice</span>,</span>
-<span>  telemetry_flags <span class="op">=</span> <span class="fu"><a href="../reference/bid_flags.html">bid_flags</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span>  <span class="co"># Informs layout selection</span></span>
+<span>  telemetry_flags <span class="op">=</span> <span class="fu"><a href="../reference/bid_flags.html">bid_flags</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span> <span class="co"># Informs layout selection</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Review suggestions</span></span>
@@ -604,7 +603,7 @@ problems from real user behavior.</p>
 <span></span>
 <span><span class="co"># Apply multiple concepts to one section:</span></span>
 <span><span class="va">ui_combined</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rstudio.github.io/bslib/reference/card.html" class="external-link">card</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rstudio.github.io/bslib/reference/card_body.html" class="external-link">card_header</a></span><span class="op">(</span><span class="st">"Key Metrics"</span><span class="op">)</span>,  <span class="co"># Visual Hierarchy - clear header</span></span>
+<span>  <span class="fu"><a href="https://rstudio.github.io/bslib/reference/card_body.html" class="external-link">card_header</a></span><span class="op">(</span><span class="st">"Key Metrics"</span><span class="op">)</span>, <span class="co"># Visual Hierarchy - clear header</span></span>
 <span></span>
 <span>  <span class="co"># Cognitive Load Theory - limit initial choices</span></span>
 <span>  <span class="fu"><a href="https://rstudio.github.io/bslib/reference/value_box.html" class="external-link">value_box</a></span><span class="op">(</span><span class="st">"Primary Metric"</span>, <span class="st">"87%"</span>, theme <span class="op">=</span> <span class="st">"success"</span><span class="op">)</span>,</span>

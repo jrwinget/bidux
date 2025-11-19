@@ -585,9 +585,9 @@ same data:</p>
 <span></span>
 <span><span class="co"># 5. Extract telemetry flags for informed decisions</span></span>
 <span><span class="va">flags</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_flags.html">bid_flags</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span></span>
-<span><span class="va">flags</span><span class="op">$</span><span class="va">has_critical_issues</span>  <span class="co"># TRUE/FALSE</span></span>
-<span><span class="va">flags</span><span class="op">$</span><span class="va">has_navigation_issues</span>  <span class="co"># TRUE/FALSE</span></span>
-<span><span class="va">flags</span><span class="op">$</span><span class="va">session_count</span>  <span class="co"># Number of sessions analyzed</span></span>
+<span><span class="va">flags</span><span class="op">$</span><span class="va">has_critical_issues</span> <span class="co"># TRUE/FALSE</span></span>
+<span><span class="va">flags</span><span class="op">$</span><span class="va">has_navigation_issues</span> <span class="co"># TRUE/FALSE</span></span>
+<span><span class="va">flags</span><span class="op">$</span><span class="va">session_count</span> <span class="co"># Number of sessions analyzed</span></span>
 <span></span>
 <span><span class="co"># 6. Use flags to inform Structure stage</span></span>
 <span><span class="va">structure_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_structure.html">bid_structure</a></span><span class="op">(</span></span>
@@ -607,14 +607,14 @@ same data:</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Legacy list interface (backward compatible)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">legacy_issues</span><span class="op">)</span>  <span class="co"># Number of issues as list length</span></span>
-<span><span class="va">legacy_issues</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>  <span class="co"># First issue as bid_stage object</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">legacy_issues</span><span class="op">)</span>  <span class="co"># Issue identifiers</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">legacy_issues</span><span class="op">)</span> <span class="co"># Number of issues as list length</span></span>
+<span><span class="va">legacy_issues</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="co"># First issue as bid_stage object</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">legacy_issues</span><span class="op">)</span> <span class="co"># Issue identifiers</span></span>
 <span></span>
 <span><span class="co"># Enhanced features (new in 0.3.1)</span></span>
-<span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="va">legacy_issues</span><span class="op">)</span>  <span class="co"># Get tidy issues view</span></span>
-<span><span class="fu"><a href="../reference/bid_flags.html">bid_flags</a></span><span class="op">(</span><span class="va">legacy_issues</span><span class="op">)</span>  <span class="co"># Extract global flags</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">legacy_issues</span><span class="op">)</span>  <span class="co"># Shows organized triage summary</span></span>
+<span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="va">legacy_issues</span><span class="op">)</span> <span class="co"># Get tidy issues view</span></span>
+<span><span class="fu"><a href="../reference/bid_flags.html">bid_flags</a></span><span class="op">(</span><span class="va">legacy_issues</span><span class="op">)</span> <span class="co"># Extract global flags</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">legacy_issues</span><span class="op">)</span> <span class="co"># Shows organized triage summary</span></span>
 <span></span>
 <span><span class="co"># Both interfaces work on same object</span></span></code></pre></div>
 </div>
@@ -627,7 +627,7 @@ the BID framework:</p>
 <code class="sourceCode R"><span><span class="co"># Step 1: Analyze telemetry to identify friction points</span></span>
 <span><span class="va">issues</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_telemetry.html">bid_telemetry</a></span><span class="op">(</span></span>
 <span>  <span class="st">"path/to/telemetry.sqlite"</span>,</span>
-<span>  thresholds <span class="op">=</span> <span class="fu"><a href="../reference/bid_telemetry_presets.html">bid_telemetry_presets</a></span><span class="op">(</span><span class="st">"strict"</span><span class="op">)</span>  <span class="co"># Catch everything during development</span></span>
+<span>  thresholds <span class="op">=</span> <span class="fu"><a href="../reference/bid_telemetry_presets.html">bid_telemetry_presets</a></span><span class="op">(</span><span class="st">"strict"</span><span class="op">)</span> <span class="co"># Catch everything during development</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Step 2: Start BID workflow with central question</span></span>
@@ -663,7 +663,7 @@ the BID framework:</p>
 <span><span class="co"># Step 5: Structure with telemetry-informed decisions</span></span>
 <span><span class="va">structure_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_structure.html">bid_structure</a></span><span class="op">(</span></span>
 <span>  previous_stage <span class="op">=</span> <span class="va">anticipate_result</span>,</span>
-<span>  telemetry_flags <span class="op">=</span> <span class="fu"><a href="../reference/bid_flags.html">bid_flags</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span>  <span class="co"># Informs layout selection</span></span>
+<span>  telemetry_flags <span class="op">=</span> <span class="fu"><a href="../reference/bid_flags.html">bid_flags</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span> <span class="co"># Informs layout selection</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Step 6: Validate with telemetry references</span></span>

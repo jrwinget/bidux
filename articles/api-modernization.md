@@ -11,7 +11,7 @@ the definitive guide to modern API usage in bidux 0.3.2+**.
 | Feature                      | Status             | Details                                                          |
 |------------------------------|--------------------|------------------------------------------------------------------|
 | **Flat data_story API**      | ✅ **RECOMMENDED** | Use `new_data_story(hook, context, tension, resolution)`         |
-| **Nested data_story format** | ⚠️ **DEPRECATED**  | `variables`/`relationships` parameters removed in 0.4.0          |
+| **Nested data_story format** | **DEPRECATED**     | `variables`/`relationships` parameters removed in 0.4.0          |
 | **Telemetry presets**        | ✅ **NEW**         | Use `bid_telemetry_presets("moderate")` for easier configuration |
 | **S3 classes and methods**   | ✅ **STABLE**      | Enhanced print, summary, and conversion methods                  |
 | **Tibble integration**       | ✅ **OPTIONAL**    | Automatic tibble output when package available                   |
@@ -312,7 +312,7 @@ try(new_data_story(context = "")) # Invalid empty context
 # Deprecated format still validates (but triggers warnings)
 try(new_data_story(
   context = "Valid context",
-  variables = "invalid_type"  # Must be a list
+  variables = "invalid_type" # Must be a list
 ))
 ```
 
@@ -377,7 +377,7 @@ issues <- bid_ingest_telemetry(
 
 # Override specific thresholds while using a preset as base
 custom_thresholds <- bid_telemetry_presets("moderate")
-custom_thresholds$unused_input_threshold <- 0.03  # More sensitive to unused inputs
+custom_thresholds$unused_input_threshold <- 0.03 # More sensitive to unused inputs
 issues <- bid_ingest_telemetry("telemetry.sqlite", thresholds = custom_thresholds)
 ```
 

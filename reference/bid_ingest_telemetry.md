@@ -16,29 +16,40 @@ not support shiny.telemetry. Consider alternative analytics solutions
 
 ``` r
 bid_ingest_telemetry(
-  path,
+  source,
   format = NULL,
   events_table = NULL,
+  table_name = NULL,
   thresholds = list()
 )
 ```
 
 ## Arguments
 
-- path:
+- source:
 
-  File path to telemetry data (SQLite database or JSON log file)
+  Either a file path to telemetry data (SQLite database or JSON log
+  file), or a DBI connection object to an already-open database. When a
+  connection is provided, it will not be closed by this function.
 
 - format:
 
   Optional format specification ("sqlite" or "json"). If NULL,
-  auto-detected from file extension.
+  auto-detected from file extension (for file paths) or defaults to
+  "sqlite" for DBI connections.
 
 - events_table:
 
   Optional data.frame specifying custom events table when reading from
   SQLite. Must have columns: event_id, timestamp, event_type, user_id.
   If NULL, auto-detects standard table names (event_data, events).
+  Cannot be used with `table_name`.
+
+- table_name:
+
+  Optional character string specifying the table name to read from the
+  database. If NULL (default), auto-detects standard table names
+  (event_data, events). Cannot be used with `events_table`.
 
 - thresholds:
 
@@ -83,7 +94,7 @@ includes:
 
 ``` r
 if (FALSE) { # \dontrun{
-# Analyze SQLite telemetry database
+# Analyze SQLite telemetry database from file path
 issues <- bid_ingest_telemetry("telemetry.sqlite")
 
 # Use sensitivity presets for easier configuration
@@ -100,6 +111,18 @@ issues <- bid_ingest_telemetry(
     unused_input_threshold = 0.1,
     delay_threshold_secs = 60
   )
+)
+
+# Use a DBI connection object directly
+con <- DBI::dbConnect(RSQLite::SQLite(), "telemetry.sqlite")
+issues <- bid_ingest_telemetry(con)
+# Connection remains open for further use
+DBI::dbDisconnect(con)
+
+# Specify custom table name
+issues <- bid_ingest_telemetry(
+  "telemetry.sqlite",
+  table_name = "my_custom_events"
 )
 
 # Use results in BID workflow

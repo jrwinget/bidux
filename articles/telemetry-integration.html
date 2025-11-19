@@ -152,20 +152,20 @@ enhanced functionality:</p>
 <span><span class="va">legacy_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry</a></span><span class="op">(</span><span class="st">"telemetry.sqlite"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 1. LEGACY LIST INTERFACE (backward compatible)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">legacy_result</span><span class="op">)</span>               <span class="co"># Number of issues as named list</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">legacy_result</span><span class="op">)</span>                <span class="co"># Issue IDs: "unused_input_region", "error_1", etc.</span></span>
-<span><span class="va">legacy_result</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>                  <span class="co"># Access individual bid_stage Notice objects</span></span>
-<span><span class="va">legacy_result</span><span class="op">$</span><span class="va">unused_input_region</span>   <span class="co"># Access by name</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">legacy_result</span><span class="op">)</span> <span class="co"># Number of issues as named list</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">legacy_result</span><span class="op">)</span> <span class="co"># Issue IDs: "unused_input_region", "error_1", etc.</span></span>
+<span><span class="va">legacy_result</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="co"># Access individual bid_stage Notice objects</span></span>
+<span><span class="va">legacy_result</span><span class="op">$</span><span class="va">unused_input_region</span> <span class="co"># Access by name</span></span>
 <span></span>
 <span><span class="co"># 2. ENHANCED TIBBLE INTERFACE (new in 0.3.1)</span></span>
-<span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="va">legacy_result</span><span class="op">)</span>            <span class="co"># Convert to tidy tibble view</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">legacy_result</span><span class="op">)</span>                <span class="co"># Pretty-printed triage summary</span></span>
+<span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="va">legacy_result</span><span class="op">)</span> <span class="co"># Convert to tidy tibble view</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">legacy_result</span><span class="op">)</span> <span class="co"># Pretty-printed triage summary</span></span>
 <span></span>
 <span><span class="co"># 3. FLAGS EXTRACTION (new in 0.3.1)</span></span>
-<span><span class="va">flags</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_flags.html">bid_flags</a></span><span class="op">(</span><span class="va">legacy_result</span><span class="op">)</span>   <span class="co"># Extract global telemetry flags</span></span>
-<span><span class="va">flags</span><span class="op">$</span><span class="va">has_critical_issues</span>           <span class="co"># Boolean flag</span></span>
-<span><span class="va">flags</span><span class="op">$</span><span class="va">has_navigation_issues</span>         <span class="co"># Boolean flag</span></span>
-<span><span class="va">flags</span><span class="op">$</span><span class="va">session_count</span>                 <span class="co"># Integer metadata</span></span></code></pre></div>
+<span><span class="va">flags</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_flags.html">bid_flags</a></span><span class="op">(</span><span class="va">legacy_result</span><span class="op">)</span> <span class="co"># Extract global telemetry flags</span></span>
+<span><span class="va">flags</span><span class="op">$</span><span class="va">has_critical_issues</span> <span class="co"># Boolean flag</span></span>
+<span><span class="va">flags</span><span class="op">$</span><span class="va">has_navigation_issues</span> <span class="co"># Boolean flag</span></span>
+<span><span class="va">flags</span><span class="op">$</span><span class="va">session_count</span> <span class="co"># Integer metadata</span></span></code></pre></div>
 <p><strong>Key characteristics of <code><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry()</a></code>
 output:</strong> - Returns a hybrid object with class:
 <code>c("bid_issues", "list")</code> - <strong>List interface</strong>:
@@ -260,7 +260,7 @@ to identify UX issues:</p>
 <span><span class="va">issues</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_telemetry.html">bid_telemetry</a></span><span class="op">(</span><span class="st">"telemetry.log"</span>, format <span class="op">=</span> <span class="st">"json"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Review identified issues</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span>  <span class="co"># Modern: tibble row count</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span> <span class="co"># Modern: tibble row count</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span> <span class="co"># Both show formatted triage summary</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -363,8 +363,8 @@ problems only.</p>
 <span>  thresholds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="../reference/bid_telemetry_presets.html">bid_telemetry_presets</a></span><span class="op">(</span><span class="st">"moderate"</span><span class="op">)</span>,</span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>      unused_input_threshold <span class="op">=</span> <span class="fl">0.03</span>,  <span class="co"># Override: flag if &lt; 3% use</span></span>
-<span>      error_rate_threshold <span class="op">=</span> <span class="fl">0.15</span>     <span class="co"># Override: flag if &gt; 15% errors</span></span>
+<span>      unused_input_threshold <span class="op">=</span> <span class="fl">0.03</span>, <span class="co"># Override: flag if &lt; 3% use</span></span>
+<span>      error_rate_threshold <span class="op">=</span> <span class="fl">0.15</span> <span class="co"># Override: flag if &gt; 15% errors</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
@@ -373,12 +373,12 @@ problems only.</p>
 <span><span class="va">fully_custom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_telemetry.html">bid_telemetry</a></span><span class="op">(</span></span>
 <span>  <span class="st">"telemetry.sqlite"</span>,</span>
 <span>  thresholds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    unused_input_threshold <span class="op">=</span> <span class="fl">0.1</span>,   <span class="co"># Flag if &lt;10% of sessions use input</span></span>
-<span>    delay_threshold_secs <span class="op">=</span> <span class="fl">60</span>,      <span class="co"># Flag if &gt;60s before first interaction</span></span>
-<span>    error_rate_threshold <span class="op">=</span> <span class="fl">0.05</span>,    <span class="co"># Flag if &gt;5% of sessions have errors</span></span>
-<span>    navigation_threshold <span class="op">=</span> <span class="fl">0.3</span>,     <span class="co"># Flag if &lt;30% visit a page</span></span>
-<span>    rapid_change_window <span class="op">=</span> <span class="fl">5</span>,        <span class="co"># Look for changes within 5 seconds</span></span>
-<span>    rapid_change_count <span class="op">=</span> <span class="fl">3</span>          <span class="co"># Flag if 3+ changes in window</span></span>
+<span>    unused_input_threshold <span class="op">=</span> <span class="fl">0.1</span>, <span class="co"># Flag if &lt;10% of sessions use input</span></span>
+<span>    delay_threshold_secs <span class="op">=</span> <span class="fl">60</span>, <span class="co"># Flag if &gt;60s before first interaction</span></span>
+<span>    error_rate_threshold <span class="op">=</span> <span class="fl">0.05</span>, <span class="co"># Flag if &gt;5% of sessions have errors</span></span>
+<span>    navigation_threshold <span class="op">=</span> <span class="fl">0.3</span>, <span class="co"># Flag if &lt;30% visit a page</span></span>
+<span>    rapid_change_window <span class="op">=</span> <span class="fl">5</span>, <span class="co"># Look for changes within 5 seconds</span></span>
+<span>    rapid_change_count <span class="op">=</span> <span class="fl">3</span> <span class="co"># Flag if 3+ changes in window</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -389,11 +389,14 @@ problems only.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Analyze same data with all three presets</span></span>
 <span><span class="va">strict</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_telemetry.html">bid_telemetry</a></span><span class="op">(</span><span class="st">"telemetry.sqlite"</span>,</span>
-<span>                        thresholds <span class="op">=</span> <span class="fu"><a href="../reference/bid_telemetry_presets.html">bid_telemetry_presets</a></span><span class="op">(</span><span class="st">"strict"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  thresholds <span class="op">=</span> <span class="fu"><a href="../reference/bid_telemetry_presets.html">bid_telemetry_presets</a></span><span class="op">(</span><span class="st">"strict"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">moderate</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_telemetry.html">bid_telemetry</a></span><span class="op">(</span><span class="st">"telemetry.sqlite"</span>,</span>
-<span>                          thresholds <span class="op">=</span> <span class="fu"><a href="../reference/bid_telemetry_presets.html">bid_telemetry_presets</a></span><span class="op">(</span><span class="st">"moderate"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  thresholds <span class="op">=</span> <span class="fu"><a href="../reference/bid_telemetry_presets.html">bid_telemetry_presets</a></span><span class="op">(</span><span class="st">"moderate"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">relaxed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_telemetry.html">bid_telemetry</a></span><span class="op">(</span><span class="st">"telemetry.sqlite"</span>,</span>
-<span>                         thresholds <span class="op">=</span> <span class="fu"><a href="../reference/bid_telemetry_presets.html">bid_telemetry_presets</a></span><span class="op">(</span><span class="st">"relaxed"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  thresholds <span class="op">=</span> <span class="fu"><a href="../reference/bid_telemetry_presets.html">bid_telemetry_presets</a></span><span class="op">(</span><span class="st">"relaxed"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Compare issue counts</span></span>
 <span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
@@ -575,12 +578,12 @@ telemetry issues into BID stages:</p>
 <span><span class="va">notice_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_notices.html">bid_notices</a></span><span class="op">(</span></span>
 <span>  issues <span class="op">=</span> <span class="va">high_priority</span>,</span>
 <span>  previous_stage <span class="op">=</span> <span class="va">interpret_result</span>,</span>
-<span>  max_issues <span class="op">=</span> <span class="fl">3</span>  <span class="co"># Limit to top 3 issues</span></span>
+<span>  max_issues <span class="op">=</span> <span class="fl">3</span> <span class="co"># Limit to top 3 issues</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Result is a named list of bid_stage objects</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">notice_list</span><span class="op">)</span>  <span class="co"># Number of Notice stages created</span></span>
-<span><span class="va">notice_list</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>     <span class="co"># Access individual Notice stage</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">notice_list</span><span class="op">)</span> <span class="co"># Number of Notice stages created</span></span>
+<span><span class="va">notice_list</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="co"># Access individual Notice stage</span></span>
 <span></span>
 <span><span class="co"># Continue BID workflow with first issue</span></span>
 <span><span class="va">anticipate_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_anticipate.html">bid_anticipate</a></span><span class="op">(</span></span>
@@ -675,12 +678,12 @@ telemetry issues into BID stages:</p>
 <span><span class="co"># Pass flags to structure stage</span></span>
 <span><span class="va">structure_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_structure.html">bid_structure</a></span><span class="op">(</span></span>
 <span>  previous_stage <span class="op">=</span> <span class="va">anticipate_result</span>,</span>
-<span>  telemetry_flags <span class="op">=</span> <span class="va">flags</span>  <span class="co"># Influences layout selection and suggestions</span></span>
+<span>  telemetry_flags <span class="op">=</span> <span class="va">flags</span> <span class="co"># Influences layout selection and suggestions</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Flags also work with legacy hybrid objects</span></span>
 <span><span class="va">legacy_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry</a></span><span class="op">(</span><span class="st">"telemetry.sqlite"</span><span class="op">)</span></span>
-<span><span class="va">legacy_flags</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_flags.html">bid_flags</a></span><span class="op">(</span><span class="va">legacy_result</span><span class="op">)</span>  <span class="co"># Same flags interface</span></span></code></pre></div>
+<span><span class="va">legacy_flags</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_flags.html">bid_flags</a></span><span class="op">(</span><span class="va">legacy_result</span><span class="op">)</span> <span class="co"># Same flags interface</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="understanding-the-hybrid-object">Understanding the Hybrid Object<a class="anchor" aria-label="anchor" href="#understanding-the-hybrid-object"></a>
@@ -696,19 +699,19 @@ interfaces:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">hybrid</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "bid_issues" "list"</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">hybrid</span><span class="op">)</span>           <span class="co"># Number of issues</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">hybrid</span><span class="op">)</span> <span class="co"># Number of issues</span></span>
 <span><span class="co">#&gt; [1] 8</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">hybrid</span><span class="op">)</span>            <span class="co"># Issue IDs</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">hybrid</span><span class="op">)</span> <span class="co"># Issue IDs</span></span>
 <span><span class="co">#&gt; [1] "unused_input_region"      "delayed_interaction"</span></span>
 <span><span class="co">#&gt; [3] "error_1"                  "navigation_settings_tab"</span></span>
 <span></span>
-<span><span class="va">hybrid</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>              <span class="co"># First issue as bid_stage object</span></span>
+<span><span class="va">hybrid</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="co"># First issue as bid_stage object</span></span>
 <span><span class="co">#&gt; BID Framework - Notice Stage</span></span>
 <span><span class="co">#&gt; Problem: Users are not interacting with the 'region' input control</span></span>
 <span><span class="co">#&gt; Evidence: Only 25 out of 847 sessions (3.0%) interacted with 'region'</span></span>
 <span></span>
-<span><span class="va">hybrid</span><span class="op">$</span><span class="va">error_1</span>           <span class="co"># Access by name</span></span>
+<span><span class="va">hybrid</span><span class="op">$</span><span class="va">error_1</span> <span class="co"># Access by name</span></span>
 <span><span class="co">#&gt; BID Framework - Notice Stage</span></span>
 <span><span class="co">#&gt; Problem: Users encounter errors when using the dashboard</span></span>
 <span></span>
@@ -718,7 +721,7 @@ interfaces:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">issues_tbl</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "tbl_df"     "tbl"        "data.frame"</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">issues_tbl</span><span class="op">)</span>        <span class="co"># Same count as length(hybrid)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">issues_tbl</span><span class="op">)</span> <span class="co"># Same count as length(hybrid)</span></span>
 <span><span class="co">#&gt; [1] 8</span></span>
 <span></span>
 <span><span class="co"># Filter and manipulate as tibble</span></span>
@@ -1019,11 +1022,14 @@ stakeholders. After 3 months in production, users are complaining it’s
 <span>      <span class="fu"><a href="https://rstudio.github.io/bslib/reference/layout_columns.html" class="external-link">layout_columns</a></span><span class="op">(</span></span>
 <span>        col_widths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>,</span>
 <span>        <span class="fu">selectInput</span><span class="op">(</span><span class="st">"time_period"</span>, <span class="st">"Time Period"</span>,</span>
-<span>          choices <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Today"</span>, <span class="st">"This Week"</span>, <span class="st">"This Month"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>          choices <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Today"</span>, <span class="st">"This Week"</span>, <span class="st">"This Month"</span><span class="op">)</span></span>
+<span>        <span class="op">)</span>,</span>
 <span>        <span class="fu">selectInput</span><span class="op">(</span><span class="st">"focus_area"</span>, <span class="st">"Focus Area"</span>,</span>
-<span>          choices <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Revenue"</span>, <span class="st">"Traffic"</span>, <span class="st">"Conversions"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>          choices <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Revenue"</span>, <span class="st">"Traffic"</span>, <span class="st">"Conversions"</span><span class="op">)</span></span>
+<span>        <span class="op">)</span>,</span>
 <span>        <span class="fu">selectInput</span><span class="op">(</span><span class="st">"comparison"</span>, <span class="st">"Compare To"</span>,</span>
-<span>          choices <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Previous Period"</span>, <span class="st">"Same Period Last Year"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>          choices <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Previous Period"</span>, <span class="st">"Same Period Last Year"</span><span class="op">)</span></span>
+<span>        <span class="op">)</span>,</span>
 <span>        <span class="fu">actionButton</span><span class="op">(</span><span class="st">"apply_custom"</span>, <span class="st">"Analyze"</span>, class <span class="op">=</span> <span class="st">"btn btn-primary"</span><span class="op">)</span></span>
 <span>      <span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
@@ -1166,7 +1172,7 @@ collect new telemetry to verify improvements:</p></li>
 <span><span class="co"># After implementing improvements</span></span>
 <span><span class="va">issues_after</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_telemetry.html">bid_telemetry</a></span><span class="op">(</span></span>
 <span>  <span class="st">"telemetry_after.sqlite"</span>,</span>
-<span>  thresholds <span class="op">=</span> <span class="fu"><a href="../reference/bid_telemetry_presets.html">bid_telemetry_presets</a></span><span class="op">(</span><span class="st">"moderate"</span><span class="op">)</span>  <span class="co"># Use same thresholds!</span></span>
+<span>  thresholds <span class="op">=</span> <span class="fu"><a href="../reference/bid_telemetry_presets.html">bid_telemetry_presets</a></span><span class="op">(</span><span class="st">"moderate"</span><span class="op">)</span> <span class="co"># Use same thresholds!</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Compare issue counts</span></span>

@@ -4,6 +4,17 @@
 
 #### NEW FEATURES
 
+- **DBI connection support for telemetry ingestion.**
+  [`bid_ingest_telemetry()`](https://jrwinget.github.io/bidux/reference/bid_ingest_telemetry.md)
+  and
+  [`bid_telemetry()`](https://jrwinget.github.io/bidux/reference/bid_telemetry.md)
+  now accept DBI connection objects in addition to file paths. This
+  allows direct use of existing database connections and supports any
+  DBI-compatible backend (SQLite, PostgreSQL, MySQL, etc.). New
+  `table_name` parameter enables reading from custom table names instead
+  of relying on auto-detection. Connections passed in remain open for
+  caller management (fixes Issue \#17).
+
 - **Flattened tibble format for Structure stage suggestions.**
   [`bid_structure()`](https://jrwinget.github.io/bidux/reference/bid_structure.md)
   now returns both the nested suggestion format (`$suggestions`) and a

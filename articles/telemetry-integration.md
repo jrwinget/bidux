@@ -82,20 +82,20 @@ compatibility while providing enhanced functionality:
 legacy_result <- bid_ingest_telemetry("telemetry.sqlite")
 
 # 1. LEGACY LIST INTERFACE (backward compatible)
-length(legacy_result)               # Number of issues as named list
-names(legacy_result)                # Issue IDs: "unused_input_region", "error_1", etc.
-legacy_result[[1]]                  # Access individual bid_stage Notice objects
-legacy_result$unused_input_region   # Access by name
+length(legacy_result) # Number of issues as named list
+names(legacy_result) # Issue IDs: "unused_input_region", "error_1", etc.
+legacy_result[[1]] # Access individual bid_stage Notice objects
+legacy_result$unused_input_region # Access by name
 
 # 2. ENHANCED TIBBLE INTERFACE (new in 0.3.1)
-as_tibble(legacy_result)            # Convert to tidy tibble view
-print(legacy_result)                # Pretty-printed triage summary
+as_tibble(legacy_result) # Convert to tidy tibble view
+print(legacy_result) # Pretty-printed triage summary
 
 # 3. FLAGS EXTRACTION (new in 0.3.1)
-flags <- bid_flags(legacy_result)   # Extract global telemetry flags
-flags$has_critical_issues           # Boolean flag
-flags$has_navigation_issues         # Boolean flag
-flags$session_count                 # Integer metadata
+flags <- bid_flags(legacy_result) # Extract global telemetry flags
+flags$has_critical_issues # Boolean flag
+flags$has_navigation_issues # Boolean flag
+flags$session_count # Integer metadata
 ```
 
 **Key characteristics of
@@ -197,7 +197,7 @@ issues_legacy <- bid_ingest_telemetry("telemetry.sqlite")
 issues <- bid_telemetry("telemetry.log", format = "json")
 
 # Review identified issues
-nrow(issues)  # Modern: tibble row count
+nrow(issues) # Modern: tibble row count
 print(issues) # Both show formatted triage summary
 ```
 
@@ -303,8 +303,8 @@ custom_issues <- bid_telemetry(
   thresholds = c(
     bid_telemetry_presets("moderate"),
     list(
-      unused_input_threshold = 0.03,  # Override: flag if < 3% use
-      error_rate_threshold = 0.15     # Override: flag if > 15% errors
+      unused_input_threshold = 0.03, # Override: flag if < 3% use
+      error_rate_threshold = 0.15 # Override: flag if > 15% errors
     )
   )
 )
@@ -313,12 +313,12 @@ custom_issues <- bid_telemetry(
 fully_custom <- bid_telemetry(
   "telemetry.sqlite",
   thresholds = list(
-    unused_input_threshold = 0.1,   # Flag if <10% of sessions use input
-    delay_threshold_secs = 60,      # Flag if >60s before first interaction
-    error_rate_threshold = 0.05,    # Flag if >5% of sessions have errors
-    navigation_threshold = 0.3,     # Flag if <30% visit a page
-    rapid_change_window = 5,        # Look for changes within 5 seconds
-    rapid_change_count = 3          # Flag if 3+ changes in window
+    unused_input_threshold = 0.1, # Flag if <10% of sessions use input
+    delay_threshold_secs = 60, # Flag if >60s before first interaction
+    error_rate_threshold = 0.05, # Flag if >5% of sessions have errors
+    navigation_threshold = 0.3, # Flag if <30% visit a page
+    rapid_change_window = 5, # Look for changes within 5 seconds
+    rapid_change_count = 3 # Flag if 3+ changes in window
   )
 )
 ```
@@ -330,11 +330,14 @@ Different presets will identify different numbers of issues:
 ``` r
 # Analyze same data with all three presets
 strict <- bid_telemetry("telemetry.sqlite",
-                        thresholds = bid_telemetry_presets("strict"))
+  thresholds = bid_telemetry_presets("strict")
+)
 moderate <- bid_telemetry("telemetry.sqlite",
-                          thresholds = bid_telemetry_presets("moderate"))
+  thresholds = bid_telemetry_presets("moderate")
+)
 relaxed <- bid_telemetry("telemetry.sqlite",
-                         thresholds = bid_telemetry_presets("relaxed"))
+  thresholds = bid_telemetry_presets("relaxed")
+)
 
 # Compare issue counts
 comparison <- data.frame(
@@ -526,12 +529,12 @@ interpret_result <- bid_interpret(
 notice_list <- bid_notices(
   issues = high_priority,
   previous_stage = interpret_result,
-  max_issues = 3  # Limit to top 3 issues
+  max_issues = 3 # Limit to top 3 issues
 )
 
 # Result is a named list of bid_stage objects
-length(notice_list)  # Number of Notice stages created
-notice_list[[1]]     # Access individual Notice stage
+length(notice_list) # Number of Notice stages created
+notice_list[[1]] # Access individual Notice stage
 
 # Continue BID workflow with first issue
 anticipate_result <- bid_anticipate(
@@ -628,12 +631,12 @@ if (flags$has_navigation_issues) {
 # Pass flags to structure stage
 structure_result <- bid_structure(
   previous_stage = anticipate_result,
-  telemetry_flags = flags  # Influences layout selection and suggestions
+  telemetry_flags = flags # Influences layout selection and suggestions
 )
 
 # Flags also work with legacy hybrid objects
 legacy_result <- bid_ingest_telemetry("telemetry.sqlite")
-legacy_flags <- bid_flags(legacy_result)  # Same flags interface
+legacy_flags <- bid_flags(legacy_result) # Same flags interface
 ```
 
 ## Understanding the Hybrid Object
@@ -651,19 +654,19 @@ hybrid <- bid_ingest_telemetry("telemetry.sqlite")
 class(hybrid)
 #> [1] "bid_issues" "list"
 
-length(hybrid)           # Number of issues
+length(hybrid) # Number of issues
 #> [1] 8
 
-names(hybrid)            # Issue IDs
+names(hybrid) # Issue IDs
 #> [1] "unused_input_region"      "delayed_interaction"
 #> [3] "error_1"                  "navigation_settings_tab"
 
-hybrid[[1]]              # First issue as bid_stage object
+hybrid[[1]] # First issue as bid_stage object
 #> BID Framework - Notice Stage
 #> Problem: Users are not interacting with the 'region' input control
 #> Evidence: Only 25 out of 847 sessions (3.0%) interacted with 'region'
 
-hybrid$error_1           # Access by name
+hybrid$error_1 # Access by name
 #> BID Framework - Notice Stage
 #> Problem: Users encounter errors when using the dashboard
 
@@ -673,7 +676,7 @@ issues_tbl <- as_tibble(hybrid)
 class(issues_tbl)
 #> [1] "tbl_df"     "tbl"        "data.frame"
 
-nrow(issues_tbl)        # Same count as length(hybrid)
+nrow(issues_tbl) # Same count as length(hybrid)
 #> [1] 8
 
 # Filter and manipulate as tibble
@@ -974,11 +977,14 @@ ui_after <- page_fillable(
       layout_columns(
         col_widths = c(3, 3, 3, 3),
         selectInput("time_period", "Time Period",
-          choices = c("Today", "This Week", "This Month")),
+          choices = c("Today", "This Week", "This Month")
+        ),
         selectInput("focus_area", "Focus Area",
-          choices = c("Revenue", "Traffic", "Conversions")),
+          choices = c("Revenue", "Traffic", "Conversions")
+        ),
         selectInput("comparison", "Compare To",
-          choices = c("Previous Period", "Same Period Last Year")),
+          choices = c("Previous Period", "Same Period Last Year")
+        ),
         actionButton("apply_custom", "Analyze", class = "btn btn-primary")
       )
     )
@@ -1117,7 +1123,7 @@ issues_before <- bid_telemetry(
 # After implementing improvements
 issues_after <- bid_telemetry(
   "telemetry_after.sqlite",
-  thresholds = bid_telemetry_presets("moderate")  # Use same thresholds!
+  thresholds = bid_telemetry_presets("moderate") # Use same thresholds!
 )
 
 # Compare issue counts

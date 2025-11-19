@@ -859,7 +859,7 @@ behavior.</p>
 <span>        <span class="st">"Year to date"</span> <span class="op">=</span> <span class="st">"ytd"</span>,</span>
 <span>        <span class="st">"Custom range"</span> <span class="op">=</span> <span class="st">"custom"</span></span>
 <span>      <span class="op">)</span>,</span>
-<span>      selected <span class="op">=</span> <span class="st">"30d"</span>,  <span class="co"># Smart default based on most common usage</span></span>
+<span>      selected <span class="op">=</span> <span class="st">"30d"</span>, <span class="co"># Smart default based on most common usage</span></span>
 <span>      inline <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span>,</span>
@@ -883,7 +883,7 @@ behavior.</p>
 <span><span class="va">server_date_feedback</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">output</span><span class="op">$</span><span class="va">data_coverage_info</span> <span class="op">&lt;-</span> <span class="fu">renderUI</span><span class="op">(</span><span class="op">{</span></span>
 <span>    <span class="co"># Calculate based on selected date range</span></span>
-<span>    <span class="va">coverage_pct</span> <span class="op">&lt;-</span> <span class="fl">95</span>  <span class="co"># Example: 95% of data falls in selected range</span></span>
+<span>    <span class="va">coverage_pct</span> <span class="op">&lt;-</span> <span class="fl">95</span> <span class="co"># Example: 95% of data falls in selected range</span></span>
 <span></span>
 <span>    <span class="fu">div</span><span class="op">(</span></span>
 <span>      class <span class="op">=</span> <span class="st">"alert alert-info"</span>,</span>

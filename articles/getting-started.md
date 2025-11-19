@@ -520,9 +520,9 @@ notices <- bid_notices(
 
 # 5. Extract telemetry flags for informed decisions
 flags <- bid_flags(issues)
-flags$has_critical_issues  # TRUE/FALSE
-flags$has_navigation_issues  # TRUE/FALSE
-flags$session_count  # Number of sessions analyzed
+flags$has_critical_issues # TRUE/FALSE
+flags$has_navigation_issues # TRUE/FALSE
+flags$session_count # Number of sessions analyzed
 
 # 6. Use flags to inform Structure stage
 structure_result <- bid_structure(
@@ -543,14 +543,14 @@ legacy_issues <- bid_ingest_telemetry(
 )
 
 # Legacy list interface (backward compatible)
-length(legacy_issues)  # Number of issues as list length
-legacy_issues[[1]]  # First issue as bid_stage object
-names(legacy_issues)  # Issue identifiers
+length(legacy_issues) # Number of issues as list length
+legacy_issues[[1]] # First issue as bid_stage object
+names(legacy_issues) # Issue identifiers
 
 # Enhanced features (new in 0.3.1)
-as_tibble(legacy_issues)  # Get tidy issues view
-bid_flags(legacy_issues)  # Extract global flags
-print(legacy_issues)  # Shows organized triage summary
+as_tibble(legacy_issues) # Get tidy issues view
+bid_flags(legacy_issues) # Extract global flags
+print(legacy_issues) # Shows organized triage summary
 
 # Both interfaces work on same object
 ```
@@ -564,7 +564,7 @@ BID framework:
 # Step 1: Analyze telemetry to identify friction points
 issues <- bid_telemetry(
   "path/to/telemetry.sqlite",
-  thresholds = bid_telemetry_presets("strict")  # Catch everything during development
+  thresholds = bid_telemetry_presets("strict") # Catch everything during development
 )
 
 # Step 2: Start BID workflow with central question
@@ -600,7 +600,7 @@ anticipate_result <- bid_anticipate(
 # Step 5: Structure with telemetry-informed decisions
 structure_result <- bid_structure(
   previous_stage = anticipate_result,
-  telemetry_flags = bid_flags(issues)  # Informs layout selection
+  telemetry_flags = bid_flags(issues) # Informs layout selection
 )
 
 # Step 6: Validate with telemetry references

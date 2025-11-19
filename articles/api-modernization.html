@@ -108,8 +108,7 @@ vignette is the definitive guide to modern API usage in bidux
 </tr>
 <tr class="even">
 <td><strong>Nested data_story format</strong></td>
-<td>⚠️ <strong>DEPRECATED</strong>
-</td>
+<td><strong>DEPRECATED</strong></td>
 <td>
 <code>variables</code>/<code>relationships</code> parameters removed
 in 0.4.0</td>
@@ -420,7 +419,7 @@ better debugging.</p>
 <span><span class="co"># Deprecated format still validates (but triggers warnings)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="../reference/new_data_story.html">new_data_story</a></span><span class="op">(</span></span>
 <span>  context <span class="op">=</span> <span class="st">"Valid context"</span>,</span>
-<span>  variables <span class="op">=</span> <span class="st">"invalid_type"</span>  <span class="co"># Must be a list</span></span>
+<span>  variables <span class="op">=</span> <span class="st">"invalid_type"</span> <span class="co"># Must be a list</span></span>
 <span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="deprecation-warnings">Deprecation Warnings<a class="anchor" aria-label="anchor" href="#deprecation-warnings"></a>
@@ -483,7 +482,7 @@ configuration, eliminating the need for manual threshold tuning.</p>
 <span></span>
 <span><span class="co"># Override specific thresholds while using a preset as base</span></span>
 <span><span class="va">custom_thresholds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_telemetry_presets.html">bid_telemetry_presets</a></span><span class="op">(</span><span class="st">"moderate"</span><span class="op">)</span></span>
-<span><span class="va">custom_thresholds</span><span class="op">$</span><span class="va">unused_input_threshold</span> <span class="op">&lt;-</span> <span class="fl">0.03</span>  <span class="co"># More sensitive to unused inputs</span></span>
+<span><span class="va">custom_thresholds</span><span class="op">$</span><span class="va">unused_input_threshold</span> <span class="op">&lt;-</span> <span class="fl">0.03</span> <span class="co"># More sensitive to unused inputs</span></span>
 <span><span class="va">issues</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry</a></span><span class="op">(</span><span class="st">"telemetry.sqlite"</span>, thresholds <span class="op">=</span> <span class="va">custom_thresholds</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">

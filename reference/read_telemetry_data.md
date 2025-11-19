@@ -1,18 +1,18 @@
-# Read telemetry data from file
+# Read telemetry data from file or connection
 
-Read telemetry data from file
+Read telemetry data from file or connection
 
 ## Usage
 
 ``` r
-read_telemetry_data(path, format, events_table = NULL)
+read_telemetry_data(source, format, events_table = NULL, table_name = NULL)
 ```
 
 ## Arguments
 
-- path:
+- source:
 
-  File path
+  File path or DBI connection object
 
 - format:
 
@@ -21,6 +21,10 @@ read_telemetry_data(path, format, events_table = NULL)
 - events_table:
 
   Optional custom events table for SQLite
+
+- table_name:
+
+  Optional table name for SQLite
 
 ## Value
 
