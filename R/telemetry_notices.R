@@ -575,13 +575,23 @@ bid_flags.default <- function(x) {
 #' issues <- bid_telemetry("telemetry.sqlite")
 #' high_priority <- issues[issues$severity %in% c("critical", "high"), ]
 #'
+#' # Use DBI connection directly
+#' con <- DBI::dbConnect(RSQLite::SQLite(), "telemetry.sqlite")
+#' issues <- bid_telemetry(con, table_name = "my_events")
+#' DBI::dbDisconnect(con)
+#'
 #' # Use with bridges for BID workflow
 #' top_issue <- issues[1, ]
 #' notice <- bid_notice_issue(top_issue, previous_stage = interpret_stage)
 #' }
-bid_telemetry <- function(path, format = NULL, events_table = NULL, thresholds = list()) {
+bid_telemetry <- function(
+    source,
+    format = NULL,
+    events_table = NULL,
+    table_name = NULL,
+    thresholds = list()) {
   # use existing ingest function but extract only the tibble
-  hybrid_result <- bid_ingest_telemetry(path, format, events_table, thresholds)
+  hybrid_result <- bid_ingest_telemetry(source, format, events_table, table_name, thresholds)
 
   # extract the tidy tibble and add specific class
   issues_tbl <- attr(hybrid_result, "issues_tbl")

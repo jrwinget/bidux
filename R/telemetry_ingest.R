@@ -58,10 +58,6 @@ bid_telemetry_presets <- function(preset = c("moderate", "strict", "relaxed")) {
   return(presets[[preset]])
 }
 
-# TODO: Add support for DBI connection objects with custom table_name parameter
-# to bid_ingest_telemetry to allow users to specify their own table names
-# (GitHub issue #17)
-
 # TODO: Add bid_suggest_analytics() function to recommend alternative telemetry
 # solutions (Plausible, Google Analytics, PostHog) for static Quarto dashboards
 # where shiny.telemetry is not available
@@ -84,13 +80,19 @@ bid_telemetry_presets <- function(preset = c("moderate", "strict", "relaxed")) {
 #' support shiny.telemetry. Consider alternative analytics solutions (e.g.,
 #' Plausible) for static dashboard usage tracking.
 #'
-#' @param path File path to telemetry data (SQLite database or JSON log file)
+#' @param source Either a file path to telemetry data (SQLite database or JSON
+#'        log file), or a DBI connection object to an already-open database.
+#'        When a connection is provided, it will not be closed by this function.
 #' @param format Optional format specification ("sqlite" or "json"). If NULL,
-#'        auto-detected from file extension.
+#'        auto-detected from file extension (for file paths) or defaults to
+#'        "sqlite" for DBI connections.
 #' @param events_table Optional data.frame specifying custom events table when
 #'        reading from SQLite. Must have columns: event_id, timestamp,
 #'        event_type, user_id. If NULL, auto-detects standard table names
-#'        (event_data, events).
+#'        (event_data, events). Cannot be used with `table_name`.
+#' @param table_name Optional character string specifying the table name to read
+#'        from the database. If NULL (default), auto-detects standard table names
+#'        (event_data, events). Cannot be used with `events_table`.
 #' @param thresholds Optional list of threshold parameters:
 #'        - unused_input_threshold: percentage of sessions below which input is
 #'          considered unused (default: 0.05)
@@ -117,7 +119,7 @@ bid_telemetry_presets <- function(preset = c("moderate", "strict", "relaxed")) {
 #'
 #' @examples
 #' \dontrun{
-#' # Analyze SQLite telemetry database
+#' # Analyze SQLite telemetry database from file path
 #' issues <- bid_ingest_telemetry("telemetry.sqlite")
 #'
 #' # Use sensitivity presets for easier configuration
@@ -136,6 +138,18 @@ bid_telemetry_presets <- function(preset = c("moderate", "strict", "relaxed")) {
 #'   )
 #' )
 #'
+#' # Use a DBI connection object directly
+#' con <- DBI::dbConnect(RSQLite::SQLite(), "telemetry.sqlite")
+#' issues <- bid_ingest_telemetry(con)
+#' # Connection remains open for further use
+#' DBI::dbDisconnect(con)
+#'
+#' # Specify custom table name
+#' issues <- bid_ingest_telemetry(
+#'   "telemetry.sqlite",
+#'   table_name = "my_custom_events"
+#' )
+#'
 #' # Use results in BID workflow
 #' if (length(issues) > 0) {
 #'   # Take first issue and continue with BID process
@@ -148,24 +162,63 @@ bid_telemetry_presets <- function(preset = c("moderate", "strict", "relaxed")) {
 #'
 #' @export
 bid_ingest_telemetry <- function(
-    path,
+    source,
     format = NULL,
     events_table = NULL,
+    table_name = NULL,
     thresholds = list()) {
-  # enhanced file validation
-  if (!file.exists(path)) {
-    cli::cli_abort("Telemetry file not found: {path}")
+  # check if source is a DBI connection or file path
+  is_connection <- inherits(source, "DBIConnection")
+
+  if (is_connection) {
+    # validate connection is open
+    if (!requireNamespace("DBI", quietly = TRUE)) {
+      cli::cli_abort("Package 'DBI' is required to use connection objects")
+    }
+    if (!DBI::dbIsValid(source)) {
+      cli::cli_abort("The provided database connection is not valid or has been closed")
+    }
+    # default to sqlite for connections
+    if (is.null(format)) {
+      format <- "sqlite"
+    }
+    # store path as NULL for messages
+    path_for_message <- "<DBI connection>"
+  } else {
+    # treat as file path
+    path <- source
+    path_for_message <- path
+
+    # enhanced file validation
+    if (!file.exists(path)) {
+      cli::cli_abort("Telemetry file not found: {path}")
+    }
+
+    # check file size (prevent extremely large files)
+    file_info <- file.info(path)
+    if (is.na(file_info$size) || file_info$size > 100 * 1024 * 1024) { # 100MB limit
+      cli::cli_abort("File size exceeds maximum limit (100MB) or cannot be accessed")
+    }
+
+    # validate file permissions
+    if (!file.access(path, 4) == 0) { # check read permission
+      cli::cli_abort("Cannot read file: {path}. Check file permissions.")
+    }
+
+    if (is.null(format)) {
+      format <- detect_telemetry_format(path)
+    }
   }
 
-  # check file size (prevent extremely large files)
-  file_info <- file.info(path)
-  if (is.na(file_info$size) || file_info$size > 100 * 1024 * 1024) { # 100MB limit
-    cli::cli_abort("File size exceeds maximum limit (100MB) or cannot be accessed")
-  }
-
-  # validate file permissions
-  if (!file.access(path, 4) == 0) { # check read permission
-    cli::cli_abort("Cannot read file: {path}. Check file permissions.")
+  # validate events_table and table_name are mutually exclusive
+  if (!is.null(events_table) && !is.null(table_name)) {
+    cli::cli_abort(standard_error_msg(
+      "Cannot specify both 'events_table' and 'table_name' parameters",
+      suggestions = c(
+        "Use 'events_table' to provide a pre-loaded data.frame",
+        "Use 'table_name' to specify which table to read from the database"
+      )
+    ))
   }
 
   # validate events_table parameter
@@ -176,6 +229,16 @@ bid_ingest_telemetry <- function(
     )
   }
 
+  # validate table_name parameter
+  if (!is.null(table_name)) {
+    if (!is.character(table_name) || length(table_name) != 1 || nchar(trimws(table_name)) == 0) {
+      cli::cli_abort(standard_error_msg(
+        "table_name must be a non-empty character string",
+        context = glue::glue("You provided: {class(table_name)[1]}")
+      ))
+    }
+  }
+
   # validate thresholds parameter
   if (!is.null(thresholds) && !is.list(thresholds)) {
     cli::cli_abort(standard_error_msg(
@@ -184,22 +247,28 @@ bid_ingest_telemetry <- function(
     ))
   }
 
-  if (is.null(format)) {
-    format <- detect_telemetry_format(path)
-  }
-
   if (!format %in% c("sqlite", "json")) {
     cli::cli_abort("Format must be 'sqlite' or 'json', got: {format}")
+  }
+
+  # json format cannot use connection objects
+
+  if (format == "json" && is_connection) {
+    cli::cli_abort("DBI connections are only supported for SQLite format, not JSON")
   }
 
   # use centralized defaults from telemetry_analysis.R (single source of truth)
   thresholds <- modifyList(.default_telemetry_thresholds, thresholds)
 
-  cli::cli_alert_info("Reading telemetry data from {format} file...")
-  events <- read_telemetry_data(path, format, events_table)
+  cli::cli_alert_info("Reading telemetry data from {format} source...")
+
+  # determine source to pass to read_telemetry_data
+  data_source <- if (is_connection) source else path
+
+  events <- read_telemetry_data(data_source, format, events_table, table_name)
 
   if (nrow(events) == 0) {
-    cli::cli_warn("No telemetry events found in {path}")
+    cli::cli_warn("No telemetry events found in {path_for_message}")
     return(list())
   }
 
@@ -366,72 +435,103 @@ detect_telemetry_format <- function(path) {
   }
 }
 
-#' Read telemetry data from file
-#' @param path File path
+#' Read telemetry data from file or connection
+#' @param source File path or DBI connection object
 #' @param format Format ("sqlite" or "json")
 #' @param events_table Optional custom events table for SQLite
+#' @param table_name Optional table name for SQLite
 #' @return Data frame of events
 #' @keywords internal
-read_telemetry_data <- function(path, format, events_table = NULL) {
+read_telemetry_data <- function(source, format, events_table = NULL, table_name = NULL) {
   if (format == "sqlite") {
-    return(read_telemetry_sqlite(path, events_table))
+    return(read_telemetry_sqlite(source, events_table, table_name))
   } else if (format == "json") {
-    return(read_telemetry_json(path))
+    return(read_telemetry_json(source))
   }
 }
 
-# TODO: Accept DBI connection + table_name as alternative to file path to
-# read_telemetry_sqlite (GitHub issue #17)
-# This would allow: read_telemetry_sqlite(con, table_name = "my_events")
-
 #' Read telemetry from SQLite database
-#' @param path SQLite database path
+#' @param source SQLite database path or DBI connection object
 #' @param events_table Optional custom events table data.frame
+#' @param table_name Optional character string specifying table name to read
 #' @return Data frame of events
 #' @keywords internal
-read_telemetry_sqlite <- function(path, events_table = NULL) {
-  if (
-    !requireNamespace("DBI", quietly = TRUE) ||
-      !requireNamespace("RSQLite", quietly = TRUE)
-  ) {
+read_telemetry_sqlite <- function(source, events_table = NULL, table_name = NULL) {
+  if (!requireNamespace("DBI", quietly = TRUE)) {
+    cli::cli_abort("Package 'DBI' is required to read SQLite telemetry data")
+  }
+
+  # determine if source is a connection or file path
+  is_connection <- inherits(source, "DBIConnection")
+
+  # for file paths, we also need RSQLite
+  if (!is_connection && !requireNamespace("RSQLite", quietly = TRUE)) {
     cli::cli_abort(
-      "Packages 'DBI' and 'RSQLite' are required to read SQLite telemetry data"
+      "Package 'RSQLite' is required to read SQLite telemetry data from file paths"
     )
   }
 
+  # connection management based on ownership pattern:
+  # - if we create the connection, we close it
+  # - if connection is passed in, we leave it open
   con <- NULL
+  we_opened_connection <- FALSE
+
   tryCatch(
     {
-      con <- DBI::dbConnect(RSQLite::SQLite(), path)
+      if (is_connection) {
+        con <- source
+        # don't close connections we didn't open
+        we_opened_connection <- FALSE
+      } else {
+        con <- DBI::dbConnect(RSQLite::SQLite(), source)
+        we_opened_connection <- TRUE
+      }
 
       # if custom events_table provided, use it directly
       if (!is.null(events_table)) {
         events <- events_table
         cli::cli_alert_info("Using provided events_table data.frame")
       } else {
-        # discover tables and read from database
-        tables <- DBI::dbListTables(con)
-
-        # look for events table (common {shiny.telemetry} table name)
-        # TODO: Add table_name parameter to allow user-specified table names
-        # (GitHub issue #17). When implemented, check table_name first before
-        # auto-detection
-        event_table <- NULL
-        if ("event_data" %in% tables) {
-          event_table <- "event_data"
-        } else if ("events" %in% tables) {
-          event_table <- "events"
-        } else if (length(tables) > 0) {
-          # use first table if no standard name found
-          event_table <- tables[1]
-          cli::cli_warn(
-            "No standard event table found, using '{event_table}'"
-          )
+        # determine table name to use
+        if (!is.null(table_name)) {
+          # user specified table name - verify it exists
+          tables <- DBI::dbListTables(con)
+          if (!table_name %in% tables) {
+            cli::cli_abort(standard_error_msg(
+              "Table '{table_name}' not found in database",
+              context = glue::glue("Available tables: {paste(tables, collapse = ', ')}"),
+              suggestions = "Check the table name or use events_table parameter to provide data directly"
+            ))
+          }
+          event_table <- table_name
+          cli::cli_alert_info("Using specified table: '{event_table}'")
         } else {
-          cli::cli_abort(standard_error_msg(
-            "No tables found in SQLite database",
-            suggestions = "Ensure the database contains event data or provide events_table parameter"
-          ))
+          # auto-detect table name
+          tables <- DBI::dbListTables(con)
+
+          # look for events table (common {shiny.telemetry} table name)
+          event_table <- NULL
+          if ("event_data" %in% tables) {
+            event_table <- "event_data"
+          } else if ("events" %in% tables) {
+            event_table <- "events"
+          } else if (length(tables) > 0) {
+            # use first table if no standard name found
+            event_table <- tables[1]
+            cli::cli_warn(
+              "No standard event table found, using '{event_table}'"
+            )
+          } else {
+            cli::cli_abort(standard_error_msg(
+              "No tables found in SQLite database",
+              suggestions = c(
+                "Ensure the database contains event data",
+                "Provide events_table parameter with pre-loaded data",
+                "Specify table_name parameter if using a custom table name"
+              )
+            ))
+          }
         }
 
         events <- DBI::dbReadTable(con, event_table)
@@ -444,7 +544,8 @@ read_telemetry_sqlite <- function(path, events_table = NULL) {
       cli::cli_abort("Error reading SQLite database: {e$message}")
     },
     finally = {
-      if (!is.null(con)) {
+      # only close connection if we opened it
+      if (we_opened_connection && !is.null(con)) {
         DBI::dbDisconnect(con)
       }
     }
