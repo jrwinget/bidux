@@ -24,7 +24,7 @@ The bidux package has been modernized with enhanced API consistency, better erro
 | Feature | Status | Details |
 |---------|--------|---------|
 | **Flat data_story API** | ✅ **RECOMMENDED** | Use `new_data_story(hook, context, tension, resolution)` |
-| **Nested data_story format** | ⚠️ **DEPRECATED** | `variables`/`relationships` parameters removed in 0.4.0 |
+| **Nested data_story format** | **DEPRECATED** | `variables`/`relationships` parameters removed in 0.4.0 |
 | **Telemetry presets** | ✅ **NEW** | Use `bid_telemetry_presets("moderate")` for easier configuration |
 | **S3 classes and methods** | ✅ **STABLE** | Enhanced print, summary, and conversion methods |
 | **Tibble integration** | ✅ **OPTIONAL** | Automatic tibble output when package available |
