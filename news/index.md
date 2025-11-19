@@ -2,6 +2,8 @@
 
 ## \# bidux 0.3.3 (2025-11-19)
 
+CRAN release: 2025-11-19
+
 #### NEW FEATURES
 
 - **DBI connection support for telemetry ingestion.**

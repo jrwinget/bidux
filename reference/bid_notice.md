@@ -91,7 +91,7 @@ bid_notice(
 #>   - Theory confidence: 90%
 #>   - Next: Use bid_anticipate() for Stage 3 
 #> BID Framework - Notice Stage
-#> Generated: 2025-11-19 20:23:30 
+#> Generated: 2025-11-19 21:31:15 
 #> Progress: 40 % (2/5) 
 #> 
 #> Problem: Users struggling with complex dropdowns and too many options 
@@ -135,5 +135,5 @@ summary(notice_result)
 #>    evidence : Mobile users report frustration with small touch targets 
 #>    suggestions : Ensure your problem description is specific and supported by strong evidence 
 #> 
-#> Generated: 2025-11-19 20:23:30 
+#> Generated: 2025-11-19 21:31:15 
 ```

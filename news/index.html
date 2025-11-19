@@ -43,7 +43,7 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.3.3" id="id_-bidux-033-2025-11-19"># bidux 0.3.3 (2025-11-19)<a class="anchor" aria-label="anchor" href="#id_-bidux-033-2025-11-19"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.3.3" id="id_-bidux-033-2025-11-19"># bidux 0.3.3 (2025-11-19)<a class="anchor" aria-label="anchor" href="#id_-bidux-033-2025-11-19"></a></h2><p class="text-muted">CRAN release: 2025-11-19</p>
 <div class="section level4">
 <h4 id="new-features-0-3-3">NEW FEATURES<a class="anchor" aria-label="anchor" href="#new-features-0-3-3"></a></h4>
 <ul><li><p><strong>DBI connection support for telemetry ingestion.</strong> <code><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry()</a></code> and <code><a href="../reference/bid_telemetry.html">bid_telemetry()</a></code> now accept DBI connection objects in addition to file paths. This allows direct use of existing database connections and supports any DBI-compatible backend (SQLite, PostgreSQL, MySQL, etc.). New <code>table_name</code> parameter enables reading from custom table names instead of relying on auto-detection. Connections passed in remain open for caller management (fixes Issue #17).</p></li>
