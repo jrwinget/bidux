@@ -417,29 +417,27 @@ test_that("bid_ingest_telemetry accepts DBI connection objects", {
   expect_true(is.list(result))
 })
 
-test_that("DBI connection stays open after bid_ingest_telemetry call",
-  {
-    skip_if_no_telemetry_deps()
+test_that("DBI connection stays open after bid_ingest_telemetry call", {
+  skip_if_no_telemetry_deps()
 
-    events <- create_sample_telemetry_events(2)
-    temp_sqlite <- create_temp_sqlite_file(events)
-    on.exit(unlink(temp_sqlite))
+  events <- create_sample_telemetry_events(2)
+  temp_sqlite <- create_temp_sqlite_file(events)
+  on.exit(unlink(temp_sqlite))
 
-    # create connection
-    con <- DBI::dbConnect(RSQLite::SQLite(), temp_sqlite)
-    withr::defer(DBI::dbDisconnect(con))
+  # create connection
+  con <- DBI::dbConnect(RSQLite::SQLite(), temp_sqlite)
+  withr::defer(DBI::dbDisconnect(con))
 
-    # call bid_ingest_telemetry
-    result <- bid_ingest_telemetry(con)
+  # call bid_ingest_telemetry
+  result <- bid_ingest_telemetry(con)
 
-    # connection should still be valid and usable
-    expect_true(DBI::dbIsValid(con))
+  # connection should still be valid and usable
+  expect_true(DBI::dbIsValid(con))
 
-    # should be able to use connection for additional queries
-    tables <- DBI::dbListTables(con)
-    expect_true(length(tables) > 0)
-  }
-)
+  # should be able to use connection for additional queries
+  tables <- DBI::dbListTables(con)
+  expect_true(length(tables) > 0)
+})
 
 test_that("file path input still works for backward compatibility", {
   skip_if_no_telemetry_deps()
@@ -1342,9 +1340,9 @@ test_that("JSON with blank lines is handled", {
   # json with blank lines should be filtered
   json_lines <- c(
     '{"timestamp": "2025-01-01 10:00:00", "session_id": "s1", "event_type": "login"}',
-    '',
+    "",
     '{"timestamp": "2025-01-01 10:00:05", "session_id": "s1", "event_type": "input", "input_id": "btn1"}',
-    '   '
+    "   "
   )
 
   temp_json <- tempfile(fileext = ".json")
@@ -1359,7 +1357,7 @@ test_that("JSON with invalid lines filters them out", {
   # some invalid JSON lines mixed with valid ones
   json_lines <- c(
     '{"timestamp": "2025-01-01 10:00:00", "session_id": "s1", "event_type": "login"}',
-    'not valid json',
+    "not valid json",
     '{"timestamp": "2025-01-01 10:00:05", "session_id": "s1", "event_type": "input", "input_id": "btn1"}'
   )
 

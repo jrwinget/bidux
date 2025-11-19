@@ -209,7 +209,7 @@ suggest_theory_from_mappings <- function(
       "Auto-suggested theory: ",
       theory,
       " (confidence: ",
-      round(theory_confidence * 100),
+      janitor::round_half_up(theory_confidence * 100),
       "%)\n"
     ))
   }

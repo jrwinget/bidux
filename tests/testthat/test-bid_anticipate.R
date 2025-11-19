@@ -152,15 +152,11 @@ test_that(
     # when include_accessibility is FALSE, accessibility field may be NA/absent
     if ("accessibility" %in% names(result)) {
       expect_true(is.na(result$accessibility[1]) || nchar(
-        result$accessibility[1]) == 0
-      )
+        result$accessibility[1]
+      ) == 0)
     }
   }
 )
-
-# ==============================================================================
-# PARAMETER VALIDATION AND ERROR HANDLING
-# ==============================================================================
 
 test_that("bid_anticipate validates bias_mitigations parameter", {
   notice_result <- create_minimal_notice_tibble()
@@ -217,10 +213,6 @@ test_that(
     )
   }
 )
-
-# ==============================================================================
-# DATA HANDLING AND EDGE CASES
-# ==============================================================================
 
 test_that("bid_anticipate handles NA values in previous_stage fields", {
   notice_result <- create_minimal_notice_tibble()
@@ -280,10 +272,6 @@ test_that("bid_anticipate handles missing fields in previous_stage", {
   expect_false(is.na(result$bias_mitigations[1]))
 })
 
-# ==============================================================================
-# INTEGRATION AND WORKFLOW TESTS
-# ==============================================================================
-
 test_that("bid_anticipate integrates properly with BID workflow", {
   # test full workflow integration without excessive repetition
   interpret_result <- create_basic_interpret_stage()
@@ -322,10 +310,6 @@ test_that("bid_anticipate preserves essential stage metadata", {
   expect_s3_class(result$timestamp, "POSIXct")
 })
 
-# ==============================================================================
-# PARAMETER EDGE CASES
-# ==============================================================================
-
 test_that("bid_anticipate handles unexpected parameters gracefully", {
   notice_result <- create_minimal_notice_tibble()
 
@@ -355,10 +339,6 @@ test_that("bid_anticipate accessibility advice varies by context", {
   expect_true(is.character(result$accessibility))
   expect_gt(nchar(result$accessibility[1]), 0)
 })
-
-# ==============================================================================
-# ADDITIONAL EDGE-CASE COVERAGE
-# ==============================================================================
 
 test_that(
   "bid_anticipate warns and defaults when include_accessibility is invalid",

@@ -98,7 +98,7 @@ find_best_concept_match <- function(concept, d_all_concepts) {
         "' to '",
         matched_concept,
         "' (similarity: ",
-        round(best_score * 100),
+        janitor::round_half_up(best_score * 100),
         "%)"
       ))
       return(matched_concept)

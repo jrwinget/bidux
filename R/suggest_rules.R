@@ -258,7 +258,10 @@ deduplicate_warnings_suggestions <- function(warnings, suggestions, similarity_t
 
       # calculate word overlap
       common_words <- intersect(warning_words, suggestion_words)
-      overlap_ratio <- length(common_words) / max(length(warning_words), length(suggestion_words))
+      overlap_ratio <- length(common_words) / max(
+        length(warning_words),
+        length(suggestion_words)
+      )
 
       if (overlap_ratio >= similarity_threshold) {
         duplicate_warnings[i] <- TRUE

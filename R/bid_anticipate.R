@@ -170,7 +170,10 @@ bid_anticipate <- function(
     !is.logical(include_accessibility) || length(include_accessibility) != 1
   ) {
     cli::cli_warn(c(
-      "!" = "include_accessibility must be a single logical value (TRUE/FALSE).",
+      "!" = paste(
+        "include_accessibility must be a single",
+        "logical value (TRUE/FALSE)."
+      ),
       "i" = "Using default value TRUE."
     ))
     include_accessibility <- TRUE
@@ -272,47 +275,63 @@ bid_anticipate <- function(
       }
     }
 
-    # apply layout-specific bias mitigations when layout information is available
-    # DEPRECATED in 0.3.1: Will be removed in 0.4.0 in favor of concept-only approach
+    # apply layout-specific bias mitigations when layout information is
+    # available
+    # DEPRECATED in 0.3.1:
+    # TODO: Will be removed in 0.4.0 in favor of concept-only approach
     if (!is.na(layout)) {
-      # issue deprecation warning once per session (skip in tests to reduce noise)
-      # use package namespace instead of global environment for CRAN compliance
+      # issue deprecation warning once per session (skip in tests to reduce
+      # noise). use package namespace instead of global environment for CRAN
+      # compliance
       pkg_env <- asNamespace("bidux")
       if (
         !exists(".bid_layout_bias_warned", envir = pkg_env) &&
           !identical(Sys.getenv("TESTTHAT"), "true")
       ) {
         warning(
-          "Layout-specific bias mitigations are deprecated and will be removed in bidux 0.4.0. ",
+          paste(
+            "Layout-specific bias mitigations are deprecated",
+            "and will be removed in bidux 0.4.0. "
+          ),
           "Consider using concept-based bias mitigations instead.",
           call. = FALSE
         )
-        try(assign(".bid_layout_bias_warned", TRUE, envir = pkg_env), silent = TRUE)
+        try(
+          assign(".bid_layout_bias_warned", TRUE, envir = pkg_env),
+          silent = TRUE
+        )
       }
 
       layout_bias_map <- list(
         "dual_process" = c(
-          "framing" = "
-            Toggle between high-level summary and detailed analysis views
-          "
+          "framing" = paste(
+            "Toggle between high-level summary",
+            "and detailed analysis views"
+          )
         ),
         "grid" = c(
-          "anchoring" = "Provide multiple reference points across grid cells to avoid single point anchoring"
+          "anchoring" = paste(
+            "Provide multiple reference points across grid cells",
+            "to avoid single point anchoring"
+          )
         ),
         "card" = c(
-          "beautiful-is-good stereotype" = "
-            Ensure card aesthetic appeal doesn't overshadow content quality
-          "
+          "beautiful-is-good stereotype" = paste(
+            "Ensure card aesthetic appeal doesn't overshadow",
+            "content quality"
+          )
         ),
         "tabs" = c(
-          "availability bias" = "
-            Make important information available in the default tab to prevent availability bias
-          "
+          "availability bias" = paste(
+            "Make important information available in the default tab",
+            "to prevent availability bias"
+          )
         ),
         "breathable" = c(
-          "cognitive load" = "
-            Use generous whitespace to reduce cognitive load and improve focus
-          "
+          "cognitive load" = paste(
+            "Use generous whitespace to reduce cognitive load",
+            "and improve focus"
+          )
         )
       )
 
@@ -526,8 +545,11 @@ bid_anticipate <- function(
           collapse = "; "
         )
       } else {
-        # legacy list format - exclude accessibility from bias mitigations string
-        bias_only <- bias_mitigations[names(bias_mitigations) != "accessibility"]
+        # legacy list format; exclude accessibility from bias mitigations string
+        bias_only <- bias_mitigations[
+          names(bias_mitigations) != "accessibility"
+        ]
+
         paste(
           names(bias_only),
           unlist(bias_only),

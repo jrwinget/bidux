@@ -214,10 +214,6 @@ create_confusion_notice <- function(confusion_info, total_sessions) {
   return(notice)
 }
 
-# ==============================================================================
-# BID_ISSUES CLASS HELPER FUNCTIONS
-# ==============================================================================
-
 #' Create tidy issues tibble from notice issues list
 #' @param notice_issues List of bid_stage objects from telemetry analysis
 #' @param total_sessions Total number of sessions analyzed
@@ -337,18 +333,28 @@ create_confusion_notice <- function(confusion_info, total_sessions) {
 #' @param total_sessions Total number of sessions
 #' @return List with severity, affected_sessions, and impact_rate
 #' @keywords internal
-.calculate_severity_metrics <- function(issue_key, notice, events, total_sessions) {
+.calculate_severity_metrics <- function(
+  issue_key,
+  notice,
+  events,
+  total_sessions
+) {
   # default values
   affected_sessions <- 0
   impact_rate <- 0.0
 
   # calculate metrics based on issue type
   if (grepl("^unused_input", issue_key)) {
-    # for unused inputs, extract input_id from problem text to avoid lossy conversion
-    # problem format: "Users are not interacting with the 'INPUT_ID' input control"
+    # for unused inputs, extract input_id from problem text to avoid
+    # lossy conversion
+    # problem format: "Users are not interacting with the 'INPUT_ID'
+    # input control"
     input_id <- NA_character_
 
-    if (is.data.frame(notice) && "problem" %in% names(notice) && !is.na(notice$problem[1])) {
+    if (
+      is.data.frame(notice) && "problem" %in% names(notice) &&
+        !is.na(notice$problem[1])
+    ) {
       # extract input_id from between single quotes in problem text
       extracted <- sub(".*'([^']+)'.*", "\\1", notice$problem[1])
       if (!is.na(extracted) && extracted != notice$problem[1]) {
@@ -357,38 +363,66 @@ create_confusion_notice <- function(confusion_info, total_sessions) {
     }
 
     # validate extracted input_id
-    if (is.na(input_id) || !is.character(input_id) || length(input_id) != 1 || nchar(trimws(input_id)) == 0) {
-      cli::cli_warn("Could not extract valid input_id from notice, using fallback metrics")
-      affected_sessions <- round(total_sessions * 0.1) # conservative estimate
+    if (
+      is.na(input_id) || !is.character(input_id) ||
+        length(input_id) != 1 || nchar(trimws(input_id)) == 0
+    ) {
+      cli::cli_warn(
+        "Could not extract valid input_id from notice, using fallback metrics"
+      )
+
+
+      affected_sessions <- janitor::round_half_up(
+        total_sessions * 0.1 # conservative estimate
+      )
+
       impact_rate <- 0.1
     } else {
       # secure comparison using exact match
       input_events <- events[events$event_type == "input" & !is.na(
         events$input_id
-      ) & events$input_id == input_id,
-      ]
-      affected_sessions <- max(0, total_sessions - length(unique(input_events$session_id)))
-      impact_rate <- if (total_sessions > 0) affected_sessions / total_sessions else 0.0
+      ) & events$input_id == input_id, ]
+
+      affected_sessions <- max(
+        0,
+        total_sessions - length(unique(input_events$session_id))
+      )
+
+      impact_rate <- if (total_sessions > 0) {
+        affected_sessions / total_sessions
+      } else {
+        0.0
+      }
     }
   } else if (grepl("^delayed", issue_key)) {
     # for delays, this affects multiple sessions
-    affected_sessions <- round(total_sessions * 0.3) # estimate
+    affected_sessions <- janitor::round_half_up(total_sessions * 0.3) # estimate
     impact_rate <- 0.3
   } else if (grepl("^error", issue_key)) {
     # for errors, count sessions with errors
     error_events <- events[events$event_type == "error", ]
     affected_sessions <- length(unique(error_events$session_id))
-    impact_rate <- if (total_sessions > 0) affected_sessions / total_sessions else 0.0
+    impact_rate <- if (total_sessions > 0) {
+      affected_sessions / total_sessions
+    } else {
+      0.0
+    }
   } else if (grepl("^navigation", issue_key)) {
     # for navigation issues, estimate based on page visits
     nav_events <- events[events$event_type == "navigation", ]
-    affected_sessions <- round(total_sessions * 0.2) # estimate
+    affected_sessions <- janitor::round_half_up(total_sessions * 0.2) # estimate
     impact_rate <- 0.2
   } else if (grepl("^confusion", issue_key)) {
     # for confusion patterns, count rapid change sessions
     input_events <- events[events$event_type == "input", ]
-    affected_sessions <- round(length(unique(input_events$session_id)) * 0.1)
-    impact_rate <- if (total_sessions > 0) affected_sessions / total_sessions else 0.0
+    affected_sessions <- janitor::round_half_up(
+      length(unique(input_events$session_id)) * 0.1
+    )
+    impact_rate <- if (total_sessions > 0) {
+      affected_sessions / total_sessions
+    } else {
+      0.0
+    }
   }
 
   # determine severity based on impact rate
@@ -408,10 +442,6 @@ create_confusion_notice <- function(confusion_info, total_sessions) {
     impact_rate = as.numeric(impact_rate)
   )
 }
-
-# ==============================================================================
-# BID_ISSUES CLASS METHODS
-# ==============================================================================
 
 #' Print method for bid_issues objects
 #'
@@ -463,7 +493,7 @@ print.bid_issues <- function(x, ...) {
     cli::cli_h3("Top Priority Issues:")
     for (i in seq_len(nrow(top_issues))) {
       issue <- top_issues[i, ]
-      impact_pct <- round(issue$impact_rate * 100, 1)
+      impact_pct <- janitor::round_half_up(issue$impact_rate * 100, 1)
 
       if (issue$severity == "critical") {
         cli::cli_alert_danger("{issue$issue_type}: {impact_pct}% impact ({issue$affected_sessions} sessions)")
@@ -554,10 +584,6 @@ bid_flags.default <- function(x) {
 
   cli::cli_abort("Object does not contain telemetry flags")
 }
-
-# ==============================================================================
-# NEW CONCISE TELEMETRY API
-# ==============================================================================
 
 #' Concise telemetry analysis with tidy output
 #'
@@ -666,7 +692,7 @@ bid_notice_issue <- function(issue, previous_stage = NULL, override = list()) {
 
   impact_rate <- safe_column_access(issue, "impact_rate")
   if (!is.na(impact_rate) && is.numeric(impact_rate)) {
-    impact_pct <- round(impact_rate * 100, 1)
+    impact_pct <- janitor::round_half_up(impact_rate * 100, 1)
     evidence_parts <- c(
       evidence_parts,
       glue::glue("Impact rate: {impact_pct}%")

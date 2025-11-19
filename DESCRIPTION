@@ -26,6 +26,7 @@ Imports:
     DBI,
     dplyr,
     glue,
+    janitor,
     jsonlite,
     readr (>= 2.1.5),
     rlang,

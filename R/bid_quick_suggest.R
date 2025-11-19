@@ -322,7 +322,10 @@ bid_quick_suggest <- function(
       )
     }
 
-    avg_score <- round(mean(filtered_suggestions$score, na.rm = TRUE), 2)
+    avg_score <- janitor::round_half_up(
+      mean(filtered_suggestions$score, na.rm = TRUE),
+      digits = 2
+    )
     summary_msg <- paste0(
       summary_msg,
       glue::glue(" (avg relevance: {avg_score})")

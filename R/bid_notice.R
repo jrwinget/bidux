@@ -170,7 +170,9 @@ bid_notice <- function(
     glue::glue("Theory: {theory}{if (auto_suggested_theory) ' (auto-suggested)' else ''}"),
     glue::glue("Evidence: {truncate_text(evidence_clean, 60)}"),
     if (auto_suggested_theory) {
-      glue::glue("Theory confidence: {round(theory_confidence * 100)}%")
+      glue::glue(
+        "Theory confidence: {janitor::round_half_up(theory_confidence * 100)}%"
+      )
     },
     "Next: Use bid_anticipate() for Stage 3",
     quiet = quiet
