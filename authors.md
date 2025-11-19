@@ -9,12 +9,12 @@
 
 Winget J (2025). *bidux: Behavioral Insight Design: A Toolkit for
 Integrating Behavioral Science in UI/UX Design*. R package version
-0.3.2.9000, <https://jrwinget.github.io/bidux/>.
+0.3.3, <https://jrwinget.github.io/bidux/>.
 
     @Manual{,
       title = {bidux: Behavioral Insight Design: A Toolkit for Integrating Behavioral Science in UI/UX Design},
       author = {Jeremy Winget},
       year = {2025},
-      note = {R package version 0.3.2.9000},
+      note = {R package version 0.3.3},
       url = {https://jrwinget.github.io/bidux/},
     }

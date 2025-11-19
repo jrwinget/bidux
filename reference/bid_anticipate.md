@@ -112,7 +112,7 @@ bid_anticipate(previous_stage = structure_info)
 #>   - Accessibility considerations included
 #>   - Key suggestions: Attention Bias mitigation: Consider how this bias affects user decisions, Belief Perseverance mitigation: Proactively show content that might disprove initial assumptions, Cognitive Load mitigation: Use tabs or collapsible sections to organize complex information 
 #> BID Framework - Anticipate Stage
-#> Generated: 2025-11-19 19:49:01 
+#> Generated: 2025-11-19 20:14:37 
 #> Progress: 60 % (3/5) 
 #> 
 #> Bias Mitigations: 3 strategies defined 
@@ -165,5 +165,5 @@ summary(anticipate_result)
 #>    previous_concepts : Cognitive Load Theory, Visual Hierarchy, Progressive Disclosure, Hick's Law 
 #>    suggestions : Bias_type mitigation: Consider how this bias affects user decisions Mitigatio... 
 #> 
-#> Generated: 2025-11-19 19:49:01 
+#> Generated: 2025-11-19 20:14:38 
 ```

@@ -1,6 +1,6 @@
 # Changelog
 
-## \# bidux 0.3.2.9000 (development version)
+## \# bidux 0.3.3 (2025-11-19)
 
 #### NEW FEATURES
 
@@ -14,6 +14,13 @@
   `table_name` parameter enables reading from custom table names instead
   of relying on auto-detection. Connections passed in remain open for
   caller management (fixes Issue \#17).
+
+- **Quick UX suggestions with
+  [`bid_quick_suggest()`](https://jrwinget.github.io/bidux/reference/bid_quick_suggest.md).**
+  New function provides immediate, actionable UX suggestions without
+  going through the full 5-stage BID workflow. Simply describe your
+  problem and get ranked component recommendations with implementation
+  guidance. Ideal for rapid prototyping or quick fixes.
 
 - **Flattened tibble format for Structure stage suggestions.**
   [`bid_structure()`](https://jrwinget.github.io/bidux/reference/bid_structure.md)
