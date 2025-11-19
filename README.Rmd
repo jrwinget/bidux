@@ -54,11 +54,27 @@ And the development version from this repo with:
 pak::pak("jrwinget/bidux")
 ```
 
-## Usage
+## Quick Start
+
+Need immediate UX suggestions? Use `bid_quick_suggest()`:
 
 ```r
 library(bidux)
 
+# Get quick suggestions for a specific problem
+suggestions <- bid_quick_suggest(
+  problem = "Users are overwhelmed by too many filter options"
+)
+
+# View ranked suggestions with component recommendations
+print(suggestions)
+```
+
+## Full BID Workflow
+
+For comprehensive dashboard redesigns, use the complete 5-stage process:
+
+```r
 # Document a complete BID process
 process <- bid_interpret(
   central_question = "How are our marketing campaigns performing across different channels?",
@@ -91,11 +107,9 @@ process <- bid_interpret(
 
 # View implementation suggestions for specific packages
 bid_suggest_components(process, package = "bslib")
-bid_suggest_components(process, package = "reactable")
 
 # Generate comprehensive reports
 bid_report(process, format = "html")
-bid_report(process, format = "markdown")
 ```
 
 ## Data-Driven UX with Telemetry

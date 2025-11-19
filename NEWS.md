@@ -5,6 +5,8 @@
 
 * **DBI connection support for telemetry ingestion.** `bid_ingest_telemetry()` and `bid_telemetry()` now accept DBI connection objects in addition to file paths. This allows direct use of existing database connections and supports any DBI-compatible backend (SQLite, PostgreSQL, MySQL, etc.). New `table_name` parameter enables reading from custom table names instead of relying on auto-detection. Connections passed in remain open for caller management (fixes Issue #17).
 
+* **Quick UX suggestions with `bid_quick_suggest()`.** New function provides immediate, actionable UX suggestions without going through the full 5-stage BID workflow. Simply describe your problem and get ranked component recommendations with implementation guidance. Ideal for rapid prototyping or quick fixes.
+
 * **Flattened tibble format for Structure stage suggestions.** `bid_structure()` now returns both the nested suggestion format (`$suggestions`) and a new flattened tibble format (`$suggestions_tbl`). The tibble includes columns for `concept`, `title`, `details`, `components`, `rationale`, `score`, `difficulty`, and `category`, making it easy to filter and analyze suggestions using standard dplyr operations. Examples include filtering by difficulty ("Easy", "Medium", "Hard"), category ("Layout", "Navigation", "Content", etc.), or score thresholds.
 
 ### IMPROVEMENTS
