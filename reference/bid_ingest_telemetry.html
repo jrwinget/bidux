@@ -3,11 +3,21 @@
 JSON) and automatically identifies potential UX issues, translating them into
 BID framework Notice stages. It returns a hybrid object that is backward-compatible
 as a list of Notice stages while also providing enhanced functionality with
-tidy tibble access and flags extraction."><meta property="og:description" content="This function ingests telemetry data from shiny.telemetry output (SQLite or
+tidy tibble access and flags extraction.
+Note: This function is designed for Shiny application telemetry. For
+Quarto dashboards, shiny.telemetry only works when using server: shiny in
+the Quarto YAML. Static Quarto dashboards and OJS-based dashboards do not
+support shiny.telemetry. Consider alternative analytics solutions (e.g.,
+Plausible) for static dashboard usage tracking."><meta property="og:description" content="This function ingests telemetry data from shiny.telemetry output (SQLite or
 JSON) and automatically identifies potential UX issues, translating them into
 BID framework Notice stages. It returns a hybrid object that is backward-compatible
 as a list of Notice stages while also providing enhanced functionality with
-tidy tibble access and flags extraction."><meta property="og:image" content="https://jrwinget.github.io/bidux/logo.png"></head><body>
+tidy tibble access and flags extraction.
+Note: This function is designed for Shiny application telemetry. For
+Quarto dashboards, shiny.telemetry only works when using server: shiny in
+the Quarto YAML. Static Quarto dashboards and OJS-based dashboards do not
+support shiny.telemetry. Consider alternative analytics solutions (e.g.,
+Plausible) for static dashboard usage tracking."><meta property="og:image" content="https://jrwinget.github.io/bidux/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -57,6 +67,11 @@ JSON) and automatically identifies potential UX issues, translating them into
 BID framework Notice stages. It returns a hybrid object that is backward-compatible
 as a list of Notice stages while also providing enhanced functionality with
 tidy tibble access and flags extraction.</p>
+<p><strong>Note:</strong> This function is designed for Shiny application telemetry. For
+Quarto dashboards, shiny.telemetry only works when using <code>server: shiny</code> in
+the Quarto YAML. Static Quarto dashboards and OJS-based dashboards do not
+support shiny.telemetry. Consider alternative analytics solutions (e.g.,
+Plausible) for static dashboard usage tracking.</p>
     </div>
 
     <div class="section level2">
@@ -84,8 +99,9 @@ auto-detected from file extension.</p></dd>
 
 <dt id="arg-events-table">events_table<a class="anchor" aria-label="anchor" href="#arg-events-table"></a></dt>
 <dd><p>Optional data.frame specifying custom events table when
-reading from SQLite. Must have columns: event_id, timestamp, event_type, user_id.
-If NULL, auto-detects standard table names (event_data, events).</p></dd>
+reading from SQLite. Must have columns: event_id, timestamp,
+event_type, user_id. If NULL, auto-detects standard table names
+(event_data, events).</p></dd>
 
 
 <dt id="arg-thresholds">thresholds<a class="anchor" aria-label="anchor" href="#arg-thresholds"></a></dt>

@@ -91,10 +91,12 @@ content from previous stages and select the most appropriate layout:
 - **tabs**: For categorical organization (unless telemetry shows issues)
 
 **Suggestion Engine**: Generates ranked, actionable recommendations
-grouped by UX concepts. Each suggestion includes specific Shiny/bslib
-components, implementation details, and rationale. Suggestions are
-scored based on relevance, layout appropriateness, and contextual
-factors.
+grouped by UX concepts. Each suggestion includes specific R dashboard
+components (Shiny, bslib, DT, plotly, etc.), implementation details, and
+rationale. Suggestions are scored based on relevance, layout
+appropriateness, and contextual factors. Component suggestions work with
+both Shiny applications and Quarto dashboards, with shiny-prefixed
+components (i.e., `shiny::`) requiring Shiny runtime.
 
 ## Examples
 
@@ -353,5 +355,5 @@ summary(structure_result)
 #>    suggestions : list(concept = "Cognitive Load Theory", suggestions = list(list(title = "Limi... 
 #>    suggestions_tbl : list(concept = c("Cognitive Load Theory", "Cognitive Load Theory", "Visual Hi... 
 #> 
-#> Generated: 2025-11-14 18:06:09 
+#> Generated: 2025-11-19 00:21:59 
 ```

@@ -125,7 +125,7 @@ summary(interpret_personas)
 #>    personas : [{"name":"Sara, Data Analyst","goals":"Needs to quickly find patterns in data... 
 #>    suggestions : Your data story has all key elements. Focus on making each component compelli... 
 #> 
-#> Generated: 2025-11-14 18:06:07 
+#> Generated: 2025-11-19 00:21:57 
 
 # Legacy list format still works (with deprecation warning)
 if (FALSE) { # \dontrun{

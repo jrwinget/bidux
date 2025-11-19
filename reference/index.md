@@ -31,7 +31,7 @@
 - [`bid_pipeline()`](https://jrwinget.github.io/bidux/reference/bid_pipeline.md)
   : Create pipeline of Notice stages from top telemetry issues (sugar)
 - [`bid_quick_suggest()`](https://jrwinget.github.io/bidux/reference/bid_quick_suggest.md)
-  : Quick UX Suggestions for Shiny Developers
+  : Quick UX Suggestions for R Dashboard Developers
 - [`bid_report()`](https://jrwinget.github.io/bidux/reference/bid_report.md)
   : Generate BID Framework Report
 - [`bid_result()`](https://jrwinget.github.io/bidux/reference/bid_result.md)

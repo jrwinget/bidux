@@ -2,7 +2,9 @@
 
 Creates a comprehensive report from a completed BID framework process.
 This report summarizes all stages and provides recommendations for
-implementation.
+implementation. Reports include component suggestions that work with
+both Shiny applications and Quarto dashboards (shiny-prefixed components
+(i.e., `shiny::`) require Shiny runtime).
 
 ## Usage
 

@@ -30,6 +30,13 @@
 
 #### DOCUMENTATION UPDATES
 
+- **Quarto dashboard compatibility.** Updated package documentation to
+  clarify that bidux works with both Shiny applications and Quarto
+  dashboards. Core BID framework stages, layout suggestions, and most
+  component recommendations (`bslib`, `DT`, `plotly`, `reactable`) work
+  in both frameworks. Added notes about which features require Shiny
+  runtime when using Quarto (`server: shiny`).
+
 - **Getting Started vignette enhanced** with comprehensive examples
   showing how to work with both nested and flattened suggestion formats,
   including practical filtering patterns for finding easy-to-implement,

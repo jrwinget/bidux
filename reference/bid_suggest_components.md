@@ -1,9 +1,11 @@
 # Suggest UI Components Based on BID Framework Analysis
 
 This function analyzes the results from BID framework stages and
-suggests appropriate UI components from popular R packages like shiny,
-bslib, DT, etc. The suggestions are based on the design principles and
-user needs identified in the BID process.
+suggests appropriate UI components from popular R dashboard packages
+like shiny, bslib, DT, plotly, reactable, and htmlwidgets. The
+suggestions are based on the design principles and user needs identified
+in the BID process. Components work with both Shiny applications and
+Quarto dashboards (shiny-prefixed components require Shiny runtime).
 
 ## Usage
 

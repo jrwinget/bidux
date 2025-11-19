@@ -133,9 +133,12 @@ from previous stages and select the most appropriate layout:</p><ul><li><p><stro
 <li><p><strong>card</strong>: For modular/chunked content</p></li>
 <li><p><strong>tabs</strong>: For categorical organization (unless telemetry shows issues)</p></li>
 </ul><p><strong>Suggestion Engine</strong>: Generates ranked, actionable recommendations grouped
-by UX concepts. Each suggestion includes specific Shiny/bslib components,
-implementation details, and rationale. Suggestions are scored based on
-relevance, layout appropriateness, and contextual factors.</p>
+by UX concepts. Each suggestion includes specific R dashboard components
+(Shiny, bslib, DT, plotly, etc.), implementation details, and rationale.
+Suggestions are scored based on relevance, layout appropriateness, and
+contextual factors. Component suggestions work with both Shiny applications
+and Quarto dashboards, with shiny-prefixed components (i.e., <code>shiny::</code>)
+requiring Shiny runtime.</p>
     </div>
 
     <div class="section level2">
@@ -394,7 +397,7 @@ relevance, layout appropriateness, and contextual factors.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    suggestions : list(concept = "Cognitive Load Theory", suggestions = list(list(title = "Limi... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    suggestions_tbl : list(concept = c("Cognitive Load Theory", "Cognitive Load Theory", "Visual Hi... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-11-14 18:06:09 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-11-19 00:21:59 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

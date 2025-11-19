@@ -1,9 +1,10 @@
-# Quick UX Suggestions for Shiny Developers
+# Quick UX Suggestions for R Dashboard Developers
 
-Provides a streamlined, single-step workflow for Shiny developers who
-need quick UX suggestions without going through the full 5-stage BID
+Provides a streamlined, single-step workflow for R dashboard developers
+who need quick UX suggestions without going through the full 5-stage BID
 framework. This function internally leverages the BID framework stages
-but presents results in a simple, actionable format.
+but presents results in a simple, actionable format. Works with both
+Shiny applications and Quarto dashboards.
 
 Unlike the full BID workflow (Interpret -\> Notice -\> Anticipate -\>
 Structure -\> Validate), this function provides immediate suggestions
@@ -40,8 +41,10 @@ bid_quick_suggest(
 - package:
 
   Optional. Filter suggestions to specific package ("bslib", "shiny",
-  "reactable", "DT", etc.). If NULL, returns suggestions for all
-  relevant packages.
+  "reactable", "DT", "plotly", "leaflet", etc.). If NULL, returns
+  suggestions for all relevant packages. Note: bslib, plotly, DT,
+  reactable, and leaflet components work in both Shiny apps and Quarto
+  dashboards.
 
 - limit:
 
@@ -72,7 +75,10 @@ A tibble with columns:
 
 - components:
 
-  Shiny/bslib component recommendations (character vector)
+  R dashboard component recommendations (character vector). Components
+  prefixed with 'shiny::' require Shiny runtime; bslib, DT, plotly,
+  reactable, and leaflet components work in both Shiny and Quarto
+  dashboards.
 
 - concept:
 
@@ -124,6 +130,12 @@ and semantic analysis to:
 
 - Use full workflow: Comprehensive redesigns, complex projects, team
   collaboration
+
+**Quarto Dashboard Compatibility:** Component suggestions include both
+Shiny-specific (shiny::) and framework-agnostic components. For static
+Quarto dashboards or OJS-based interactivity, focus on bslib, DT,
+plotly, reactable, and leaflet suggestions. Shiny-prefixed components
+require `server: shiny` in Quarto dashboards or a traditional Shiny app.
 
 ## Examples
 

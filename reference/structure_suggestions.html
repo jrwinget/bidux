@@ -90,10 +90,15 @@ relevance and grouped by concept for systematic implementation.</p>
 <li><p>Optional user-provided concepts</p></li>
 </ul><p>Each suggestion includes:</p><ul><li><p>title: Brief actionable description</p></li>
 <li><p>details: Specific implementation guidance</p></li>
-<li><p>components: Shiny/bslib component recommendations</p></li>
+<li><p>components: R dashboard component recommendations (shiny::, bslib::, etc.)</p></li>
 <li><p>rationale: 1-2 sentence explanation</p></li>
 <li><p>score: Relevance ranking (0-1)</p></li>
-</ul></div>
+</ul><p><strong>Framework Compatibility:</strong>
+Components prefixed with 'shiny::' require Shiny runtime (either a Shiny app
+or Quarto dashboard with <code>server: shiny</code>). Components from bslib, DT, plotly,
+reactable, and leaflet work in both Shiny apps and static/OJS Quarto
+dashboards.</p>
+    </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

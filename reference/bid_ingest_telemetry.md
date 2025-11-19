@@ -6,6 +6,12 @@ them into BID framework Notice stages. It returns a hybrid object that
 is backward-compatible as a list of Notice stages while also providing
 enhanced functionality with tidy tibble access and flags extraction.
 
+**Note:** This function is designed for Shiny application telemetry. For
+Quarto dashboards, shiny.telemetry only works when using `server: shiny`
+in the Quarto YAML. Static Quarto dashboards and OJS-based dashboards do
+not support shiny.telemetry. Consider alternative analytics solutions
+(e.g., Plausible) for static dashboard usage tracking.
+
 ## Usage
 
 ``` r
