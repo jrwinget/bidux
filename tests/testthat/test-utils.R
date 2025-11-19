@@ -473,6 +473,15 @@ test_that("find_best_concept_match works correctly", {
   expect_null(find_best_concept_match("nonexistent", test_concepts_data))
   expect_null(find_best_concept_match("", test_concepts_data))
   expect_null(find_best_concept_match(NA, test_concepts_data))
+
+  # fuzzy match - misspelled concept should trigger stringdist matching
+  # uses jaro-winkler distance and should match with similarity > 0.6
+  skip_if_not_installed("stringdist")
+  fuzzy_result <- find_best_concept_match(
+    "Cognitve Lod Theery",
+    test_concepts_data
+  )
+  expect_equal(fuzzy_result, "Cognitive Load Theory")
 })
 
 test_that("detect_concepts_from_text works correctly", {

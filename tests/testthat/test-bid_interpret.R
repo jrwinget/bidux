@@ -550,3 +550,655 @@ test_that("bid_interpret works with different previous_stage types", {
   )
   expect_s3_class(result_anticipate, "bid_stage")
 })
+
+test_that("bid_interpret errors on invalid bid_data_story object", {
+  # create an object with bid_data_story class but invalid structure
+  # missing context - required field
+  invalid_story <- structure(
+    list(
+      hook = "Test hook"
+    ),
+    class = c("bid_data_story", "list")
+  )
+
+  expect_error(
+    bid_interpret(
+      central_question = "Test?",
+      data_story = invalid_story
+    ),
+    "Invalid bid_data_story object"
+  )
+
+  # object with context but neither flat format fields (hook/tension/resolution)
+  # nor nested format fields (variables/relationships) - fails validation
+  invalid_story2 <- structure(
+    list(
+      context = "Has context but no format indicator"
+    ),
+    class = c("bid_data_story", "list")
+  )
+
+  expect_error(
+    bid_interpret(
+      central_question = "Test?",
+      data_story = invalid_story2
+    ),
+    "Invalid bid_data_story object"
+  )
+
+  # object with non-character context - fails validation
+  invalid_story3 <- structure(
+    list(
+      hook = "Test hook",
+      context = 123
+    ),
+    class = c("bid_data_story", "list")
+  )
+
+  expect_error(
+    bid_interpret(
+      central_question = "Test?",
+      data_story = invalid_story3
+    ),
+    "Invalid bid_data_story object"
+  )
+})
+
+test_that("bid_interpret errors on invalid bid_user_personas object", {
+  # create an object with bid_user_personas class but invalid structure
+  # missing required columns
+
+  invalid_personas <- structure(
+    tibble::tibble(
+      name = "Test",
+      goals = "Test goals"
+      # missing pain_points and technical_level
+    ),
+    class = c("bid_user_personas", "tbl_df", "tbl", "data.frame")
+  )
+
+  expect_error(
+    bid_interpret(
+      central_question = "Test?",
+      user_personas = invalid_personas
+    ),
+    "Invalid bid_user_personas object"
+  )
+
+  # empty personas - should also fail validation
+  empty_personas <- structure(
+    tibble::tibble(
+      name = character(0),
+      goals = character(0),
+      pain_points = character(0),
+      technical_level = character(0)
+    ),
+    class = c("bid_user_personas", "tbl_df", "tbl", "data.frame")
+  )
+
+  expect_error(
+    bid_interpret(
+      central_question = "Test?",
+      user_personas = empty_personas
+    ),
+    "Invalid bid_user_personas object"
+  )
+})
+
+test_that("bid_interpret generates question for 'find/locate/discover' problems", {
+  previous_stage <- tibble::tibble(
+    stage = "Notice",
+    problem = "Users cannot find key reports quickly",
+    theory = "Information Architecture",
+    evidence = "User testing feedback",
+    target_audience = "Analysts",
+    suggestions = "Improve navigation",
+    timestamp = Sys.time()
+  )
+
+  suppressMessages(
+    result <- bid_interpret(
+      previous_stage = previous_stage,
+      central_question = NULL
+    )
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_match(
+    result$central_question[1],
+    "easier for users to find",
+    ignore.case = TRUE
+  )
+})
+
+test_that("bid_interpret generates question for 'slow/delay/time' problems", {
+  previous_stage <- tibble::tibble(
+    stage = "Notice",
+    problem = "Dashboard is too slow to load",
+    theory = "Performance optimization",
+    evidence = "Timing metrics",
+    target_audience = "End users",
+    suggestions = "Optimize queries",
+    timestamp = Sys.time()
+  )
+
+  suppressMessages(
+    result <- bid_interpret(
+      previous_stage = previous_stage,
+      central_question = NULL
+    )
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_match(
+    result$central_question[1],
+    "speed and efficiency",
+    ignore.case = TRUE
+  )
+})
+
+test_that("bid_interpret generates question for 'overwhelm' problems", {
+  previous_stage <- tibble::tibble(
+    stage = "Notice",
+    problem = "Users are overwhelmed by too many charts",
+    theory = "Cognitive load theory",
+    evidence = "Survey results",
+    target_audience = "Managers",
+    suggestions = "Simplify",
+    timestamp = Sys.time()
+  )
+
+  suppressMessages(
+    result <- bid_interpret(
+      previous_stage = previous_stage,
+      central_question = NULL
+    )
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_match(
+    result$central_question[1],
+    "cognitive load|focus",
+    ignore.case = TRUE
+  )
+})
+
+test_that("bid_interpret generates default question for unmatched problems", {
+  previous_stage <- tibble::tibble(
+    stage = "Notice",
+    problem = "Color scheme is not accessible",
+    theory = "Accessibility",
+    evidence = "Accessibility audit",
+    target_audience = "All users",
+    suggestions = "Update colors",
+    timestamp = Sys.time()
+  )
+
+  suppressMessages(
+    result <- bid_interpret(
+      previous_stage = previous_stage,
+      central_question = NULL
+    )
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_match(
+    result$central_question[1],
+    "address the issue|Color scheme",
+    ignore.case = TRUE
+  )
+})
+
+test_that("bid_interpret modifies question based on cognitive load theory", {
+  previous_stage <- tibble::tibble(
+    stage = "Notice",
+    problem = "Users struggle with complex interface",
+    theory = "Cognitive Load Theory",
+    evidence = "User testing",
+    target_audience = "General users",
+    suggestions = "Simplify",
+    timestamp = Sys.time()
+  )
+
+  suppressMessages(
+    result <- bid_interpret(
+      previous_stage = previous_stage,
+      central_question = NULL
+    )
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_match(
+    result$central_question[1],
+    "cognitive load|reduce",
+    ignore.case = TRUE
+  )
+})
+
+test_that("bid_interpret modifies question based on Hick's Law theory", {
+  previous_stage <- tibble::tibble(
+    stage = "Notice",
+    problem = "Users struggle with too many menu options",
+    theory = "Hick's Law",
+    evidence = "Decision time metrics",
+    target_audience = "New users",
+    suggestions = "Reduce choices",
+    timestamp = Sys.time()
+  )
+
+  suppressMessages(
+    result <- bid_interpret(
+      previous_stage = previous_stage,
+      central_question = NULL
+    )
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_match(
+    result$central_question[1],
+    "simplify choices",
+    ignore.case = TRUE
+  )
+})
+
+test_that("bid_interpret modifies question based on Visual Hierarchy theory", {
+  previous_stage <- tibble::tibble(
+    stage = "Notice",
+    problem = "Users struggle to prioritize information",
+    theory = "Visual Hierarchy principles",
+    evidence = "Eye tracking study",
+    target_audience = "Data consumers",
+    suggestions = "Improve layout",
+    timestamp = Sys.time()
+  )
+
+  suppressMessages(
+    result <- bid_interpret(
+      previous_stage = previous_stage,
+      central_question = NULL
+    )
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_match(
+    result$central_question[1],
+    "visual hierarchy",
+    ignore.case = TRUE
+  )
+})
+
+test_that("bid_interpret generates visual approach for cognitive load theory", {
+  previous_stage <- tibble::tibble(
+    stage = "Notice",
+    problem = "Dashboard is cluttered",
+    theory = "Cognitive Load",
+    evidence = "User feedback",
+    target_audience = "Analysts",
+    suggestions = "Simplify",
+    timestamp = Sys.time()
+  )
+
+  suppressMessages(
+    result <- bid_interpret(
+      previous_stage = previous_stage,
+      central_question = NULL,
+      data_story = NULL
+    )
+  )
+
+  expect_s3_class(result, "bid_stage")
+  # visual_approach should be in the result
+  expect_true("visual_approach" %in% names(result))
+})
+
+test_that("bid_interpret generates visual approach for Hick's Law theory", {
+  previous_stage <- tibble::tibble(
+    stage = "Notice",
+    problem = "Too many navigation options",
+    theory = "Hick's Law decision time",
+    evidence = "Analytics",
+    target_audience = "Users",
+    suggestions = "Reduce options",
+    timestamp = Sys.time()
+  )
+
+  suppressMessages(
+    result <- bid_interpret(
+      previous_stage = previous_stage,
+      central_question = NULL,
+      data_story = NULL
+    )
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_true("visual_approach" %in% names(result))
+})
+
+test_that("bid_interpret generates visual approach for Visual Hierarchy theory", {
+  previous_stage <- tibble::tibble(
+    stage = "Notice",
+    problem = "Important data not prominent",
+    theory = "Visual Hierarchy design",
+    evidence = "Heatmaps",
+    target_audience = "Executives",
+    suggestions = "Improve prominence",
+    timestamp = Sys.time()
+  )
+
+  suppressMessages(
+    result <- bid_interpret(
+      previous_stage = previous_stage,
+      central_question = NULL,
+      data_story = NULL
+    )
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_true("visual_approach" %in% names(result))
+})
+
+test_that("bid_interpret extracts character metrics from data_story", {
+  story <- new_data_story(
+    hook = "Test hook",
+    context = "Test context",
+    metrics = "metric1, metric2, metric3"
+  )
+
+  result <- bid_interpret(
+    central_question = "Test?",
+    data_story = story
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_true("metrics" %in% names(result))
+  expect_equal(result$metrics[1], "metric1, metric2, metric3")
+})
+
+test_that("bid_interpret extracts numeric metrics from data_story", {
+  story <- new_data_story(
+    hook = "Test hook",
+    context = "Test context",
+    metrics = c(100, 200, 300)
+  )
+
+  result <- bid_interpret(
+    central_question = "Test?",
+    data_story = story
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_true("metrics" %in% names(result))
+  expect_equal(result$metrics[1], "100, 200, 300")
+})
+
+test_that("bid_interpret extracts list metrics from data_story", {
+  story <- new_data_story(
+    hook = "Test hook",
+    context = "Test context",
+    metrics = list(kpi1 = "revenue", kpi2 = "engagement")
+  )
+
+  result <- bid_interpret(
+    central_question = "Test?",
+    data_story = story
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_true("metrics" %in% names(result))
+  expect_match(result$metrics[1], "revenue.*engagement|engagement.*revenue")
+})
+
+test_that("bid_interpret handles character vector metrics from data_story", {
+  story <- new_data_story(
+    hook = "Test hook",
+    context = "Test context",
+    metrics = c("DAU", "MAU", "retention_rate")
+  )
+
+  result <- bid_interpret(
+    central_question = "Test?",
+    data_story = story
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_equal(result$metrics[1], "DAU, MAU, retention_rate")
+})
+
+test_that("bid_interpret handles Notice stage with NA problem", {
+  previous_stage <- tibble::tibble(
+    stage = "Notice",
+    problem = NA_character_,
+    theory = "Some theory",
+    evidence = "Some evidence",
+    target_audience = "Users",
+    suggestions = "Suggestions",
+    timestamp = Sys.time()
+  )
+
+  suppressMessages(
+    result <- bid_interpret(
+      previous_stage = previous_stage,
+      central_question = NULL,
+      data_story = NULL
+    )
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_match(
+    result$central_question[1],
+    "improve the user experience",
+    ignore.case = TRUE
+  )
+})
+
+test_that("bid_interpret generates appropriate suggestion for incomplete story", {
+  # use legacy list format to create an actually incomplete story
+  # new_data_story() always includes all fields in names even if NULL
+  suppressWarnings(
+    result <- bid_interpret(
+      central_question = "Test?",
+      data_story = list(
+        context = "Only context"
+        # missing hook, tension, resolution
+      )
+    )
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_match(result$suggestions[1], "incomplete|25%", ignore.case = TRUE)
+})
+
+test_that("bid_interpret generates taking shape suggestion for 50% complete story", {
+  # manually create a bid_data_story with exactly 2 of 4 elements at top level
+  story <- structure(
+    list(
+      hook = "Hook",
+      context = "Context"
+      # no tension or resolution at top level = 50%
+    ),
+    class = c("bid_data_story", "list")
+  )
+
+  result <- bid_interpret(
+    central_question = "Test?",
+    data_story = story
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_match(result$suggestions[1], "taking shape|50%", ignore.case = TRUE)
+})
+
+test_that("bid_interpret generates almost complete suggestion for 75% complete story", {
+  # manually create a bid_data_story with exactly 3 of 4 elements at top level
+  story <- structure(
+    list(
+      hook = "Hook",
+      context = "Context",
+      tension = "Tension"
+      # no resolution at top level = 75%
+    ),
+    class = c("bid_data_story", "list")
+  )
+
+  result <- bid_interpret(
+    central_question = "Test?",
+    data_story = story
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_match(result$suggestions[1], "almost complete|75%", ignore.case = TRUE)
+})
+
+test_that("bid_interpret errors on empty list user_personas", {
+  # empty list cannot be migrated - results in error
+  expect_error(
+    suppressWarnings(
+      bid_interpret(
+        central_question = "Test?",
+        user_personas = list()
+      )
+    ),
+    "at least 1 row"
+  )
+})
+
+test_that("bid_interpret generates correct suggestion for multiple personas", {
+  personas_df <- data.frame(
+    name = c("Analyst", "Manager", "Executive"),
+    goals = c("Deep analysis", "Team oversight", "Strategic view"),
+    pain_points = c("Complexity", "Time", "Detail"),
+    technical_level = c("advanced", "intermediate", "beginner"),
+    stringsAsFactors = FALSE
+  )
+
+  result <- bid_interpret(
+    central_question = "Test?",
+    user_personas = personas_df
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_match(
+    result$suggestions[1],
+    "3 persona\\(s\\)|defined.*3",
+    ignore.case = TRUE
+  )
+})
+
+test_that("bid_interpret handles audience in legacy list data_story", {
+  # note: when legacy list is migrated, audience goes into nested metadata
+  # this test verifies the migration behavior
+  suppressWarnings(
+    result <- bid_interpret(
+      central_question = "Test?",
+      data_story = list(
+        hook = "Hook",
+        context = "Context",
+        audience = "Marketing professionals"
+      )
+    )
+  )
+
+  expect_s3_class(result, "bid_stage")
+  # migration nests audience in metadata$metadata, so it's not directly accessible
+  # this is expected behavior for deprecated legacy format
+  expect_true("personas" %in% names(result))
+})
+
+test_that("bid_interpret generates developer persona from audience", {
+  story <- new_data_story(
+    hook = "Test",
+    context = "Test context",
+    audience = "Software developers and engineers"
+  )
+
+  result <- bid_interpret(
+    central_question = "Test?",
+    data_story = story
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_false(is.na(result$personas[1]))
+})
+
+test_that("bid_interpret generates operations persona from audience", {
+  story <- new_data_story(
+    hook = "Test",
+    context = "Test context",
+    audience = "Operations and IT staff"
+  )
+
+  result <- bid_interpret(
+    central_question = "Test?",
+    data_story = story
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_false(is.na(result$personas[1]))
+})
+
+test_that("bid_interpret generates generic persona from unrecognized audience", {
+  story <- new_data_story(
+    hook = "Test",
+    context = "Test context",
+    audience = "Some custom user group"
+  )
+
+  result <- bid_interpret(
+    central_question = "Test?",
+    data_story = story
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_false(is.na(result$personas[1]))
+})
+
+test_that("bid_interpret handles empty audience string in data_story", {
+  story <- new_data_story(
+    hook = "Test",
+    context = "Test context",
+    audience = ""
+  )
+
+  result <- bid_interpret(
+    central_question = "Test?",
+    data_story = story
+  )
+
+  expect_s3_class(result, "bid_stage")
+  # empty audience should result in NA personas
+  expect_true(is.na(result$personas[1]))
+})
+
+test_that("bid_interpret handles whitespace-only audience in data_story", {
+  story <- new_data_story(
+    hook = "Test",
+    context = "Test context",
+    audience = "   "
+  )
+
+  result <- bid_interpret(
+    central_question = "Test?",
+    data_story = story
+  )
+
+  expect_s3_class(result, "bid_stage")
+  # whitespace-only audience should result in NA personas
+  expect_true(is.na(result$personas[1]))
+})
+
+test_that("bid_interpret truncates long central question in message", {
+  # question longer than 60 characters should be truncated in the message
+  long_question <- paste0(
+    "How can we improve the dashboard experience for all users ",
+    "across multiple departments and regions?"
+  )
+  expect_true(nchar(long_question) > 60)
+
+
+  result <- bid_interpret(
+    central_question = long_question
+  )
+
+  expect_s3_class(result, "bid_stage")
+  expect_equal(result$central_question[1], long_question)
+})
