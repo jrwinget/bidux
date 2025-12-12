@@ -18,7 +18,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Jeremy Winget \email{contact@jrwinget.com} (\href{https://orcid.org/0000-0002-3783-4354}{ORCID}) [copyright holder]
+\strong{Maintainer}: Jeremy Winget \email{contact@jrwinget.com} (\href{https://orcid.org/0000-0002-3783-4354}{ORCID})
 
 }
 \keyword{internal}

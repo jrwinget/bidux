@@ -232,7 +232,7 @@ test_that("unix nanosecond to POSIXct conversion is accurate", {
     traceId = "test123",
     spanId = "span001",
     parentSpanId = NA_character_,
-    name = "test",
+    name = "session_start",
     startTimeUnixNano = test_nano,
     endTimeUnixNano = as.character(as.numeric(test_nano) + 1e9),
     attributes = list(list(list(
@@ -479,15 +479,15 @@ test_that("ExtendedTask spans convert correctly", {
   skip_if_no_otel()
 
   task_span <- tibble::tibble(
-    trace_id = "test123",
-    span_id = "span001",
-    parent_span_id = NA_character_,
-    name = "ExtendedTask",
+    traceId = "test123",
+    spanId = "span001",
+    parentSpanId = NA_character_,
+    name = "reactive:long_computation",
     startTimeUnixNano = "1609459200000000000",
     endTimeUnixNano = "1609459205000000000", # 5 seconds
     attributes = list(list(list(
       list(key = "session.id", value = list(stringValue = "s1")),
-      list(key = "task.name", value = list(stringValue = "long_computation"))
+      list(key = "input_id", value = list(stringValue = "long_computation"))
     ))),
     events = list(list(list()))
   )

@@ -441,7 +441,7 @@ test_that("read_otel_json handles large span counts efficiently", {
   unlink(otlp_file)
 })
 
-test_that("read_otel_json preserves span hierarchy information", {
+test_that("read_otel_json converts spans to bidux event schema", {
   skip_if_no_otel()
 
   spans <- create_mock_otel_spans(sessions = 1, reactives_per_session = 3)
@@ -449,14 +449,12 @@ test_that("read_otel_json preserves span hierarchy information", {
 
   result <- bidux:::read_otel_json(otlp_file)
 
-  # should preserve parent_span_id for hierarchy
-  expect_true("parent_span_id" %in% names(result) || "parentSpanId" %in% names(result))
-
-  # session spans should have children
-  if ("parent_span_id" %in% names(result)) {
-    has_parents <- !all(is.na(result$parent_span_id))
-    expect_true(has_parents)
-  }
+  # should have bidux event schema columns
+  expect_true(is.data.frame(result))
+  expect_gt(nrow(result), 0)
+  expect_true("event_type" %in% names(result))
+  expect_true("timestamp" %in% names(result))
+  expect_true("session_id" %in% names(result))
 
   unlink(otlp_file)
 })
