@@ -45,6 +45,9 @@ new_data_story <- function(
     relationships = NULL,
     ...) {
   # detect if using deprecated nested format
+  # TODO: Remove nested format support in 0.4.0 before release
+  #       Delete lines 48-117 (entire nested format handling block)
+  #       Keep only flat format validation (lines 119+)
   using_nested_format <- !is.null(variables) || !is.null(relationships)
 
   if (using_nested_format) {
@@ -52,7 +55,7 @@ new_data_story <- function(
     cli::cli_warn(c(
       "!" = "Using deprecated nested format for data_story",
       "i" = "The flat API is now recommended: new_data_story(hook, context, tension, resolution)",
-      "i" = "Nested format (variables, relationships) will be removed in bidux 0.4.0"
+      "i" = "Nested format (variables, relationships) will be removed soon"
     ))
 
     # validate old parameters

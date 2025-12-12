@@ -45,14 +45,6 @@
   - Performance context calculations
   - Edge cases and error handling
 
-### DEPRECATIONS
-
-* **Nested data_story format will be removed in bidux 0.5.0** (previously scheduled for 0.4.0, extended one more release). Use the flat API instead: `new_data_story(hook, context, tension, resolution)`.
-
-* **Layout auto-selection will be removed in bidux 0.5.0** (previously scheduled for 0.4.0, extended one more release). The layout selection feature in `bid_structure()` will be removed to reduce complexity.
-
-* **Layout-specific bias mitigations will be removed in bidux 0.5.0** (previously scheduled for 0.4.0, extended one more release). The layout-dependent bias mappings in `bid_anticipate()` will be removed in favor of concept-driven bias mitigations.
-
 ### NOTES
 
 * OpenTelemetry support requires Shiny >= 1.12.0 and optional installation of `otel` package for OTLP reading

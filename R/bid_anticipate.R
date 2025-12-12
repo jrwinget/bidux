@@ -278,7 +278,9 @@ bid_anticipate <- function(
     # apply layout-specific bias mitigations when layout information is
     # available
     # DEPRECATED in 0.3.1:
-    # TODO: Will be removed in 0.4.0 in favor of concept-only approach
+    # TODO: Remove layout-specific bias mitigations in 0.4.0 before release
+    #       This entire if block (lines 282-344) should be deleted.
+    #       Keep only concept-based approach (lines 246-276).
     if (!is.na(layout)) {
       # issue deprecation warning once per session (skip in tests to reduce
       # noise). use package namespace instead of global environment for CRAN
@@ -291,7 +293,7 @@ bid_anticipate <- function(
         warning(
           paste(
             "Layout-specific bias mitigations are deprecated",
-            "and will be removed in bidux 0.4.0. "
+            "and will be removed soon."
           ),
           "Consider using concept-based bias mitigations instead.",
           call. = FALSE

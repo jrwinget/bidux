@@ -32,7 +32,7 @@
 #'
 #' @details
 #' **Layout Auto-Selection**: For backwards compatibility with versions < 0.3.0;
-#' to be removed in 0.4.0. Uses deterministic heuristics to analyze content
+#' DEPRECATED - to be removed in 0.4.0 before release. Uses deterministic heuristics to analyze content
 #' from previous stages and select the most appropriate layout:
 #' - **breathable**: For information overload/confusion patterns
 #' - **dual_process**: For overview vs detail needs
@@ -100,6 +100,11 @@ bid_structure <- function(
   validate_required_params(previous_stage = previous_stage)
   validate_previous_stage(previous_stage, "Structure")
 
+  # TODO: Remove layout auto-selection in 0.4.0 before release
+  #       Delete lines 103-125 (layout selection and deprecation warning)
+  #       Remove layout column from result_data tibble
+  #       Update structure_suggestions() to work without layout parameter
+  #       Remove suggest_layout_from_previous() and layout_rationale() helper functions
   chosen_layout <- suggest_layout_from_previous(previous_stage, telemetry_flags)
 
   bid_alert_info(glue::glue("Auto-selected layout: {chosen_layout}"), quiet = quiet)
@@ -113,9 +118,8 @@ bid_structure <- function(
       !identical(Sys.getenv("TESTTHAT"), "true")
   ) {
     warning(
-      "Layout auto-selection is deprecated and will be removed in bidux 0.4.0. ",
-      "The BID framework will focus on concept-based suggestions instead. ",
-      "Existing code will continue to work until 0.4.0.",
+      "Layout auto-selection is deprecated and will be removed soon. ",
+      "The BID framework will focus on concept-based suggestions instead.",
       call. = FALSE
     )
     try(
