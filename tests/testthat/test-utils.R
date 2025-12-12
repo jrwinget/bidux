@@ -563,21 +563,6 @@ test_that("safe_data_story_access works with new flat format", {
   expect_equal(safe_data_story_access(data_story_flat, "metrics"), "metric1, metric2")
 })
 
-test_that("safe_data_story_access works with old nested format", {
-  # create old nested format data_story with deprecation warning suppression
-  suppressWarnings({
-    data_story_nested <- new_data_story(
-      context = "Nested context",
-      variables = list(hook = "Nested hook", tension = "Nested tension"),
-      relationships = list(resolution = "Nested resolution")
-    )
-  })
-
-  expect_equal(safe_data_story_access(data_story_nested, "context"), "Nested context")
-  expect_equal(safe_data_story_access(data_story_nested, "hook"), "Nested hook")
-  expect_equal(safe_data_story_access(data_story_nested, "tension"), "Nested tension")
-  expect_equal(safe_data_story_access(data_story_nested, "resolution"), "Nested resolution")
-})
 
 # ==============================================================================
 # SUGGESTION SYSTEM

@@ -81,17 +81,4 @@ interpret_personas <- bid_interpret(
 
 summary(interpret_personas)
 
-# Legacy list format still works (with deprecation warning)
-\dontrun{
-interpret_legacy <- bid_interpret(
-  central_question = "How can we improve UX?",
-  data_story = list(
-    hook = "Users struggling",
-    context = "Dashboard complexity",
-    tension = "High abandonment rate",
-    resolution = "Simplify interface"
-  )
-)
-}
-
 }

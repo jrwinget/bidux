@@ -376,11 +376,14 @@ analyze_financial_dashboard <- function(config, custom_concepts = NULL) {
 generate_domain_insights <- function(bid_result, custom_concepts = NULL) {
   insights <- list()
 
-  # Analyze layout choice against domain best practices
-  layout <- bid_result$layout[1]
+  # Analyze suggestions against domain best practices
+  suggestions <- bid_result$suggestions
 
-  if (layout == "dual_process") {
-    insights$layout_analysis <- "Dual-process layout chosen. Good for financial dashboards requiring both summary and detailed analysis."
+  if (length(suggestions) > 0) {
+    insights$suggestion_analysis <- paste(
+      "Generated", length(suggestions),
+      "concept groups with actionable recommendations."
+    )
   }
 
   # Check for domain-specific bias considerations

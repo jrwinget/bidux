@@ -4,7 +4,7 @@
 \alias{get_progressive_disclosure_suggestions}
 \title{Generate Progressive Disclosure suggestions}
 \usage{
-get_progressive_disclosure_suggestions(chosen_layout, previous_stage)
+get_progressive_disclosure_suggestions(previous_stage)
 }
 \description{
 Generate Progressive Disclosure suggestions

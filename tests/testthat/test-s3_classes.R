@@ -28,38 +28,6 @@ test_that("new_data_story creates valid objects with flat API", {
   expect_equal(story_extended$metadata$metrics, "adoption_rate, time_to_insight")
 })
 
-test_that("new_data_story backward compatible with nested API", {
-  # deprecated nested API with warning
-  expect_warning(
-    story_nested <- new_data_story(
-      context = "Test context",
-      variables = list(hook = "Test hook", metric = "engagement"),
-      relationships = list(impact = "User satisfaction increases")
-    ),
-    "deprecated nested format"
-  )
-
-  expect_s3_class(story_nested, "bid_data_story")
-  expect_equal(story_nested$context, "Test context")
-  expect_equal(story_nested$variables$hook, "Test hook")
-  expect_equal(story_nested$relationships$impact, "User satisfaction increases")
-  expect_true("created_at" %in% names(story_nested))
-
-  # nested API with metadata
-  expect_warning(
-    story_meta <- new_data_story(
-      context = "Test with metadata",
-      variables = list(),
-      relationships = list(),
-      source = "survey",
-      confidence = 0.9
-    ),
-    "deprecated nested format"
-  )
-
-  expect_equal(story_meta$metadata$source, "survey")
-  expect_equal(story_meta$metadata$confidence, 0.9)
-})
 
 test_that("new_data_story validates inputs", {
   # Test invalid context
@@ -77,18 +45,6 @@ test_that("new_data_story validates inputs", {
     new_data_story(context = 123),
     "must be a character string"
   )
-
-  # Test invalid variables
-  expect_error(
-    new_data_story(context = "test", variables = "not a list"),
-    "Parameter 'variables' must be a list"
-  )
-
-  # Test invalid relationships
-  expect_error(
-    new_data_story(context = "test", relationships = "not a list"),
-    "Parameter 'relationships' must be a list"
-  )
 })
 
 test_that("validate_data_story works correctly", {
@@ -100,15 +56,13 @@ test_that("validate_data_story works correctly", {
   expect_false(validate_data_story(list(context = "test")))
 
   # Missing required fields
-  invalid_story <- list(variables = list(), relationships = list())
+  invalid_story <- list(hook = "test")
   class(invalid_story) <- c("bid_data_story", "list")
   expect_false(validate_data_story(invalid_story))
 
   # Invalid context type
   invalid_context <- list(
-    context = c("multiple", "values"),
-    variables = list(),
-    relationships = list()
+    context = c("multiple", "values")
   )
   class(invalid_context) <- c("bid_data_story", "list")
   expect_false(validate_data_story(invalid_context))
@@ -243,39 +197,6 @@ test_that("new_bias_mitigations validates inputs", {
   )
 })
 
-test_that("migrate_data_story handles legacy formats", {
-  # Test basic legacy format
-  legacy_story <- list(
-    context = "Legacy context",
-    hook = "Legacy hook",
-    tension = "Legacy tension",
-    resolution = "Legacy resolution"
-  )
-
-  migrated <- migrate_data_story(legacy_story)
-
-  expect_s3_class(migrated, "bid_data_story")
-  expect_equal(migrated$context, "Legacy context")
-  expect_equal(migrated$variables$hook, "Legacy hook")
-  expect_equal(migrated$variables$tension, "Legacy tension")
-  expect_equal(migrated$relationships$resolution, "Legacy resolution")
-
-  # Test empty context handling
-  empty_context_story <- list(context = "")
-  migrated_empty <- migrate_data_story(empty_context_story)
-  expect_equal(migrated_empty$context, "Legacy data story migration")
-
-  # Test non-character context
-  non_char_story <- list(context = list(complex = "structure"))
-  migrated_non_char <- migrate_data_story(non_char_story)
-  expect_equal(migrated_non_char$context, "Legacy data story migration")
-
-  # Test invalid input
-  expect_error(
-    migrate_data_story("not a list"),
-    "data_story must be a list"
-  )
-})
 
 test_that("migrate_user_personas handles legacy formats", {
   # Test legacy list format
@@ -341,9 +262,10 @@ test_that("migrate_bias_mitigations handles legacy formats", {
 test_that("print methods work correctly", {
   # Test print.bid_data_story
   story <- new_data_story(
+    hook = "Test hook",
     context = "Test story",
-    variables = list(hook = "Test hook"),
-    relationships = list(impact = "Test impact")
+    tension = "Test tension",
+    resolution = "Test resolution"
   )
 
   output <- capture.output(print(story))

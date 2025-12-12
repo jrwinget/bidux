@@ -206,8 +206,7 @@ structured <- bid_structure(
   quiet = TRUE
 )
 
-# View auto-selected layout and concept-grouped suggestions
-print(paste("Auto-selected layout:", structured$layout))
+# View concept-grouped suggestions
 print("Structured recommendations:")
 print(structured$suggestions)
 

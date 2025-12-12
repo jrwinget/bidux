@@ -23,50 +23,33 @@ function uses fuzzy matching to identify the concepts. If NULL, will
 detect relevant concepts from previous stages automatically.}
 
 \item{telemetry_flags}{Optional named list of telemetry flags from bid_flags().
-Used to adjust layout choice and suggestion scoring based on observed
-user behavior patterns.}
+Used to adjust suggestion scoring based on observed user behavior patterns.}
 
 \item{quiet}{Logical indicating whether to suppress informational messages.
 If NULL, uses getOption("bidux.quiet", FALSE).}
 
-\item{...}{Additional parameters. If \code{layout} is provided via \code{...}, the
-function will abort with a helpful error message.}
+\item{...}{Additional parameters (reserved for future use).}
 }
 \value{
 A bid_stage object containing:
 \item{stage}{"Structure"}
-\item{layout}{Auto-selected layout type}
 \item{suggestions}{List of concept groups with ranked suggestions (nested format)}
 \item{suggestions_tbl}{Flattened tibble with all suggestions, includes columns:
 concept, title, details, components, rationale, score, difficulty, category}
 \item{concepts}{Comma-separated string of all concepts used}
 }
 \description{
-This function documents the structure of the dashboard with automatic layout
-selection and generates ranked, concept-grouped actionable UI/UX suggestions.
-Layout is intelligently chosen based on content analysis of previous stages
-using deterministic heuristics. Returns structured recommendations with
-specific component pointers and implementation rationales.
+This function documents the structure of the dashboard and generates ranked,
+concept-grouped actionable UI/UX suggestions. Returns structured recommendations
+with specific component pointers and implementation rationales.
 }
 \details{
-\strong{Layout Auto-Selection}: For backwards compatibility with versions < 0.3.0;
-to be removed in 0.4.0. Uses deterministic heuristics to analyze content
-from previous stages and select the most appropriate layout:
-\itemize{
-\item \strong{breathable}: For information overload/confusion patterns
-\item \strong{dual_process}: For overview vs detail needs
-\item \strong{grid}: For grouping/comparison requirements
-\item \strong{card}: For modular/chunked content
-\item \strong{tabs}: For categorical organization (unless telemetry shows issues)
-}
-
 \strong{Suggestion Engine}: Generates ranked, actionable recommendations grouped
 by UX concepts. Each suggestion includes specific R dashboard components
 (Shiny, bslib, DT, plotly, etc.), implementation details, and rationale.
-Suggestions are scored based on relevance, layout appropriateness, and
-contextual factors. Component suggestions work with both Shiny applications
-and Quarto dashboards, with shiny-prefixed components (i.e., \verb{shiny::})
-requiring Shiny runtime.
+Suggestions are scored based on relevance and contextual factors. Component
+suggestions work with both Shiny applications and Quarto dashboards, with
+shiny-prefixed components (i.e., \verb{shiny::}) requiring Shiny runtime.
 }
 \examples{
 notice_result <- bid_interpret(
@@ -83,9 +66,8 @@ notice_result <- bid_interpret(
     evidence = "Survey results indicate delays"
   )
 
-# Auto-selected layout with concept-grouped suggestions
+# Generate concept-grouped suggestions
 structure_result <- bid_structure(previous_stage = notice_result)
-print(structure_result$layout) # Auto-selected layout
 print(structure_result$suggestions) # Ranked suggestions by concept (nested)
 
 # Access flattened tibble format for easier manipulation

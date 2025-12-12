@@ -4,14 +4,12 @@
 \alias{rank_and_sort_suggestions}
 \title{Rank and sort suggestions within each group}
 \usage{
-rank_and_sort_suggestions(groups, previous_stage, chosen_layout)
+rank_and_sort_suggestions(groups, previous_stage)
 }
 \arguments{
 \item{groups}{List of concept groups with suggestions}
 
 \item{previous_stage}{Previous stage data for scoring adjustments}
-
-\item{chosen_layout}{Selected layout type}
 }
 \value{
 List of groups with ranked suggestions
