@@ -74,12 +74,424 @@ bid_telemetry_presets <- function(preset = c("moderate", "strict", "relaxed")) {
   return(presets[[preset]])
 }
 
-# TODO: Add bid_suggest_analytics() function to recommend alternative telemetry
-# solutions (Plausible, Google Analytics, PostHog) for static Quarto dashboards
-# where shiny.telemetry is not available
+#' Suggest alternative analytics solutions for static dashboards
+#'
+#' @description
+#' Provides recommendations for analytics and telemetry solutions suitable for
+#' static Quarto dashboards, where Shiny-based telemetry (shiny.telemetry or
+#' OpenTelemetry) is not available. This function helps you choose the right
+#' analytics tool based on your needs and constraints.
+#'
+#' **Important**: shiny.telemetry and Shiny OpenTelemetry only work with
+#' `server: shiny` in Quarto YAML. For static Quarto dashboards (including
+#' OJS-based dashboards), you need alternative web analytics solutions.
+#'
+#' @param dashboard_type Character string specifying the type of dashboard:
+#'   \describe{
+#'     \item{static}{Static HTML Quarto dashboard (default)}
+#'     \item{ojs}{Quarto dashboard using Observable JS}
+#'     \item{python}{Static dashboard with Python/Jupyter}
+#'   }
+#' @param privacy_preference Character string indicating privacy requirements:
+#'   \describe{
+#'     \item{gdpr_compliant}{Prioritize GDPR-compliant solutions (default)}
+#'     \item{privacy_focused}{Emphasize user privacy and no tracking}
+#'     \item{standard}{Standard analytics with typical tracking}
+#'   }
+#' @param budget Character string indicating budget constraints:
+#'   \describe{
+#'     \item{free}{Only free/open-source solutions}
+#'     \item{low}{Low-cost solutions (< $10/month)}
+#'     \item{flexible}{Any cost tier (default)}
+#'   }
+#' @param self_hosted Logical indicating whether self-hosted solutions are
+#'   preferred (default: FALSE)
+#'
+#' @return A data frame with recommended analytics solutions, including:
+#'   \item{solution}{Name of the analytics platform}
+#'   \item{type}{Type of solution (privacy-focused, traditional, open-source)}
+#'   \item{cost}{Cost tier (free, paid, freemium)}
+#'   \item{self_hosted}{Whether self-hosting is available}
+#'   \item{gdpr_compliant}{Whether the solution is GDPR compliant}
+#'   \item{integration_method}{How to integrate (script tag, API, etc.)}
+#'   \item{key_features}{Main features for UX analysis}
+#'   \item{bidux_compatibility}{How well it works with BID framework}
+#'   \item{docs_url}{Link to integration documentation}
+#'
+#' @section Integration Patterns:
+#'
+#' **For Static Quarto Dashboards:**
+#'
+#' 1. **Event Tracking** - Track user interactions with custom events:
+#'    - Button clicks, filter changes, tab switches
+#'    - Use JavaScript event listeners in Quarto
+#'    - Send events to analytics platform via API
+#'
+#' 2. **Session Analysis** - Monitor user sessions:
+#'    - Page views, time on page, bounce rate
+#'    - User flow through dashboard sections
+#'    - Identify drop-off points
+#'
+#' 3. **Custom Dimensions** - Track dashboard-specific metrics:
+#'    - Selected filters, date ranges, visualization types
+#'    - User cohorts, roles, or departments
+#'    - Dashboard version or configuration
+#'
+#' **Example Integration (Plausible Analytics):**
+#'
+#' Add to your Quarto dashboard header:
+#' ```html
+#' <script defer data-domain="yourdomain.com"
+#'   src="https://plausible.io/js/script.tagged-events.js"></script>
+#' ```
+#'
+#' Track custom events in your dashboard JavaScript:
+#' ```javascript
+#' // Track filter change
+#' document.getElementById('regionFilter').addEventListener('change', function(e) {
+#'   plausible('Filter Changed', {props: {filter: 'region', value: e.target.value}});
+#' });
+#'
+#' // Track visualization interaction
+#' plotElement.on('plotly_click', function(data) {
+#'   plausible('Chart Interaction', {props: {chart: 'sales_plot', action: 'click'}});
+#' });
+#' ```
+#'
+#' **Analyzing Results with BID Framework:**
+#'
+#' While these analytics tools won't automatically integrate with `bid_ingest_telemetry()`,
+#' you can still apply BID framework principles:
+#'
+#' 1. **Notice** - Export analytics data, identify friction points manually
+#' 2. **Interpret** - Use `bid_interpret()` with insights from analytics
+#' 3. **Anticipate** - Apply `bid_anticipate()` to plan improvements
+#' 4. **Structure** - Design improvements with `bid_structure()`
+#' 5. **Validate** - Measure impact with before/after analytics comparison
+#'
+#' @examples
+#' # Get recommendations for static Quarto dashboard with GDPR compliance
+#' suggestions <- bid_suggest_analytics(
+#'   dashboard_type = "static",
+#'   privacy_preference = "gdpr_compliant"
+#' )
+#' print(suggestions)
+#'
+#' # Find free, privacy-focused solutions for OJS dashboard
+#' privacy_options <- bid_suggest_analytics(
+#'   dashboard_type = "ojs",
+#'   privacy_preference = "privacy_focused",
+#'   budget = "free"
+#' )
+#'
+#' # Get self-hosted options
+#' self_hosted <- bid_suggest_analytics(
+#'   dashboard_type = "static",
+#'   self_hosted = TRUE
+#' )
+#'
+#' # View top recommendation
+#' top_choice <- suggestions[1, ]
+#' cat(sprintf("Recommended: %s\n", top_choice$solution))
+#' cat(sprintf("Integration: %s\n", top_choice$integration_method))
+#' cat(sprintf("Docs: %s\n", top_choice$docs_url))
+#'
+#' @export
+bid_suggest_analytics <- function(
+    dashboard_type = c("static", "ojs", "python"),
+    privacy_preference = c("gdpr_compliant", "privacy_focused", "standard"),
+    budget = c("flexible", "free", "low"),
+    self_hosted = FALSE) {
 
-# TODO: Document integration patterns for web analytics in static Quarto
-# dashboards to achieve similar UX insights as shiny.telemetry
+  dashboard_type <- match.arg(dashboard_type)
+  privacy_preference <- match.arg(privacy_preference)
+  budget <- match.arg(budget)
+
+  # Define comprehensive analytics solutions database
+  all_solutions <- list(
+    plausible = list(
+      solution = "Plausible Analytics",
+      type = "privacy-focused",
+      cost = "paid",
+      cost_monthly = 9,
+      self_hosted = TRUE,
+      gdpr_compliant = TRUE,
+      cookieless = TRUE,
+      integration_method = "Script tag with custom events API",
+      key_features = c(
+        "Cookieless tracking",
+        "Custom event tracking",
+        "Goal conversions",
+        "Real-time dashboard",
+        "No personal data collection"
+      ),
+      bidux_compatibility = "manual",
+      compatibility_notes = "Export events manually for BID analysis",
+      dashboard_support = c("static", "ojs", "python"),
+      docs_url = "https://plausible.io/docs"
+    ),
+    fathom = list(
+      solution = "Fathom Analytics",
+      type = "privacy-focused",
+      cost = "paid",
+      cost_monthly = 14,
+      self_hosted = FALSE,
+      gdpr_compliant = TRUE,
+      cookieless = TRUE,
+      integration_method = "Script tag with event tracking",
+      key_features = c(
+        "Privacy-first tracking",
+        "Event tracking",
+        "Uptime monitoring",
+        "Email reports",
+        "GDPR/CCPA compliant"
+      ),
+      bidux_compatibility = "manual",
+      compatibility_notes = "Export data via API for analysis",
+      dashboard_support = c("static", "ojs", "python"),
+      docs_url = "https://usefathom.com/docs"
+    ),
+    simple_analytics = list(
+      solution = "Simple Analytics",
+      type = "privacy-focused",
+      cost = "paid",
+      cost_monthly = 9,
+      self_hosted = FALSE,
+      gdpr_compliant = TRUE,
+      cookieless = TRUE,
+      integration_method = "Script tag with events API",
+      key_features = c(
+        "Privacy-friendly",
+        "Automated events",
+        "Custom events",
+        "Bot detection",
+        "API access"
+      ),
+      bidux_compatibility = "manual",
+      compatibility_notes = "Use API to export for BID framework",
+      dashboard_support = c("static", "ojs", "python"),
+      docs_url = "https://docs.simpleanalytics.com/"
+    ),
+    posthog = list(
+      solution = "PostHog",
+      type = "product-analytics",
+      cost = "freemium",
+      cost_monthly = 0,
+      self_hosted = TRUE,
+      gdpr_compliant = TRUE,
+      cookieless = FALSE,
+      integration_method = "JavaScript SDK with comprehensive event tracking",
+      key_features = c(
+        "Product analytics",
+        "Session recording",
+        "Feature flags",
+        "Funnel analysis",
+        "Heatmaps",
+        "User cohorts"
+      ),
+      bidux_compatibility = "good",
+      compatibility_notes = "Rich event data can be exported for detailed BID analysis",
+      dashboard_support = c("static", "ojs", "python"),
+      docs_url = "https://posthog.com/docs"
+    ),
+    matomo = list(
+      solution = "Matomo (formerly Piwik)",
+      type = "open-source",
+      cost = "free",
+      cost_monthly = 0,
+      self_hosted = TRUE,
+      gdpr_compliant = TRUE,
+      cookieless = TRUE,
+      integration_method = "JavaScript tracking code with events API",
+      key_features = c(
+        "Full data ownership",
+        "Event tracking",
+        "Custom dimensions",
+        "Heatmaps (plugin)",
+        "Session recording (plugin)",
+        "API access"
+      ),
+      bidux_compatibility = "good",
+      compatibility_notes = "Export detailed event logs for BID analysis",
+      dashboard_support = c("static", "ojs", "python"),
+      docs_url = "https://matomo.org/docs/"
+    ),
+    umami = list(
+      solution = "Umami",
+      type = "open-source",
+      cost = "free",
+      cost_monthly = 0,
+      self_hosted = TRUE,
+      gdpr_compliant = TRUE,
+      cookieless = TRUE,
+      integration_method = "Script tag with event tracking",
+      key_features = c(
+        "Lightweight and fast",
+        "Custom events",
+        "Real-time data",
+        "No cookies needed",
+        "Easy self-hosting"
+      ),
+      bidux_compatibility = "manual",
+      compatibility_notes = "Export events from database for analysis",
+      dashboard_support = c("static", "ojs", "python"),
+      docs_url = "https://umami.is/docs"
+    ),
+    google_analytics = list(
+      solution = "Google Analytics 4",
+      type = "traditional",
+      cost = "free",
+      cost_monthly = 0,
+      self_hosted = FALSE,
+      gdpr_compliant = FALSE,
+      cookieless = FALSE,
+      integration_method = "gtag.js with event tracking",
+      key_features = c(
+        "Comprehensive analytics",
+        "Event tracking",
+        "Custom dimensions",
+        "Funnel analysis",
+        "Integration with Google ecosystem",
+        "BigQuery export"
+      ),
+      bidux_compatibility = "manual",
+      compatibility_notes = "Requires GDPR consent; export via API or BigQuery",
+      dashboard_support = c("static", "ojs", "python"),
+      docs_url = "https://developers.google.com/analytics"
+    ),
+    heap = list(
+      solution = "Heap Analytics",
+      type = "product-analytics",
+      cost = "freemium",
+      cost_monthly = 0,
+      self_hosted = FALSE,
+      gdpr_compliant = TRUE,
+      cookieless = FALSE,
+      integration_method = "JavaScript snippet with autocapture",
+      key_features = c(
+        "Automatic event capture",
+        "Retroactive analysis",
+        "Session replay",
+        "Funnel analysis",
+        "User segmentation"
+      ),
+      bidux_compatibility = "good",
+      compatibility_notes = "Rich autocaptured events ideal for UX analysis",
+      dashboard_support = c("static", "ojs", "python"),
+      docs_url = "https://developers.heap.io/docs"
+    )
+  )
+
+  # Filter based on criteria
+  filtered <- all_solutions
+
+  # Filter by self-hosted preference
+  if (self_hosted) {
+    filtered <- Filter(function(x) x$self_hosted == TRUE, filtered)
+  }
+
+  # Filter by privacy preference
+  if (privacy_preference == "privacy_focused") {
+    filtered <- Filter(function(x) {
+      x$type == "privacy-focused" && x$cookieless == TRUE
+    }, filtered)
+  } else if (privacy_preference == "gdpr_compliant") {
+    filtered <- Filter(function(x) x$gdpr_compliant == TRUE, filtered)
+  }
+
+  # Filter by budget
+  if (budget == "free") {
+    filtered <- Filter(function(x) {
+      x$cost == "free" || (x$cost == "freemium" && x$cost_monthly == 0)
+    }, filtered)
+  } else if (budget == "low") {
+    filtered <- Filter(function(x) {
+      x$cost == "free" ||
+        (x$cost == "freemium" && x$cost_monthly == 0) ||
+        (x$cost == "paid" && x$cost_monthly <= 10)
+    }, filtered)
+  }
+
+  # Filter by dashboard type (all solutions support all types in this case)
+  # This is a placeholder for future expansion
+  filtered <- Filter(function(x) {
+    dashboard_type %in% x$dashboard_support
+  }, filtered)
+
+  if (length(filtered) == 0) {
+    cli::cli_warn(c(
+      "No analytics solutions match your criteria",
+      "i" = "Try relaxing constraints (e.g., budget or self_hosted)",
+      "i" = "Use bid_suggest_analytics() with default parameters to see all options"
+    ))
+    return(data.frame(
+      solution = character(0),
+      type = character(0),
+      cost = character(0),
+      self_hosted = logical(0),
+      gdpr_compliant = logical(0),
+      integration_method = character(0),
+      key_features = character(0),
+      bidux_compatibility = character(0),
+      docs_url = character(0),
+      stringsAsFactors = FALSE
+    ))
+  }
+
+  # Convert to data frame
+  result <- do.call(rbind, lapply(names(filtered), function(name) {
+    sol <- filtered[[name]]
+    data.frame(
+      solution = sol$solution,
+      type = sol$type,
+      cost = sol$cost,
+      self_hosted = sol$self_hosted,
+      gdpr_compliant = sol$gdpr_compliant,
+      integration_method = sol$integration_method,
+      key_features = paste(sol$key_features, collapse = "; "),
+      bidux_compatibility = sol$bidux_compatibility,
+      docs_url = sol$docs_url,
+      stringsAsFactors = FALSE
+    )
+  }))
+
+  # Sort by relevance (privacy-focused first if requested, then by compatibility)
+  priority_order <- c("privacy-focused", "open-source", "product-analytics", "traditional")
+  result$type_order <- match(result$type, priority_order)
+
+  compatibility_order <- c("good", "manual")
+  result$compat_order <- match(result$bidux_compatibility, compatibility_order)
+
+  result <- result[order(result$type_order, result$compat_order), ]
+  result$type_order <- NULL
+  result$compat_order <- NULL
+  rownames(result) <- NULL
+
+  # Add helpful message
+  cli::cli_alert_info(
+    paste(
+      "Found {nrow(result)} analytics solution{?s} matching your criteria",
+      "for {dashboard_type} Quarto dashboards"
+    )
+  )
+
+  if (nrow(result) > 0) {
+    cli::cli_alert_success(
+      paste(
+        "Top recommendation: {result$solution[1]}",
+        "({result$type[1]}, {result$cost[1]})"
+      )
+    )
+    cli::cli_alert_info(
+      paste(
+        "See documentation for integration:",
+        "{result$docs_url[1]}"
+      )
+    )
+  }
+
+  return(result)
+}
 
 #' Ingest telemetry data and identify UX friction points
 #'
@@ -99,7 +511,7 @@ bid_telemetry_presets <- function(preset = c("moderate", "strict", "relaxed")) {
 #' **OpenTelemetry Support**: For Shiny >= 1.12.0 applications using native
 #' OpenTelemetry, pass the path to OTLP JSON exports or OTEL-formatted
 #' SQLite databases. Spans are automatically converted to events for analysis.
-#' See \code{vignette("opentelemetry-integration")} for setup.
+#' See \code{vignette("otel-integration")} for complete setup guide.
 #'
 #' **Note:** For Quarto dashboards, shiny.telemetry only works when using
 #' `server: shiny` in the Quarto YAML. Static Quarto dashboards and OJS-based

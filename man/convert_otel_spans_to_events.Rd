@@ -72,6 +72,6 @@ issues <- detect_telemetry_issues(events)
 \itemize{
 \item \code{\link[=bid_telemetry]{bid_telemetry()}} for high-level telemetry analysis (automatic format detection)
 \item \code{\link[=bid_ingest_telemetry]{bid_ingest_telemetry()}} for legacy telemetry workflows
-\item \code{vignette("opentelemetry-integration")} for complete OTEL setup guide
+\item \code{vignette("otel-integration")} for complete OTEL setup guide
 }
 }

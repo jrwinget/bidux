@@ -80,7 +80,7 @@ Format is automatically detected based on file structure and content.
 \strong{OpenTelemetry Support}: For Shiny >= 1.12.0 applications using native
 OpenTelemetry, pass the path to OTLP JSON exports or OTEL-formatted
 SQLite databases. Spans are automatically converted to events for analysis.
-See \code{vignette("opentelemetry-integration")} for setup.
+See \code{vignette("otel-integration")} for complete setup guide.
 
 \strong{Note:} For Quarto dashboards, shiny.telemetry only works when using
 \code{server: shiny} in the Quarto YAML. Static Quarto dashboards and OJS-based

@@ -643,7 +643,7 @@ bid_flags.default <- function(x) {
 #' **OpenTelemetry Support**: For Shiny >= 1.12.0 applications using native
 #' OpenTelemetry, pass the path to OTLP JSON exports or OTEL-formatted
 #' SQLite databases. Format is auto-detected. See
-#' \code{vignette("opentelemetry-integration")} for setup.
+#' \code{vignette("otel-integration")} for complete setup guide.
 #'
 #' @inheritParams bid_ingest_telemetry
 #' @return A tibble of class "bid_issues_tbl" with structured issue metadata

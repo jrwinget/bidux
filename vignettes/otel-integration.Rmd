@@ -214,11 +214,107 @@ OTEL_TRACES_SAMPLER = "traceidratio"    # Sampler type
 OTEL_TRACES_SAMPLER_ARG = "0.1"         # Sample 10% of traces
 ```
 
+## How OTEL Spans Are Converted to Bidux Events
+
+Before analyzing OTEL data, bidux automatically converts OpenTelemetry spans to its event schema. Understanding this conversion helps you:
+
+1. Configure your Shiny app to emit useful spans
+2. Understand what the analysis results mean
+3. Debug issues when data doesn't look right
+
+### Span Type Mappings
+
+Bidux recognizes these OTEL span types and converts them to event types:
+
+| Span Name/Pattern | Event Type | Description |
+|-------------------|------------|-------------|
+| `session_start` | `login` | User session begins |
+| `session_end` | `logout` | User session ends |
+| `output:<id>` | `output` | Shiny output rendering (e.g., `output:plot1`) |
+| `reactive:<id>` | `input` | Reactive expression execution |
+| `observe:<id>` | `input` | Observer execution |
+| `navigation` | `navigation` | Tab/page navigation event |
+| `reactive_update` | `reactive_update` | Reactive recalculation (timing event) |
+| Span with error event | `error` | Error occurred during execution |
+
+### Column Schema
+
+After conversion, events have this schema:
+
+| Column | Type | Description | Example |
+|--------|------|-------------|---------|
+| `timestamp` | POSIXct | Event time (from `startTimeUnixNano`) | `2025-01-15 14:23:01 UTC` |
+| `session_id` | character | Session identifier (from `session.id` attribute) | `"session_abc123"` |
+| `event_type` | character | Type of event | `"output"`, `"input"`, `"login"` |
+| `input_id` | character | Input/reactive identifier | `"slider1"`, `"filtered_data"` |
+| `output_id` | character | Output identifier | `"plot1"`, `"table1"` |
+| `error_message` | character | Error description (if error occurred) | `"object not found"` |
+| `navigation_id` | character | Navigation target | `"settings_tab"` |
+| `duration_ms` | numeric | Span duration in milliseconds | `234.5` |
+| `value` | character | Value (usually NA for OTEL) | `NA` |
+
+### ID Extraction Logic
+
+Bidux uses flexible extraction to handle various naming conventions:
+
+**For Input IDs** (reactive and observer spans):
+1. Check span name for patterns:
+   - `reactive:input$<id>` → extracts `<id>`
+   - `reactive:<id>` → extracts `<id>`
+   - `observe:<id>` → extracts `<id>`
+2. Check attributes for: `input_id`, `widget_id`, `element_id`
+
+**For Output IDs** (output spans):
+1. Check span name: `output:<id>` → extracts `<id>`
+2. Check attributes for: `output_id`, `target_id`, `output`, `output.name`
+
+**For Session IDs** (all spans):
+- Check attributes for: `session.id`, `session_id`
+
+**For Navigation IDs** (navigation spans):
+- Check attributes for: `navigation_id`, `navigation.target`, `page`, `target`
+
+**For Error Messages**:
+- Look in span events for events named `error` or `exception`
+- Extract from event attributes: `message`, `error.message`, `exception.message`
+
+### Timestamp Conversion
+
+OTLP uses Unix nanosecond timestamps. Bidux converts them:
+
+```r
+# OTLP timestamp example: "1704459200000000000" (nanoseconds since epoch)
+# Converted to: 2024-01-05 12:00:00 UTC (POSIXct)
+
+# Conversion formula:
+timestamp_seconds <- as.numeric(startTimeUnixNano) / 1e9
+timestamp_posix <- as.POSIXct(timestamp_seconds, origin = "1970-01-01", tz = "UTC")
+```
+
+### Duration Calculation
+
+Span duration is calculated from start and end timestamps:
+
+```r
+# Example span:
+# startTimeUnixNano: "1704459200000000000"
+# endTimeUnixNano:   "1704459200234500000"
+
+# Duration calculation:
+duration_ms <- (endTimeUnixNano - startTimeUnixNano) / 1e6
+# Result: 234.5 milliseconds
+```
+
+This gives you precise millisecond-level timing for:
+- Output render times
+- Reactive execution times
+- Observer execution times
+
 ## Analyzing OTEL Data with Bidux
 
 ### The Workflow (Same as shiny.telemetry!)
 
-The beauty of bidux's OTEL support is that the analysis workflow is **identical** to `shiny.telemetry`:
+The beauty of bidux's OTEL support is that **after conversion**, the analysis workflow is **identical** to `shiny.telemetry`:
 
 ```{r bidux_workflow}
 library(bidux)
@@ -265,25 +361,58 @@ issues_otel_db <- bid_telemetry("otel_spans.sqlite")
 # Same analysis, same results, regardless of source!
 ```
 
-### Understanding OTEL-Sourced Issues
+### Understanding OTEL Span Conversion
 
-When bidux analyzes OTEL data, spans are automatically converted to the event schema. The `telemetry_source` column indicates the data origin:
+When bidux analyzes OTEL data, spans are automatically converted to the bidux event schema. Here's how the conversion works:
 
-```{r otel_issues}
+### Span Name Patterns
+
+OTEL spans use naming conventions that bidux recognizes:
+
+- **Session lifecycle**: `session_start`, `session_end`
+- **Outputs**: `output:plot1`, `output:table1` (pattern: `output:<id>`)
+- **Reactives**: `reactive:input$slider`, `reactive:filtered_data` (pattern: `reactive:<id>`)
+- **Observers**: `observe:update_db` (pattern: `observe:<id>`)
+- **Navigation**: `navigation` (target extracted from attributes)
+
+### Attribute Extraction
+
+Bidux extracts metadata from span attributes using multiple naming conventions:
+
+**Session ID**: Looks for `session.id` or `session_id` attributes
+
+**Input ID**: Looks for:
+- `input_id` in attributes
+- `input$<id>` pattern in span name
+- `reactive:<id>` or `observe:<id>` patterns
+
+**Output ID**: Looks for:
+- `output_id`, `target_id`, `output`, or `output.name` in attributes
+- `output:<id>` pattern in span name
+
+**Navigation ID**: Looks for:
+- `navigation_id`, `navigation.target`, `page`, or `target` attributes
+
+**Error Messages**: Extracted from span events with name `error` or `exception`:
+- Looks for `message`, `error.message`, or `exception.message` attributes
+
+### Duration Calculation
+
+OTEL spans include precise timing information:
+
+```{r otel_duration}
+# Duration calculated from span timestamps
+# duration_ms = (endTimeUnixNano - startTimeUnixNano) / 1e6
+
 # Analyze OTEL data
 issues <- bid_telemetry("otel_spans.json")
 
-# Check source
-unique(issues$telemetry_source)
-#> [1] "opentelemetry"
-
-# OTEL data provides additional performance context
+# OTEL data provides performance context
 issues |>
   filter(issue_type == "delayed_interaction") |>
-  select(problem, evidence, duration_ms)
+  select(problem, evidence)
 #> Problem: Users take a long time before making their first interaction
 #> Evidence: Median time to first input is 47 seconds
-#> Duration: Performance data from OTEL spans
 ```
 
 ### Complete Example: From Setup to Analysis

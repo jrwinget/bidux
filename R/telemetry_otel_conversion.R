@@ -448,7 +448,7 @@ extract_error_message_from_span <- function(span_events) {
 #' @seealso
 #' - [bid_telemetry()] for high-level telemetry analysis (automatic format detection)
 #' - [bid_ingest_telemetry()] for legacy telemetry workflows
-#' - \code{vignette("opentelemetry-integration")} for complete OTEL setup guide
+#' - \code{vignette("otel-integration")} for complete OTEL setup guide
 #'
 #' @examples
 #' \dontrun{

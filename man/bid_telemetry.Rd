@@ -61,7 +61,7 @@ for new workflows that don't need backward compatibility.
 \strong{OpenTelemetry Support}: For Shiny >= 1.12.0 applications using native
 OpenTelemetry, pass the path to OTLP JSON exports or OTEL-formatted
 SQLite databases. Format is auto-detected. See
-\code{vignette("opentelemetry-integration")} for setup.
+\code{vignette("otel-integration")} for complete setup guide.
 }
 \examples{
 \dontrun{

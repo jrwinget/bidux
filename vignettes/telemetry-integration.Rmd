@@ -49,7 +49,11 @@ Both work seamlessly with `bid_telemetry()` using automatic format detection.
 - Integrating with observability platforms (Jaeger, Grafana, Datadog)
 - Need distributed tracing across services
 
-See `vignette("opentelemetry-integration")` for complete OpenTelemetry setup guide and comparison.
+See `vignette("otel-integration")` for complete OpenTelemetry setup guide including:
+- Detailed span-to-event conversion mappings
+- Column schema and ID extraction logic
+- OTEL configuration and export formats
+- Comparison with `{shiny.telemetry}`
 
 ### Automatic Format Detection
 

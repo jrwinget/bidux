@@ -17,6 +17,8 @@ DT
 echarts4r
 endTimeUnixNano
 Fitts's
+freemium
+GDPR
 getOption
 ggplot2
 github
@@ -24,11 +26,15 @@ Grafana
 htmlwidgets
 Integration
 jrwinget
+JS
 JSON
 json
+Jupyter
 Knaflic
+lifecycle
 memoise
 mitigations
+observeEvent
 Onboarding
 ORCID
 OJS
@@ -45,6 +51,8 @@ plotly
 POSIXct
 pre
 reactable
+Reactives
+reactives
 README
 repo
 resourceSpans

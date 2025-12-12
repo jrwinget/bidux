@@ -169,6 +169,13 @@ The `bid_telemetry()` function automatically identifies five key friction indica
 - **Navigation Drop-offs**: Pages or tabs users rarely visit
 - **Confusion Patterns**: Rapid repeated changes indicating user uncertainty
 
+**OTEL Span Types Supported**:
+- `session_start`/`session_end` (user sessions)
+- `output:<id>` (output rendering with timing)
+- `reactive:<id>`, `observe:<id>` (reactive/observer execution)
+- `navigation` (page/tab navigation)
+- Span events with errors (automatic error detection)
+
 **OpenTelemetry Integration (Shiny 1.12+):**
 
 For modern Shiny applications, use native OpenTelemetry for richer insights:
@@ -181,7 +188,9 @@ options(shiny.otel.collect = "all")
 issues <- bid_telemetry("otel_spans.json")
 ```
 
-See `vignette("opentelemetry-integration")` for complete setup guide including:
+See `vignette("otel-integration")` for complete setup guide including:
+- Span-to-event conversion details (session_start→login, output:*→output, reactive:*→input, etc.)
+- Column schema and ID extraction logic
 - OTEL configuration and export formats
 - Performance metrics integration
 - Comparison with `{shiny.telemetry}`
@@ -233,7 +242,7 @@ bid_concepts("cognitive") |>
   - `vignette("behavioral-science-primer")`: Behavioral science for data scientists
   - `vignette("introduction-to-bid")`: Framework overview and core principles
   - `vignette("telemetry-integration")`: Data-driven UX workflows with `{shiny.telemetry}`
-  - `vignette("opentelemetry-integration")`: Using Shiny's native OpenTelemetry (NEW!)
+  - `vignette("otel-integration")`: Using Shiny's native OpenTelemetry (NEW!)
   - `vignette("practical-examples")`: Practical dashboard examples
   - `vignette("getting-started")`: Complete walk-through with examples
   - `vignette("concepts-reference")`: Behavioral science concepts with practical implementation

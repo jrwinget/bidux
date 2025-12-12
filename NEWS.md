@@ -1,3 +1,64 @@
+# bidux 0.4.0 (2025-12-12)
+==========================
+
+### NEW FEATURES
+
+* **OpenTelemetry (OTEL) integration for Shiny >= 1.12.0.** `bid_ingest_telemetry()` and `bid_telemetry()` now support native Shiny OpenTelemetry span data in addition to shiny.telemetry events. OTEL spans are automatically detected and converted to the standard bidux event schema for seamless analysis. Supported formats include OTLP JSON exports and OTEL-formatted SQLite databases.
+
+* **Automatic OTEL span-to-event conversion.** New conversion utilities intelligently map OTEL span types to bidux events:
+  - `session_start` spans → login events
+  - `session_end` spans → logout events
+  - `reactive` and `observe` spans → input events with automatic ID extraction
+  - `output` spans → output events
+  - `navigation` spans → navigation events
+  - Error events extracted from span events and attached to relevant spans
+  - Duration calculation from span start/end timestamps
+
+* **Comprehensive OTEL format detection.** Auto-detection of OTEL JSON and SQLite formats based on file structure and content. Format parameter is optional - bidux automatically identifies whether data is from shiny.telemetry or OpenTelemetry sources.
+
+* **Enhanced telemetry readers.** New `read_otel_json()` and `read_otel_sqlite()` functions handle OTLP-formatted telemetry data, with robust parsing of nested span attributes and events. Exported utility functions (`convert_otel_spans_to_events()`, `detect_otel_json()`, etc.) enable custom OTEL workflows.
+
+* **Performance context for span analysis.** Duration metrics automatically calculated from OTEL span timestamps, enabling detection of slow reactives, delayed outputs, and performance bottlenecks.
+
+### IMPROVEMENTS
+
+* **Unified telemetry pipeline.** Both shiny.telemetry and OTEL data flow through the same analysis pipeline, ensuring consistent friction detection and issue reporting regardless of telemetry source.
+
+* **Extended telemetry preset compatibility.** `bid_telemetry_presets()` now works seamlessly with both shiny.telemetry events and OTEL spans, providing consistent sensitivity configurations across telemetry sources.
+
+* **Enhanced documentation.** New `vignette("otel-integration")` provides comprehensive setup guide for Shiny >= 1.12.0 OpenTelemetry, including instrumentation examples and conversion details. Updated telemetry vignette clarifies differences between shiny.telemetry and native OTEL approaches.
+
+### BUG FIXES
+
+* Fixed edge cases in session ID extraction from nested OTEL attribute structures
+* Improved error message extraction from OTEL span events
+* Enhanced handling of reactive updates and observeEvent spans
+* Corrected duration calculation for spans with missing end timestamps
+
+### TESTING
+
+* **Comprehensive OTEL test suite.** Added 500+ new test cases covering:
+  - OTEL span conversion for all span types (session, reactive, output, navigation, error)
+  - JSON and SQLite format detection and reading
+  - Backward compatibility with existing shiny.telemetry workflows
+  - Integration with telemetry analysis pipeline
+  - Performance context calculations
+  - Edge cases and error handling
+
+### DEPRECATIONS
+
+* **Nested data_story format will be removed in bidux 0.5.0** (previously scheduled for 0.4.0, extended one more release). Use the flat API instead: `new_data_story(hook, context, tension, resolution)`.
+
+* **Layout auto-selection will be removed in bidux 0.5.0** (previously scheduled for 0.4.0, extended one more release). The layout selection feature in `bid_structure()` will be removed to reduce complexity.
+
+* **Layout-specific bias mitigations will be removed in bidux 0.5.0** (previously scheduled for 0.4.0, extended one more release). The layout-dependent bias mappings in `bid_anticipate()` will be removed in favor of concept-driven bias mitigations.
+
+### NOTES
+
+* OpenTelemetry support requires Shiny >= 1.12.0 and optional installation of `otel` package for OTLP reading
+* OTEL functionality is automatically available when `otel` package is installed; falls back gracefully with informative messages if not available
+* All existing shiny.telemetry code continues to work unchanged - no migration required
+
 # bidux 0.3.3 (2025-11-19)
 ==========================
 
