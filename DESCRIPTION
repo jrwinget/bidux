@@ -39,6 +39,8 @@ Imports:
 Suggests:
     DiagrammeR,
     knitr,
+    otel,
+    otelsdk,
     rmarkdown,
     spelling,
     testthat (>= 3.0.0),

@@ -4,7 +4,7 @@
 \alias{create_delay_notice}
 \title{Create notice stage for delayed interactions}
 \usage{
-create_delay_notice(delay_info, total_sessions, threshold)
+create_delay_notice(delay_info, total_sessions, threshold, events = NULL)
 }
 \arguments{
 \item{delay_info}{List with delay statistics}
@@ -12,6 +12,8 @@ create_delay_notice(delay_info, total_sessions, threshold)
 \item{total_sessions}{Total number of sessions}
 
 \item{threshold}{Threshold used for analysis}
+
+\item{events}{Optional full events data frame for performance context}
 }
 \value{
 bid_stage object

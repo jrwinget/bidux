@@ -13,13 +13,19 @@ bid_telemetry(
 )
 }
 \arguments{
-\item{source}{Either a file path to telemetry data (SQLite database or JSON
-log file), or a DBI connection object to an already-open database.
-When a connection is provided, it will not be closed by this function.}
+\item{source}{Either a file path to telemetry data or a DBI connection object.
+Supports:
+\itemize{
+\item SQLite databases (shiny.telemetry or OTEL format)
+\item JSON files (shiny.telemetry logs or OTLP JSON exports)
+\item DBI connections to databases with event or span tables
+When a connection is provided, it will not be closed by this function.
+}}
 
-\item{format}{Optional format specification ("sqlite" or "json"). If NULL,
-auto-detected from file extension (for file paths) or defaults to
-"sqlite" for DBI connections.}
+\item{format}{Optional format specification ("sqlite", "json", "otlp_json",
+"otel_sqlite"). If NULL (default), auto-detected from file extension and
+structure. OTLP formats are automatically detected when file contains
+OpenTelemetry span data.}
 
 \item{events_table}{Optional data.frame specifying custom events table when
 reading from SQLite. Must have columns: event_id, timestamp,
@@ -51,11 +57,21 @@ A tibble of class "bid_issues_tbl" with structured issue metadata
 Preferred modern interface for telemetry analysis. Returns a clean tibble
 of identified issues without the legacy list structure. Use this function
 for new workflows that don't need backward compatibility.
+
+\strong{OpenTelemetry Support}: For Shiny >= 1.12.0 applications using native
+OpenTelemetry, pass the path to OTLP JSON exports or OTEL-formatted
+SQLite databases. Format is auto-detected. See
+\code{vignette("opentelemetry-integration")} for setup.
 }
 \examples{
 \dontrun{
-# Modern workflow
+# Works with shiny.telemetry
 issues <- bid_telemetry("telemetry.sqlite")
+
+# Works with Shiny OpenTelemetry (1.12+)
+issues <- bid_telemetry("otel_spans.json")
+
+# Same analysis workflow for both
 high_priority <- issues[issues$severity \%in\% c("critical", "high"), ]
 
 # Use DBI connection directly

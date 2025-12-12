@@ -1,9 +1,10 @@
 #' Create notice stage for unused input
 #' @param input_info List with input usage information
 #' @param total_sessions Total number of sessions
+#' @param events Optional full events data frame for performance context
 #' @return bid_stage object
 #' @keywords internal
-create_unused_input_notice <- function(input_info, total_sessions) {
+create_unused_input_notice <- function(input_info, total_sessions, events = NULL) {
   problem <- sprintf(
     "Users are not interacting with the '%s' input control",
     input_info$input_id
@@ -25,6 +26,14 @@ create_unused_input_notice <- function(input_info, total_sessions) {
     )
   }
 
+  # add performance context if available (for used inputs with timing data)
+  if (!is.null(events) && input_info$sessions_used > 0) {
+    event_filter <- events$event_type == "input" &
+      !is.na(events$input_id) &
+      events$input_id == input_info$input_id
+    evidence <- add_performance_context(evidence, events, event_filter)
+  }
+
   # create interpret stage first, then notice stage with auto-suggested theory
   interpret <- bid_interpret(
     central_question = "How can we improve user interaction with unused inputs?"
@@ -43,9 +52,10 @@ create_unused_input_notice <- function(input_info, total_sessions) {
 #' @param delay_info List with delay statistics
 #' @param total_sessions Total number of sessions
 #' @param threshold Threshold used for analysis
+#' @param events Optional full events data frame for performance context
 #' @return bid_stage object
 #' @keywords internal
-create_delay_notice <- function(delay_info, total_sessions, threshold) {
+create_delay_notice <- function(delay_info, total_sessions, threshold, events = NULL) {
   problem <- "Users take a long time before making their first interaction with the dashboard"
 
   evidence_parts <- character(0)
@@ -83,6 +93,12 @@ create_delay_notice <- function(delay_info, total_sessions, threshold) {
 
   evidence <- paste(evidence_parts, collapse = ", and ")
 
+  # add performance context from login/session_start spans if available
+  if (!is.null(events)) {
+    event_filter <- events$event_type == "login"
+    evidence <- add_performance_context(evidence, events, event_filter)
+  }
+
   # create interpret stage first, then notice stage
   interpret <- bid_interpret(
     central_question = "How can we reduce user interaction delays?"
@@ -100,9 +116,10 @@ create_delay_notice <- function(delay_info, total_sessions, threshold) {
 #' Create notice stage for error patterns
 #' @param error_info List with error pattern information
 #' @param total_sessions Total number of sessions
+#' @param events Optional full events data frame for performance context
 #' @return bid_stage object
 #' @keywords internal
-create_error_notice <- function(error_info, total_sessions) {
+create_error_notice <- function(error_info, total_sessions, events = NULL) {
   problem <- "Users encounter errors when using the dashboard"
 
   evidence_parts <- sprintf(
@@ -126,6 +143,19 @@ create_error_notice <- function(error_info, total_sessions) {
     )
   }
 
+  # add performance context from error events if available
+  if (!is.null(events)) {
+    event_filter <- events$event_type == "error" &
+      !is.na(events$error_message) &
+      events$error_message == error_info$error_message
+    if (!is.null(error_info$output_id)) {
+      event_filter <- event_filter &
+        !is.na(events$output_id) &
+        events$output_id == error_info$output_id
+    }
+    evidence_parts <- add_performance_context(evidence_parts, events, event_filter)
+  }
+
   # create interpret stage first, then notice stage
   interpret <- bid_interpret(
     central_question = "How can we reduce user errors and confusion?"
@@ -143,9 +173,10 @@ create_error_notice <- function(error_info, total_sessions) {
 #' Create notice stage for navigation issues
 #' @param nav_info List with navigation pattern information
 #' @param total_sessions Total number of sessions
+#' @param events Optional full events data frame for performance context
 #' @return bid_stage object
 #' @keywords internal
-create_navigation_notice <- function(nav_info, total_sessions) {
+create_navigation_notice <- function(nav_info, total_sessions, events = NULL) {
   problem <- sprintf(
     "The '%s' page/tab is rarely visited by users",
     nav_info$page
@@ -168,6 +199,14 @@ create_navigation_notice <- function(nav_info, total_sessions) {
     )
   }
 
+  # add performance context from navigation events if available
+  if (!is.null(events)) {
+    event_filter <- events$event_type == "navigation" &
+      !is.na(events$navigation_id) &
+      events$navigation_id == nav_info$page
+    evidence <- add_performance_context(evidence, events, event_filter)
+  }
+
   # create interpret stage first, then notice stage
   interpret <- bid_interpret(
     central_question = "How can we improve user navigation flow?"
@@ -185,9 +224,10 @@ create_navigation_notice <- function(nav_info, total_sessions) {
 #' Create notice stage for confusion patterns
 #' @param confusion_info List with confusion pattern information
 #' @param total_sessions Total number of sessions
+#' @param events Optional full events data frame for performance context
 #' @return bid_stage object
 #' @keywords internal
-create_confusion_notice <- function(confusion_info, total_sessions) {
+create_confusion_notice <- function(confusion_info, total_sessions, events = NULL) {
   problem <- sprintf(
     "Users show signs of confusion when interacting with '%s'",
     confusion_info$input_id
@@ -199,6 +239,14 @@ create_confusion_notice <- function(confusion_info, total_sessions) {
     confusion_info$total_rapid_changes / confusion_info$affected_sessions,
     confusion_info$avg_time_window
   )
+
+  # add performance context from rapid input changes if available
+  if (!is.null(events)) {
+    event_filter <- events$event_type == "input" &
+      !is.na(events$input_id) &
+      events$input_id == confusion_info$input_id
+    evidence <- add_performance_context(evidence, events, event_filter)
+  }
 
   # create interpret stage first, then notice stage
   interpret <- bid_interpret(
@@ -592,13 +640,23 @@ bid_flags.default <- function(x) {
 #' of identified issues without the legacy list structure. Use this function
 #' for new workflows that don't need backward compatibility.
 #'
+#' **OpenTelemetry Support**: For Shiny >= 1.12.0 applications using native
+#' OpenTelemetry, pass the path to OTLP JSON exports or OTEL-formatted
+#' SQLite databases. Format is auto-detected. See
+#' \code{vignette("opentelemetry-integration")} for setup.
+#'
 #' @inheritParams bid_ingest_telemetry
 #' @return A tibble of class "bid_issues_tbl" with structured issue metadata
 #' @export
 #' @examples
 #' \dontrun{
-#' # Modern workflow
+#' # Works with shiny.telemetry
 #' issues <- bid_telemetry("telemetry.sqlite")
+#'
+#' # Works with Shiny OpenTelemetry (1.12+)
+#' issues <- bid_telemetry("otel_spans.json")
+#'
+#' # Same analysis workflow for both
 #' high_priority <- issues[issues$severity %in% c("critical", "high"), ]
 #'
 #' # Use DBI connection directly

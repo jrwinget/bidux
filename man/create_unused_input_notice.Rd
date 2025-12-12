@@ -4,12 +4,14 @@
 \alias{create_unused_input_notice}
 \title{Create notice stage for unused input}
 \usage{
-create_unused_input_notice(input_info, total_sessions)
+create_unused_input_notice(input_info, total_sessions, events = NULL)
 }
 \arguments{
 \item{input_info}{List with input usage information}
 
 \item{total_sessions}{Total number of sessions}
+
+\item{events}{Optional full events data frame for performance context}
 }
 \value{
 bid_stage object

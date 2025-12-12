@@ -118,19 +118,33 @@ bid_report(process, format = "html")
 
 ## Data-Driven UX with Telemetry
 
-**New in 0.3.2**: Enhanced telemetry workflow transforms real user
-behavior data into actionable BID insights.
+Enhanced telemetry workflows transform real user behavior data into
+actionable BID insights.
+
+**Telemetry Sources Supported:**
+
+- **`{shiny.telemetry}`**: [Appsilon’s
+  package](https://github.com/Appsilon/shiny.telemetry) for Shiny app
+  telemetry
+- **Shiny OpenTelemetry** (NEW!): Native OTEL support in `{shiny}` 1.12+
+  with rich performance data
+
+Both sources work seamlessly with the same API:
 
 ``` r
-# Modern approach: analyze telemetry data with bid_telemetry()
-# Returns a clean tibble of issues (without legacy list structure)
+# Works with {shiny.telemetry}
 issues <- bid_telemetry("telemetry.sqlite")
+
+# Works with Shiny OpenTelemetry (1.12+)
+issues <- bid_telemetry("otel_spans.json")
+
+# Same analysis workflow for both!
 print(issues)  # Shows organized issue summary with severity levels
 
 # Adjust sensitivity with presets
 strict_issues <- bid_telemetry(
   "telemetry.sqlite",
-  thresholds = bid_telemetry_presets("strict")    # or "moderate", "relaxed"
+  thresholds = bid_telemetry_presets("strict") # or "moderate", "relaxed"
 )
 
 # Focus on critical issues using tidy workflows
@@ -148,9 +162,10 @@ notices <- bid_notices(
 
 # Use telemetry flags to inform structure decisions
 flags <- bid_flags(issues)
+
 structure_result <- bid_structure(
   previous_stage = anticipate_result,
-  telemetry_flags = flags  # Influences layout selection
+  telemetry_flags = flags  # influences layout selection
 )
 ```
 
@@ -163,6 +178,23 @@ friction indicators:
 - **Navigation Drop-offs**: Pages or tabs users rarely visit
 - **Confusion Patterns**: Rapid repeated changes indicating user
   uncertainty
+
+**OpenTelemetry Integration (Shiny 1.12+):**
+
+For modern Shiny applications, use native OpenTelemetry for richer
+insights:
+
+``` r
+# In your Shiny app - enable OTEL collection
+options(shiny.otel.collect = "all")
+
+# After collecting data, analyze with bidux
+issues <- bid_telemetry("otel_spans.json")
+```
+
+See `vignette("opentelemetry-integration")` for complete setup guide
+including: - OTEL configuration and export formats - Performance metrics
+integration - Comparison with `{shiny.telemetry}` - Migration strategies
 
 **Function comparison:** - `bid_telemetry()`: Modern API returning a
 clean tibble (recommended for new code) - `bid_ingest_telemetry()`:
@@ -224,7 +256,10 @@ bid_concepts("cognitive") |>
     scientists
   - `vignette("introduction-to-bid")`: Framework overview and core
     principles
-  - `vignette("telemetry-integration")`: Data-driven UX workflows
+  - `vignette("telemetry-integration")`: Data-driven UX workflows with
+    `{shiny.telemetry}`
+  - `vignette("opentelemetry-integration")`: Using Shiny’s native
+    OpenTelemetry (NEW!)
   - `vignette("practical-examples")`: Practical dashboard examples
   - `vignette("getting-started")`: Complete walk-through with examples
   - `vignette("concepts-reference")`: Behavioral science concepts with

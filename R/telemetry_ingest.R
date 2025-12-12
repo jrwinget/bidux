@@ -1,9 +1,18 @@
+# Declare global variables to avoid R CMD check NOTEs
+# These are used in dplyr/NSE contexts within read_otel_sqlite
+utils::globalVariables(c("span_id", "value", "key"))
+
 #' Get predefined telemetry sensitivity presets
 #'
 #' @description
 #' Returns predefined threshold configurations for telemetry analysis with different
-#' sensitivity levels. Use these presets with [bid_ingest_telemetry()] to easily
-#' adjust how aggressively the analysis identifies UX friction points.
+#' sensitivity levels. Use these presets with [bid_ingest_telemetry()] or
+#' [bid_telemetry()] to easily adjust how aggressively the analysis identifies
+#' UX friction points.
+#'
+#' **OpenTelemetry Compatibility**: These presets work with both shiny.telemetry
+#' event data and Shiny 1.12+ OpenTelemetry span data. When using OTEL data,
+#' spans are automatically converted to events for analysis.
 #'
 #' @param preset Character string specifying the sensitivity level:
 #'   \describe{
@@ -13,16 +22,23 @@
 #'   }
 #'
 #' @return Named list of threshold parameters suitable for passing to
-#'   [bid_ingest_telemetry()] thresholds parameter.
+#'   [bid_ingest_telemetry()] or [bid_telemetry()] thresholds parameter.
 #'
 #' @examples
 #' # Get strict sensitivity thresholds
 #' strict_thresholds <- bid_telemetry_presets("strict")
 #'
-#' # Use with telemetry analysis
+#' # Use with telemetry analysis (works with both shiny.telemetry and OTEL)
 #' \dontrun{
-#' issues <- bid_ingest_telemetry(
+#' # Works with shiny.telemetry
+#' issues <- bid_telemetry(
 #'   "telemetry.sqlite",
+#'   thresholds = bid_telemetry_presets("strict")
+#' )
+#'
+#' # Works with Shiny OpenTelemetry (1.12+)
+#' issues <- bid_telemetry(
+#'   "otel_spans.json",
 #'   thresholds = bid_telemetry_presets("strict")
 #' )
 #' }
@@ -68,24 +84,39 @@ bid_telemetry_presets <- function(preset = c("moderate", "strict", "relaxed")) {
 #' Ingest telemetry data and identify UX friction points
 #'
 #' @description
-#' This function ingests telemetry data from shiny.telemetry output (SQLite or
-#' JSON) and automatically identifies potential UX issues, translating them into
-#' BID framework Notice stages. It returns a hybrid object that is backward-compatible
-#' as a list of Notice stages while also providing enhanced functionality with
-#' tidy tibble access and flags extraction.
+#' This function ingests telemetry data from multiple sources and automatically
+#' identifies potential UX issues, translating them into BID framework Notice stages.
+#' It returns a hybrid object that is backward-compatible as a list of Notice stages
+#' while also providing enhanced functionality with tidy tibble access and flags extraction.
 #'
-#' **Note:** This function is designed for Shiny application telemetry. For
-#' Quarto dashboards, shiny.telemetry only works when using `server: shiny` in
-#' the Quarto YAML. Static Quarto dashboards and OJS-based dashboards do not
-#' support shiny.telemetry. Consider alternative analytics solutions (e.g.,
-#' Plausible) for static dashboard usage tracking.
+#' **Supported telemetry sources:**
+#' - shiny.telemetry (SQLite or JSON)
+#' - Shiny native OpenTelemetry (Shiny >= 1.12.0, OTLP JSON or SQLite)
+#' - DBI database connections
 #'
-#' @param source Either a file path to telemetry data (SQLite database or JSON
-#'        log file), or a DBI connection object to an already-open database.
-#'        When a connection is provided, it will not be closed by this function.
-#' @param format Optional format specification ("sqlite" or "json"). If NULL,
-#'        auto-detected from file extension (for file paths) or defaults to
-#'        "sqlite" for DBI connections.
+#' Format is automatically detected based on file structure and content.
+#'
+#' **OpenTelemetry Support**: For Shiny >= 1.12.0 applications using native
+#' OpenTelemetry, pass the path to OTLP JSON exports or OTEL-formatted
+#' SQLite databases. Spans are automatically converted to events for analysis.
+#' See \code{vignette("opentelemetry-integration")} for setup.
+#'
+#' **Note:** For Quarto dashboards, shiny.telemetry only works when using
+#' `server: shiny` in the Quarto YAML. Static Quarto dashboards and OJS-based
+#' dashboards do not support shiny.telemetry. Consider alternative analytics
+#' solutions (e.g., Plausible) for static dashboard usage tracking.
+#'
+#' @param source Either a file path to telemetry data or a DBI connection object.
+#'   Supports:
+#'   - SQLite databases (shiny.telemetry or OTEL format)
+#'   - JSON files (shiny.telemetry logs or OTLP JSON exports)
+#'   - DBI connections to databases with event or span tables
+#'   When a connection is provided, it will not be closed by this function.
+#'
+#' @param format Optional format specification ("sqlite", "json", "otlp_json",
+#'   "otel_sqlite"). If NULL (default), auto-detected from file extension and
+#'   structure. OTLP formats are automatically detected when file contains
+#'   OpenTelemetry span data.
 #' @param events_table Optional data.frame specifying custom events table when
 #'        reading from SQLite. Must have columns: event_id, timestamp,
 #'        event_type, user_id. If NULL, auto-detects standard table names
@@ -119,8 +150,11 @@ bid_telemetry_presets <- function(preset = c("moderate", "strict", "relaxed")) {
 #'
 #' @examples
 #' \dontrun{
-#' # Analyze SQLite telemetry database from file path
+#' # Works with shiny.telemetry SQLite
 #' issues <- bid_ingest_telemetry("telemetry.sqlite")
+#'
+#' # Works with Shiny OpenTelemetry (1.12+)
+#' issues <- bid_ingest_telemetry("otel_spans.json")
 #'
 #' # Use sensitivity presets for easier configuration
 #' strict_issues <- bid_ingest_telemetry(
@@ -150,7 +184,7 @@ bid_telemetry_presets <- function(preset = c("moderate", "strict", "relaxed")) {
 #'   table_name = "my_custom_events"
 #' )
 #'
-#' # Use results in BID workflow
+#' # Same analysis workflow for both shiny.telemetry and OTEL
 #' if (length(issues) > 0) {
 #'   # Take first issue and continue with BID process
 #'   interpret_result <- bid_interpret(
@@ -290,7 +324,8 @@ bid_ingest_telemetry <- function(
       )
       notice_issues[[issue_key]] <- create_unused_input_notice(
         input_info,
-        total_sessions
+        total_sessions,
+        events
       )
     }
   }
@@ -304,7 +339,8 @@ bid_ingest_telemetry <- function(
     notice_issues[["delayed_interaction"]] <- create_delay_notice(
       delay_info,
       total_sessions,
-      thresholds$delay_threshold_secs
+      thresholds$delay_threshold_secs,
+      events
     )
   }
 
@@ -316,7 +352,8 @@ bid_ingest_telemetry <- function(
       issue_key <- paste0("error_", i)
       notice_issues[[issue_key]] <- create_error_notice(
         error_info,
-        total_sessions
+        total_sessions,
+        events
       )
     }
   }
@@ -335,7 +372,8 @@ bid_ingest_telemetry <- function(
         )
         notice_issues[[issue_key]] <- create_navigation_notice(
           nav_info,
-          total_sessions
+          total_sessions,
+          events
         )
       }
     }
@@ -356,7 +394,8 @@ bid_ingest_telemetry <- function(
       )
       notice_issues[[issue_key]] <- create_confusion_notice(
         confusion_info,
-        total_sessions
+        total_sessions,
+        events
       )
     }
   }
@@ -488,6 +527,15 @@ read_telemetry_sqlite <- function(source, events_table = NULL, table_name = NULL
         we_opened_connection <- TRUE
       }
 
+      # check if this is an otel database (has spans table)
+      tables <- DBI::dbListTables(con)
+      if ("spans" %in% tables && is.null(events_table) && is.null(table_name)) {
+        # likely otel format - use otel reader
+        cli::cli_alert_info("Detected OpenTelemetry SQLite format")
+        events <- read_otel_sqlite(con)
+        return(events)
+      }
+
       # if custom events_table provided, use it directly
       if (!is.null(events_table)) {
         events <- events_table
@@ -496,7 +544,6 @@ read_telemetry_sqlite <- function(source, events_table = NULL, table_name = NULL
         # determine table name to use
         if (!is.null(table_name)) {
           # user specified table name - verify it exists
-          tables <- DBI::dbListTables(con)
           if (!table_name %in% tables) {
             cli::cli_abort(standard_error_msg(
               "Table '{table_name}' not found in database",
@@ -508,8 +555,6 @@ read_telemetry_sqlite <- function(source, events_table = NULL, table_name = NULL
           cli::cli_alert_info("Using specified table: '{event_table}'")
         } else {
           # auto-detect table name
-          tables <- DBI::dbListTables(con)
-
           # look for events table (common {shiny.telemetry} table name)
           event_table <- NULL
           if ("event_data" %in% tables) {
@@ -559,6 +604,12 @@ read_telemetry_sqlite <- function(source, events_table = NULL, table_name = NULL
 read_telemetry_json <- function(path) {
   if (!requireNamespace("jsonlite", quietly = TRUE)) {
     cli::cli_abort("Package 'jsonlite' is required to read JSON telemetry data")
+  }
+
+  # check if this is an otel json file
+  if (detect_otel_json(path)) {
+    cli::cli_alert_info("Detected OpenTelemetry JSON format")
+    return(read_otel_json(path))
   }
 
   tryCatch(
@@ -646,6 +697,354 @@ read_telemetry_json <- function(path) {
         "i" = "File: {path}",
         "i" = "Ensure the file contains valid JSON with required fields: timestamp, session_id, event_type"
       ))
+    }
+  )
+}
+
+#' Detect if JSON file contains OTLP (OpenTelemetry Protocol) data
+#'
+#' @description
+#' Checks if a JSON file contains OpenTelemetry Protocol span data by looking
+#' for the characteristic OTLP structure (resourceSpans, scopeSpans, spans).
+#'
+#' @param source_path Path to JSON file
+#' @return Logical TRUE if OTLP format detected, FALSE otherwise
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#' detect_otel_json("spans.json") # returns TRUE for otlp files
+#' detect_otel_json("telemetry.json") # returns FALSE for shiny.telemetry files
+#' }
+detect_otel_json <- function(source_path) {
+  tryCatch(
+    {
+      # parse json file
+      json_data <- jsonlite::fromJSON(source_path, simplifyVector = FALSE)
+
+      # check for otlp structure markers
+      has_resource_spans <- "resourceSpans" %in% names(json_data)
+
+      if (has_resource_spans) {
+        # verify nested structure
+        if (length(json_data$resourceSpans) > 0) {
+          first_resource <- json_data$resourceSpans[[1]]
+          has_scope_spans <- "scopeSpans" %in% names(first_resource)
+
+          if (has_scope_spans && length(first_resource$scopeSpans) > 0) {
+            first_scope <- first_resource$scopeSpans[[1]]
+            has_spans <- "spans" %in% names(first_scope)
+            return(has_spans)
+          }
+        }
+      }
+
+      return(FALSE)
+    },
+    error = function(e) {
+      # if we can't parse, assume not otel format
+      return(FALSE)
+    }
+  )
+}
+
+#' Read OpenTelemetry JSON (OTLP) file
+#'
+#' @description
+#' Reads OpenTelemetry Protocol (OTLP) JSON files containing span data from
+#' Shiny 1.12+ applications. Extracts spans from the nested OTLP structure and
+#' converts them to bidux event schema.
+#'
+#' @param path Path to OTLP JSON file
+#' @return Data frame with bidux event schema (converted from spans)
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#' events <- read_otel_json("otel_spans.json")
+#' names(events)
+#' # [1] "timestamp" "session_id" "event_type" "input_id" "value" "error_message"
+#' # [7] "output_id" "navigation_id"
+#' }
+read_otel_json <- function(path) {
+  if (!requireNamespace("jsonlite", quietly = TRUE)) {
+    cli::cli_abort("Package 'jsonlite' is required to read OTLP JSON data")
+  }
+
+  tryCatch(
+    {
+      # parse otlp json structure
+      json_data <- jsonlite::fromJSON(path, simplifyVector = FALSE)
+
+      # validate otlp structure
+      if (!"resourceSpans" %in% names(json_data)) {
+        cli::cli_abort(c(
+          "Invalid OTLP JSON structure",
+          "i" = "Expected top-level 'resourceSpans' field",
+          "i" = "File: {path}"
+        ))
+      }
+
+      # extract all spans from nested structure
+      all_spans <- list()
+
+      for (resource_span in json_data$resourceSpans) {
+        if (!"scopeSpans" %in% names(resource_span)) {
+          next
+        }
+
+        for (scope_span in resource_span$scopeSpans) {
+          if (!"spans" %in% names(scope_span)) {
+            next
+          }
+
+          # add spans from this scope
+          all_spans <- c(all_spans, scope_span$spans)
+        }
+      }
+
+      if (length(all_spans) == 0) {
+        cli::cli_warn("No spans found in OTLP JSON file")
+        return(data.frame(
+          timestamp = character(),
+          session_id = character(),
+          event_type = character(),
+          stringsAsFactors = FALSE
+        ))
+      }
+
+      # convert list of spans to data frame
+      spans_df <- dplyr::bind_rows(lapply(all_spans, function(span) {
+        # flatten span attributes
+        attrs_list <- list()
+        if (!is.null(span$attributes)) {
+          for (attr in span$attributes) {
+            key <- attr$key
+            # extract value from nested structure
+            value <- if (!is.null(attr$value$stringValue)) {
+              attr$value$stringValue
+            } else if (!is.null(attr$value$intValue)) {
+              attr$value$intValue
+            } else if (!is.null(attr$value$doubleValue)) {
+              attr$value$doubleValue
+            } else if (!is.null(attr$value$boolValue)) {
+              attr$value$boolValue
+            } else {
+              NA
+            }
+            attrs_list[[key]] <- value
+          }
+        }
+
+        # create span record with attributes as nested list
+        # ensure all ID fields are always character (not list) to avoid type mismatch
+        # jsonlite may parse IDs as lists when unicode/special chars present
+        trace_id <- if (is.null(span$traceId)) {
+          NA_character_
+        } else if (is.list(span$traceId)) {
+          as.character(span$traceId[[1]])
+        } else {
+          as.character(span$traceId)
+        }
+
+        span_id <- if (is.null(span$spanId)) {
+          NA_character_
+        } else if (is.list(span$spanId)) {
+          as.character(span$spanId[[1]])
+        } else {
+          as.character(span$spanId)
+        }
+
+        parent_span_id <- if (is.null(span$parentSpanId)) {
+          NA_character_
+        } else if (is.list(span$parentSpanId)) {
+          as.character(span$parentSpanId[[1]])
+        } else {
+          as.character(span$parentSpanId)
+        }
+
+        start_time <- if (is.null(span$startTimeUnixNano)) {
+          NA_character_
+        } else if (is.list(span$startTimeUnixNano)) {
+          as.character(span$startTimeUnixNano[[1]])
+        } else {
+          as.character(span$startTimeUnixNano)
+        }
+
+        end_time <- if (is.null(span$endTimeUnixNano)) {
+          NA_character_
+        } else if (is.list(span$endTimeUnixNano)) {
+          as.character(span$endTimeUnixNano[[1]])
+        } else {
+          as.character(span$endTimeUnixNano)
+        }
+
+        tibble::tibble(
+          name = span$name %||% NA_character_,
+          traceId = trace_id,
+          spanId = span_id,
+          parentSpanId = parent_span_id,
+          startTimeUnixNano = start_time,
+          endTimeUnixNano = end_time,
+          attributes = list(attrs_list),
+          events = list(span$events)
+        )
+      }))
+
+      # convert spans to bidux event schema
+      events <- convert_otel_spans_to_events(spans_df)
+
+      return(events)
+    },
+    error = function(e) {
+      cli::cli_abort(c(
+        "Error reading OTLP JSON file: {e$message}",
+        "i" = "File: {path}",
+        "i" = "Ensure the file contains valid OTLP JSON structure"
+      ))
+    }
+  )
+}
+
+#' Read OpenTelemetry SQLite database
+#'
+#' @description
+#' Reads OpenTelemetry span data from SQLite databases that store OTEL traces.
+#' Looks for standard OTEL table names (spans, span_events, span_attributes) and
+#' joins them to reconstruct the span structure before converting to bidux events.
+#'
+#' @param source SQLite database path or DBI connection object
+#' @return Data frame with bidux event schema (converted from spans)
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#' events <- read_otel_sqlite("otel_traces.db")
+#' names(events)
+#' # [1] "timestamp" "session_id" "event_type" "input_id" "value" "error_message"
+#' # [7] "output_id" "navigation_id"
+#' }
+read_otel_sqlite <- function(source) {
+  if (!requireNamespace("DBI", quietly = TRUE)) {
+    cli::cli_abort("Package 'DBI' is required to read OTEL SQLite data")
+  }
+
+  # determine if source is a connection or file path
+  is_connection <- inherits(source, "DBIConnection")
+
+  # for file paths, we also need rsqlite
+  if (!is_connection && !requireNamespace("RSQLite", quietly = TRUE)) {
+    cli::cli_abort(
+      "Package 'RSQLite' is required to read OTEL SQLite data from file paths"
+    )
+  }
+
+  con <- NULL
+  we_opened_connection <- FALSE
+
+  tryCatch(
+    {
+      if (is_connection) {
+        con <- source
+        we_opened_connection <- FALSE
+      } else {
+        con <- DBI::dbConnect(RSQLite::SQLite(), source)
+        we_opened_connection <- TRUE
+      }
+
+      # check for otel table structure
+      tables <- DBI::dbListTables(con)
+
+      if (!"spans" %in% tables) {
+        cli::cli_abort(c(
+          "Database does not contain OTEL span data",
+          "i" = "Expected 'spans' table not found",
+          "i" = "Available tables: {paste(tables, collapse = ', ')}"
+        ))
+      }
+
+      # read spans table
+      spans <- DBI::dbReadTable(con, "spans")
+
+      if (nrow(spans) == 0) {
+        cli::cli_warn("No spans found in database")
+        return(data.frame(
+          timestamp = character(),
+          session_id = character(),
+          event_type = character(),
+          stringsAsFactors = FALSE
+        ))
+      }
+
+      # join with attributes if available
+      if ("span_attributes" %in% tables) {
+        attrs <- DBI::dbReadTable(con, "span_attributes")
+
+        # pivot attributes to wide format
+        if (nrow(attrs) > 0) {
+          # group attributes by span_id and create nested list
+          attrs_wide <- attrs |>
+            dplyr::group_by(span_id) |>
+            dplyr::summarise(
+              attributes = list(setNames(
+                as.list(value),
+                key
+              )),
+              .groups = "drop"
+            )
+
+          # join with spans (handle both camelCase and underscore column names)
+          join_col <- if ("spanId" %in% names(spans)) "spanId" else "span_id"
+          spans <- spans |>
+            dplyr::left_join(attrs_wide, by = stats::setNames("span_id", join_col))
+        }
+      }
+
+      # join with events if available
+      if ("span_events" %in% tables) {
+        span_events <- DBI::dbReadTable(con, "span_events")
+
+        if (nrow(span_events) > 0) {
+          # group events by span_id
+          events_grouped <- span_events |>
+            dplyr::group_by(span_id) |>
+            dplyr::summarise(
+              events = list(dplyr::pick(dplyr::everything())),
+              .groups = "drop"
+            )
+
+          # join with spans (handle both camelCase and underscore column names)
+          join_col <- if ("spanId" %in% names(spans)) "spanId" else "span_id"
+          spans <- spans |>
+            dplyr::left_join(events_grouped, by = stats::setNames("span_id", join_col))
+        }
+      }
+
+      # ensure required columns exist
+      if (!"name" %in% names(spans)) {
+        spans$name <- NA_character_
+      }
+      if (!"startTimeUnixNano" %in% names(spans) && "start_time" %in% names(spans)) {
+        # convert from timestamp to unix nano
+        spans$startTimeUnixNano <- as.character(as.numeric(spans$start_time) * 1e9)
+      }
+      if (!"endTimeUnixNano" %in% names(spans) && "end_time" %in% names(spans)) {
+        spans$endTimeUnixNano <- as.character(as.numeric(spans$end_time) * 1e9)
+      }
+
+      # convert spans to bidux event schema
+      events <- convert_otel_spans_to_events(spans)
+
+      return(events)
+    },
+    error = function(e) {
+      cli::cli_abort("Error reading OTEL SQLite database: {e$message}")
+    },
+    finally = {
+      # only close connection if we opened it
+      if (we_opened_connection && !is.null(con)) {
+        DBI::dbDisconnect(con)
+      }
     }
   )
 }
