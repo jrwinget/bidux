@@ -14,9 +14,11 @@ test_that("bid_notice_issue creates equivalent Notice to manual approach", {
   # create previous stage for comparison
   interpret_stage <- bid_interpret(
     central_question = "How can we improve filtering usability?",
-    data_story = list(
+    data_story = new_data_story(
       hook = "Users struggle with complex filters",
-      context = "Dashboard has 15+ filter options"
+      context = "Dashboard has 15+ filter options",
+      tension = "Filter abandonment is high",
+      resolution = "Simplify filter interface"
     )
   )
 

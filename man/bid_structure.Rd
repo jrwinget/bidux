@@ -54,7 +54,7 @@ shiny-prefixed components (i.e., \verb{shiny::}) requiring Shiny runtime.
 \examples{
 notice_result <- bid_interpret(
   central_question = "How can we simplify data presentation?",
-  data_story = list(
+  data_story = new_data_story(
     hook = "Data is too complex",
     context = "Overloaded with charts",
     tension = "Confusing layout",

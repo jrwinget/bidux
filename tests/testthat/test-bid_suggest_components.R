@@ -138,9 +138,11 @@ test_that("bid_suggest_components works with different BID stages", {
   interpret_result2 <- bid_interpret(
     previous_stage = notice_result,
     central_question = "How to simplify the interface?",
-    data_story = list(
+    data_story = new_data_story(
       hook = "Users are confused",
-      context = "Dashboard is complex"
+      context = "Dashboard is complex",
+      tension = "Navigation is difficult",
+      resolution = "Simplify layout"
     )
   )
 

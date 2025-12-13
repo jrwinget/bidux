@@ -17,29 +17,31 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-The bidux package has been modernized with enhanced API consistency, better error handling, and optional tibble support. **This vignette is the definitive guide to modern API usage in bidux 0.3.2+**.
+The bidux package has been modernized with enhanced API consistency, better error handling, and optional tibble support. **This vignette is the definitive guide to modern API usage in bidux 0.4.0+**.
 
-### What's New in 0.3.2
+### What's New in 0.4.0
 
 | Feature | Status | Details |
 |---------|--------|---------|
-| **Flat data_story API** | ✅ **RECOMMENDED** | Use `new_data_story(hook, context, tension, resolution)` |
-| **Nested data_story format** | **DEPRECATED** | `variables`/`relationships` parameters removed in 0.4.0 |
-| **Telemetry presets** | ✅ **NEW** | Use `bid_telemetry_presets("moderate")` for easier configuration |
+| **Flat data_story API** | ✅ **REQUIRED** | Use `new_data_story(hook, context, tension, resolution)` |
+| **Nested data_story format** | ❌ **REMOVED** | `variables`/`relationships` parameters removed in 0.4.0 |
+| **Telemetry presets** | ✅ **STABLE** | Use `bid_telemetry_presets("moderate")` for easier configuration |
 | **S3 classes and methods** | ✅ **STABLE** | Enhanced print, summary, and conversion methods |
 | **Tibble integration** | ✅ **OPTIONAL** | Automatic tibble output when package available |
 
-### Quick Migration Guide
+### Migration from 0.3.x to 0.4.0
+
+As of 0.4.0, the nested data_story format has been removed. Update your code:
 
 ```r
-# DEPRECATED (will be removed in 0.4.0)
+# OLD (removed in 0.4.0)
 story <- new_data_story(
   context = "Dashboard usage dropped",
   variables = list(hook = "Engagement declining"),
   relationships = list(resolution = "Analyze telemetry")
 )
 
-# RECOMMENDED (0.3.2+)
+# REQUIRED (0.4.0+)
 story <- new_data_story(
   hook = "Engagement declining",
   context = "Dashboard usage dropped 30%",
@@ -58,9 +60,9 @@ if (requireNamespace("tibble", quietly = TRUE)) {
 
 ## Enhanced Data Story Creation
 
-The `new_data_story()` function provides a structured way to create behavioral insights. **As of bidux 0.3.2, the flat API is the RECOMMENDED approach** for creating data stories.
+The `new_data_story()` function provides a structured way to create behavioral insights. **As of bidux 0.4.0, the flat API is the ONLY supported approach** for creating data stories.
 
-### Recommended: Flat API (0.3.2+)
+### Flat API (Required in 0.4.0+)
 
 The flat API accepts four intuitive arguments that map directly to storytelling elements:
 
@@ -85,33 +87,17 @@ story$resolution
 # Story is automatically structured for further BID framework usage
 ```
 
-### Deprecated: Nested Format (Removal in 0.4.0)
+### Legacy Nested Format (Removed in 0.4.0)
 
-The nested format using `variables` and `relationships` parameters is **DEPRECATED** and will be removed in bidux 0.4.0.
+The nested format using `variables` and `relationships` parameters was **REMOVED** in bidux 0.4.0. Code using this format will now error.
 
-```{r data_story_deprecated, eval = FALSE}
-# DEPRECATED: Nested format (will be removed in 0.4.0)
-# This will trigger a deprecation warning
-story_old <- new_data_story(
-  context = "Dashboard usage analysis",
-  variables = list(
-    metric = "engagement",
-    trend = "declining"
-  ),
-  relationships = list(
-    correlation = "negative_with_complexity"
-  )
-)
-# Warning: Using deprecated nested format for data_story
-# The flat API is now recommended: new_data_story(hook, context, tension, resolution)
-# Nested format (variables, relationships) will be removed in bidux 0.4.0
-```
+### Migration from Nested to Flat Format
 
-### Migration Guide
+If you're upgrading from 0.3.x, update your code from the old nested format to the flat format:
 
-**Old nested format:**
+**Old nested format (no longer supported):**
 ```{r migration_old, eval = FALSE}
-# OLD (deprecated)
+# OLD (removed in 0.4.0) - THIS WILL ERROR
 story <- new_data_story(
   context = "Dashboard usage dropped",
   variables = list(hook = "User engagement declining"),
@@ -119,9 +105,9 @@ story <- new_data_story(
 )
 ```
 
-**New flat format:**
+**Required flat format (0.4.0+):**
 ```{r migration_new, eval = FALSE}
-# NEW (recommended)
+# REQUIRED (0.4.0+)
 story <- new_data_story(
   hook = "User engagement declining",
   context = "Dashboard usage dropped 30%",
@@ -132,7 +118,7 @@ story <- new_data_story(
 
 ## Modern BID Framework Interpretation
 
-The enhanced `bid_interpret()` function captures user needs and central questions with comprehensive validation and modern S3 methods. **Always use the recommended flat API for data_story objects.**
+The enhanced `bid_interpret()` function captures user needs and central questions with comprehensive validation and modern S3 methods. **Always use the flat API for data_story objects (required in 0.4.0+).**
 
 ```{r interpret}
 # Basic interpretation with modern flat API (RECOMMENDED)
@@ -174,7 +160,7 @@ interpretation <- bid_interpret(
 print(interpretation)
 ```
 
-**Note:** While `bid_interpret()` still accepts plain list format for `data_story` for backward compatibility, using `new_data_story()` with the flat API is recommended for clarity and consistency.
+**Note:** While `bid_interpret()` still accepts plain list format for `data_story` for backward compatibility, using `new_data_story()` with the flat API is required for proper validation and consistency.
 
 ## Structured Dashboard Layout with bid_structure
 
@@ -216,10 +202,10 @@ summary(structured)
 
 ## Complete Workflow Example
 
-Demonstrate the full modernized BID framework workflow with consistent API patterns using the **RECOMMENDED flat API throughout**.
+Demonstrate the full modernized BID framework workflow with consistent API patterns using the **flat API throughout** (required in 0.4.0+).
 
 ```{r workflow}
-# Step 1: Interpret user needs and context (using RECOMMENDED flat API)
+# Step 1: Interpret user needs and context (using flat API)
 ui_analysis <- bid_interpret(
   central_question = "How can we improve landing page conversion without damaging user trust?",
   data_story = new_data_story(
@@ -300,29 +286,21 @@ try(bid_interpret(central_question = "test", data_story = "invalid")) # Invalid 
 # Descriptive validation errors for data story creation (flat API)
 try(new_data_story()) # Missing required parameter (context)
 try(new_data_story(context = "")) # Invalid empty context
-
-# Deprecated format still validates (but triggers warnings)
-try(new_data_story(
-  context = "Valid context",
-  variables = "invalid_type" # Must be a list
-))
 ```
 
-### Deprecation Warnings
+### Removed Features
 
-When using the deprecated nested format, you'll see helpful warnings:
+As of 0.4.0, the nested format is no longer supported and will produce an error:
 
-```{r deprecation_warning, eval = FALSE}
-# Using deprecated nested format triggers warning
-story <- new_data_story(
+```{r removed_features, eval = FALSE}
+# Nested format is no longer supported (removed in 0.4.0)
+try(new_data_story(
   context = "Dashboard analysis",
   variables = list(metric = "engagement"),
   relationships = list(trend = "declining")
-)
-# Warning message:
-# ! Using deprecated nested format for data_story
-# ℹ The flat API is now recommended: new_data_story(hook, context, tension, resolution)
-# ℹ Nested format (variables, relationships) will be removed in bidux 0.4.0
+))
+# Error: The nested data_story format (variables/relationships) was removed in bidux 0.4.0.
+# Please use the flat API: new_data_story(hook, context, tension, resolution)
 ```
 
 ## Telemetry Sensitivity Presets (New in 0.3.2)
@@ -390,7 +368,7 @@ When the tibble package is available, all functions can return modern tibble obj
 # Check if tibble is available
 if (requireNamespace("tibble", quietly = TRUE)) {
   # BID framework functions return tibbles by default when available
-  # Using RECOMMENDED flat API
+  # Using flat API
   result_tbl <- bid_interpret(
     central_question = "How can we test tibble integration?",
     data_story = new_data_story(
@@ -441,59 +419,34 @@ bid_structure_params <- c("insights", "format", "priority", "context", "return_t
 # - Modern data types (tibble when available)
 ```
 
-## Backward Compatibility
+## Breaking Changes in 0.4.0
 
-All enhancements maintain full backward compatibility - existing code continues to work with deprecation warnings where appropriate.
+As of version 0.4.0, the nested data_story format has been removed. This is a breaking change that requires updating existing code.
 
-```{r backward_compatibility, eval = FALSE}
-# Legacy nested format still works (with deprecation warning)
-old_style_story <- new_data_story(
-  context = "Dashboard analysis",
-  variables = list(metric = "engagement"),
-  relationships = list(trend = "declining")
-)
-# Triggers deprecation warning but functions correctly
+### What Was Removed
 
-# Modern flat API is recommended
-new_style_story <- new_data_story(
-  hook = "Engagement metrics show concerning trends",
-  context = "Dashboard analysis of Q3 2024 usage patterns",
-  tension = "User engagement declining despite new features",
-  resolution = "Implement BID framework to identify UX friction"
-)
+The following parameters and features are no longer supported:
 
-# Both can be used with bid_interpret()
-result_old <- bid_interpret(
-  central_question = "How to improve engagement?",
-  data_story = old_style_story,
-  quiet = TRUE
-)
+1. **Nested data_story format**: The `variables` and `relationships` parameters in `new_data_story()` have been removed
+2. **Layout auto-selection based on nested format**: Removed (flat API only)
+3. **Layout-specific bias mitigations**: Removed in favor of explicit bias mitigation strategies
 
-result_new <- bid_interpret(
-  central_question = "How to improve engagement?",
-  data_story = new_style_story,
-  quiet = TRUE
-)
-
-# Both return compatible structures
-identical(names(result_old), names(result_new))
-```
-
-### Migration Strategy
+### Required Migration Steps
 
 For codebases with existing nested data_story usage:
 
-1. **Immediate (0.3.2)**: Code continues to work with deprecation warnings
-2. **Short-term**: Update to flat API following warning guidance
-3. **Before 0.4.0**: Complete migration required (nested format will be removed)
+**Step 1: Identify all `new_data_story()` calls with variables/relationships**
+
+Search your codebase for:
+- `variables = list(`
+- `relationships = list(`
+
+**Step 2: Extract nested values and flatten**
 
 Example migration:
 
 ```{r migration_strategy, eval = FALSE}
-# Step 1: Identify all new_data_story() calls with variables/relationships
-# Step 2: Extract nested values and flatten
-
-# OLD CODE
+# OLD CODE (removed in 0.4.0) - THIS WILL ERROR
 story <- new_data_story(
   context = "User study results",
   variables = list(
@@ -506,7 +459,7 @@ story <- new_data_story(
   )
 )
 
-# NEW CODE (flattened)
+# NEW CODE (required in 0.4.0+)
 story <- new_data_story(
   hook = "Users struggle with feature discovery",
   context = "User study results: 42% task completion rate",
@@ -518,37 +471,45 @@ story <- new_data_story(
 )
 ```
 
+### Backward Compatibility for Other Features
+
+All other enhancements from 0.3.x maintain backward compatibility. Only the nested data_story format was removed.
+
 ## Summary
 
-The modernized bidux API (0.3.2+) provides:
+The modernized bidux API (0.4.0+) provides:
 
-### Core Modernizations
+### Core Features
 
-- **Flat data_story API (RECOMMENDED)**: Intuitive `new_data_story(hook, context, tension, resolution)` replaces nested format
+- **Flat data_story API (REQUIRED)**: Intuitive `new_data_story(hook, context, tension, resolution)` is the only supported format
 - **Telemetry sensitivity presets**: Pre-configured threshold sets (`strict`, `moderate`, `relaxed`) via `bid_telemetry_presets()`
 - **Enhanced S3 classes** with comprehensive method implementations
 - **Optional tibble support** for modern data handling
 - **Robust parameter validation** with clear error messages
 - **Consistent function interfaces** across all core functions
 
-### Deprecation Timeline
+### Breaking Changes in 0.4.0
 
-- **Nested data_story format** (variables/relationships): Deprecated in 0.3.2, removal in 0.4.0
-- Clear migration warnings guide users to recommended patterns
-- All legacy formats continue to work during deprecation period
+- **Nested data_story format** (variables/relationships): **REMOVED in 0.4.0**
+- **Layout auto-selection based on nested format**: **REMOVED in 0.4.0**
+- **Layout-specific bias mitigations**: **REMOVED in 0.4.0**
 
-### Best Practices for 0.3.2+
+Code using these features will now produce errors and must be updated.
+
+### Best Practices for 0.4.0+
 
 1. **Always use flat API for data stories**: `new_data_story(hook, context, tension, resolution)`
 2. **Use telemetry presets**: Start with `bid_telemetry_presets("moderate")` instead of manual thresholds
 3. **Leverage S3 methods**: Use `print()`, `summary()`, and `as_tibble()` for enhanced output
 4. **Follow modern patterns**: Embrace pipe workflows and tidy data principles
 
-### Backward Compatibility
+### Migration from 0.3.x
 
-- **Full backward compatibility** maintained for all existing code
-- Legacy formats trigger helpful deprecation warnings
-- Migration examples provided throughout documentation
-- Smooth transition path to modern patterns
+If upgrading from 0.3.x:
 
-These improvements make the package more robust, user-friendly, and suitable for modern R workflows while maintaining all existing functionality during the transition period.
+1. Search your codebase for `variables = list(` and `relationships = list(`
+2. Convert all nested format calls to flat format (see migration examples above)
+3. Test your code to ensure all data_story objects use the flat API
+4. Remove any layout-specific bias mitigation code
+
+These improvements make the package more robust, user-friendly, and suitable for modern R workflows with a cleaner, more maintainable API.

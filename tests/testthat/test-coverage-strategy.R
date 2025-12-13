@@ -105,12 +105,14 @@ test_that("suggestion system handles missing dependencies", {
 # ==============================================================================
 
 test_that("bid functions handle complex data story structures", {
-  # test nested data story with complex types
-  complex_story <- list(
+  # test data story with additional optional fields
+  complex_story <- new_data_story(
     hook = "Complex hook",
-    context = list(nested = "context"),
-    metrics = c(1, 2, 3),
-    visual_approach = NA
+    context = "Complex context",
+    tension = "Complex tension",
+    resolution = "Complex resolution",
+    audience = "Complex audience",
+    metrics = "metric1, metric2, metric3"
   )
 
   result <- bid_interpret(

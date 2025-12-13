@@ -18,3 +18,4 @@
 ^\.vscode$
 ^_pkgdown\.yml$
 ^pkgdown$
+^\.qodo$

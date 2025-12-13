@@ -102,7 +102,7 @@ create_full_workflow <- function(override_params = list()) {
   # Create Interpret stage
   interpret_params <- list(
     central_question = "How can we improve user engagement?",
-    data_story = list(
+    data_story = new_data_story(
       hook = "User engagement declining",
       context = "Recent changes to UI",
       tension = "Users finding features",
@@ -160,7 +160,7 @@ create_full_workflow <- function(override_params = list()) {
 }
 
 # test data objects
-sample_data_story <- list(
+sample_data_story <- new_data_story(
   hook = "Users struggle with interface",
   context = "Current design is complex",
   tension = "Performance issues arise",

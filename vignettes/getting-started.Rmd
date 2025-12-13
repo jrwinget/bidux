@@ -351,7 +351,7 @@ If you have telemetry data from user interactions, `{bidux}` can help transform 
 - Returns a hybrid object that works as both a list and enhanced object
 - Maintains backward compatibility with pre-0.3.1 code
 - Provides same analysis as `bid_telemetry()` with additional list interface
-- Will be soft-deprecated in 0.4.0
+- Soft-deprecated as of 0.4.0 (will be removed in a future version)
 
 Both functions analyze the same telemetry patterns:
 - **Unused inputs** - UI controls rarely or never used

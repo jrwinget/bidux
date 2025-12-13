@@ -45,8 +45,9 @@ support.
 \examples{
 interpret_result <- bid_interpret(
   central_question = "How can we improve user task completion?",
-  data_story = list(
+  data_story = new_data_story(
     hook = "Users are struggling with complex interfaces",
+    context = "Complex interfaces reducing completion",
     resolution = "Simplify key interactions"
   )
 )
