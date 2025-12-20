@@ -4,12 +4,10 @@
 \alias{build_concept_group}
 \title{Build suggestions for a specific concept}
 \usage{
-build_concept_group(concept, chosen_layout, previous_stage)
+build_concept_group(concept, previous_stage)
 }
 \arguments{
 \item{concept}{Name of the concept to generate suggestions for}
-
-\item{chosen_layout}{Selected layout type}
 
 \item{previous_stage}{Previous stage data}
 }

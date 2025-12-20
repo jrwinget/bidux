@@ -22,7 +22,12 @@ test_that("apply_suggestion_rules works with context data", {
   # test with interpret stage
   context_data <- list(
     central_question = "Short?",
-    data_story = list(hook = "test", context = "", tension = "", resolution = "")
+    data_story = new_data_story(
+      hook = "test",
+      context = "test context",
+      tension = "test tension",
+      resolution = "test resolution"
+    )
   )
 
   suggestions <- apply_suggestion_rules("Interpret", context_data)
@@ -33,7 +38,7 @@ test_that("apply_suggestion_rules works with context data", {
   # test with more complete context
   complete_context <- list(
     central_question = "How can we improve user engagement through better dashboard design?",
-    data_story = list(
+    data_story = new_data_story(
       hook = "Users are struggling with our dashboard",
       context = "Analytics show low engagement",
       tension = "Current design is confusing",
@@ -162,7 +167,12 @@ test_that("interpret stage rules work correctly", {
 
   # test data story completeness rule
   incomplete_context <- list(
-    data_story = list(hook = "test", context = "", tension = "", resolution = "")
+    data_story = new_data_story(
+      hook = "test",
+      context = "test context",
+      tension = "test tension",
+      resolution = "test resolution"
+    )
   )
 
   suggestions <- apply_suggestion_rules("interpret", incomplete_context)
@@ -346,7 +356,12 @@ test_that("all consolidated rules have valid conditions", {
   test_contexts <- list(
     interpret = list(
       central_question = "How can we improve?",
-      data_story = list(hook = "test", context = "test", tension = "", resolution = ""),
+      data_story = new_data_story(
+        hook = "test",
+        context = "test",
+        tension = "test tension",
+        resolution = "test resolution"
+      ),
       audience = "test audience"
     ),
     notice = list(
@@ -400,9 +415,11 @@ test_that("apply_suggestion_rules handles different context structures", {
 
   # test with nested list context
   nested_context <- list(
-    data_story = list(
-      hook = list(title = "Test", content = "Test content"),
-      context = "Test context"
+    data_story = new_data_story(
+      hook = "Test hook",
+      context = "Test context",
+      tension = "Test tension",
+      resolution = "Test resolution"
     )
   )
   nested_suggestions <- apply_suggestion_rules("interpret", nested_context)

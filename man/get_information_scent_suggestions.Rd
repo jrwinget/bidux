@@ -4,7 +4,7 @@
 \alias{get_information_scent_suggestions}
 \title{Generate Information Scent suggestions}
 \usage{
-get_information_scent_suggestions(chosen_layout, previous_stage)
+get_information_scent_suggestions(previous_stage)
 }
 \description{
 Generate Information Scent suggestions

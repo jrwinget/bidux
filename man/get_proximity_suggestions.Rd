@@ -4,7 +4,7 @@
 \alias{get_proximity_suggestions}
 \title{Generate Principle of Proximity suggestions}
 \usage{
-get_proximity_suggestions(chosen_layout, previous_stage)
+get_proximity_suggestions(previous_stage)
 }
 \description{
 Generate Principle of Proximity suggestions

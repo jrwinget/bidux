@@ -1,32 +1,29 @@
-# bidux 0.4.0 (2025-12-12)
+# bidux 0.4.0 (2025-12-15)
 ==========================
+
+### BREAKING CHANGES
+
+* **Removed nested data_story format.** The `variables` and `relationships` parameters have been removed from `new_data_story()`. Use the flat API instead: `new_data_story(hook, context, tension, resolution)`. See `vignette("api-modernization")` for migration guide.
+
+* **Removed layout auto-selection.** The `bid_structure()` function no longer auto-selects layouts or includes a `layout` field in results. The Structure stage now focuses exclusively on concept-based suggestions.
+
+* **Removed layout-specific bias mitigations.** The `bid_anticipate()` function no longer applies layout-dependent bias mappings. Use concept-based bias mitigations instead (auto-detected from Interpret stage content).
 
 ### NEW FEATURES
 
-* **OpenTelemetry (OTEL) integration for Shiny >= 1.12.0.** `bid_ingest_telemetry()` and `bid_telemetry()` now support native Shiny OpenTelemetry span data in addition to shiny.telemetry events. OTEL spans are automatically detected and converted to the standard bidux event schema for seamless analysis. Supported formats include OTLP JSON exports and OTEL-formatted SQLite databases.
+* **OpenTelemetry (OTEL) integration for Shiny >= 1.12.0.** `bid_ingest_telemetry()` and `bid_telemetry()` now support native Shiny OpenTelemetry span data in addition to shiny.telemetry events. OTEL spans are automatically detected and converted to the standard bidux event schema. Supported formats: OTLP JSON exports and OTEL-formatted SQLite databases.
 
-* **Automatic OTEL span-to-event conversion.** New conversion utilities intelligently map OTEL span types to bidux events:
-  - `session_start` spans → login events
-  - `session_end` spans → logout events
-  - `reactive` and `observe` spans → input events with automatic ID extraction
-  - `output` spans → output events
-  - `navigation` spans → navigation events
-  - Error events extracted from span events and attached to relevant spans
-  - Duration calculation from span start/end timestamps
+* **Automatic OTEL span-to-event conversion.** New utilities intelligently map OTEL span types to bidux events (session_start → login, session_end → logout, reactive/observe → input, output → output, navigation → navigation) with automatic ID extraction, error event handling, and duration calculation from span timestamps.
 
-* **Comprehensive OTEL format detection.** Auto-detection of OTEL JSON and SQLite formats based on file structure and content. Format parameter is optional - bidux automatically identifies whether data is from shiny.telemetry or OpenTelemetry sources.
+* **Enhanced telemetry readers.** New `read_otel_json()` and `read_otel_sqlite()` functions handle OTLP-formatted telemetry data with robust parsing. Exported utilities (`convert_otel_spans_to_events()`, `detect_otel_json()`, etc.) enable custom OTEL workflows.
 
-* **Enhanced telemetry readers.** New `read_otel_json()` and `read_otel_sqlite()` functions handle OTLP-formatted telemetry data, with robust parsing of nested span attributes and events. Exported utility functions (`convert_otel_spans_to_events()`, `detect_otel_json()`, etc.) enable custom OTEL workflows.
-
-* **Performance context for span analysis.** Duration metrics automatically calculated from OTEL span timestamps, enabling detection of slow reactives, delayed outputs, and performance bottlenecks.
+* **Analytics recommendations for static dashboards.** New `bid_suggest_analytics()` function recommends alternative analytics solutions (Plausible, Matomo, PostHog, etc.) for static Quarto dashboards where shiny.telemetry isn't available, with filtering by privacy preferences, budget, and self-hosting requirements.
 
 ### IMPROVEMENTS
 
-* **Unified telemetry pipeline.** Both shiny.telemetry and OTEL data flow through the same analysis pipeline, ensuring consistent friction detection and issue reporting regardless of telemetry source.
+* **Unified telemetry pipeline.** Both shiny.telemetry and OTEL data flow through the same analysis pipeline, ensuring consistent friction detection regardless of telemetry source.
 
-* **Extended telemetry preset compatibility.** `bid_telemetry_presets()` now works seamlessly with both shiny.telemetry events and OTEL spans, providing consistent sensitivity configurations across telemetry sources.
-
-* **Enhanced documentation.** New `vignette("otel-integration")` provides comprehensive setup guide for Shiny >= 1.12.0 OpenTelemetry, including instrumentation examples and conversion details. Updated telemetry vignette clarifies differences between shiny.telemetry and native OTEL approaches.
+* **Enhanced documentation.** New `vignette("otel-integration")` provides comprehensive setup guide for Shiny >= 1.12.0 OpenTelemetry. Updated `vignette("api-modernization")` documents breaking changes and migration paths.
 
 ### BUG FIXES
 
@@ -37,19 +34,14 @@
 
 ### TESTING
 
-* **Comprehensive OTEL test suite.** Added 500+ new test cases covering:
-  - OTEL span conversion for all span types (session, reactive, output, navigation, error)
-  - JSON and SQLite format detection and reading
-  - Backward compatibility with existing shiny.telemetry workflows
-  - Integration with telemetry analysis pipeline
-  - Performance context calculations
-  - Edge cases and error handling
+* Added 500+ new OTEL test cases covering span conversion, format detection, backward compatibility, and edge cases
+* All 2472 tests passing with comprehensive coverage of new features and breaking changes
 
 ### NOTES
 
-* OpenTelemetry support requires Shiny >= 1.12.0 and optional installation of `otel` package for OTLP reading
-* OTEL functionality is automatically available when `otel` package is installed; falls back gracefully with informative messages if not available
-* All existing shiny.telemetry code continues to work unchanged - no migration required
+* OpenTelemetry support requires Shiny >= 1.12.0 and optional `otel` package installation
+* Existing shiny.telemetry code continues to work unchanged - no migration required for telemetry features
+* See `vignette("api-modernization")` for guidance on migrating from removed features
 
 # bidux 0.3.3 (2025-11-19)
 ==========================

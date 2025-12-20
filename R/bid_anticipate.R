@@ -23,7 +23,7 @@
 #' @examples
 #' interpret_stage <- bid_interpret(
 #'   central_question = "How can we improve selection efficiency?",
-#'   data_story = list(
+#'   data_story = new_data_story(
 #'     hook = "Too many options",
 #'     context = "Excessive choices",
 #'     tension = "User frustration",
@@ -275,76 +275,7 @@ bid_anticipate <- function(
       }
     }
 
-    # apply layout-specific bias mitigations when layout information is
-    # available
-    # DEPRECATED in 0.3.1:
-    # TODO: Remove layout-specific bias mitigations in 0.4.0 before release
-    #       This entire if block (lines 282-344) should be deleted.
-    #       Keep only concept-based approach (lines 246-276).
-    if (!is.na(layout)) {
-      # issue deprecation warning once per session (skip in tests to reduce
-      # noise). use package namespace instead of global environment for CRAN
-      # compliance
-      pkg_env <- asNamespace("bidux")
-      if (
-        !exists(".bid_layout_bias_warned", envir = pkg_env) &&
-          !identical(Sys.getenv("TESTTHAT"), "true")
-      ) {
-        warning(
-          paste(
-            "Layout-specific bias mitigations are deprecated",
-            "and will be removed soon."
-          ),
-          "Consider using concept-based bias mitigations instead.",
-          call. = FALSE
-        )
-        try(
-          assign(".bid_layout_bias_warned", TRUE, envir = pkg_env),
-          silent = TRUE
-        )
-      }
-
-      layout_bias_map <- list(
-        "dual_process" = c(
-          "framing" = paste(
-            "Toggle between high-level summary",
-            "and detailed analysis views"
-          )
-        ),
-        "grid" = c(
-          "anchoring" = paste(
-            "Provide multiple reference points across grid cells",
-            "to avoid single point anchoring"
-          )
-        ),
-        "card" = c(
-          "beautiful-is-good stereotype" = paste(
-            "Ensure card aesthetic appeal doesn't overshadow",
-            "content quality"
-          )
-        ),
-        "tabs" = c(
-          "availability bias" = paste(
-            "Make important information available in the default tab",
-            "to prevent availability bias"
-          )
-        ),
-        "breathable" = c(
-          "cognitive load" = paste(
-            "Use generous whitespace to reduce cognitive load",
-            "and improve focus"
-          )
-        )
-      )
-
-      if (!is.na(layout) && layout %in% names(layout_bias_map)) {
-        for (bias_name in names(layout_bias_map[[layout]])) {
-          suggested_biases[[bias_name]] <- layout_bias_map[[layout]][[
-            bias_name
-          ]]
-        }
-      }
-    } else if (previous_stage$stage[1] == "Interpret") {
+    if (previous_stage$stage[1] == "Interpret") {
       story_elements <- list()
       for (field in c("central_question", "hook", "tension", "resolution")) {
         if (

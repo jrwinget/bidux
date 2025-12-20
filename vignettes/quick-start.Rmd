@@ -63,15 +63,14 @@ print(filter_problem$theory) # "Cognitive Load Theory"
 **Get structure suggestions:**
 
 ```{r problem1-suggestions}
-# Get layout recommendations
+# Get structure recommendations
 structure_result <- bid_structure(previous_stage = filter_problem)
-
-# bidux recommends "breathable" layout to reduce cognitive load
-print(structure_result$layout)
-print(structure_result$layout_rationale)
 
 # See concrete suggestions organized by UX concept
 View(structure_result$suggestions)
+
+# Access flattened tibble for easier filtering
+suggestions_flat <- structure_result$suggestions_tbl[[1]]
 ```
 
 **Apply the fix:**
@@ -349,12 +348,11 @@ top_notice <- notices[[1]]
 # Get structure suggestions for this specific issue
 structure_result <- bid_structure(
   previous_stage = top_notice,
-  telemetry_flags = bid_flags(issues) # Informs layout selection
+  telemetry_flags = bid_flags(issues) # Informs suggestion scoring
 )
 
 # Review suggestions
-print(structure_result$layout)
-print(structure_result$layout_rationale)
+print(structure_result$suggestions)
 ```
 
 ### Step 4: Use Flags for Decision Making

@@ -4,7 +4,7 @@
 \alias{get_onboarding_suggestions}
 \title{Generate User Onboarding suggestions}
 \usage{
-get_onboarding_suggestions(chosen_layout, previous_stage)
+get_onboarding_suggestions(previous_stage)
 }
 \description{
 Generate User Onboarding suggestions

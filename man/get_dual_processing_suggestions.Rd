@@ -4,7 +4,7 @@
 \alias{get_dual_processing_suggestions}
 \title{Generate Dual-Processing Theory suggestions}
 \usage{
-get_dual_processing_suggestions(chosen_layout, previous_stage)
+get_dual_processing_suggestions(previous_stage)
 }
 \description{
 Generate Dual-Processing Theory suggestions
