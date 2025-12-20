@@ -1,5 +1,5 @@
-# Declare global variables to avoid R CMD check NOTEs
-# These are used in dplyr/NSE contexts within read_otel_sqlite
+# declare global variables to avoid R CMD check NOTEs
+# these are used in dplyr/NSE contexts within read_otel_sqlite
 utils::globalVariables(c("span_id", "value", "key"))
 
 #' Get predefined telemetry sensitivity presets

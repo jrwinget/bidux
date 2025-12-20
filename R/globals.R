@@ -1,10 +1,10 @@
-# Variables used in dplyr operations
+# variables used in dplyr operations
 utils::globalVariables(
   c(
     "concept", # used in bid_concept() filtering
     "relevance", # used in bid_suggest_components() ordering
 
-    # Telemetry analysis variables
+    # telemetry analysis variables
     "session_id", # used in find_delayed_sessions and find_error_patterns
     "event_type", # used in find_delayed_sessions
     "error_message", # used in find_error_patterns
@@ -21,7 +21,7 @@ utils::globalVariables(
     "avg_changes", # used in find_confusion_patterns
     "usage_rate", # used in find_unused_inputs
 
-    # Accessibility validation variables
+    # accessibility validation variables
     "screen_reader", # used in validate_accessibility_parameter
     "keyboard_navigation", # used in validate_accessibility_parameter
     "color_contrast", # used in validate_accessibility_parameter
@@ -31,7 +31,7 @@ utils::globalVariables(
     "semantic_markup", # used in validate_accessibility_parameter
     "aria_labels", # used in validate_accessibility_parameter
 
-    # Concept matching variables
+    # concept matching variables
     "category", # used in concept matching functions
     "description", # used in concept descriptions
     "implementation_tip", # used in concept implementation tips
@@ -43,7 +43,7 @@ utils::globalVariables(
     "layout", # used in layout mappings
     "components", # used in component suggestions
 
-    # Stage validation variables
+    # stage validation variables
     "stage", # used in stage validation
     "problem", # used in problem validation
     "evidence", # used in evidence validation
@@ -59,7 +59,7 @@ utils::globalVariables(
     "bias_mitigations", # used in bias mitigation validation
     "interaction_principles", # used in interaction principle validation
 
-    # Component suggestion variables
+    # component suggestion variables
     "framework", # used in component framework filtering
     "stage_relevance", # used in stage-specific component scoring
     "layout_score", # used in layout-specific component scoring
@@ -70,7 +70,7 @@ utils::globalVariables(
     "component_type", # used in component type filtering
     "component_description", # used in component descriptions
 
-    # Additional telemetry variables
+    # additional telemetry variables
     "navigation_id", # used in find_navigation_dropoffs
     "unique_sessions", # used in find_navigation_dropoffs
     "visit_rate", # used in find_navigation_dropoffs
@@ -79,6 +79,6 @@ utils::globalVariables(
   )
 )
 
-# Import required functions from base packages
+# import required functions from base packages
 #' @importFrom stats complete.cases
 NULL
