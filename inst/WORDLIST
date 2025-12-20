@@ -33,6 +33,7 @@ json
 Jupyter
 Knaflic
 lifecycle
+Matomo
 memoise
 mitigations
 observeEvent
@@ -50,6 +51,7 @@ pkgdown
 plot1
 plotly
 POSIXct
+PostHog
 pre
 reactable
 Reactives

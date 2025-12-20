@@ -332,7 +332,11 @@ create_temp_otel_sqlite <- function(spans_df, db_path = NULL) {
           attrs_rows[[length(attrs_rows) + 1]] <- list(
             span_id = span_id,
             key = attr$key,
-            value = attr$value$stringValue %||% attr$value$intValue %||% attr$value$doubleValue %||% NA_character_
+            value = attr$value$stringValue %||%
+              attr$value$intValue %||%
+              attr$value$doubleValue %||%
+              attr$value$boolValue %||%
+              NA_character_
           )
         }
       }

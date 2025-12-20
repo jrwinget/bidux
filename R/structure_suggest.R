@@ -54,7 +54,7 @@ safe_stage_data_story_access <- function(previous_stage, element) {
 }
 
 # ==============================================================================
-# CONCEPT-GROUPED STRUCTURE SUGGESTIONS
+# concept-grouped structure suggestions
 # ==============================================================================
 
 #' Generate ranked, concept-grouped, actionable UI/UX suggestions
@@ -580,7 +580,7 @@ adjust_suggestion_score <- function(
 }
 
 # ==============================================================================
-# TIBBLE CONVERSION UTILITIES
+# tibble conversion utilities
 # ==============================================================================
 
 #' Assign difficulty rating based on components and suggestion complexity

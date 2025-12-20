@@ -503,8 +503,8 @@ convert_otel_spans_to_events <- function(spans_df) {
     ))
   }
 
-  # initialize result list
-  events_list <- vector("list", nrow(spans_df))
+  # initialize result list (dynamically build without pre-allocation to avoid NULL entries)
+  events_list <- list()
 
   # process each span
   for (i in seq_len(nrow(spans_df))) {
@@ -579,8 +579,8 @@ convert_otel_spans_to_events <- function(spans_df) {
       next
     }
 
-    # create primary event record
-    events_list[[i]] <- tibble::tibble(
+    # create primary event record (append to list using length + 1)
+    events_list[[length(events_list) + 1]] <- tibble::tibble(
       timestamp = timestamp,
       session_id = session_id,
       event_type = event_type,
@@ -611,9 +611,7 @@ convert_otel_spans_to_events <- function(spans_df) {
     }
   }
 
-  # remove NULL entries (skipped spans)
-  events_list <- events_list[!sapply(events_list, is.null)]
-
+  # check if we have any events
   if (length(events_list) == 0) {
     # return empty tibble with correct schema
     return(tibble::tibble(

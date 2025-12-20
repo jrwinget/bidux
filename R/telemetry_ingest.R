@@ -1160,6 +1160,36 @@ detect_otel_json <- function(source_path) {
   )
 }
 
+#' Check JSON nesting depth recursively
+#'
+#' @description
+#' Validates that JSON data does not exceed a maximum nesting depth to prevent
+#' stack overflow and resource exhaustion attacks.
+#'
+#' @param obj JSON object (list or other R object from `jsonlite::fromJSON`)
+#' @param max_depth Maximum allowed nesting depth (default: 50)
+#' @param current_depth Current recursion depth (internal use)
+#' @return Logical `TRUE` if depth is acceptable, aborts with error if exceeded
+#' @keywords internal
+check_json_depth <- function(obj, max_depth = 50, current_depth = 1) {
+  if (current_depth > max_depth) {
+    cli::cli_abort(c(
+      "JSON nesting depth exceeds security limit",
+      "x" = "Maximum allowed depth: {max_depth} levels",
+      "i" = "This file may be malformed or malicious",
+      "i" = "Consider using trusted data sources only"
+    ))
+  }
+
+  if (is.list(obj)) {
+    for (element in obj) {
+      check_json_depth(element, max_depth, current_depth + 1)
+    }
+  }
+
+  return(TRUE)
+}
+
 #' Read OpenTelemetry JSON (OTLP) file
 #'
 #' @description
@@ -1187,6 +1217,9 @@ read_otel_json <- function(path) {
     {
       # parse otlp json structure
       json_data <- jsonlite::fromJSON(path, simplifyVector = FALSE)
+
+      # validate JSON depth to prevent stack overflow attacks
+      check_json_depth(json_data, max_depth = 50)
 
       # validate otlp structure
       if (!"resourceSpans" %in% names(json_data)) {
@@ -1254,7 +1287,11 @@ read_otel_json <- function(path) {
         trace_id <- if (is.null(span$traceId)) {
           NA_character_
         } else if (is.list(span$traceId)) {
-          as.character(span$traceId[[1]])
+          if (length(span$traceId) > 0) {
+            as.character(span$traceId[[1]])
+          } else {
+            NA_character_
+          }
         } else {
           as.character(span$traceId)
         }
@@ -1262,7 +1299,11 @@ read_otel_json <- function(path) {
         span_id <- if (is.null(span$spanId)) {
           NA_character_
         } else if (is.list(span$spanId)) {
-          as.character(span$spanId[[1]])
+          if (length(span$spanId) > 0) {
+            as.character(span$spanId[[1]])
+          } else {
+            NA_character_
+          }
         } else {
           as.character(span$spanId)
         }
@@ -1270,7 +1311,11 @@ read_otel_json <- function(path) {
         parent_span_id <- if (is.null(span$parentSpanId)) {
           NA_character_
         } else if (is.list(span$parentSpanId)) {
-          as.character(span$parentSpanId[[1]])
+          if (length(span$parentSpanId) > 0) {
+            as.character(span$parentSpanId[[1]])
+          } else {
+            NA_character_
+          }
         } else {
           as.character(span$parentSpanId)
         }
@@ -1278,7 +1323,11 @@ read_otel_json <- function(path) {
         start_time <- if (is.null(span$startTimeUnixNano)) {
           NA_character_
         } else if (is.list(span$startTimeUnixNano)) {
-          as.character(span$startTimeUnixNano[[1]])
+          if (length(span$startTimeUnixNano) > 0) {
+            as.character(span$startTimeUnixNano[[1]])
+          } else {
+            NA_character_
+          }
         } else {
           as.character(span$startTimeUnixNano)
         }
@@ -1286,7 +1335,11 @@ read_otel_json <- function(path) {
         end_time <- if (is.null(span$endTimeUnixNano)) {
           NA_character_
         } else if (is.list(span$endTimeUnixNano)) {
-          as.character(span$endTimeUnixNano[[1]])
+          if (length(span$endTimeUnixNano) > 0) {
+            as.character(span$endTimeUnixNano[[1]])
+          } else {
+            NA_character_
+          }
         } else {
           as.character(span$endTimeUnixNano)
         }
@@ -1394,8 +1447,23 @@ read_otel_sqlite <- function(source) {
 
         # pivot attributes to wide format
         if (nrow(attrs) > 0) {
-          # group attributes by span_id and create nested list
+          # Check for and warn about duplicate attribute keys
+          dup_check <- attrs |>
+            dplyr::group_by(span_id, key) |>
+            dplyr::filter(dplyr::n() > 1)
+
+          if (nrow(dup_check) > 0) {
+            cli::cli_warn(c(
+              "Duplicate attribute keys detected in OTEL data",
+              "i" = "Keeping first occurrence of duplicate keys",
+              "i" = "Affected spans: {length(unique(dup_check$span_id))} span(s)"
+            ))
+          }
+
+          # Pivot with deduplication
           attrs_wide <- attrs |>
+            dplyr::group_by(span_id, key) |>
+            dplyr::slice(1) |>  # Keep first occurrence
             dplyr::group_by(span_id) |>
             dplyr::summarise(
               attributes = list(setNames(
