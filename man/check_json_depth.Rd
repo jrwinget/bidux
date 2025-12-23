@@ -14,7 +14,7 @@ check_json_depth(obj, max_depth = 50, current_depth = 1)
 \item{current_depth}{Current recursion depth (internal use)}
 }
 \value{
-Logical TRUE if depth is acceptable, aborts with error if exceeded
+Logical \code{TRUE} if depth is acceptable, aborts with error if exceeded
 }
 \description{
 Validates that JSON data does not exceed a maximum nesting depth to prevent

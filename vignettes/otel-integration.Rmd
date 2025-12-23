@@ -139,7 +139,7 @@ library(otelsdk)
 Sys.setenv(
   OTEL_TRACES_EXPORTER = "otlp",
   OTEL_EXPORTER_OTLP_PROTOCOL = "http/json",
-  OTEL_EXPORTER_OTLP_ENDPOINT = "file:///path/to/otel_spans.json"
+  OTEL_EXPORTER_OTLP_ENDPOINT = "/path/to/otel_spans.json"
 )
 
 # Enable collection
@@ -148,6 +148,11 @@ options(shiny.otel.collect = "all")
 # Run your Shiny app
 # Spans will be exported to otel_spans.json
 }
+```
+
+**Security Note:** Always use telemetry data from trusted sources. The `{bidux}` package includes protections against malformed data, but users should only analyze telemetry files they have generated from their own applications.
+
+```{r json_export, echo=FALSE}
 ```
 
 #### Option 2: SQLite Database Export
@@ -432,7 +437,7 @@ library(otelsdk)
 # Enable OTEL with file export
 Sys.setenv(
   OTEL_TRACES_EXPORTER = "otlp",
-  OTEL_EXPORTER_OTLP_ENDPOINT = "file:///tmp/shiny_otel.json"
+  OTEL_EXPORTER_OTLP_ENDPOINT = "/tmp/shiny_otel.json"
 )
 options(shiny.otel.collect = "all")
 

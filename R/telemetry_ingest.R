@@ -635,6 +635,15 @@ bid_ingest_telemetry <- function(
     path <- source
     path_for_message <- path
 
+    if (grepl("^file://", path, ignore.case = TRUE)) {
+      cli::cli_abort(c(
+        "file:// URLs are not supported",
+        "i" = "Please provide a filesystem path instead",
+        "x" = "Invalid: 'file:///path/to/file.json'",
+        "v" = "Correct: '/path/to/file.json'"
+      ))
+    }
+
     # enhanced file validation
     if (!file.exists(path)) {
       cli::cli_abort("Telemetry file not found: {path}")

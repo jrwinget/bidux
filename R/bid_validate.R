@@ -1,3 +1,54 @@
+# TODO [0.4.0 - Accessibility Auditing Integration]: Add accessibility audit to validation stage
+#
+# INTEGRATION TASKS:
+#
+# [ ] 1. Add new parameters to bid_validate():
+#     - include_accessibility_audit = TRUE (default: run audit during validation)
+#     - accessibility_level = c("AA", "A", "AAA") (default: "AA")
+#     - html_output = NULL (optional: for deeper HTML-based checks)
+#
+# [ ] 2. Update function body:
+#     - After existing validation logic, check if include_accessibility_audit = TRUE
+#     - If TRUE, call bid_audit_accessibility(previous_stage, wcag_level = accessibility_level, html_output = html_output, quiet = quiet)
+#     - Store audit results in validation output
+#     - Generate summary message: "Accessibility audit: Score X/100 (Y critical, Z high violations)"
+#
+# [ ] 3. Integrate audit results into validation suggestions:
+#     - If accessibility score < 80, add high-priority validation suggestion
+#     - If critical violations exist, add them to next_steps
+#     - Link violations back to specific components from Structure stage
+#
+# [ ] 4. Update validation output tibble:
+#     - Add accessibility_audit column containing nested audit results tibble
+#     - Add accessibility_score column with overall score (0-100)
+#     - Add accessibility_status column: "Pass" (>=90), "Warning" (80-89), "Fail" (<80)
+#
+# [ ] 5. Update @param documentation:
+#     - Document new include_accessibility_audit parameter
+#     - Document new accessibility_level parameter
+#     - Document new html_output parameter
+#
+# [ ] 6. Add to @examples:
+#     ```r
+#     # Validation with accessibility audit
+#     validate_result <- bid_validate(
+#       previous_stage = structure_result,
+#       include_accessibility_audit = TRUE,
+#       accessibility_level = "AA"
+#     )
+#
+#     # View accessibility audit results
+#     validate_result$accessibility_audit
+#     ```
+#
+# [ ] 7. Update tests in tests/testthat/test-bid_validate.R:
+#     - Test with include_accessibility_audit = TRUE
+#     - Test with different accessibility_level values
+#     - Test that audit results are properly attached
+#     - Test integration with other validation features
+#
+# See R/bid_audit_accessibility.R for complete accessibility audit implementation details
+
 #' Document User Validation Stage in BID Framework
 #'
 #' @description

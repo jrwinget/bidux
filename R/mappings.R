@@ -354,6 +354,24 @@ get_layout_concepts <- function(layout, mappings = NULL) {
   return(c("Visual Hierarchy", "Principle of Proximity"))
 }
 
+# TODO [0.4.0 - Accessibility Data Expansion]: Expand accessibility guidelines for comprehensive auditing
+#
+# See detailed implementation plan in R/bid_audit_accessibility.R
+# This TODO focuses on data layer enhancements needed for the audit feature.
+#
+# QUICK REFERENCE:
+# [ ] Expand inst/extdata/accessibility_guidelines.csv to 50+ WCAG 2.1 Level AA criteria
+# [ ] Add columns: guideline_id, category, automated_check, check_logic, common_violations,
+#     fix_examples, component_types, bid_concepts, reference_url
+# [ ] Create inst/extdata/component_accessibility_map.csv mapping components to guidelines
+# [ ] Add load_component_accessibility_map() function
+# [ ] Add get_component_accessibility_requirements() function
+# [ ] Update load_accessibility_guidelines() to handle expanded structure
+# [ ] Ensure backward compatibility
+#
+# ESTIMATED TIME: 1 day
+# See R/bid_audit_accessibility.R for complete implementation details
+
 #' Load accessibility guidelines
 #'
 #' @param custom_guidelines Optional custom guidelines data frame
