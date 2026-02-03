@@ -277,12 +277,11 @@ test_that("check_json_depth passes for valid depth", {
 })
 
 test_that("check_json_depth rejects excessive nesting", {
-  # Create deeply nested structure
-  deeply_nested <- list(level1 = list())
-  current <- deeply_nested$level1
-  for (i in 2:60) {
-    current[[paste0("level", i)]] <- list()
-    current <- current[[1]]
+  # create deeply nested structure using recursive approach
+  # r copies lists so we need to build from inside out
+  deeply_nested <- list()
+  for (i in 60:1) {
+    deeply_nested <- list(deeply_nested)
   }
 
   expect_error(

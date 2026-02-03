@@ -264,7 +264,7 @@ test_that("read_otel_json errors on invalid OTLP structure", {
 
   expect_error(
     bidux:::read_otel_json(temp_file),
-    "resourceSpans"
+    "Invalid OTLP JSON structure"
   )
 
   unlink(temp_file)

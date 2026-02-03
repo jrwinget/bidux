@@ -1067,12 +1067,7 @@ read_telemetry_json <- function(path) {
         events_list <- events_list[!sapply(events_list, is.null)]
 
         if (length(events_list) == 0) {
-          return(data.frame(
-            timestamp = character(),
-            session_id = character(),
-            event_type = character(),
-            stringsAsFactors = FALSE
-          ))
+          cli::cli_abort("No valid JSON could be parsed from file")
         }
 
         # filter out events that don't have required fields
@@ -1273,16 +1268,26 @@ read_otel_json <- function(path) {
         attrs_list <- list()
         if (!is.null(span$attributes)) {
           for (attr in span$attributes) {
-            key <- attr$key
-            # extract value from nested structure
-            value <- if (!is.null(attr$value$stringValue)) {
-              attr$value$stringValue
-            } else if (!is.null(attr$value$intValue)) {
-              attr$value$intValue
-            } else if (!is.null(attr$value$doubleValue)) {
-              attr$value$doubleValue
-            } else if (!is.null(attr$value$boolValue)) {
-              attr$value$boolValue
+            # handle key that might be a list (from auto_unbox = FALSE)
+            key <- if (is.list(attr$key)) {
+              as.character(attr$key[[1]])
+            } else {
+              as.character(attr$key)
+            }
+            # extract value from nested structure (also handle list-wrapped values)
+            raw_value <- attr$value
+            value <- if (!is.null(raw_value$stringValue)) {
+              v <- raw_value$stringValue
+              if (is.list(v)) v[[1]] else v
+            } else if (!is.null(raw_value$intValue)) {
+              v <- raw_value$intValue
+              if (is.list(v)) v[[1]] else v
+            } else if (!is.null(raw_value$doubleValue)) {
+              v <- raw_value$doubleValue
+              if (is.list(v)) v[[1]] else v
+            } else if (!is.null(raw_value$boolValue)) {
+              v <- raw_value$boolValue
+              if (is.list(v)) v[[1]] else v
             } else {
               NA
             }
@@ -1353,8 +1358,17 @@ read_otel_json <- function(path) {
           as.character(span$endTimeUnixNano)
         }
 
+        # handle name that might be a list
+        span_name <- if (is.null(span$name)) {
+          NA_character_
+        } else if (is.list(span$name)) {
+          if (length(span$name) > 0) as.character(span$name[[1]]) else NA_character_
+        } else {
+          as.character(span$name)
+        }
+
         tibble::tibble(
-          name = span$name %||% NA_character_,
+          name = span_name,
           traceId = trace_id,
           spanId = span_id,
           parentSpanId = parent_span_id,

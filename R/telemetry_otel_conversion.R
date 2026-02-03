@@ -394,8 +394,8 @@ extract_error_message_from_span <- function(span_events) {
   if (is.data.frame(span_events)) {
     error_events <- span_events[span_events$name %in% c("error", "exception"), ]
     if (nrow(error_events) > 0) {
-      # look for message column
-      for (col_name in c("message", "error.message", "exception.message")) {
+      # look for message column (various naming conventions)
+      for (col_name in c("message", "error_message", "error.message", "exception.message")) {
         if (col_name %in% names(error_events)) {
           msg <- error_events[[col_name]][1]
           if (!is.na(msg) && nchar(trimws(msg)) > 0) {
@@ -545,17 +545,18 @@ convert_otel_spans_to_events <- function(spans_df) {
       } else if (grepl("^output:", span_name) || span_name == "output") {
         event_type <- "output"
         output_id <- extract_output_id_from_span(span_name, span_attrs)
+      } else if (span_name == "reactive_update") {
+        # reactive updates indicate reactive recalculations
+        # treat as synthetic timing events (could be input-driven)
+        # check this before the generic reactive/observe regex
+        event_type <- "reactive_update"
+        input_id <- extract_input_id_from_span(span_name, span_attrs)
       } else if (grepl("^(reactive|observe)", span_name)) {
         event_type <- "input"
         input_id <- extract_input_id_from_span(span_name, span_attrs)
       } else if (span_name == "navigation") {
         event_type <- "navigation"
         navigation_id <- extract_navigation_id_from_span(span_attrs)
-      } else if (span_name == "reactive_update") {
-        # reactive updates indicate reactive recalculations
-        # treat as synthetic timing events (could be input-driven)
-        event_type <- "reactive_update"
-        input_id <- extract_input_id_from_span(span_name, span_attrs)
       }
     }
 

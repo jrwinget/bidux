@@ -87,19 +87,19 @@ test_that("bid_suggest_analytics handles combined filters", {
 })
 
 test_that("bid_suggest_analytics handles restrictive filters gracefully", {
-  # Very restrictive filter - may return empty
-
+  # very restrictive filter - will return empty and warn
   expect_warning(
     result <- bid_suggest_analytics(
       privacy_preference = "privacy_focused",
       budget = "free",
       self_hosted = TRUE
     ),
-    NA # May or may not warn depending on data
+    "No analytics solutions match your criteria"
   )
 
-  # Result should be data frame (possibly empty)
+  # result should be empty data frame
   expect_true(is.data.frame(result))
+  expect_equal(nrow(result), 0)
 })
 
 test_that("bid_suggest_analytics results are properly sorted", {
