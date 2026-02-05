@@ -1,3 +1,96 @@
+# TODO [0.4.0 - Accessibility Reporting]: Add accessibility audit section to reports
+#
+# REPORTING ENHANCEMENT TASKS:
+#
+# [ ] 1. Detect accessibility audit in validate_stage:
+#     - Check if validate_stage contains accessibility_audit column
+#     - Check if validate_stage contains accessibility_score column
+#     - If present, extract for reporting
+#
+# [ ] 2. Add accessibility section to report output (all formats):
+#     - Section title: "## Accessibility Audit" (markdown) or "\nACCESSIBILITY AUDIT\n" (text)
+#     - Overall score: "Score: X/100" with grade (A+ >= 95, A >= 90, B >= 80, C >= 70, D >= 60, F < 60)
+#     - Summary: "Y critical, Z high, W medium, V low violations"
+#     - WCAG compliance badge: "WCAG 2.1 Level AA: [PASS/FAIL]" (pass if score >= 90)
+#
+# [ ] 3. Format violations table by severity:
+#     TEXT format:
+#     ```
+#     CRITICAL VIOLATIONS (2):
+#     - [bslib::value_box] Color Contrast: Insufficient contrast ratio
+#       Fix: Increase contrast to 4.5:1 minimum
+#     - [plotly::plot_ly] Missing ARIA Labels: Charts lack descriptive labels
+#       Fix: Add aria-label attribute to all plots
+#
+#     HIGH VIOLATIONS (5):
+#     ...
+#     ```
+#
+#     HTML format:
+#     ```html
+#     <div class="accessibility-audit">
+#       <h2>Accessibility Audit</h2>
+#       <div class="audit-score">
+#         <span class="score">85/100</span>
+#         <span class="grade">B</span>
+#       </div>
+#       <table class="violations">
+#         <tr class="critical">...</tr>
+#       </table>
+#     </div>
+#     ```
+#     - Use color coding: Critical = red, High = orange, Medium = yellow, Low = blue
+#     - Make violations clickable links to WCAG documentation
+#
+#     MARKDOWN format:
+#     ```markdown
+#     ## Accessibility Audit
+#
+#     **Score:** 85/100 (Grade: B)
+#     **WCAG 2.1 Level AA:** ⚠️ Warning
+#
+#     ### Critical Violations (2)
+#
+#     | Component | Guideline | Issue | Remediation |
+#     |-----------|-----------|-------|-------------|
+#     | bslib::value_box | 1.4.3 Contrast (Minimum) | Insufficient contrast | Increase to 4.5:1 |
+#     ```
+#
+# [ ] 4. Add remediation section:
+#     - Group violations by component
+#     - Show code examples for fixes
+#     - Link to accessibility vignette for details
+#
+# [ ] 5. Add accessibility badge/banner for high-quality dashboards:
+#     - If score >= 95: "✅ Excellent Accessibility (A+)"
+#     - If score >= 90: "✅ WCAG 2.1 Level AA Compliant"
+#     - If score >= 80: "⚠️ Good accessibility with minor issues"
+#     - If score < 80: "❌ Accessibility improvements needed"
+#
+# [ ] 6. Export options:
+#     - CSV export: Allow exporting violations table to CSV for tracking
+#     - JSON export: Machine-readable format for CI/CD integration
+#     - Add to existing format options (text, html, markdown)
+#
+# [ ] 7. Integration with existing report sections:
+#     - Place accessibility audit after "Structure" section, before "Validate" section
+#     - Cross-reference components from Structure stage
+#     - Link violations to specific suggestions
+#
+# [ ] 8. Update documentation:
+#     - Update @description to mention accessibility reporting
+#     - Add @param for potential export_format parameter (if adding CSV/JSON)
+#     - Update @examples to show accessibility report output
+#
+# [ ] 9. Testing:
+#     - Test with validate_stage that includes accessibility audit
+#     - Test with validate_stage that doesn't include accessibility audit (graceful handling)
+#     - Test all output formats (text, html, markdown)
+#     - Test with varying levels of violations
+#     - Test empty audit results
+#
+# See R/bid_audit_accessibility.R for audit data structure and R/bid_validate.R for integration details
+
 #' Generate BID Framework Report
 #'
 #' @description

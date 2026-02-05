@@ -42,9 +42,9 @@ test_that("telemetry data normalization handles malformed data", {
   writeLines('{"invalid": json}', bad_json_file)
   on.exit(unlink(bad_json_file))
 
-  expect_warning(
+  expect_error(
     bid_ingest_telemetry(bad_json_file),
-    "No telemetry events found"
+    "Error reading JSON file"
   )
 
   # test empty JSON file
@@ -105,12 +105,14 @@ test_that("suggestion system handles missing dependencies", {
 # ==============================================================================
 
 test_that("bid functions handle complex data story structures", {
-  # test nested data story with complex types
-  complex_story <- list(
+  # test data story with additional optional fields
+  complex_story <- new_data_story(
     hook = "Complex hook",
-    context = list(nested = "context"),
-    metrics = c(1, 2, 3),
-    visual_approach = NA
+    context = "Complex context",
+    tension = "Complex tension",
+    resolution = "Complex resolution",
+    audience = "Complex audience",
+    metrics = "metric1, metric2, metric3"
   )
 
   result <- bid_interpret(

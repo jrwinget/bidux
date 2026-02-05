@@ -333,7 +333,9 @@ Future versions of `{bidux}` will include:
 
 ## Integrating Telemetry Data (New in 0.3.1)
 
-If you have telemetry data from user interactions (e.g., from the `{shiny.telemetry}` package), `{bidux}` can help transform it into actionable BID insights by automatically detecting UX friction patterns.
+If you have telemetry data from user interactions, `{bidux}` can help transform it into actionable BID insights by automatically detecting UX friction patterns.
+
+**Note**: Bidux supports both `{shiny.telemetry}` and Shiny's native OpenTelemetry (v1.12+). The examples below work with either source; `{bidux}` automatically detects the format. For OpenTelemetry setup, see `vignette("otel-integration")`.
 
 ### Understanding the Two Telemetry Functions
 
@@ -349,7 +351,7 @@ If you have telemetry data from user interactions (e.g., from the `{shiny.teleme
 - Returns a hybrid object that works as both a list and enhanced object
 - Maintains backward compatibility with pre-0.3.1 code
 - Provides same analysis as `bid_telemetry()` with additional list interface
-- Will be soft-deprecated in 0.4.0
+- Soft-deprecated as of 0.4.0 (will be removed in a future version)
 
 Both functions analyze the same telemetry patterns:
 - **Unused inputs** - UI controls rarely or never used

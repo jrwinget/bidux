@@ -57,7 +57,7 @@ refines the dashboard. It represents stage 5 in the BID framework.
 \examples{
 validate_result <- bid_interpret(
   central_question = "How can we improve delivery efficiency?",
-  data_story = list(
+  data_story = new_data_story(
     hook = "Too many delays",
     context = "Excessive shipments",
     tension = "User frustration",

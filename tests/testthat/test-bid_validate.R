@@ -5,9 +5,11 @@
 create_complete_bid_workflow <- function() {
   interpret_result <- bid_interpret(
     central_question = "How to simplify?",
-    data_story = list(
+    data_story = new_data_story(
       hook = "Users are confused",
-      context = "Dashboard has evolved over time"
+      context = "Dashboard has evolved over time",
+      tension = "Navigation is unclear",
+      resolution = "Simplify interface"
     )
   )
 

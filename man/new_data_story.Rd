@@ -9,8 +9,6 @@ new_data_story(
   context = NULL,
   tension = NULL,
   resolution = NULL,
-  variables = NULL,
-  relationships = NULL,
   ...
 )
 }
@@ -23,10 +21,6 @@ new_data_story(
 
 \item{resolution}{Character string describing the resolution or next steps}
 
-\item{variables}{DEPRECATED. List of variable descriptions (use flat arguments instead)}
-
-\item{relationships}{DEPRECATED. List describing data relationships (use flat arguments instead)}
-
 \item{...}{Optional additional fields (audience, metrics, visual_approach, etc.)}
 }
 \value{
@@ -34,12 +28,11 @@ A bid_data_story S3 object
 }
 \description{
 Creates a structured data story object for use in bid_interpret() and other
-bidux functions. The flattened API (hook, context, tension, resolution) is
-recommended for most users. The nested format (variables, relationships) is
-still supported for backward compatibility.
+bidux functions. Uses a flat API with hook, context, tension, and resolution
+fields to structure your data narrative.
 }
 \examples{
-# Recommended: flat API
+# Basic usage
 story <- new_data_story(
   hook = "User engagement is declining",
   context = "Our dashboard usage has dropped 30\% this quarter",

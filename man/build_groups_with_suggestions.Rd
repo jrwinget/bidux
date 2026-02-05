@@ -4,12 +4,10 @@
 \alias{build_groups_with_suggestions}
 \title{Build suggestion groups organized by concept}
 \usage{
-build_groups_with_suggestions(concepts_final, chosen_layout, previous_stage)
+build_groups_with_suggestions(concepts_final, previous_stage)
 }
 \arguments{
 \item{concepts_final}{Final list of concepts to generate suggestions for}
-
-\item{chosen_layout}{Selected layout type}
 
 \item{previous_stage}{Previous stage data for context}
 }

@@ -4,12 +4,14 @@
 \alias{create_error_notice}
 \title{Create notice stage for error patterns}
 \usage{
-create_error_notice(error_info, total_sessions)
+create_error_notice(error_info, total_sessions, events = NULL)
 }
 \arguments{
 \item{error_info}{List with error pattern information}
 
 \item{total_sessions}{Total number of sessions}
+
+\item{events}{Optional full events data frame for performance context}
 }
 \value{
 bid_stage object

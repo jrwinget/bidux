@@ -16,21 +16,33 @@ bid_telemetry_presets(preset = c("moderate", "strict", "relaxed"))
 }
 \value{
 Named list of threshold parameters suitable for passing to
-\code{\link[=bid_ingest_telemetry]{bid_ingest_telemetry()}} thresholds parameter.
+\code{\link[=bid_ingest_telemetry]{bid_ingest_telemetry()}} or \code{\link[=bid_telemetry]{bid_telemetry()}} thresholds parameter.
 }
 \description{
 Returns predefined threshold configurations for telemetry analysis with different
-sensitivity levels. Use these presets with \code{\link[=bid_ingest_telemetry]{bid_ingest_telemetry()}} to easily
-adjust how aggressively the analysis identifies UX friction points.
+sensitivity levels. Use these presets with \code{\link[=bid_ingest_telemetry]{bid_ingest_telemetry()}} or
+\code{\link[=bid_telemetry]{bid_telemetry()}} to easily adjust how aggressively the analysis identifies
+UX friction points.
+
+\strong{OpenTelemetry Compatibility}: These presets work with both shiny.telemetry
+event data and Shiny 1.12+ OpenTelemetry span data. When using OTEL data,
+spans are automatically converted to events for analysis.
 }
 \examples{
 # Get strict sensitivity thresholds
 strict_thresholds <- bid_telemetry_presets("strict")
 
-# Use with telemetry analysis
+# Use with telemetry analysis (works with both shiny.telemetry and OTEL)
 \dontrun{
-issues <- bid_ingest_telemetry(
+# Works with shiny.telemetry
+issues <- bid_telemetry(
   "telemetry.sqlite",
+  thresholds = bid_telemetry_presets("strict")
+)
+
+# Works with Shiny OpenTelemetry (1.12+)
+issues <- bid_telemetry(
+  "otel_spans.json",
   thresholds = bid_telemetry_presets("strict")
 )
 }

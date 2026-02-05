@@ -112,3 +112,94 @@ calculate_session_rates <- function(session_counts, total_sessions) {
 
   session_counts / total_sessions
 }
+
+#' Add performance context from OTEL timing data
+#'
+#' @description
+#' Enhances telemetry issue evidence with performance metrics when
+#' duration_ms data is available from OpenTelemetry spans. This function
+#' is backward compatible and gracefully handles events without timing data.
+#'
+#' @param issue_evidence Character string with existing evidence text
+#' @param events Data frame of telemetry events (may include duration_ms column)
+#' @param event_filter Optional expression to filter relevant events (e.g., input_id match)
+#'
+#' @return Enhanced evidence string with performance context appended, or
+#'         original evidence if no duration data available
+#'
+#' @examples
+#' \dontrun{
+#' # add performance context for specific input
+#' events_with_timing <- data.frame(
+#'   event_type = "input",
+#'   input_id = "slider1",
+#'   duration_ms = c(120, 150, 1200, 180, 200)
+#' )
+#' evidence <- "Users frequently change this input"
+#' add_performance_context(evidence, events_with_timing)
+#' # returns: "Users frequently change this input. Average duration: 0.4s, p95: 1.1s"
+#' }
+#'
+#' @keywords internal
+#' @noRd
+add_performance_context <- function(
+    issue_evidence,
+    events,
+    event_filter = NULL) {
+  # check if duration_ms column exists
+  if (!is.data.frame(events) || !"duration_ms" %in% names(events)) {
+    return(issue_evidence)
+  }
+
+  # apply optional filter to get relevant events (use which() to handle NAs safely)
+  filtered_events <- events
+  if (!is.null(event_filter)) {
+    filtered_events <- events[which(event_filter), ]
+  }
+
+  # extract duration data and remove NAs
+  durations <- filtered_events$duration_ms
+  durations <- durations[!is.na(durations) & is.finite(durations)]
+
+  # need at least 3 measurements for meaningful statistics
+  if (length(durations) < 3) {
+    return(issue_evidence)
+  }
+
+  # calculate performance metrics
+  avg_duration_ms <- mean(durations)
+  p95_duration_ms <- stats::quantile(durations, probs = 0.95, names = FALSE)
+
+  # convert to user-friendly seconds format
+  avg_seconds <- avg_duration_ms / 1000
+  p95_seconds <- p95_duration_ms / 1000
+
+  # format timing context based on magnitude
+  if (avg_seconds < 0.1) {
+    # sub-100ms - show milliseconds
+    timing_text <- sprintf(
+      "Average duration: %.0fms, p95: %.0fms",
+      avg_duration_ms,
+      p95_duration_ms
+    )
+  } else if (avg_seconds < 10) {
+    # 0.1s to 10s - show one decimal
+    timing_text <- sprintf(
+      "Average duration: %.1fs, p95: %.1fs",
+      avg_seconds,
+      p95_seconds
+    )
+  } else {
+    # 10s+ - show whole seconds
+    timing_text <- sprintf(
+      "Average duration: %.0fs, p95: %.0fs",
+      round(avg_seconds),
+      round(p95_seconds)
+    )
+  }
+
+  # append performance context to existing evidence
+  enhanced_evidence <- paste0(issue_evidence, ". ", timing_text)
+
+  return(enhanced_evidence)
+}

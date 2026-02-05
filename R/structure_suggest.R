@@ -1,201 +1,3 @@
-#' Suggest layout based on previous stage content using heuristics
-#'
-#' @description
-#' Automatically suggests an appropriate layout type based on content analysis
-#' of previous BID stages. Uses deterministic heuristics to match keywords in
-#' problem descriptions, evidence, data story, and other contextual information
-#' to layout types that best address the identified issues.
-#'
-#' @param previous_stage A tibble or list output from an earlier BID stage
-#'        function containing stage data with potential fields like problem,
-#'        evidence, central_question, data_story, etc.
-#' @param telemetry_flags Optional named list of telemetry flags from bid_flags()
-#'        Used to adjust layout recommendations based on observed behavior patterns
-#' @return Character string indicating the suggested layout type
-#'         ("breathable", "dual_process", "grid", "card", "tabs", or fallback)
-#'
-#' @details
-#' The heuristics follow a priority order:
-#' 1. **breathable** - if content suggests information overload, confusion, or
-#'    cognitive load issues
-#' 2. **dual_process** - if content mentions overview vs detail, quick vs deep,
-#'    or two-mode interactions
-#' 3. **grid** - if content focuses on grouping, clustering, visual hierarchy,
-#'    or comparing related metrics
-#' 4. **card** - if content mentions cards, chunks, tiles, modular blocks,
-#'    or per-item summaries
-#' 5. **tabs** - if content suggests sections, categories, progressive
-#'    disclosure, but avoids tabs if telemetry shows tab drop-off
-#' 6. **breathable** - fallback for any unmatched cases
-#'
-#' @keywords internal
-suggest_layout_from_previous <- function(previous_stage, telemetry_flags = NULL) {
-  # extract and normalize text from various fields in previous_stage
-  # handle both flattened columns (from bid_interpret) and nested data_story
-  txt <- paste(
-    safe_lower(safe_column_access(previous_stage, "problem", "")),
-    safe_lower(safe_column_access(previous_stage, "evidence", "")),
-    safe_lower(safe_column_access(previous_stage, "central_question", "")),
-    # try flattened columns first (from bid_interpret output)
-    safe_lower(safe_column_access(previous_stage, "hook", "")),
-    safe_lower(safe_column_access(previous_stage, "context", "")),
-    safe_lower(safe_column_access(previous_stage, "tension", "")),
-    safe_lower(safe_column_access(previous_stage, "resolution", "")),
-    safe_lower(safe_column_access(previous_stage, "audience", "")),
-    # fallback to nested data_story access (for other tibble structures)
-    safe_lower(safe_stage_data_story_access(previous_stage, "hook")),
-    safe_lower(safe_stage_data_story_access(previous_stage, "context")),
-    safe_lower(safe_stage_data_story_access(previous_stage, "tension")),
-    safe_lower(safe_stage_data_story_access(previous_stage, "resolution")),
-    safe_lower(safe_stage_data_story_access(previous_stage, "audience")),
-    collapse = " "
-  )
-
-  # heuristic 1: dual-process for overview vs detail patterns
-  # (check first since it's more specific)
-  if (
-    grepl(
-      "summary vs detail|overview and detail|quick vs deep|fast vs thorough|two modes|at a glance|quick access.*summaries|detailed breakdowns|two different modes|dual mode|quick access to summaries.*detailed breakdowns|summaries.*detailed breakdowns",
-      txt
-    )
-  ) {
-    return("dual_process")
-  }
-
-  # Heuristic 2: Breathable layout for overload/confusion patterns
-  if (
-    grepl(
-      "\\boverload|overwhelmed|too many|confus|clutter|busy|noise|cognitive load|whitespace\\b",
-      txt
-    ) || (
-      !is.null(telemetry_flags) && isTRUE(
-        telemetry_flags$has_confusion_patterns
-      )
-    )
-  ) {
-    return("breathable")
-  }
-
-  # Heuristic 3: Grid layout for grouping/hierarchy patterns
-  if (
-    grepl(
-      "\\bgroup|cluster|related metrics|compare panels|visual hierarchy|proximity\\b",
-      txt
-    )
-  ) {
-    return("grid")
-  }
-
-  # Heuristic 4: Card layout for modular/chunked patterns
-  if (
-    grepl(
-      "\\bcards|chunks|tiles|modular blocks|per-item summary|entity cards\\b",
-      txt
-    )
-  ) {
-    return("card")
-  }
-
-  # Heuristic 5: Tabs layout for sections/categories, but check telemetry
-  if (
-    grepl(
-      "\\bsections|categories|module separation|progressive disclosure|stepwise\\b",
-      txt
-    )
-  ) {
-    # check if telemetry flags indicate navigation issues
-    if (!is.null(telemetry_flags) && isTRUE(telemetry_flags$has_navigation_issues)) {
-      return("grid") # fallback to grid if tabs have telemetry issues
-    }
-    return("tabs")
-  }
-
-  # Heuristic 6: Default fallback
-  "breathable"
-}
-
-#' Generate layout selection rationale
-#'
-#' @description
-#' Provides a concise explanation for why a particular layout was chosen
-#' based on the content analysis of the previous stage.
-#'
-#' @param previous_stage A tibble or list output from an earlier BID stage
-#' @param chosen Character string with the chosen layout type
-#' @return Character string with explanation for the layout choice
-#'
-#' @keywords internal
-layout_rationale <- function(previous_stage, chosen) {
-  # Extract text for pattern matching
-  # handle both flattened columns (from bid_interpret) and nested data_story
-  txt <- paste(
-    safe_lower(safe_column_access(previous_stage, "problem", "")),
-    safe_lower(safe_column_access(previous_stage, "evidence", "")),
-    safe_lower(safe_column_access(previous_stage, "central_question", "")),
-    # try flattened columns first (from bid_interpret output)
-    safe_lower(safe_column_access(previous_stage, "hook", "")),
-    safe_lower(safe_column_access(previous_stage, "context", "")),
-    safe_lower(safe_column_access(previous_stage, "tension", "")),
-    safe_lower(safe_column_access(previous_stage, "resolution", "")),
-    safe_lower(safe_column_access(previous_stage, "audience", "")),
-    # fallback to nested data_story access (for other tibble structures)
-    safe_lower(safe_stage_data_story_access(previous_stage, "hook")),
-    safe_lower(safe_stage_data_story_access(previous_stage, "context")),
-    safe_lower(safe_stage_data_story_access(previous_stage, "tension")),
-    safe_lower(safe_stage_data_story_access(previous_stage, "resolution")),
-    safe_lower(safe_stage_data_story_access(previous_stage, "audience")),
-    collapse = " "
-  )
-
-  # Generate specific rationale based on detected patterns
-  rationale <- switch(chosen,
-    "dual_process" = {
-      "Detected overview vs detail patterns; choosing 'dual_process' for quick insights and detailed analysis."
-    },
-    "breathable" = {
-      if (
-        grepl(
-          "\\boverload|overwhelmed|too many|confus|clutter|busy|noise|cognitive load\\b",
-          txt
-        )
-      ) {
-        "Detected information overload patterns; choosing 'breathable' to reduce cognitive load."
-      } else {
-        "Selected 'breathable' as safe default to ensure clean, uncluttered layout."
-      }
-    },
-    "grid" = {
-      if (
-        grepl(
-          "\\bsections|categories|module separation|progressive disclosure|stepwise\\b",
-          txt
-        ) &&
-          !is.null(safe_column_access(previous_stage, "telemetry", NULL)) &&
-          isTRUE(
-            safe_column_access(
-              previous_stage,
-              "telemetry",
-              NULL
-            )$nav_dropoff_tabs
-          )
-      ) {
-        "Detected section-based content but telemetry shows tab navigation issues; choosing 'grid' instead."
-      } else {
-        "Detected grouping and comparison needs; choosing 'grid' for related content organization."
-      }
-    },
-    "card" = {
-      "Detected modular content patterns; choosing 'card' for distinct content containers."
-    },
-    "tabs" = {
-      "Detected categorical content structure; choosing 'tabs' for progressive disclosure."
-    },
-    sprintf("Selected '%s' based on detected content and user context.", chosen)
-  )
-
-  return(rationale)
-}
-
 #' Safely convert text to lowercase with null handling
 #'
 #' @description
@@ -252,7 +54,7 @@ safe_stage_data_story_access <- function(previous_stage, element) {
 }
 
 # ==============================================================================
-# CONCEPT-GROUPED STRUCTURE SUGGESTIONS
+# concept-grouped structure suggestions
 # ==============================================================================
 
 #' Generate ranked, concept-grouped, actionable UI/UX suggestions
@@ -263,7 +65,6 @@ safe_stage_data_story_access <- function(previous_stage, element) {
 #' relevance and grouped by concept for systematic implementation.
 #'
 #' @param previous_stage A tibble or list output from an earlier BID stage
-#' @param chosen_layout Character string with the selected layout type
 #' @param concepts Optional character vector of additional concepts to include
 #' @return List of concept groups with ranked suggestions
 #'
@@ -290,7 +91,6 @@ safe_stage_data_story_access <- function(previous_stage, element) {
 #' @keywords internal
 structure_suggestions <- function(
     previous_stage,
-    chosen_layout,
     concepts = NULL,
     quiet = NULL) {
   # combine concepts from multiple sources
@@ -308,10 +108,9 @@ structure_suggestions <- function(
   # build suggestion groups with rankings
   groups <- build_groups_with_suggestions(
     concepts_final,
-    chosen_layout,
     previous_stage
   )
-  groups <- rank_and_sort_suggestions(groups, previous_stage, chosen_layout)
+  groups <- rank_and_sort_suggestions(groups, previous_stage)
 
   bid_alert_info(
     'Tip: Learn more about any concept via bid_concept("<concept>").',
@@ -455,13 +254,11 @@ infer_concepts_from_story <- function(previous_stage) {
 #' Build suggestion groups organized by concept
 #'
 #' @param concepts_final Final list of concepts to generate suggestions for
-#' @param chosen_layout Selected layout type
 #' @param previous_stage Previous stage data for context
 #' @return List of concept groups with suggestions
 #' @keywords internal
 build_groups_with_suggestions <- function(
     concepts_final,
-    chosen_layout,
     previous_stage) {
   # ensure at least some core concepts if none provided
   if (length(concepts_final) == 0) {
@@ -479,7 +276,7 @@ build_groups_with_suggestions <- function(
   groups <- list()
 
   for (concept in concepts_final) {
-    group <- build_concept_group(concept, chosen_layout, previous_stage)
+    group <- build_concept_group(concept, previous_stage)
     if (!is.null(group) && length(group$suggestions) > 0) {
       groups <- append(groups, list(group))
     }
@@ -491,41 +288,19 @@ build_groups_with_suggestions <- function(
 #' Build suggestions for a specific concept
 #'
 #' @param concept Name of the concept to generate suggestions for
-#' @param chosen_layout Selected layout type
 #' @param previous_stage Previous stage data
 #' @return List with concept name and suggestions
 #' @keywords internal
-build_concept_group <- function(concept, chosen_layout, previous_stage) {
+build_concept_group <- function(concept, previous_stage) {
   suggestions <- switch(concept,
-    "Cognitive Load Theory" = get_cognitive_load_suggestions(
-      chosen_layout,
-      previous_stage
-    ),
-    "Progressive Disclosure" = get_progressive_disclosure_suggestions(
-      chosen_layout,
-      previous_stage
-    ),
-    "Visual Hierarchy" = get_visual_hierarchy_suggestions(
-      chosen_layout,
-      previous_stage
-    ),
-    "Dual-Processing Theory" = get_dual_processing_suggestions(
-      chosen_layout,
-      previous_stage
-    ),
-    "User Onboarding" = get_onboarding_suggestions(
-      chosen_layout,
-      previous_stage
-    ),
-    "Information Scent" = get_information_scent_suggestions(
-      chosen_layout,
-      previous_stage
-    ),
-    "Principle of Proximity" = get_proximity_suggestions(
-      chosen_layout,
-      previous_stage
-    ),
-    get_generic_suggestions(concept, chosen_layout, previous_stage)
+    "Cognitive Load Theory" = get_cognitive_load_suggestions(previous_stage),
+    "Progressive Disclosure" = get_progressive_disclosure_suggestions(previous_stage),
+    "Visual Hierarchy" = get_visual_hierarchy_suggestions(previous_stage),
+    "Dual-Processing Theory" = get_dual_processing_suggestions(previous_stage),
+    "User Onboarding" = get_onboarding_suggestions(previous_stage),
+    "Information Scent" = get_information_scent_suggestions(previous_stage),
+    "Principle of Proximity" = get_proximity_suggestions(previous_stage),
+    get_generic_suggestions(concept, previous_stage)
   )
 
   if (length(suggestions) == 0) {
@@ -542,7 +317,7 @@ build_concept_group <- function(concept, chosen_layout, previous_stage) {
 
 #' Generate Cognitive Load Theory suggestions
 #' @keywords internal
-get_cognitive_load_suggestions <- function(chosen_layout, previous_stage) {
+get_cognitive_load_suggestions <- function(previous_stage) {
   base_suggestions <- list(
     list(
       title = "Limit initial choices",
@@ -579,19 +354,12 @@ get_cognitive_load_suggestions <- function(chosen_layout, previous_stage) {
     )
   )
 
-  # layout-specific adjustments
-  if (chosen_layout == "breathable") {
-    base_suggestions[[1]]$score <- min(1.0, base_suggestions[[1]]$score + 0.05)
-  }
-
   return(base_suggestions)
 }
 
 #' Generate Progressive Disclosure suggestions
 #' @keywords internal
-get_progressive_disclosure_suggestions <- function(
-    chosen_layout,
-    previous_stage) {
+get_progressive_disclosure_suggestions <- function(previous_stage) {
   base_suggestions <- list(
     list(
       title = "Use collapsible advanced filters",
@@ -613,12 +381,6 @@ get_progressive_disclosure_suggestions <- function(
     )
   )
 
-  # boost score for tabs layout
-  if (chosen_layout == "tabs") {
-    base_suggestions[[1]]$score <- min(1.0, base_suggestions[[1]]$score + 0.05)
-    base_suggestions[[2]]$score <- min(1.0, base_suggestions[[2]]$score + 0.03)
-  }
-
   # check telemetry for tab issues
   telemetry_data <- safe_column_access(previous_stage, "telemetry", NULL)
   if (!is.null(telemetry_data) && isTRUE(telemetry_data$nav_dropoff_tabs)) {
@@ -635,7 +397,7 @@ get_progressive_disclosure_suggestions <- function(
 
 #' Generate Visual Hierarchy suggestions
 #' @keywords internal
-get_visual_hierarchy_suggestions <- function(chosen_layout, previous_stage) {
+get_visual_hierarchy_suggestions <- function(previous_stage) {
   list(
     list(
       title = "Establish clear information priority",
@@ -661,7 +423,7 @@ get_visual_hierarchy_suggestions <- function(chosen_layout, previous_stage) {
 
 #' Generate Dual-Processing Theory suggestions
 #' @keywords internal
-get_dual_processing_suggestions <- function(chosen_layout, previous_stage) {
+get_dual_processing_suggestions <- function(previous_stage) {
   base_suggestions <- list(
     list(
       title = "Provide summary and detail views",
@@ -672,17 +434,12 @@ get_dual_processing_suggestions <- function(chosen_layout, previous_stage) {
     )
   )
 
-  # boost for dual_process layout
-  if (chosen_layout == "dual_process") {
-    base_suggestions[[1]]$score <- min(1.0, base_suggestions[[1]]$score + 0.08)
-  }
-
   return(base_suggestions)
 }
 
 #' Generate User Onboarding suggestions
 #' @keywords internal
-get_onboarding_suggestions <- function(chosen_layout, previous_stage) {
+get_onboarding_suggestions <- function(previous_stage) {
   list(
     list(
       title = "Add contextual guidance",
@@ -707,7 +464,7 @@ get_onboarding_suggestions <- function(chosen_layout, previous_stage) {
 
 #' Generate Information Scent suggestions
 #' @keywords internal
-get_information_scent_suggestions <- function(chosen_layout, previous_stage) {
+get_information_scent_suggestions <- function(previous_stage) {
   list(
     list(
       title = "Use descriptive labels and headers",
@@ -721,7 +478,7 @@ get_information_scent_suggestions <- function(chosen_layout, previous_stage) {
 
 #' Generate Principle of Proximity suggestions
 #' @keywords internal
-get_proximity_suggestions <- function(chosen_layout, previous_stage) {
+get_proximity_suggestions <- function(previous_stage) {
   base_suggestions <- list(
     list(
       title = "Group related controls together",
@@ -736,26 +493,19 @@ get_proximity_suggestions <- function(chosen_layout, previous_stage) {
     )
   )
 
-  # boost for grid layout
-  if (chosen_layout == "grid") {
-    base_suggestions[[1]]$score <- min(1.0, base_suggestions[[1]]$score + 0.05)
-  }
-
   return(base_suggestions)
 }
 
 #' Generate generic suggestions for unrecognized concepts
 #' @keywords internal
-get_generic_suggestions <- function(concept, chosen_layout, previous_stage) {
+get_generic_suggestions <- function(concept, previous_stage) {
   list(
     list(
       title = paste("Apply", concept, "principles"),
       details = paste(
         "Consider how",
         concept,
-        "applies to your",
-        chosen_layout,
-        "layout design."
+        "applies to your dashboard design."
       ),
       components = c("bslib::card", "shiny::fluidRow", "bslib::layout_columns"),
       rationale = paste(
@@ -772,17 +522,15 @@ get_generic_suggestions <- function(concept, chosen_layout, previous_stage) {
 #'
 #' @param groups List of concept groups with suggestions
 #' @param previous_stage Previous stage data for scoring adjustments
-#' @param chosen_layout Selected layout type
 #' @return List of groups with ranked suggestions
 #' @keywords internal
-rank_and_sort_suggestions <- function(groups, previous_stage, chosen_layout) {
+rank_and_sort_suggestions <- function(groups, previous_stage) {
   for (i in seq_along(groups)) {
     # apply context-based scoring adjustments
     for (j in seq_along(groups[[i]]$suggestions)) {
       groups[[i]]$suggestions[[j]] <- adjust_suggestion_score(
         groups[[i]]$suggestions[[j]],
         previous_stage,
-        chosen_layout,
         groups[[i]]$concept
       )
     }
@@ -807,7 +555,6 @@ rank_and_sort_suggestions <- function(groups, previous_stage, chosen_layout) {
 adjust_suggestion_score <- function(
     suggestion,
     previous_stage,
-    chosen_layout,
     concept) {
   score <- suggestion$score
 
@@ -815,22 +562,6 @@ adjust_suggestion_score <- function(
   stage1_theory <- extract_stage1_theory(previous_stage)
   if (concept %in% stage1_theory) {
     score <- score + 0.05
-  }
-
-  # boost for layout-appropriate suggestions
-  layout_boosts <- list(
-    "breathable" = c("Cognitive Load Theory"),
-    "tabs" = c("Progressive Disclosure"),
-    "dual_process" = c("Dual-Processing Theory"),
-    "grid" = c("Visual Hierarchy", "Principle of Proximity")
-  )
-
-  if (
-    chosen_layout %in%
-      names(layout_boosts) &&
-      concept %in% layout_boosts[[chosen_layout]]
-  ) {
-    score <- score + 0.03
   }
 
   # demote tabs-related suggestions if telemetry shows issues
@@ -849,7 +580,7 @@ adjust_suggestion_score <- function(
 }
 
 # ==============================================================================
-# TIBBLE CONVERSION UTILITIES
+# tibble conversion utilities
 # ==============================================================================
 
 #' Assign difficulty rating based on components and suggestion complexity

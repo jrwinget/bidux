@@ -242,10 +242,10 @@ test_that("bid_ingest_telemetry handles malformed JSON gracefully", {
   writeLines("{ invalid json", temp_json)
   on.exit(unlink(temp_json))
 
-  # function may give warning for malformed JSON instead of error
-  expect_warning(
-    result <- bid_ingest_telemetry(temp_json),
-    "No telemetry events found"
+  # malformed JSON triggers an error via cli_abort
+  expect_error(
+    bid_ingest_telemetry(temp_json),
+    "Error reading JSON file"
   )
 })
 

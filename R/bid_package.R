@@ -19,6 +19,7 @@
 #' @importFrom rlang quo_is_null
 #' @importFrom RSQLite SQLite
 #' @importFrom stats median
+#' @importFrom stats setNames
 #' @importFrom stringdist stringdistmatrix
 #' @importFrom tibble as_tibble
 #' @importFrom tibble tibble

@@ -5,9 +5,11 @@
 create_basic_interpret_stage <- function(question = "How to simplify?") {
   bid_interpret(
     central_question = question,
-    data_story = list(
+    data_story = new_data_story(
       hook = "Users are confused",
-      context = "Dashboard has evolved over time"
+      context = "Dashboard has evolved over time",
+      tension = "Navigation is unclear",
+      resolution = "Simplify layout"
     )
   )
 }
@@ -722,9 +724,11 @@ test_that("bid_anticipate extracts accessibility from accessibility field", {
 test_that("bid_anticipate detects anchoring keywords in Interpret stage", {
   interpret_stage <- bid_interpret(
     central_question = "Compare values to baseline target",
-    data_story = list(
+    data_story = new_data_story(
       hook = "Reference points missing",
-      context = "Users need comparison data"
+      context = "Users need comparison data",
+      tension = "No baseline for comparison",
+      resolution = "Add reference points"
     )
   )
 
@@ -746,9 +750,11 @@ test_that("bid_anticipate detects anchoring keywords in Interpret stage", {
 test_that("bid_anticipate detects framing keywords in Interpret stage", {
   interpret_stage <- bid_interpret(
     central_question = "How to frame data positively?",
-    data_story = list(
+    data_story = new_data_story(
       hook = "Negative framing causes concern",
-      context = "Users see loss instead of gain"
+      context = "Users see loss instead of gain",
+      tension = "Framing affects perception",
+      resolution = "Use positive framing"
     )
   )
 
@@ -770,10 +776,11 @@ test_that("bid_anticipate detects framing keywords in Interpret stage", {
 test_that("bid_anticipate detects confirmation bias keywords in Interpret stage", {
   interpret_stage <- bid_interpret(
     central_question = "How to validate assumptions?",
-    data_story = list(
+    data_story = new_data_story(
       hook = "Users expect certain results",
       context = "Hypothesis testing needed",
-      tension = "Beliefs may be wrong"
+      tension = "Beliefs may be wrong",
+      resolution = "Test assumptions"
     )
   )
 
@@ -795,10 +802,11 @@ test_that("bid_anticipate detects confirmation bias keywords in Interpret stage"
 test_that("bid_anticipate detects availability bias keywords in Interpret stage", {
   interpret_stage <- bid_interpret(
     central_question = "How to handle recent data?",
-    data_story = list(
+    data_story = new_data_story(
       hook = "Recent examples dominate",
       context = "Users recall only top of mind items",
-      tension = "Memorable events skew perception"
+      tension = "Memorable events skew perception",
+      resolution = "Balance with historical data"
     )
   )
 
@@ -820,9 +828,11 @@ test_that("bid_anticipate detects availability bias keywords in Interpret stage"
 test_that("bid_anticipate detects loss aversion keywords in Interpret stage", {
   interpret_stage <- bid_interpret(
     central_question = "How to reduce risk perception?",
-    data_story = list(
+    data_story = new_data_story(
       hook = "Users averse to loss",
-      context = "Risk avoidance behavior observed"
+      context = "Risk avoidance behavior observed",
+      tension = "Fear drives decisions",
+      resolution = "Balance risk information"
     )
   )
 
@@ -844,9 +854,11 @@ test_that("bid_anticipate detects loss aversion keywords in Interpret stage", {
 test_that("bid_anticipate uses default biases when no keywords detected", {
   interpret_stage <- bid_interpret(
     central_question = "Generic dashboard question?",
-    data_story = list(
+    data_story = new_data_story(
       hook = "Data overview",
-      context = "General information display"
+      context = "General information display",
+      tension = "Information organization",
+      resolution = "Improve layout"
     )
   )
 
@@ -869,10 +881,11 @@ test_that("bid_anticipate uses default biases when no keywords detected", {
 test_that("bid_anticipate handles Interpret stage with tension field", {
   interpret_stage <- bid_interpret(
     central_question = "What is the issue?",
-    data_story = list(
+    data_story = new_data_story(
       hook = "Users struggle",
       context = "Dashboard complexity",
-      tension = "Risk of loss aversion impacts decisions"
+      tension = "Risk of loss aversion impacts decisions",
+      resolution = "Mitigate loss aversion"
     )
   )
 
@@ -884,213 +897,6 @@ test_that("bid_anticipate handles Interpret stage with tension field", {
   )
 
   expect_s3_class(result, "bid_stage")
-})
-
-# layout-specific bias suggestions (deprecated path)
-
-test_that("bid_anticipate generates layout-specific biases for dual_process", {
-  notice_stage <- create_minimal_notice_tibble()
-  notice_stage$layout <- "dual_process"
-
-  suppressMessages(
-    result <- bid_anticipate(
-      previous_stage = notice_stage,
-      bias_mitigations = NULL
-    )
-  )
-
-  expect_s3_class(result, "bid_stage")
-  expect_match(
-    result$bias_mitigations,
-    "framing",
-    ignore.case = TRUE
-  )
-})
-
-test_that("bid_anticipate generates layout-specific biases for grid", {
-  notice_stage <- create_minimal_notice_tibble()
-  notice_stage$layout <- "grid"
-
-  suppressMessages(
-    result <- bid_anticipate(
-      previous_stage = notice_stage,
-      bias_mitigations = NULL
-    )
-  )
-
-  expect_s3_class(result, "bid_stage")
-  expect_match(
-    result$bias_mitigations,
-    "anchoring",
-    ignore.case = TRUE
-  )
-})
-
-test_that("bid_anticipate generates layout-specific biases for card", {
-  notice_stage <- create_minimal_notice_tibble()
-  notice_stage$layout <- "card"
-
-  suppressMessages(
-    result <- bid_anticipate(
-      previous_stage = notice_stage,
-      bias_mitigations = NULL
-    )
-  )
-
-  expect_s3_class(result, "bid_stage")
-  expect_match(
-    result$bias_mitigations,
-    "beautiful|good|stereotype",
-    ignore.case = TRUE
-  )
-})
-
-test_that("bid_anticipate generates layout-specific biases for tabs", {
-  notice_stage <- create_minimal_notice_tibble()
-  notice_stage$layout <- "tabs"
-
-  suppressMessages(
-    result <- bid_anticipate(
-      previous_stage = notice_stage,
-      bias_mitigations = NULL
-    )
-  )
-
-  expect_s3_class(result, "bid_stage")
-  expect_match(
-    result$bias_mitigations,
-    "availability",
-    ignore.case = TRUE
-  )
-})
-
-test_that("bid_anticipate generates layout-specific biases for breathable", {
-  notice_stage <- create_minimal_notice_tibble()
-  notice_stage$layout <- "breathable"
-
-  suppressMessages(
-    result <- bid_anticipate(
-      previous_stage = notice_stage,
-      bias_mitigations = NULL
-    )
-  )
-
-  expect_s3_class(result, "bid_stage")
-  expect_match(
-    result$bias_mitigations,
-    "cognitive",
-    ignore.case = TRUE
-  )
-})
-
-test_that("bid_anticipate includes tabs-specific accessibility in bias_mitigations", {
-  notice_stage <- create_minimal_notice_tibble()
-  notice_stage$layout <- "tabs"
-
-  # when using NULL bias_mitigations, accessibility is included in suggestions
-  suppressMessages(
-    result <- bid_anticipate(
-      previous_stage = notice_stage,
-      bias_mitigations = NULL,
-      include_accessibility = TRUE
-    )
-  )
-
-  expect_s3_class(result, "bid_stage")
-  # accessibility advice appears in bias_mitigations field when auto-suggested
-  expect_match(
-    result$bias_mitigations,
-    "keyboard|tab|screen reader|accessibility",
-    ignore.case = TRUE
-  )
-})
-
-test_that("bid_anticipate includes grid-specific accessibility in bias_mitigations", {
-  notice_stage <- create_minimal_notice_tibble()
-  notice_stage$layout <- "grid"
-
-  # when using NULL bias_mitigations, accessibility is included in suggestions
-  suppressMessages(
-    result <- bid_anticipate(
-      previous_stage = notice_stage,
-      bias_mitigations = NULL,
-      include_accessibility = TRUE
-    )
-  )
-
-  expect_s3_class(result, "bid_stage")
-  # accessibility advice appears in bias_mitigations field when auto-suggested
-  expect_match(
-    result$bias_mitigations,
-    "row|column|header|cell|accessibility",
-    ignore.case = TRUE
-  )
-})
-
-test_that("bid_anticipate includes card-specific biases in bias_mitigations", {
-  notice_stage <- create_minimal_notice_tibble()
-  notice_stage$layout <- "card"
-
-  # when using NULL bias_mitigations, layout-specific biases are suggested
-  suppressMessages(
-    result <- bid_anticipate(
-      previous_stage = notice_stage,
-      bias_mitigations = NULL,
-      include_accessibility = TRUE
-    )
-  )
-
-  expect_s3_class(result, "bid_stage")
-  # card layout generates beautiful-is-good stereotype bias
-  expect_match(
-    result$bias_mitigations,
-    "beautiful|good|stereotype|aesthetic",
-    ignore.case = TRUE
-  )
-})
-
-test_that("bid_anticipate includes dual_process-specific accessibility in bias_mitigations", {
-  notice_stage <- create_minimal_notice_tibble()
-  notice_stage$layout <- "dual_process"
-
-  # when using NULL bias_mitigations, accessibility is included in suggestions
-  suppressMessages(
-    result <- bid_anticipate(
-      previous_stage = notice_stage,
-      bias_mitigations = NULL,
-      include_accessibility = TRUE
-    )
-  )
-
-  expect_s3_class(result, "bid_stage")
-  # accessibility advice appears in bias_mitigations field when auto-suggested
-  expect_match(
-    result$bias_mitigations,
-    "summary|detail|view|accessibility",
-    ignore.case = TRUE
-  )
-})
-
-test_that("bid_anticipate includes breathable-specific accessibility in bias_mitigations", {
-  notice_stage <- create_minimal_notice_tibble()
-  notice_stage$layout <- "breathable"
-
-  # when using NULL bias_mitigations, accessibility is included in suggestions
-  suppressMessages(
-    result <- bid_anticipate(
-      previous_stage = notice_stage,
-      bias_mitigations = NULL,
-      include_accessibility = TRUE
-    )
-  )
-
-  expect_s3_class(result, "bid_stage")
-  # accessibility advice appears in bias_mitigations field when auto-suggested
-  expect_match(
-    result$bias_mitigations,
-    "contrast|focus|indicator|accessibility",
-    ignore.case = TRUE
-  )
 })
 
 test_that("bid_anticipate auto-suggests common biases when no layout", {
@@ -1321,7 +1127,7 @@ test_that("bid_anticipate generates suggestions for missing common biases", {
 test_that("bid_anticipate handles Interpret stage with resolution field", {
   interpret_stage <- bid_interpret(
     central_question = "What should we do?",
-    data_story = list(
+    data_story = new_data_story(
       hook = "Problem identified",
       context = "Analysis needed",
       tension = "Risk of loss",

@@ -1,4 +1,4 @@
-test_that("bid_structure selects breathable layout for overload patterns", {
+test_that("bid_structure generates suggestions for overload patterns", {
   previous_stage <- tibble::tibble(
     stage = "Interpret",
     problem = "Users are overwhelmed by too many options in the interface",
@@ -13,136 +13,11 @@ test_that("bid_structure selects breathable layout for overload patterns", {
 
   expect_s3_class(result, "bid_stage")
   expect_equal(result$stage[1], "Structure")
-  expect_equal(result$layout[1], "breathable")
+  expect_false("layout" %in% names(result))
   expect_true("suggestions" %in% names(result))
   expect_true(length(result$suggestions) > 0)
 })
 
-test_that("bid_structure selects dual_process layout for overview vs detail patterns", {
-  previous_stage <- tibble::tibble(
-    stage = "Interpret",
-    problem = "Users need both summary overview and detailed analysis",
-    central_question = "How to provide quick vs thorough access?",
-    hook = "Two modes of interaction needed",
-    context = "Users want to see at a glance but also dig deeper",
-    timestamp = Sys.time()
-  )
-
-  suppressMessages(
-    result <- bid_structure(previous_stage)
-  )
-
-  expect_s3_class(result, "bid_stage")
-  expect_equal(result$layout[1], "dual_process")
-  expect_true(length(result$suggestions) > 0)
-})
-
-test_that("bid_structure selects grid layout for grouping patterns", {
-  previous_stage <- tibble::tibble(
-    stage = "Interpret",
-    problem = "Related metrics need better visual hierarchy",
-    evidence = "Users want to group and compare panels",
-    resolution = "Use proximity to show relationships",
-    timestamp = Sys.time()
-  )
-
-  suppressMessages(
-    result <- bid_structure(previous_stage)
-  )
-
-  expect_s3_class(result, "bid_stage")
-  expect_equal(result$layout[1], "grid")
-})
-
-test_that("bid_structure selects card layout for modular content patterns", {
-  previous_stage <- tibble::tibble(
-    stage = "Interpret",
-    problem = "Dashboard needs modular blocks for different data types",
-    central_question = "How to organize content in chunks?",
-    resolution = "Use cards and tiles for per-item summary",
-    timestamp = Sys.time()
-  )
-
-  suppressMessages(
-    result <- bid_structure(previous_stage)
-  )
-
-  expect_s3_class(result, "bid_stage")
-  expect_equal(result$layout[1], "card")
-})
-
-test_that("bid_structure selects tabs layout for categorical patterns", {
-  previous_stage <- tibble::tibble(
-    stage = "Interpret",
-    problem = "Dashboard needs progressive disclosure across sections",
-    evidence = "Different categories require module separation",
-    context = "Stepwise navigation through different areas",
-    timestamp = Sys.time()
-  )
-
-  suppressMessages(
-    result <- bid_structure(previous_stage)
-  )
-
-  expect_s3_class(result, "bid_stage")
-  expect_equal(result$layout[1], "tabs")
-})
-
-test_that("bid_structure avoids tabs when telemetry shows navigation issues", {
-  previous_stage <- tibble::tibble(
-    stage = "Interpret",
-    problem = "Users need progressive disclosure across sections",
-    evidence = "Categories require module separation",
-    timestamp = Sys.time()
-  )
-
-  # create telemetry flags indicating navigation issues
-  telemetry_flags <- list(has_navigation_issues = TRUE)
-
-  suppressMessages(
-    result <- bid_structure(previous_stage, telemetry_flags = telemetry_flags)
-  )
-
-  expect_s3_class(result, "bid_stage")
-  expect_false(result$layout[1] == "tabs")
-  expect_equal(result$layout[1], "grid") # should fallback to grid
-})
-
-# T7: Fallback → breathable
-test_that("bid_structure falls back to breathable for unmatched patterns", {
-  previous_stage <- tibble::tibble(
-    stage = "Interpret",
-    problem = "Generic usability issue",
-    evidence = "Some minor interface problems",
-    central_question = "How to improve the interface?",
-    timestamp = Sys.time()
-  )
-
-  suppressMessages(
-    result <- bid_structure(previous_stage)
-  )
-
-  expect_s3_class(result, "bid_stage")
-  expect_equal(result$layout[1], "breathable")
-})
-
-test_that("bid_structure provides helpful error when layout parameter is used", {
-  previous_stage <- tibble::tibble(
-    stage = "Interpret",
-    problem = "Test problem",
-    timestamp = Sys.time()
-  )
-
-  expect_error(
-    bid_structure(previous_stage, layout = "dual_process"),
-    regexp = "layout.*parameter.*was removed.*0\\.2\\.0"
-  )
-
-  expect_error(
-    bid_structure(previous_stage, concepts = NULL, layout = "grid"),
-    regexp = "Layout is now auto-selected"
-  )
-})
 
 test_that("bid_structure returns correct structure with all required fields", {
   previous_stage <- tibble::tibble(
@@ -159,13 +34,9 @@ test_that("bid_structure returns correct structure with all required fields", {
   # check basic structure
   expect_s3_class(result, "bid_stage")
   expect_equal(result$stage[1], "Structure")
-  expect_true("layout" %in% names(result))
+  expect_false("layout" %in% names(result))
   expect_true("suggestions" %in% names(result))
   expect_true("concepts" %in% names(result))
-
-  # check layout is valid
-  valid_layouts <- c("dual_process", "grid", "card", "tabs", "breathable")
-  expect_true(result$layout[1] %in% valid_layouts)
 
   # check suggestions structure
   suggestions <- result$suggestions
@@ -203,12 +74,7 @@ test_that("bid_structure shows appropriate CLI messages", {
     timestamp = Sys.time()
   )
 
-  # should show layout selection and rationale messages
-  expect_message(
-    bid_structure(previous_stage),
-    "Auto-selected layout"
-  )
-
+  # should show concept tip message
   expect_message(
     bid_structure(previous_stage),
     "Tip.*bid_concept"
@@ -232,9 +98,6 @@ test_that("bid_structure generates high-quality suggestions for complex scenario
   suppressMessages(
     result <- bid_structure(previous_stage)
   )
-
-  # should select breathable layout for overload scenario
-  expect_equal(result$layout[1], "breathable")
 
   # check that we get expected concept groups
   suggestion_groups <- result$suggestions
@@ -288,7 +151,7 @@ test_that("bid_structure handles edge cases gracefully", {
   )
 
   expect_s3_class(result, "bid_stage")
-  expect_equal(result$layout[1], "breathable") # should fallback
+  expect_false("layout" %in% names(result))
   expect_true(length(result$suggestions) > 0)
 
   # test with custom concepts
@@ -303,8 +166,8 @@ test_that("bid_structure handles edge cases gracefully", {
   expect_true(grepl("Visual Hierarchy", result_custom$concepts[1]))
 })
 
-test_that("layout heuristics work correctly with different field combinations", {
-  # test data story fields
+test_that("concept detection works correctly with different field combinations", {
+  # test data story fields for concept detection
   story_stage <- tibble::tibble(
     stage = "Interpret",
     data_story = list(list(
@@ -319,9 +182,10 @@ test_that("layout heuristics work correctly with different field combinations", 
   suppressMessages(
     result <- bid_structure(story_stage)
   )
-  expect_equal(result$layout[1], "dual_process")
+  expect_s3_class(result, "bid_stage")
+  expect_true(length(result$suggestions) > 0)
 
-  # test nested data_story access
+  # test nested data_story access for audience-based concepts
   nested_stage <- tibble::tibble(
     stage = "Interpret",
     problem = "Interface has cluttered design",
@@ -334,7 +198,7 @@ test_that("layout heuristics work correctly with different field combinations", 
   suppressMessages(
     result <- bid_structure(nested_stage)
   )
-  expect_equal(result$layout[1], "breathable")
+  expect_s3_class(result, "bid_stage")
   expect_true(grepl("User Onboarding", result$concepts[1]))
 })
 
@@ -352,9 +216,6 @@ test_that("bid_structure respects telemetry data in scoring", {
   suppressMessages(
     result <- bid_structure(stage_with_telemetry, telemetry_flags = telemetry_flags)
   )
-
-  # should avoid tabs layout
-  expect_false(result$layout[1] == "tabs")
 
   # tab-related suggestions should have lower scores
   all_suggestions <- unlist(

@@ -1,8 +1,8 @@
 ---
-title: "Integrating shiny.telemetry with bidux"
+title: "Integrating {shiny.telemetry} with bidux"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Integrating shiny.telemetry with bidux}
+  %\VignetteIndexEntry{Integrating {shiny.telemetry} with bidux}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -16,13 +16,60 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-The `{bidux}` package provides powerful tools to analyze real user behavior data from `{shiny.telemetry}` and automatically identify UX friction points. Think of it as A/B testing for UX design—you can measure the impact of design changes on user behavior with the same rigor you apply to data analysis.
+The `{bidux}` package provides powerful tools to analyze real user behavior data from telemetry sources and automatically identify UX friction points. Think of it as A/B testing for UX design—you can measure the impact of design changes on user behavior with the same rigor you apply to data analysis.
 
 **The power of telemetry + BID**: Instead of guessing what users struggle with, you can systematically identify friction points from real usage data, then apply behavioral science principles to fix them.
 
 This creates a powerful feedback loop where actual usage patterns drive design improvements through the BID framework.
 
 **New in 0.3.1:** Enhanced telemetry workflow with hybrid objects and streamlined API for better integration with tidy data workflows.
+
+## Choosing a Telemetry Source
+
+Bidux supports two telemetry sources:
+
+1. **`{shiny.telemetry}`** - Dedicated package for Shiny app telemetry (covered in this vignette)
+2. **Shiny Native OpenTelemetry** - Built into Shiny 1.12+ with rich performance data (NEW!)
+
+Both work seamlessly with `bid_telemetry()` using automatic format detection.
+
+### When to Use Each
+
+**Use `{shiny.telemetry}` when:**
+
+- Using Shiny versions < 1.12.0
+- Need simple event tracking without additional dependencies
+- Have an established `{shiny.telemetry}` workflow
+- Want lightweight telemetry with minimal overhead
+
+**Use Shiny OpenTelemetry when:**
+
+- Using Shiny >= 1.12.0
+- Want performance insights (render times, reactive latency) in addition to interactions
+- Integrating with observability platforms (Jaeger, Grafana, Datadog)
+- Need distributed tracing across services
+
+See `vignette("otel-integration")` for complete OpenTelemetry setup guide including:
+- Detailed span-to-event conversion mappings
+- Column schema and ID extraction logic
+- OTEL configuration and export formats
+- Comparison with `{shiny.telemetry}`
+
+### Automatic Format Detection
+
+Bidux automatically detects the telemetry source, so the analysis workflow is identical:
+
+```{r auto_detect, eval=FALSE}
+# Works with {shiny.telemetry}
+issues <- bid_telemetry("telemetry.sqlite")
+
+# Works with Shiny OTEL
+issues <- bid_telemetry("otel_spans.json")
+
+# Same analysis workflow for both!
+critical <- issues |>
+  dplyr::filter(severity == "critical")
+```
 
 ## Modern vs Legacy API
 

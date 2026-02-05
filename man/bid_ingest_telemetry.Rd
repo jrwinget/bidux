@@ -13,13 +13,19 @@ bid_ingest_telemetry(
 )
 }
 \arguments{
-\item{source}{Either a file path to telemetry data (SQLite database or JSON
-log file), or a DBI connection object to an already-open database.
-When a connection is provided, it will not be closed by this function.}
+\item{source}{Either a file path to telemetry data or a DBI connection object.
+Supports:
+\itemize{
+\item SQLite databases (shiny.telemetry or OTEL format)
+\item JSON files (shiny.telemetry logs or OTLP JSON exports)
+\item DBI connections to databases with event or span tables
+When a connection is provided, it will not be closed by this function.
+}}
 
-\item{format}{Optional format specification ("sqlite" or "json"). If NULL,
-auto-detected from file extension (for file paths) or defaults to
-"sqlite" for DBI connections.}
+\item{format}{Optional format specification ("sqlite", "json", "otlp_json",
+"otel_sqlite"). If NULL (default), auto-detected from file extension and
+structure. OTLP formats are automatically detected when file contains
+OpenTelemetry span data.}
 
 \item{events_table}{Optional data.frame specifying custom events table when
 reading from SQLite. Must have columns: event_id, timestamp,
@@ -57,22 +63,37 @@ for each identified issue in the "Notice" stage. The object includes:
 }\if{html}{\out{</div>}}
 }
 \description{
-This function ingests telemetry data from shiny.telemetry output (SQLite or
-JSON) and automatically identifies potential UX issues, translating them into
-BID framework Notice stages. It returns a hybrid object that is backward-compatible
-as a list of Notice stages while also providing enhanced functionality with
-tidy tibble access and flags extraction.
+This function ingests telemetry data from multiple sources and automatically
+identifies potential UX issues, translating them into BID framework Notice stages.
+It returns a hybrid object that is backward-compatible as a list of Notice stages
+while also providing enhanced functionality with tidy tibble access and flags extraction.
 
-\strong{Note:} This function is designed for Shiny application telemetry. For
-Quarto dashboards, shiny.telemetry only works when using \code{server: shiny} in
-the Quarto YAML. Static Quarto dashboards and OJS-based dashboards do not
-support shiny.telemetry. Consider alternative analytics solutions (e.g.,
-Plausible) for static dashboard usage tracking.
+\strong{Supported telemetry sources:}
+\itemize{
+\item shiny.telemetry (SQLite or JSON)
+\item Shiny native OpenTelemetry (Shiny >= 1.12.0, OTLP JSON or SQLite)
+\item DBI database connections
+}
+
+Format is automatically detected based on file structure and content.
+
+\strong{OpenTelemetry Support}: For Shiny >= 1.12.0 applications using native
+OpenTelemetry, pass the path to OTLP JSON exports or OTEL-formatted
+SQLite databases. Spans are automatically converted to events for analysis.
+See \code{vignette("otel-integration")} for complete setup guide.
+
+\strong{Note:} For Quarto dashboards, shiny.telemetry only works when using
+\code{server: shiny} in the Quarto YAML. Static Quarto dashboards and OJS-based
+dashboards do not support shiny.telemetry. Consider alternative analytics
+solutions (e.g., Plausible) for static dashboard usage tracking.
 }
 \examples{
 \dontrun{
-# Analyze SQLite telemetry database from file path
+# Works with shiny.telemetry SQLite
 issues <- bid_ingest_telemetry("telemetry.sqlite")
+
+# Works with Shiny OpenTelemetry (1.12+)
+issues <- bid_ingest_telemetry("otel_spans.json")
 
 # Use sensitivity presets for easier configuration
 strict_issues <- bid_ingest_telemetry(
@@ -102,7 +123,7 @@ issues <- bid_ingest_telemetry(
   table_name = "my_custom_events"
 )
 
-# Use results in BID workflow
+# Same analysis workflow for both shiny.telemetry and OTEL
 if (length(issues) > 0) {
   # Take first issue and continue with BID process
   interpret_result <- bid_interpret(

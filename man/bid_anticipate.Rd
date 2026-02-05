@@ -41,7 +41,7 @@ It also supports adding interaction hints and visual feedback elements.
 \examples{
 interpret_stage <- bid_interpret(
   central_question = "How can we improve selection efficiency?",
-  data_story = list(
+  data_story = new_data_story(
     hook = "Too many options",
     context = "Excessive choices",
     tension = "User frustration",

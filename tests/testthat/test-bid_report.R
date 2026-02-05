@@ -5,9 +5,11 @@ test_that("bid_report generates text report with expected content", {
         bid_notice(
           previous_stage = bid_interpret(
             central_question = "How to simplify?",
-            data_story = list(
+            data_story = new_data_story(
               hook = "Users are confused",
-              context = "Dashboard has evolved over time"
+              context = "Dashboard has evolved over time",
+              tension = "Navigation is unclear",
+              resolution = "Simplify interface"
             )
           ),
           problem = "Complex interface",
@@ -47,9 +49,11 @@ test_that("bid_report generates HTML report with correct format", {
         bid_notice(
           previous_stage = bid_interpret(
             central_question = "How to simplify?",
-            data_story = list(
+            data_story = new_data_story(
               hook = "Users are confused",
-              context = "Dashboard has evolved over time"
+              context = "Dashboard has evolved over time",
+              tension = "Navigation is unclear",
+              resolution = "Simplify interface"
             )
           ),
           problem = "Complex interface",

@@ -4,7 +4,7 @@
 \alias{get_visual_hierarchy_suggestions}
 \title{Generate Visual Hierarchy suggestions}
 \usage{
-get_visual_hierarchy_suggestions(chosen_layout, previous_stage)
+get_visual_hierarchy_suggestions(previous_stage)
 }
 \description{
 Generate Visual Hierarchy suggestions

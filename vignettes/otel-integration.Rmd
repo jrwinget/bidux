@@ -1,0 +1,879 @@
+---
+title: "Using Shiny's Native OpenTelemetry with Bidux"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using Shiny's Native OpenTelemetry with Bidux}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+## Introduction
+
+OpenTelemetry is an industry-standard observability framework that provides distributed tracing, metrics, and logging capabilities. Starting with version 1.12.0, Shiny includes native OpenTelemetry support, allowing you to collect rich performance and interaction data from your applications without additional packages.
+
+The `{bidux}` package now supports analyzing OpenTelemetry data alongside traditional `{shiny.telemetry}` data, providing a seamless workflow for UX friction detection regardless of your telemetry source.
+
+### What is OpenTelemetry?
+
+OpenTelemetry (OTEL) is a vendor-neutral, open-source observability framework that provides:
+
+- **Distributed tracing**: Track requests and operations across services
+- **Rich performance data**: Capture detailed timing information for renders, reactive updates, and user interactions
+- **Standard format**: OTLP (OpenTelemetry Protocol) is widely supported by observability platforms
+- **Flexible exports**: Send data to files, databases, or live collectors like Jaeger, Grafana, or Datadog
+
+### Why Use OpenTelemetry with Shiny?
+
+**Benefits of Shiny's native OpenTelemetry:**
+
+1. **Built into Shiny** - No need to add telemetry packages to your application code
+2. **Richer data** - Captures performance metrics (render times, reactive latency) alongside user interactions
+3. **Modern observability** - Integrates with industry-standard monitoring tools
+4. **Production-ready** - Designed for enterprise observability workflows
+
+**When to use it:**
+
+- You're running Shiny 1.12.0 or later
+- You want detailed performance insights (not just interaction tracking)
+- You need integration with existing observability infrastructure
+- You're deploying production applications at scale
+
+## Prerequisites
+
+To use OpenTelemetry with Shiny and analyze the data with bidux, you need:
+
+```{r prerequisites}
+# 1. Shiny >= 1.12.0 (when OTEL support was added)
+packageVersion("shiny") # Should be >= 1.12.0
+
+# 2. OpenTelemetry packages
+install.packages("otel")
+install.packages("otelsdk")
+
+# 3. bidux with OTEL support
+install.packages("bidux") # or development version from GitHub
+```
+
+## Setting Up OpenTelemetry in Your Shiny App
+
+### Basic Configuration
+
+The simplest way to enable OpenTelemetry in your Shiny app is through options or environment variables:
+
+```{r basic_setup}
+library(shiny)
+
+# Enable OTEL collection for all events
+options(shiny.otel.collect = "all")
+
+# Or use environment variable (set before starting R)
+# Sys.setenv(SHINY_OTEL_COLLECT = "all")
+
+# Your Shiny app code
+ui <- fluidPage(
+  titlePanel("Sales Dashboard"),
+  sidebarLayout(
+    sidebarPanel(
+      selectInput("region", "Region:",
+                  choices = c("North", "South", "East", "West")),
+      dateRangeInput("date_range", "Date Range:")
+    ),
+    mainPanel(
+      plotOutput("sales_plot")
+    )
+  )
+)
+
+server <- function(input, output, session) {
+  output$sales_plot <- renderPlot({
+    # Your plotting logic
+  })
+}
+
+shinyApp(ui, server)
+```
+
+### Collection Levels
+
+Shiny's OpenTelemetry supports different collection levels to control data volume:
+
+| Level | What's Collected | Use Case |
+|-------|-----------------|----------|
+| `"none"` | No telemetry | Production (no monitoring) |
+| `"session"` | Session start/end only | Minimal overhead tracking |
+| `"reactive_update"` | Session + reactive updates | Balance of data and performance |
+| `"reactivity"` | Above + reactive dependencies | Detailed reactive graph insights |
+| `"all"` | Everything (max detail) | Development and analysis |
+
+```{r collection_levels}
+# For development and UX analysis - collect everything
+options(shiny.otel.collect = "all")
+
+# For production with moderate overhead
+options(shiny.otel.collect = "reactive_update")
+
+# Minimal production tracking
+options(shiny.otel.collect = "session")
+```
+
+### Export Formats
+
+#### Option 1: File Export (for Bidux Analysis)
+
+To analyze OTEL data with bidux, export to OTLP JSON format:
+
+```{r file_export}
+\dontrun{
+library(otel)
+library(otelsdk)
+
+# Configure OTLP JSON file exporter
+Sys.setenv(
+  OTEL_TRACES_EXPORTER = "otlp",
+  OTEL_EXPORTER_OTLP_PROTOCOL = "http/json",
+  OTEL_EXPORTER_OTLP_ENDPOINT = "/path/to/otel_spans.json"
+)
+
+# Enable collection
+options(shiny.otel.collect = "all")
+
+# Run your Shiny app
+# Spans will be exported to otel_spans.json
+}
+```
+
+**Security Note:** Always use telemetry data from trusted sources. The `{bidux}` package includes protections against malformed data, but users should only analyze telemetry files they have generated from their own applications.
+
+```{r json_export, echo=FALSE}
+```
+
+#### Option 2: SQLite Database Export
+
+For persistent storage compatible with bidux:
+
+```{r sqlite_export}
+\dontrun{
+library(otel)
+library(otelsdk)
+
+# Configure SQLite exporter (custom implementation)
+# Note: Requires additional setup - see otel package documentation
+Sys.setenv(
+  OTEL_TRACES_EXPORTER = "sqlite",
+  OTEL_EXPORTER_SQLITE_PATH = "/path/to/otel_spans.sqlite"
+)
+
+options(shiny.otel.collect = "all")
+}
+```
+
+#### Option 3: Live Collectors (Jaeger, Grafana, etc.)
+
+For real-time monitoring in production:
+
+```{r live_export}
+\dontrun{
+library(otel)
+library(otelsdk)
+
+# Configure OTLP HTTP exporter to send to collector
+Sys.setenv(
+  OTEL_TRACES_EXPORTER = "otlp",
+  OTEL_EXPORTER_OTLP_PROTOCOL = "http/protobuf",
+  OTEL_EXPORTER_OTLP_ENDPOINT = "https://collector.example.com:4318",
+  OTEL_EXPORTER_OTLP_HEADERS = "Authorization=Bearer YOUR_TOKEN",
+  OTEL_RESOURCE_ATTRIBUTES = "service.name=my-shiny-app,environment=production"
+)
+
+options(shiny.otel.collect = "all")
+}
+```
+
+### Environment Variables Reference
+
+Key environment variables for configuring OpenTelemetry:
+
+```{r env_vars}
+# Core configuration
+SHINY_OTEL_COLLECT = "all"              # Collection level
+OTEL_TRACES_EXPORTER = "otlp"           # Exporter type
+
+# OTLP configuration
+OTEL_EXPORTER_OTLP_ENDPOINT = "https://collector:4318"  # Collector URL
+OTEL_EXPORTER_OTLP_PROTOCOL = "http/json"               # Protocol format
+OTEL_EXPORTER_OTLP_HEADERS = "Authorization=Bearer token"  # Auth headers
+
+# Resource attributes (metadata)
+OTEL_RESOURCE_ATTRIBUTES = "service.name=my-app,environment=prod,version=1.0"
+
+# Sampling (control data volume)
+OTEL_TRACES_SAMPLER = "traceidratio"    # Sampler type
+OTEL_TRACES_SAMPLER_ARG = "0.1"         # Sample 10% of traces
+```
+
+## How OTEL Spans Are Converted to Bidux Events
+
+Before analyzing OTEL data, bidux automatically converts OpenTelemetry spans to its event schema. Understanding this conversion helps you:
+
+1. Configure your Shiny app to emit useful spans
+2. Understand what the analysis results mean
+3. Debug issues when data doesn't look right
+
+### Span Type Mappings
+
+Bidux recognizes these OTEL span types and converts them to event types:
+
+| Span Name/Pattern | Event Type | Description |
+|-------------------|------------|-------------|
+| `session_start` | `login` | User session begins |
+| `session_end` | `logout` | User session ends |
+| `output:<id>` | `output` | Shiny output rendering (e.g., `output:plot1`) |
+| `reactive:<id>` | `input` | Reactive expression execution |
+| `observe:<id>` | `input` | Observer execution |
+| `navigation` | `navigation` | Tab/page navigation event |
+| `reactive_update` | `reactive_update` | Reactive recalculation (timing event) |
+| Span with error event | `error` | Error occurred during execution |
+
+### Column Schema
+
+After conversion, events have this schema:
+
+| Column | Type | Description | Example |
+|--------|------|-------------|---------|
+| `timestamp` | POSIXct | Event time (from `startTimeUnixNano`) | `2025-01-15 14:23:01 UTC` |
+| `session_id` | character | Session identifier (from `session.id` attribute) | `"session_abc123"` |
+| `event_type` | character | Type of event | `"output"`, `"input"`, `"login"` |
+| `input_id` | character | Input/reactive identifier | `"slider1"`, `"filtered_data"` |
+| `output_id` | character | Output identifier | `"plot1"`, `"table1"` |
+| `error_message` | character | Error description (if error occurred) | `"object not found"` |
+| `navigation_id` | character | Navigation target | `"settings_tab"` |
+| `duration_ms` | numeric | Span duration in milliseconds | `234.5` |
+| `value` | character | Value (usually NA for OTEL) | `NA` |
+
+### ID Extraction Logic
+
+Bidux uses flexible extraction to handle various naming conventions:
+
+**For Input IDs** (reactive and observer spans):
+1. Check span name for patterns:
+   - `reactive:input$<id>` → extracts `<id>`
+   - `reactive:<id>` → extracts `<id>`
+   - `observe:<id>` → extracts `<id>`
+2. Check attributes for: `input_id`, `widget_id`, `element_id`
+
+**For Output IDs** (output spans):
+1. Check span name: `output:<id>` → extracts `<id>`
+2. Check attributes for: `output_id`, `target_id`, `output`, `output.name`
+
+**For Session IDs** (all spans):
+- Check attributes for: `session.id`, `session_id`
+
+**For Navigation IDs** (navigation spans):
+- Check attributes for: `navigation_id`, `navigation.target`, `page`, `target`
+
+**For Error Messages**:
+- Look in span events for events named `error` or `exception`
+- Extract from event attributes: `message`, `error.message`, `exception.message`
+
+### Timestamp Conversion
+
+OTLP uses Unix nanosecond timestamps. Bidux converts them:
+
+```r
+# OTLP timestamp example: "1704459200000000000" (nanoseconds since epoch)
+# Converted to: 2024-01-05 12:00:00 UTC (POSIXct)
+
+# Conversion formula:
+timestamp_seconds <- as.numeric(startTimeUnixNano) / 1e9
+timestamp_posix <- as.POSIXct(timestamp_seconds, origin = "1970-01-01", tz = "UTC")
+```
+
+### Duration Calculation
+
+Span duration is calculated from start and end timestamps:
+
+```r
+# Example span:
+# startTimeUnixNano: "1704459200000000000"
+# endTimeUnixNano:   "1704459200234500000"
+
+# Duration calculation:
+duration_ms <- (endTimeUnixNano - startTimeUnixNano) / 1e6
+# Result: 234.5 milliseconds
+```
+
+This gives you precise millisecond-level timing for:
+- Output render times
+- Reactive execution times
+- Observer execution times
+
+## Analyzing OTEL Data with Bidux
+
+### The Workflow (Same as shiny.telemetry!)
+
+The beauty of bidux's OTEL support is that **after conversion**, the analysis workflow is **identical** to `shiny.telemetry`:
+
+```{r bidux_workflow}
+library(bidux)
+library(dplyr)
+
+# Works just like shiny.telemetry!
+issues <- bid_telemetry("otel_spans.json")
+
+# Same friction detection
+critical_issues <- issues |>
+  filter(severity == "critical") |>
+  arrange(desc(impact_rate))
+
+# Same BID pipeline
+interpret <- bid_interpret(
+  central_question = "How to improve user experience based on OTEL data?"
+)
+
+notices <- bid_notices(
+  issues = critical_issues,
+  previous_stage = interpret,
+  max_issues = 3
+)
+
+# Extract telemetry flags
+flags <- bid_flags(issues)
+flags$has_critical_issues
+```
+
+### Format Auto-Detection
+
+Bidux automatically detects whether your data is from `shiny.telemetry` or OpenTelemetry:
+
+```{r auto_detect}
+# Automatically detects shiny.telemetry format
+issues_st <- bid_telemetry("telemetry.sqlite")
+
+# Automatically detects OTLP JSON format
+issues_otel <- bid_telemetry("otel_spans.json")
+
+# Automatically detects OTEL SQLite format
+issues_otel_db <- bid_telemetry("otel_spans.sqlite")
+
+# Same analysis, same results, regardless of source!
+```
+
+### Understanding OTEL Span Conversion
+
+When bidux analyzes OTEL data, spans are automatically converted to the bidux event schema. Here's how the conversion works:
+
+### Span Name Patterns
+
+OTEL spans use naming conventions that bidux recognizes:
+
+- **Session lifecycle**: `session_start`, `session_end`
+- **Outputs**: `output:plot1`, `output:table1` (pattern: `output:<id>`)
+- **Reactives**: `reactive:input$slider`, `reactive:filtered_data` (pattern: `reactive:<id>`)
+- **Observers**: `observe:update_db` (pattern: `observe:<id>`)
+- **Navigation**: `navigation` (target extracted from attributes)
+
+### Attribute Extraction
+
+Bidux extracts metadata from span attributes using multiple naming conventions:
+
+**Session ID**: Looks for `session.id` or `session_id` attributes
+
+**Input ID**: Looks for:
+- `input_id` in attributes
+- `input$<id>` pattern in span name
+- `reactive:<id>` or `observe:<id>` patterns
+
+**Output ID**: Looks for:
+- `output_id`, `target_id`, `output`, or `output.name` in attributes
+- `output:<id>` pattern in span name
+
+**Navigation ID**: Looks for:
+- `navigation_id`, `navigation.target`, `page`, or `target` attributes
+
+**Error Messages**: Extracted from span events with name `error` or `exception`:
+- Looks for `message`, `error.message`, or `exception.message` attributes
+
+### Duration Calculation
+
+OTEL spans include precise timing information:
+
+```{r otel_duration}
+# Duration calculated from span timestamps
+# duration_ms = (endTimeUnixNano - startTimeUnixNano) / 1e6
+
+# Analyze OTEL data
+issues <- bid_telemetry("otel_spans.json")
+
+# OTEL data provides performance context
+issues |>
+  filter(issue_type == "delayed_interaction") |>
+  select(problem, evidence)
+#> Problem: Users take a long time before making their first interaction
+#> Evidence: Median time to first input is 47 seconds
+```
+
+### Complete Example: From Setup to Analysis
+
+Here's a full workflow from configuring OTEL in your Shiny app to analyzing results with bidux:
+
+```{r complete_example}
+\dontrun{
+# ============================================
+# STEP 1: Configure OTEL in your Shiny app
+# ============================================
+
+library(shiny)
+library(otel)
+library(otelsdk)
+
+# Enable OTEL with file export
+Sys.setenv(
+  OTEL_TRACES_EXPORTER = "otlp",
+  OTEL_EXPORTER_OTLP_ENDPOINT = "/tmp/shiny_otel.json"
+)
+options(shiny.otel.collect = "all")
+
+# Your Shiny app
+ui <- fluidPage(
+  titlePanel("Sales Dashboard"),
+  sidebarLayout(
+    sidebarPanel(
+      selectInput("region", "Region:",
+                  choices = c("North", "South", "East", "West")),
+      selectInput("product", "Product:",
+                  choices = c("A", "B", "C")),
+      dateRangeInput("dates", "Date Range:")
+    ),
+    mainPanel(
+      tabsetPanel(
+        tabPanel("Overview", plotOutput("overview")),
+        tabPanel("Details", tableOutput("details")),
+        tabPanel("Settings", uiOutput("settings"))
+      )
+    )
+  )
+)
+
+server <- function(input, output, session) {
+  output$overview <- renderPlot({
+    # Plotting logic
+  })
+
+  output$details <- renderTable({
+    # Table logic
+  })
+
+  output$settings <- renderUI({
+    # Settings UI
+  })
+}
+
+# Run app and collect data
+shinyApp(ui, server)
+
+# ============================================
+# STEP 2: Analyze OTEL data with bidux
+# ============================================
+
+library(bidux)
+library(dplyr)
+
+# Analyze collected OTEL spans
+issues <- bid_telemetry(
+  "/tmp/shiny_otel.json",
+  thresholds = bid_telemetry_presets("moderate")
+)
+
+# Review identified issues
+print(issues)
+#> # BID Telemetry Issues Summary
+#> Found 5 issues from 342 sessions
+#>
+#> Critical: 1 issue
+#> High: 2 issues
+#> Medium: 2 issues
+
+# Filter to critical issues
+critical <- issues |>
+  filter(severity == "critical")
+
+print(critical)
+#> Issue: unused_input_product
+#> Problem: Users are not interacting with the 'product' input control
+#> Evidence: Only 12 out of 342 sessions (3.5%) interacted with 'product'
+#> Impact: 96.5% of sessions affected
+
+# ============================================
+# STEP 3: Apply BID framework
+# ============================================
+
+# Start BID workflow with OTEL insights
+interpret_result <- bid_interpret(
+  central_question = "Why aren't users engaging with the product filter?",
+  data_story = new_data_story(
+    hook = "96.5% of users never use the product filter",
+    context = "OTEL data from 342 sessions over 2 weeks",
+    tension = "Filter may be unnecessary or poorly positioned",
+    resolution = "Simplify interface or improve filter discoverability"
+  )
+)
+
+# Convert OTEL issue to Notice
+notice_result <- bid_notices(
+  issues = critical,
+  previous_stage = interpret_result
+)[[1]]
+
+# Continue through BID stages
+anticipate_result <- bid_anticipate(
+  previous_stage = notice_result,
+  bias_mitigations = list(
+    choice_overload = "Reduce number of visible filters",
+    default_effect = "Set smart defaults based on common patterns"
+  )
+)
+
+# Use OTEL flags to inform structure
+flags <- bid_flags(issues)
+structure_result <- bid_structure(
+  previous_stage = anticipate_result,
+  telemetry_flags = flags
+)
+
+# Validate
+validate_result <- bid_validate(
+  previous_stage = structure_result,
+  summary_panel = "Simplified dashboard with progressive disclosure",
+  next_steps = c(
+    "Remove or hide unused product filter",
+    "Re-run OTEL analysis to verify improvement",
+    "Monitor user engagement metrics"
+  )
+)
+
+# Generate report
+bid_report(validate_result, format = "html")
+}
+```
+
+## Comparison: shiny.telemetry vs Shiny Native OTEL
+
+Understanding the differences helps you choose the right approach:
+
+| Feature | shiny.telemetry | Shiny OTEL |
+|---------|----------------|------------|
+| **Setup** | Separate package | Built into Shiny 1.12+ |
+| **In-app code** | `use_telemetry()` + tracking calls | Just set `options(shiny.otel.collect)` |
+| **Data captured** | User interactions | Interactions + performance spans |
+| **Format** | Events (direct) | Spans (converted to events by bidux) |
+| **Performance data** | Limited (manual timing) | Rich (automatic render times, reactive latency) |
+| **File size** | Smaller (event-only) | Larger (includes span metadata) |
+| **Shiny version** | Works with older Shiny | Requires Shiny >= 1.12.0 |
+| **Bidux support** | Yes (native) | Yes (automatic conversion) |
+| **Best for** | Simple tracking, older Shiny | Performance insights, modern Shiny |
+
+### When to Use Each
+
+**Use shiny.telemetry when:**
+
+- Using Shiny versions < 1.12.0
+- You need lightweight event tracking only
+- You have an established `shiny.telemetry` workflow
+- File size and storage are constraints
+- You want fine-grained control over what's tracked
+
+**Use Shiny OpenTelemetry when:**
+
+- Using Shiny >= 1.12.0
+- You want comprehensive performance insights
+- You're integrating with existing OTEL infrastructure
+- You need distributed tracing across services
+- You want automatic tracking without instrumentation code
+
+**Use both during transition:**
+
+You can run both systems simultaneously during migration:
+
+```{r dual_tracking}
+\dontrun{
+library(shiny)
+library(shiny.telemetry)
+library(otel)
+
+# Enable both systems
+telemetry <- Telemetry$new()
+options(shiny.otel.collect = "all")
+
+ui <- fluidPage(
+  use_telemetry(),  # shiny.telemetry
+  # Your UI
+)
+
+server <- function(input, output, session) {
+  telemetry$start_session()  # shiny.telemetry
+  # Your server logic
+}
+
+# Analyze both sources
+issues_st <- bid_telemetry("telemetry.sqlite")
+issues_otel <- bid_telemetry("otel_spans.json")
+
+# Compare results
+nrow(issues_st)
+nrow(issues_otel)
+}
+```
+
+## Migration Considerations
+
+### Should You Switch from shiny.telemetry to OTEL?
+
+**Reasons to migrate:**
+
+1. **Automatic instrumentation** - No need to add tracking code
+2. **Richer data** - Performance metrics included automatically
+3. **Standard format** - OTLP is widely supported
+4. **Future-proof** - OTEL is the industry standard
+
+**Reasons to stay with shiny.telemetry:**
+
+1. **Shiny version** - You're on Shiny < 1.12.0
+2. **Simplicity** - You only need basic event tracking
+3. **Storage** - OTEL data is more verbose
+4. **Established workflow** - You have working pipelines
+
+### Migration Strategy
+
+If you decide to migrate, here's a phased approach:
+
+**Phase 1: Parallel tracking (2-4 weeks)**
+
+```{r migration_phase1}
+\dontrun{
+# Run both systems to compare
+options(shiny.otel.collect = "all")
+# Keep existing shiny.telemetry code
+
+# Compare results weekly
+issues_st <- bid_telemetry("telemetry.sqlite")
+issues_otel <- bid_telemetry("otel_spans.json")
+
+# Verify OTEL captures same issues
+}
+```
+
+**Phase 2: OTEL primary (2-4 weeks)**
+
+```{r migration_phase2}
+\dontrun{
+# Switch to OTEL as primary
+options(shiny.otel.collect = "all")
+# Keep shiny.telemetry as backup
+
+# Use OTEL data for analysis
+issues <- bid_telemetry("otel_spans.json")
+}
+```
+
+**Phase 3: OTEL only**
+
+```{r migration_phase3}
+\dontrun{
+# Remove shiny.telemetry code
+# library(shiny.telemetry) - remove
+# use_telemetry() - remove
+# telemetry$start_session() - remove
+
+# OTEL only
+options(shiny.otel.collect = "all")
+}
+```
+
+## Troubleshooting
+
+### Common Issues and Solutions
+
+**Problem: "otel package not found"**
+
+```{r troubleshoot_1}
+# Solution: Install OpenTelemetry packages
+install.packages("otel")
+install.packages("otelsdk")
+```
+
+**Problem: "No spans detected"**
+
+```{r troubleshoot_2}
+# Check if OTEL is enabled
+getOption("shiny.otel.collect")
+#> Should return "all" or another collection level
+
+# Verify otel is tracing
+library(otel)
+otel::is_tracing_enabled()
+#> Should return TRUE
+
+# Enable OTEL if disabled
+options(shiny.otel.collect = "all")
+```
+
+**Problem: "Format not recognized" when analyzing OTLP JSON**
+
+```{r troubleshoot_3}
+# Verify file structure
+jsonlite::fromJSON("otel_spans.json", simplifyVector = FALSE) |>
+  str(max.level = 2)
+
+# Should contain spans with startTimeUnixNano, endTimeUnixNano, etc.
+# If not, check OTLP exporter configuration
+```
+
+**Problem: "Empty spans file"**
+
+```{r troubleshoot_4}
+# Check exporter endpoint
+Sys.getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
+
+# Verify file path is writable
+file.access("otel_spans.json", mode = 2)
+#> Should return 0 (success)
+
+# Check Shiny app had user interactions
+# Spans only created when actions occur
+```
+
+**Problem: "Too much data / large files"**
+
+```{r troubleshoot_5}
+# Use sampling to reduce volume
+Sys.setenv(
+  OTEL_TRACES_SAMPLER = "traceidratio",
+  OTEL_TRACES_SAMPLER_ARG = "0.1"  # Sample 10% of traces
+)
+
+# Or reduce collection level
+options(shiny.otel.collect = "reactive_update")  # Less than "all"
+```
+
+**Problem: "Bidux not detecting OTEL format"**
+
+```{r troubleshoot_6}
+# Explicitly specify format
+issues <- bid_telemetry("otel_spans.json", format = "otlp_json")
+
+# Or for OTEL SQLite
+issues <- bid_telemetry("otel_spans.sqlite", format = "otel_sqlite")
+```
+
+## Advanced Topics
+
+### Custom Span Attributes
+
+You can add custom attributes to OTEL spans for richer analysis:
+
+```{r custom_attributes}
+\dontrun{
+library(otel)
+
+# Add custom attributes to current span
+otel::add_span_attribute("user_role", "analyst")
+otel::add_span_attribute("dashboard_version", "2.1.0")
+
+# These attributes are preserved in OTLP exports
+# and available for custom analysis
+}
+```
+
+### Filtering Analysis by Attributes
+
+```{r filter_attributes}
+\dontrun{
+# Analyze OTEL data
+issues <- bid_telemetry("otel_spans.json")
+
+# Access raw span data for custom filtering
+# (Advanced: requires understanding OTLP structure)
+raw_spans <- jsonlite::fromJSON("otel_spans.json")
+
+# Filter spans by custom attributes before analysis
+# Then re-analyze with bidux
+}
+```
+
+## Best Practices
+
+1. **Start with "all" during development** - Collect everything for UX analysis
+   ```{r bp1}
+   options(shiny.otel.collect = "all")
+   ```
+
+2. **Use sampling in production** - Reduce overhead with sampling
+   ```{r bp2}
+   Sys.setenv(OTEL_TRACES_SAMPLER_ARG = "0.1")  # 10% sampling
+   ```
+
+3. **Rotate log files** - Prevent unbounded file growth
+   ```{r bp3}
+   \dontrun{
+   # Implement log rotation in your deployment
+   # Example: daily rotation with retention
+   file_pattern <- paste0("otel_spans_", Sys.Date(), ".json")
+   }
+   ```
+
+4. **Monitor file sizes** - OTEL data can grow quickly
+   ```{r bp4}
+   \dontrun{
+   file.size("otel_spans.json") / 1024 / 1024  # Size in MB
+   }
+   ```
+
+5. **Regular analysis** - Run bidux analysis weekly or monthly
+   ```{r bp5}
+   # Schedule regular UX reviews
+   issues <- bid_telemetry("otel_spans.json")
+   if (any(issues$severity == "critical")) {
+     # Alert team
+   }
+   ```
+
+6. **Combine with user feedback** - OTEL shows *what*, interviews show *why*
+   ```{r bp6}
+   # Use OTEL to identify friction points
+   # Then interview users to understand root causes
+   ```
+
+## References
+
+- [Shiny Changelog - Version 1.12.0](https://rstudio.github.io/shiny/news/index.html)
+- [otel Package Documentation](https://otel.r-lib.org/)
+- [otelsdk Package Documentation](https://otelsdk.r-lib.org/)
+- [OpenTelemetry Specification](https://opentelemetry.io/docs/specs/otel/)
+- [OTLP Protocol Reference](https://opentelemetry.io/docs/specs/otlp/)
+- [bidux Package](https://github.com/jrwinget/bidux)
+
+## Next Steps
+
+Now that you understand OpenTelemetry integration with bidux:
+
+1. **Set up OTEL** in your Shiny app following the configuration examples
+2. **Collect data** from real users (at least 50-100 sessions)
+3. **Analyze with bidux** using `bid_telemetry()`
+4. **Apply BID framework** to address identified friction points
+5. **Measure improvement** by comparing before/after metrics
+
+For more details on the BID framework and telemetry analysis:
+
+- `vignette("telemetry-integration")` - Comprehensive telemetry guide
+- `vignette("getting-started")` - BID framework introduction
+- `vignette("practical-examples")` - Real-world use cases
+
+Happy analyzing!

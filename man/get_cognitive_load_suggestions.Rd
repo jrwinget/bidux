@@ -4,7 +4,7 @@
 \alias{get_cognitive_load_suggestions}
 \title{Generate Cognitive Load Theory suggestions}
 \usage{
-get_cognitive_load_suggestions(chosen_layout, previous_stage)
+get_cognitive_load_suggestions(previous_stage)
 }
 \description{
 Generate Cognitive Load Theory suggestions

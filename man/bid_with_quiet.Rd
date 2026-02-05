@@ -20,7 +20,11 @@ Execute code with bidux messages temporarily suppressed.
 result <- bid_with_quiet({
   bid_interpret(
     central_question = "How can we improve user engagement?",
-    data_story = list(hook = "Users are leaving", resolution = "Fix issues")
+    data_story = new_data_story(
+      hook = "Users are leaving",
+      context = "User engagement declining",
+      resolution = "Fix issues"
+    )
   )
 })
 

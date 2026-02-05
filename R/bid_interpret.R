@@ -63,19 +63,6 @@
 #'
 #' summary(interpret_personas)
 #'
-#' # Legacy list format still works (with deprecation warning)
-#' \dontrun{
-#' interpret_legacy <- bid_interpret(
-#'   central_question = "How can we improve UX?",
-#'   data_story = list(
-#'     hook = "Users struggling",
-#'     context = "Dashboard complexity",
-#'     tension = "High abandonment rate",
-#'     resolution = "Simplify interface"
-#'   )
-#' )
-#' }
-#'
 #' @export
 bid_interpret <- function(
     previous_stage = NULL,
@@ -83,32 +70,19 @@ bid_interpret <- function(
     data_story = NULL,
     user_personas = NULL,
     quiet = NULL) {
-  # enhanced parameter validation for data_story
+  # parameter validation for data_story
   if (!is.null(data_story)) {
-    if (inherits(data_story, "bid_data_story")) {
-      # new s3 class - validate structure
-      if (!validate_data_story(data_story)) {
-        cli::cli_abort(standard_error_msg(
-          "Invalid bid_data_story object",
-          suggestions = "Use new_data_story() constructor to create valid objects"
-        ))
-      }
-    } else if (is.list(data_story)) {
-      # legacy list format - migrate to new s3 class with deprecation warning
-      cli::cli_warn(c(
-        "!" = "Using deprecated list format for data_story parameter",
-        "i" = "Please use new_data_story() constructor for new code",
-        "i" = "Legacy format will be automatically migrated"
-      ))
-      data_story <- migrate_data_story(data_story)
-    } else {
+    if (!inherits(data_story, "bid_data_story")) {
       cli::cli_abort(standard_error_msg(
-        "data_story must be a bid_data_story object or list",
+        "data_story must be a bid_data_story object",
         context = glue::glue("You provided: {class(data_story)[1]}"),
-        suggestions = c(
-          "Use new_data_story() constructor",
-          "Or provide a list with context, variables, relationships"
-        )
+        suggestions = "Use new_data_story() constructor to create valid objects"
+      ))
+    }
+    if (!validate_data_story(data_story)) {
+      cli::cli_abort(standard_error_msg(
+        "Invalid bid_data_story object",
+        suggestions = "Use new_data_story() constructor to create valid objects"
       ))
     }
   }
@@ -263,67 +237,50 @@ bid_interpret <- function(
       target_audience <- stage_data$target_audience
 
       if (!is.na(problem)) {
-        # create context from problem and evidence
+        # create data story from problem and evidence
+        hook_text <- "Current interface challenges are affecting user success"
         context_text <- paste0("Users are experiencing problems with ", problem)
-
-        # build variables list from extracted data
-        variables_list <- list(
-          problem = problem,
-          evidence = if (!is.na(evidence)) evidence else "Interface usability issue",
-          theory = if (!is.na(theory)) theory else "General usability principles",
-          hook = paste0("Current interface challenges are affecting user success")
+        tension_text <- paste0(
+          "This is creating friction in the user experience",
+          if (!is.na(theory)) paste0(" related to ", theory) else ""
+        )
+        resolution_text <- paste0(
+          "We need to redesign the interface",
+          if (!is.na(theory)) paste0(" using principles from ", theory) else "",
+          " to address this problem."
         )
 
-        # build relationships based on theory
-        relationships_list <- list(
-          problem_to_solution = paste0(
-            "We need to redesign the interface",
-            if (!is.na(theory)) paste0(" using principles from ", theory) else "",
-            " to address this problem."
-          ),
-          user_friction = paste0(
-            "This is creating friction in the user experience",
-            if (!is.na(theory)) paste0(" related to ", theory) else ""
-          )
-        )
-
-        # add metadata with legacy fields for backward compatibility
-        metadata_list <- list(
-          audience = if (!is.na(target_audience)) target_audience else NULL,
-          visual_approach = if (!is.na(theory)) {
-            theory_lower <- tolower(theory)
-            if (grepl("cognitive load", theory_lower)) {
-              "Simplified visualizations with reduced clutter"
-            } else if (grepl("hick", theory_lower)) {
-              "Clear hierarchy of choices with progressive disclosure"
-            } else if (grepl("visual hierarch", theory_lower)) {
-              "Strong visual hierarchy using size, color, and positioning"
-            } else {
-              "Clean, focused visualizations with clear purpose"
-            }
+        # determine visual approach based on theory
+        visual_approach <- if (!is.na(theory)) {
+          theory_lower <- tolower(theory)
+          if (grepl("cognitive load", theory_lower)) {
+            "Simplified visualizations with reduced clutter"
+          } else if (grepl("hick", theory_lower)) {
+            "Clear hierarchy of choices with progressive disclosure"
+          } else if (grepl("visual hierarch", theory_lower)) {
+            "Strong visual hierarchy using size, color, and positioning"
           } else {
             "Clean, focused visualizations with clear purpose"
           }
-        )
+        } else {
+          "Clean, focused visualizations with clear purpose"
+        }
 
         data_story <- new_data_story(
+          hook = hook_text,
           context = context_text,
-          variables = variables_list,
-          relationships = relationships_list,
-          metadata = metadata_list
+          tension = tension_text,
+          resolution = resolution_text,
+          audience = if (!is.na(target_audience)) target_audience else NULL,
+          visual_approach = visual_approach
         )
       } else {
         # fallback for missing problem data
         data_story <- new_data_story(
+          hook = "Users may be experiencing interface challenges",
           context = "Dashboard users may not be getting maximum value from current interface",
-          variables = list(
-            user_challenge = "Suboptimal user experience",
-            improvement_area = "Interface design",
-            hook = "Users may be experiencing interface challenges"
-          ),
-          relationships = list(
-            solution_path = "Redesign interface using behavioral science principles"
-          )
+          tension = "Suboptimal user experience in interface design",
+          resolution = "Redesign interface using behavioral science principles"
         )
       }
 
@@ -339,30 +296,20 @@ bid_interpret <- function(
     ) {
       # iteration cycle data story
       data_story <- new_data_story(
+        hook = "There may be gaps in our current understanding",
         context = "We need to revisit our understanding of user needs",
-        variables = list(
-          design_status = "The current design may need refinement",
-          user_understanding = "User needs may have evolved or been incompletely understood",
-          hook = "There may be gaps in our current understanding"
-        ),
-        relationships = list(
-          improvement_cycle = "Gather additional user feedback and refine our interpretation"
-        )
+        tension = "User needs may have evolved or been incompletely understood",
+        resolution = "Gather additional user feedback and refine our interpretation"
       )
 
       bid_alert_info("Suggested generic data story for iteration cycle", quiet = quiet)
     } else if (is.null(previous_stage)) {
       # new project data story
       data_story <- new_data_story(
+        hook = "Users deserve a better interface experience",
         context = "Dashboard users may not be getting maximum value from current interface",
-        variables = list(
-          user_challenge = "Users may be missing important insights or spending too much time",
-          opportunity = "Current interface could be improved for better user experience",
-          hook = "Users deserve a better interface experience"
-        ),
-        relationships = list(
-          solution_approach = "Redesign interface using behavioral science principles"
-        )
+        tension = "Users may be missing important insights or spending too much time",
+        resolution = "Redesign interface using behavioral science principles"
       )
 
       bid_alert_info(
@@ -431,8 +378,6 @@ bid_interpret <- function(
     if (!is.null(data_story)) {
       if (inherits(data_story, "bid_data_story")) {
         audience <- safe_list_access(data_story$metadata, "audience", NULL)
-      } else if (is.list(data_story) && "audience" %in% names(data_story)) {
-        audience <- data_story$audience
       }
     }
 
@@ -487,14 +432,10 @@ bid_interpret <- function(
     persona_suggestion
   )
 
-  # extract fields from data_story s3 object or legacy format
+  # extract fields from data_story s3 object
   audience <- if (!is.null(data_story)) {
     if (inherits(data_story, "bid_data_story")) {
-      # new s3 class - check metadata
       safe_list_access(data_story$metadata, "audience", NA_character_)
-    } else if (is.list(data_story) && "audience" %in% names(data_story)) {
-      # legacy list format
-      data_story$audience %||% NA_character_
     } else {
       NA_character_
     }
@@ -505,8 +446,6 @@ bid_interpret <- function(
   metrics <- if (!is.null(data_story)) {
     metrics_value <- if (inherits(data_story, "bid_data_story")) {
       safe_list_access(data_story$metadata, "metrics", NULL)
-    } else if (is.list(data_story)) {
-      safe_list_access(data_story, "metrics", NULL)
     } else {
       NULL
     }
@@ -530,11 +469,7 @@ bid_interpret <- function(
 
   visual_approach <- if (!is.null(data_story)) {
     if (inherits(data_story, "bid_data_story")) {
-      # new s3 class - check metadata
       safe_list_access(data_story$metadata, "visual_approach", NA_character_)
-    } else if (is.list(data_story) && "visual_approach" %in% names(data_story)) {
-      # legacy list format
-      data_story$visual_approach %||% NA_character_
     } else {
       NA_character_
     }

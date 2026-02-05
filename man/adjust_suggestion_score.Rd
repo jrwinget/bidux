@@ -4,7 +4,7 @@
 \alias{adjust_suggestion_score}
 \title{Apply context-based scoring adjustments}
 \usage{
-adjust_suggestion_score(suggestion, previous_stage, chosen_layout, concept)
+adjust_suggestion_score(suggestion, previous_stage, concept)
 }
 \description{
 Apply context-based scoring adjustments

@@ -530,16 +530,17 @@ test_that("get_accessibility_advice works correctly", {
   expect_gt(nchar(result_null), 0)
 })
 
-test_that("safe_data_story_access works with legacy plain list", {
-  data_story <- list(
+test_that("safe_data_story_access works with new_data_story format", {
+  data_story <- new_data_story(
     hook = "Test hook",
     context = "Test context",
-    resolution = ""
+    tension = "Test tension",
+    resolution = "Test resolution"
   )
 
   expect_equal(safe_data_story_access(data_story, "hook"), "Test hook")
   expect_equal(safe_data_story_access(data_story, "context"), "Test context")
-  expect_true(is.na(safe_data_story_access(data_story, "resolution"))) # empty
+  expect_equal(safe_data_story_access(data_story, "resolution"), "Test resolution")
   expect_true(is.na(safe_data_story_access(data_story, "missing")))
   expect_true(is.na(safe_data_story_access(NULL, "hook")))
 })
@@ -563,21 +564,6 @@ test_that("safe_data_story_access works with new flat format", {
   expect_equal(safe_data_story_access(data_story_flat, "metrics"), "metric1, metric2")
 })
 
-test_that("safe_data_story_access works with old nested format", {
-  # create old nested format data_story with deprecation warning suppression
-  suppressWarnings({
-    data_story_nested <- new_data_story(
-      context = "Nested context",
-      variables = list(hook = "Nested hook", tension = "Nested tension"),
-      relationships = list(resolution = "Nested resolution")
-    )
-  })
-
-  expect_equal(safe_data_story_access(data_story_nested, "context"), "Nested context")
-  expect_equal(safe_data_story_access(data_story_nested, "hook"), "Nested hook")
-  expect_equal(safe_data_story_access(data_story_nested, "tension"), "Nested tension")
-  expect_equal(safe_data_story_access(data_story_nested, "resolution"), "Nested resolution")
-})
 
 # ==============================================================================
 # SUGGESTION SYSTEM
@@ -588,7 +574,12 @@ test_that("generate_stage_suggestions works correctly", {
   if (exists("apply_suggestion_rules") && exists("get_fallback_suggestion")) {
     interpret_context <- list(
       central_question = "How to improve?",
-      data_story = list(hook = "Users struggle", context = "")
+      data_story = new_data_story(
+        hook = "Users struggle",
+        context = "Dashboard complexity",
+        tension = "Users frustrated",
+        resolution = "Simplify design"
+      )
     )
 
     suggestions <- generate_stage_suggestions("Interpret", interpret_context)

@@ -4,7 +4,7 @@
 \alias{get_generic_suggestions}
 \title{Generate generic suggestions for unrecognized concepts}
 \usage{
-get_generic_suggestions(concept, chosen_layout, previous_stage)
+get_generic_suggestions(concept, previous_stage)
 }
 \description{
 Generate generic suggestions for unrecognized concepts

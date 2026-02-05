@@ -4,12 +4,14 @@
 \alias{create_navigation_notice}
 \title{Create notice stage for navigation issues}
 \usage{
-create_navigation_notice(nav_info, total_sessions)
+create_navigation_notice(nav_info, total_sessions, events = NULL)
 }
 \arguments{
 \item{nav_info}{List with navigation pattern information}
 
 \item{total_sessions}{Total number of sessions}
+
+\item{events}{Optional full events data frame for performance context}
 }
 \value{
 bid_stage object
