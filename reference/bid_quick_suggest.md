@@ -149,17 +149,17 @@ suggestions <- bid_quick_suggest(
 #> ℹ Suggested layout pattern: breathable
 #> ℹ Generating actionable suggestions
 #> Quick suggestions ready
-#>   - Found 9 suggestions (avg relevance: 0.89)
+#>   - Found 9 suggestions (avg relevance: 0.88)
 #>   - Top concept: Cognitive Load Theory
 #>   - Use bid_concept() to learn more about any concept 
 print(suggestions)
 #> # A tibble: 9 × 7
 #>   title                    details components concept score difficulty rationale
 #>   <chr>                    <chr>   <list>     <chr>   <dbl> <chr>      <chr>    
-#> 1 Limit initial choices    Show o… <chr [3]>  Cognit…  1    moderate   Reduces …
-#> 2 Use progressive complex… Start … <chr [3]>  Cognit…  0.96 easy       Prevents…
-#> 3 Provide smart defaults   Pre-se… <chr [3]>  Cognit…  0.93 moderate   Leverage…
-#> 4 Use descriptive labels … Make n… <chr [3]>  Inform…  0.92 easy       Strong i…
+#> 1 Limit initial choices    Show o… <chr [3]>  Cognit…  0.97 moderate   Reduces …
+#> 2 Use progressive complex… Start … <chr [3]>  Cognit…  0.93 easy       Prevents…
+#> 3 Use descriptive labels … Make n… <chr [3]>  Inform…  0.92 easy       Strong i…
+#> 4 Provide smart defaults   Pre-se… <chr [3]>  Cognit…  0.9  moderate   Leverage…
 #> 5 Establish clear informa… Use si… <chr [4]>  Visual…  0.9  easy       Helps us…
 #> 6 Use collapsible advance… Place … <chr [2]>  Progre…  0.88 moderate   Reveals …
 #> 7 Group related content v… Use co… <chr [3]>  Visual…  0.87 moderate   Leverage…
@@ -177,7 +177,7 @@ suggestions <- bid_quick_suggest(
 #> ℹ Suggested layout pattern: breathable
 #> ℹ Generating actionable suggestions
 #> Quick suggestions ready
-#>   - Found 5 suggestions (avg relevance: 0.95)
+#>   - Found 5 suggestions (avg relevance: 0.93)
 #>   - Top concept: Cognitive Load Theory
 #>   - Use bid_concept() to learn more about any concept 
 
@@ -192,7 +192,7 @@ bslib_suggestions <- bid_quick_suggest(
 #> ℹ Suggested layout pattern: breathable
 #> ℹ Generating actionable suggestions
 #> Quick suggestions ready
-#>   - Found 6 suggestions for package 'bslib' (avg relevance: 0.91)
+#>   - Found 6 suggestions for package 'bslib' (avg relevance: 0.88)
 #>   - Top concept: Cognitive Load Theory
 #>   - Use bid_concept() to learn more about any concept 
 
@@ -206,7 +206,7 @@ nav_suggestions <- bid_quick_suggest(
 #> ℹ Suggested layout pattern: tabs
 #> ℹ Generating actionable suggestions
 #> Quick suggestions ready
-#>   - Found 8 suggestions (avg relevance: 0.91)
+#>   - Found 8 suggestions (avg relevance: 0.89)
 #>   - Top concept: Cognitive Load Theory
 #>   - Use bid_concept() to learn more about any concept 
 
@@ -220,7 +220,7 @@ overload_suggestions <- bid_quick_suggest(
 #> ℹ Suggested layout pattern: breathable
 #> ℹ Generating actionable suggestions
 #> Quick suggestions ready
-#>   - Found 10 suggestions (avg relevance: 0.9)
+#>   - Found 10 suggestions (avg relevance: 0.89)
 #>   - Top concept: Cognitive Load Theory
 #>   - Use bid_concept() to learn more about any concept 
 ```

@@ -15,9 +15,11 @@
   bidux](https://jrwinget.github.io/bidux/articles/getting-started.md):
 - [Introduction to the BID
   Framework](https://jrwinget.github.io/bidux/articles/introduction-to-bid.md):
+- [Using Shiny's Native OpenTelemetry with
+  Bidux](https://jrwinget.github.io/bidux/articles/otel-integration.md):
 - [Practical Examples: Before and After Dashboard
   Transformations](https://jrwinget.github.io/bidux/articles/practical-examples.md):
 - [Quick Start: Improve Your Shiny Dashboard in 15
   Minutes](https://jrwinget.github.io/bidux/articles/quick-start.md):
-- [Integrating shiny.telemetry with
+- [Integrating {shiny.telemetry} with
   bidux](https://jrwinget.github.io/bidux/articles/telemetry-integration.md):

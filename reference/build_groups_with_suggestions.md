@@ -5,7 +5,7 @@ Build suggestion groups organized by concept
 ## Usage
 
 ``` r
-build_groups_with_suggestions(concepts_final, chosen_layout, previous_stage)
+build_groups_with_suggestions(concepts_final, previous_stage)
 ```
 
 ## Arguments
@@ -13,10 +13,6 @@ build_groups_with_suggestions(concepts_final, chosen_layout, previous_stage)
 - concepts_final:
 
   Final list of concepts to generate suggestions for
-
-- chosen_layout:
-
-  Selected layout type
 
 - previous_stage:
 

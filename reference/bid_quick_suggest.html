@@ -23,7 +23,7 @@ For comprehensive UX redesign projects, use the full BID workflow."><meta proper
 
     <a class="navbar-brand me-2" href="../index.html">bidux</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,9 +40,10 @@ For comprehensive UX redesign projects, use the full BID workflow."><meta proper
     <li><a class="dropdown-item" href="../articles/concepts-reference.html">BID Framework Concepts: Practical Implementation</a></li>
     <li><a class="dropdown-item" href="../articles/getting-started.html">Getting Started with bidux</a></li>
     <li><a class="dropdown-item" href="../articles/introduction-to-bid.html">Introduction to the BID Framework</a></li>
+    <li><a class="dropdown-item" href="../articles/otel-integration.html">Using Shiny's Native OpenTelemetry with Bidux</a></li>
     <li><a class="dropdown-item" href="../articles/practical-examples.html">Practical Examples: Before and After Dashboard Transformations</a></li>
     <li><a class="dropdown-item" href="../articles/quick-start.html">Quick Start: Improve Your Shiny Dashboard in 15 Minutes</a></li>
-    <li><a class="dropdown-item" href="../articles/telemetry-integration.html">Integrating shiny.telemetry with bidux</a></li>
+    <li><a class="dropdown-item" href="../articles/telemetry-integration.html">Integrating {shiny.telemetry} with bidux</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -182,17 +183,17 @@ require <code>server: shiny</code> in Quarto dashboards or a traditional Shiny a
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Suggested layout pattern: breathable</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Generating actionable suggestions</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Quick suggestions ready</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Found 9 suggestions (avg relevance: 0.89)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Found 9 suggestions (avg relevance: 0.88)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Top concept: Cognitive Load Theory</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Use bid_concept() to learn more about any concept </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">suggestions</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 9 × 7</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   title                    details components concept score difficulty rationale</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Limit initial choices    Show o… <span style="color: #949494;">&lt;chr [3]&gt;</span>  Cognit…  1    moderate   Reduces …</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> Use progressive complex… Start … <span style="color: #949494;">&lt;chr [3]&gt;</span>  Cognit…  0.96 easy       Prevents…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> Provide smart defaults   Pre-se… <span style="color: #949494;">&lt;chr [3]&gt;</span>  Cognit…  0.93 moderate   Leverage…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> Use descriptive labels … Make n… <span style="color: #949494;">&lt;chr [3]&gt;</span>  Inform…  0.92 easy       Strong i…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Limit initial choices    Show o… <span style="color: #949494;">&lt;chr [3]&gt;</span>  Cognit…  0.97 moderate   Reduces …</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> Use progressive complex… Start … <span style="color: #949494;">&lt;chr [3]&gt;</span>  Cognit…  0.93 easy       Prevents…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> Use descriptive labels … Make n… <span style="color: #949494;">&lt;chr [3]&gt;</span>  Inform…  0.92 easy       Strong i…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> Provide smart defaults   Pre-se… <span style="color: #949494;">&lt;chr [3]&gt;</span>  Cognit…  0.9  moderate   Leverage…</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> Establish clear informa… Use si… <span style="color: #949494;">&lt;chr [4]&gt;</span>  Visual…  0.9  easy       Helps us…</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> Use collapsible advance… Place … <span style="color: #949494;">&lt;chr [2]&gt;</span>  Progre…  0.88 moderate   Reveals …</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">7</span> Group related content v… Use co… <span style="color: #949494;">&lt;chr [3]&gt;</span>  Visual…  0.87 moderate   Leverage…</span>
@@ -210,7 +211,7 @@ require <code>server: shiny</code> in Quarto dashboards or a traditional Shiny a
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Suggested layout pattern: breathable</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Generating actionable suggestions</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Quick suggestions ready</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Found 5 suggestions (avg relevance: 0.95)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Found 5 suggestions (avg relevance: 0.93)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Top concept: Cognitive Load Theory</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Use bid_concept() to learn more about any concept </span>
 <span class="r-in"><span></span></span>
@@ -225,7 +226,7 @@ require <code>server: shiny</code> in Quarto dashboards or a traditional Shiny a
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Suggested layout pattern: breathable</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Generating actionable suggestions</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Quick suggestions ready</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Found 6 suggestions for package 'bslib' (avg relevance: 0.91)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Found 6 suggestions for package 'bslib' (avg relevance: 0.88)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Top concept: Cognitive Load Theory</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Use bid_concept() to learn more about any concept </span>
 <span class="r-in"><span></span></span>
@@ -239,7 +240,7 @@ require <code>server: shiny</code> in Quarto dashboards or a traditional Shiny a
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Suggested layout pattern: tabs</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Generating actionable suggestions</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Quick suggestions ready</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Found 8 suggestions (avg relevance: 0.91)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Found 8 suggestions (avg relevance: 0.89)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Top concept: Cognitive Load Theory</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Use bid_concept() to learn more about any concept </span>
 <span class="r-in"><span></span></span>
@@ -253,7 +254,7 @@ require <code>server: shiny</code> in Quarto dashboards or a traditional Shiny a
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Suggested layout pattern: breathable</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Generating actionable suggestions</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Quick suggestions ready</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Found 10 suggestions (avg relevance: 0.9)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Found 10 suggestions (avg relevance: 0.89)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Top concept: Cognitive Load Theory</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Use bid_concept() to learn more about any concept </span>
 <span class="r-in"><span></span></span>

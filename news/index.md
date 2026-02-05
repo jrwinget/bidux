@@ -1,5 +1,101 @@
 # Changelog
 
+## \# bidux 0.4.0 (2025-12-20)
+
+#### BREAKING CHANGES
+
+- **Removed nested data_story format.** The `variables` and
+  `relationships` parameters have been removed from
+  [`new_data_story()`](https://jrwinget.github.io/bidux/reference/new_data_story.md).
+  Use the flat API instead:
+  `new_data_story(hook, context, tension, resolution)`. See
+  [`vignette("api-modernization")`](https://jrwinget.github.io/bidux/articles/api-modernization.md)
+  for migration guide.
+
+- **Removed layout auto-selection.** The
+  [`bid_structure()`](https://jrwinget.github.io/bidux/reference/bid_structure.md)
+  function no longer auto-selects layouts or includes a `layout` field
+  in results. The Structure stage now focuses exclusively on
+  concept-based suggestions.
+
+- **Removed layout-specific bias mitigations.** The
+  [`bid_anticipate()`](https://jrwinget.github.io/bidux/reference/bid_anticipate.md)
+  function no longer applies layout-dependent bias mappings. Use
+  concept-based bias mitigations instead (auto-detected from Interpret
+  stage content).
+
+#### NEW FEATURES
+
+- **OpenTelemetry (OTEL) integration for Shiny \>= 1.12.0.**
+  [`bid_ingest_telemetry()`](https://jrwinget.github.io/bidux/reference/bid_ingest_telemetry.md)
+  and
+  [`bid_telemetry()`](https://jrwinget.github.io/bidux/reference/bid_telemetry.md)
+  now support native Shiny OpenTelemetry span data in addition to
+  shiny.telemetry events. OTEL spans are automatically detected and
+  converted to the standard bidux event schema. Supported formats: OTLP
+  JSON exports and OTEL-formatted SQLite databases.
+
+- **Automatic OTEL span-to-event conversion.** New utilities
+  intelligently map OTEL span types to bidux events (session_start →
+  login, session_end → logout, reactive/observe → input, output →
+  output, navigation → navigation) with automatic ID extraction, error
+  event handling, and duration calculation from span timestamps.
+
+- **Enhanced telemetry readers.** New
+  [`read_otel_json()`](https://jrwinget.github.io/bidux/reference/read_otel_json.md)
+  and
+  [`read_otel_sqlite()`](https://jrwinget.github.io/bidux/reference/read_otel_sqlite.md)
+  functions handle OTLP-formatted telemetry data with robust parsing.
+  Exported utilities
+  ([`convert_otel_spans_to_events()`](https://jrwinget.github.io/bidux/reference/convert_otel_spans_to_events.md),
+  [`detect_otel_json()`](https://jrwinget.github.io/bidux/reference/detect_otel_json.md),
+  etc.) enable custom OTEL workflows.
+
+- **Analytics recommendations for static dashboards.** New
+  [`bid_suggest_analytics()`](https://jrwinget.github.io/bidux/reference/bid_suggest_analytics.md)
+  function recommends alternative analytics solutions (Plausible,
+  Matomo, PostHog, etc.) for static Quarto dashboards where
+  shiny.telemetry isn’t available, with filtering by privacy
+  preferences, budget, and self-hosting requirements.
+
+#### IMPROVEMENTS
+
+- **Unified telemetry pipeline.** Both shiny.telemetry and OTEL data
+  flow through the same analysis pipeline, ensuring consistent friction
+  detection regardless of telemetry source.
+
+- **Enhanced documentation.** New
+  [`vignette("otel-integration")`](https://jrwinget.github.io/bidux/articles/otel-integration.md)
+  provides comprehensive setup guide for Shiny \>= 1.12.0 OpenTelemetry.
+  Updated
+  [`vignette("api-modernization")`](https://jrwinget.github.io/bidux/articles/api-modernization.md)
+  documents breaking changes and migration paths.
+
+#### BUG FIXES
+
+- Fixed edge cases in session ID extraction from nested OTEL attribute
+  structures
+- Improved error message extraction from OTEL span events
+- Enhanced handling of reactive updates and observeEvent spans
+- Corrected duration calculation for spans with missing end timestamps
+
+#### TESTING
+
+- Added 500+ new OTEL test cases covering span conversion, format
+  detection, backward compatibility, and edge cases
+- All 2472 tests passing with comprehensive coverage of new features and
+  breaking changes
+
+#### NOTES
+
+- OpenTelemetry support requires Shiny \>= 1.12.0 and optional `otel`
+  package installation
+- Existing shiny.telemetry code continues to work unchanged - no
+  migration required for telemetry features
+- See
+  [`vignette("api-modernization")`](https://jrwinget.github.io/bidux/articles/api-modernization.md)
+  for guidance on migrating from removed features
+
 ## \# bidux 0.3.3 (2025-11-19)
 
 CRAN release: 2025-11-19

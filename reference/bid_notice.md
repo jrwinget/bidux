@@ -59,21 +59,15 @@ A bid_stage object containing the documented information for the
 ``` r
 interpret_result <- bid_interpret(
   central_question = "How can we improve user task completion?",
-  data_story = list(
+  data_story = new_data_story(
     hook = "Users are struggling with complex interfaces",
+    context = "Complex interfaces reducing completion",
     resolution = "Simplify key interactions"
   )
 )
-#> Warning: ! Using deprecated list format for data_story parameter
-#> ℹ Please use new_data_story() constructor for new code
-#> ℹ Legacy format will be automatically migrated
-#> Warning: ! Using deprecated nested format for data_story
-#> ℹ The flat API is now recommended: new_data_story(hook, context, tension,
-#>   resolution)
-#> ℹ Nested format (variables, relationships) will be removed in bidux 0.4.0
 #> Stage 1 (Interpret) completed.
 #>   - Central question: How can we improve user task completion?
-#>   - Your data story is incomplete (25%). Consider adding these missing elements: hook, tension, resolution.
+#>   - Your data story has all key elements. Focus on making each component compelling and relevant.
 #>   - Your central question is appropriately scoped.
 #>   - No user personas defined 
 
@@ -91,7 +85,7 @@ bid_notice(
 #>   - Theory confidence: 90%
 #>   - Next: Use bid_anticipate() for Stage 3 
 #> BID Framework - Notice Stage
-#> Generated: 2025-11-19 21:33:47 
+#> Generated: 2026-02-05 19:58:38 
 #> Progress: 40 % (2/5) 
 #> 
 #> Problem: Users struggling with complex dropdowns and too many options 
@@ -135,5 +129,5 @@ summary(notice_result)
 #>    evidence : Mobile users report frustration with small touch targets 
 #>    suggestions : Ensure your problem description is specific and supported by strong evidence 
 #> 
-#> Generated: 2025-11-19 21:33:47 
+#> Generated: 2026-02-05 19:58:38 
 ```

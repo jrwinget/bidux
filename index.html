@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="index.html">bidux</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,9 +47,10 @@
     <li><a class="dropdown-item" href="articles/concepts-reference.html">BID Framework Concepts: Practical Implementation</a></li>
     <li><a class="dropdown-item" href="articles/getting-started.html">Getting Started with bidux</a></li>
     <li><a class="dropdown-item" href="articles/introduction-to-bid.html">Introduction to the BID Framework</a></li>
+    <li><a class="dropdown-item" href="articles/otel-integration.html">Using Shiny's Native OpenTelemetry with Bidux</a></li>
     <li><a class="dropdown-item" href="articles/practical-examples.html">Practical Examples: Before and After Dashboard Transformations</a></li>
     <li><a class="dropdown-item" href="articles/quick-start.html">Quick Start: Improve Your Shiny Dashboard in 15 Minutes</a></li>
-    <li><a class="dropdown-item" href="articles/telemetry-integration.html">Integrating shiny.telemetry with bidux</a></li>
+    <li><a class="dropdown-item" href="articles/telemetry-integration.html">Integrating {shiny.telemetry} with bidux</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
@@ -162,17 +163,29 @@
 <div class="section level2">
 <h2 id="data-driven-ux-with-telemetry">Data-Driven UX with Telemetry<a class="anchor" aria-label="anchor" href="#data-driven-ux-with-telemetry"></a>
 </h2>
-<p><strong>New in 0.3.2</strong>: Enhanced telemetry workflow transforms real user behavior data into actionable BID insights.</p>
+<p>Enhanced telemetry workflows transform real user behavior data into actionable BID insights.</p>
+<p><strong>Telemetry Sources Supported:</strong></p>
+<ul>
+<li>
+<strong><a href="https://appsilon.github.io/shiny.telemetry/" class="external-link">shiny.telemetry</a></strong>: <a href="https://github.com/Appsilon/shiny.telemetry" class="external-link">Appsilon’s package</a> for Shiny app telemetry</li>
+<li>
+<strong>Shiny OpenTelemetry</strong> (NEW!): Native OTEL support in <a href="https://shiny.posit.co/" class="external-link">shiny</a> 1.12+ with rich performance data</li>
+</ul>
+<p>Both sources work seamlessly with the same API:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Modern approach: analyze telemetry data with bid_telemetry()</span></span>
-<span><span class="co"># Returns a clean tibble of issues (without legacy list structure)</span></span>
+<code class="sourceCode R"><span><span class="co"># Works with {shiny.telemetry}</span></span>
 <span><span class="va">issues</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_telemetry.html">bid_telemetry</a></span><span class="op">(</span><span class="st">"telemetry.sqlite"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Works with Shiny OpenTelemetry (1.12+)</span></span>
+<span><span class="va">issues</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_telemetry.html">bid_telemetry</a></span><span class="op">(</span><span class="st">"otel_spans.json"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Same analysis workflow for both!</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span>  <span class="co"># Shows organized issue summary with severity levels</span></span>
 <span></span>
 <span><span class="co"># Adjust sensitivity with presets</span></span>
 <span><span class="va">strict_issues</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_telemetry.html">bid_telemetry</a></span><span class="op">(</span></span>
 <span>  <span class="st">"telemetry.sqlite"</span>,</span>
-<span>  thresholds <span class="op">=</span> <span class="fu"><a href="reference/bid_telemetry_presets.html">bid_telemetry_presets</a></span><span class="op">(</span><span class="st">"strict"</span><span class="op">)</span>    <span class="co"># or "moderate", "relaxed"</span></span>
+<span>  thresholds <span class="op">=</span> <span class="fu"><a href="reference/bid_telemetry_presets.html">bid_telemetry_presets</a></span><span class="op">(</span><span class="st">"strict"</span><span class="op">)</span> <span class="co"># or "moderate", "relaxed"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Focus on critical issues using tidy workflows</span></span>
@@ -190,9 +203,10 @@
 <span></span>
 <span><span class="co"># Use telemetry flags to inform structure decisions</span></span>
 <span><span class="va">flags</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_flags.html">bid_flags</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span></span>
+<span></span>
 <span><span class="va">structure_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_structure.html">bid_structure</a></span><span class="op">(</span></span>
 <span>  previous_stage <span class="op">=</span> <span class="va">anticipate_result</span>,</span>
-<span>  telemetry_flags <span class="op">=</span> <span class="va">flags</span>  <span class="co"># Influences layout selection</span></span>
+<span>  telemetry_flags <span class="op">=</span> <span class="va">flags</span>  <span class="co"># influences layout selection</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>The <code><a href="reference/bid_telemetry.html">bid_telemetry()</a></code> function automatically identifies five key friction indicators:</p>
 <ul>
@@ -207,6 +221,16 @@
 <li>
 <strong>Confusion Patterns</strong>: Rapid repeated changes indicating user uncertainty</li>
 </ul>
+<p><strong>OTEL Span Types Supported</strong>: - <code>session_start</code>/<code>session_end</code> (user sessions) - <code>output:&lt;id&gt;</code> (output rendering with timing) - <code>reactive:&lt;id&gt;</code>, <code>observe:&lt;id&gt;</code> (reactive/observer execution) - <code>navigation</code> (page/tab navigation) - Span events with errors (automatic error detection)</p>
+<p><strong>OpenTelemetry Integration (Shiny 1.12+):</strong></p>
+<p>For modern Shiny applications, use native OpenTelemetry for richer insights:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># In your Shiny app - enable OTEL collection</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>shiny.otel.collect <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># After collecting data, analyze with bidux</span></span>
+<span><span class="va">issues</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bid_telemetry.html">bid_telemetry</a></span><span class="op">(</span><span class="st">"otel_spans.json"</span><span class="op">)</span></span></code></pre></div>
+<p>See <code><a href="articles/otel-integration.html">vignette("otel-integration")</a></code> for complete setup guide including: - Span-to-event conversion details (session_start→login, output:<em>→output, reactive:</em>→input, etc.) - Column schema and ID extraction logic - OTEL configuration and export formats - Performance metrics integration - Comparison with <a href="https://appsilon.github.io/shiny.telemetry/" class="external-link">shiny.telemetry</a> - Migration strategies</p>
 <p><strong>Function comparison:</strong> - <code><a href="reference/bid_telemetry.html">bid_telemetry()</a></code>: Modern API returning a clean tibble (recommended for new code) - <code><a href="reference/bid_ingest_telemetry.html">bid_ingest_telemetry()</a></code>: Legacy API returning hybrid object with list structure (for backward compatibility)</p>
 </div>
 <div class="section level2">
@@ -253,7 +277,7 @@
 <h2 id="learning-more">Learning More<a class="anchor" aria-label="anchor" href="#learning-more"></a>
 </h2>
 <p>The BID framework is based on established behavioral science and UX design principles. Explore the concept dictionary:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Browse all available concepts</span></span>
 <span><span class="fu"><a href="reference/bid_concepts.html">bid_concepts</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">concept</span>, <span class="va">category</span>, <span class="va">description</span><span class="op">)</span></span>
@@ -279,7 +303,10 @@
 <li>
 <code><a href="articles/introduction-to-bid.html">vignette("introduction-to-bid")</a></code>: Framework overview and core principles</li>
 <li>
-<code><a href="articles/telemetry-integration.html">vignette("telemetry-integration")</a></code>: Data-driven UX workflows</li>
+<code><a href="articles/telemetry-integration.html">vignette("telemetry-integration")</a></code>: Data-driven UX workflows with <a href="https://appsilon.github.io/shiny.telemetry/" class="external-link">shiny.telemetry</a>
+</li>
+<li>
+<code><a href="articles/otel-integration.html">vignette("otel-integration")</a></code>: Using Shiny’s native OpenTelemetry (NEW!)</li>
 <li>
 <code><a href="articles/practical-examples.html">vignette("practical-examples")</a></code>: Practical dashboard examples</li>
 <li>

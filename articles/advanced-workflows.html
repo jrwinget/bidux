@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">bidux</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,9 +44,10 @@
     <li><a class="dropdown-item" href="../articles/concepts-reference.html">BID Framework Concepts: Practical Implementation</a></li>
     <li><a class="dropdown-item" href="../articles/getting-started.html">Getting Started with bidux</a></li>
     <li><a class="dropdown-item" href="../articles/introduction-to-bid.html">Introduction to the BID Framework</a></li>
+    <li><a class="dropdown-item" href="../articles/otel-integration.html">Using Shiny's Native OpenTelemetry with Bidux</a></li>
     <li><a class="dropdown-item" href="../articles/practical-examples.html">Practical Examples: Before and After Dashboard Transformations</a></li>
     <li><a class="dropdown-item" href="../articles/quick-start.html">Quick Start: Improve Your Shiny Dashboard in 15 Minutes</a></li>
-    <li><a class="dropdown-item" href="../articles/telemetry-integration.html">Integrating shiny.telemetry with bidux</a></li>
+    <li><a class="dropdown-item" href="../articles/telemetry-integration.html">Integrating {shiny.telemetry} with bidux</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -446,11 +447,14 @@ maturity and criticality:</p>
 <span><span class="va">generate_domain_insights</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">bid_result</span>, <span class="va">custom_concepts</span> <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">insights</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span>  <span class="co"># Analyze layout choice against domain best practices</span></span>
-<span>  <span class="va">layout</span> <span class="op">&lt;-</span> <span class="va">bid_result</span><span class="op">$</span><span class="va">layout</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
+<span>  <span class="co"># Analyze suggestions against domain best practices</span></span>
+<span>  <span class="va">suggestions</span> <span class="op">&lt;-</span> <span class="va">bid_result</span><span class="op">$</span><span class="va">suggestions</span></span>
 <span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">layout</span> <span class="op">==</span> <span class="st">"dual_process"</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">insights</span><span class="op">$</span><span class="va">layout_analysis</span> <span class="op">&lt;-</span> <span class="st">"Dual-process layout chosen. Good for financial dashboards requiring both summary and detailed analysis."</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">suggestions</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">insights</span><span class="op">$</span><span class="va">suggestion_analysis</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span></span>
+<span>      <span class="st">"Generated"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">suggestions</span><span class="op">)</span>,</span>
+<span>      <span class="st">"concept groups with actionable recommendations."</span></span>
+<span>    <span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span></span>
 <span>  <span class="co"># Check for domain-specific bias considerations</span></span>
@@ -724,7 +728,7 @@ maturity and criticality:</p>
 <span></span>
 <span>  <span class="va">issue_impact</span> <span class="op">&lt;-</span> <span class="va">telemetry_issues</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>      weighted_impact <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
+<span>      weighted_impact <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
 <span>        <span class="va">severity</span> <span class="op">==</span> <span class="st">"critical"</span> <span class="op">~</span> <span class="fl">5</span>,</span>
 <span>        <span class="va">severity</span> <span class="op">==</span> <span class="st">"high"</span> <span class="op">~</span> <span class="fl">3</span>,</span>
 <span>        <span class="va">severity</span> <span class="op">==</span> <span class="st">"medium"</span> <span class="op">~</span> <span class="fl">2</span>,</span>
@@ -741,7 +745,7 @@ maturity and criticality:</p>
 <span>  <span class="co"># Calculate health score (0-100, higher is better)</span></span>
 <span>  <span class="va">health_score</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">pmax</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">100</span> <span class="op">-</span> <span class="op">(</span><span class="va">issue_impact</span><span class="op">$</span><span class="va">weighted_impact_score</span> <span class="op">*</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span>  <span class="va">health_rating</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
+<span>  <span class="va">health_rating</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
 <span>    <span class="va">health_score</span> <span class="op">&gt;=</span> <span class="fl">85</span> <span class="op">~</span> <span class="st">"Excellent"</span>,</span>
 <span>    <span class="va">health_score</span> <span class="op">&gt;=</span> <span class="fl">70</span> <span class="op">~</span> <span class="st">"Good"</span>,</span>
 <span>    <span class="va">health_score</span> <span class="op">&gt;=</span> <span class="fl">55</span> <span class="op">~</span> <span class="st">"Fair"</span>,</span>

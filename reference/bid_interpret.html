@@ -11,7 +11,7 @@ in the BID framework."><meta property="og:image" content="https://jrwinget.githu
 
     <a class="navbar-brand me-2" href="../index.html">bidux</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,9 +28,10 @@ in the BID framework."><meta property="og:image" content="https://jrwinget.githu
     <li><a class="dropdown-item" href="../articles/concepts-reference.html">BID Framework Concepts: Practical Implementation</a></li>
     <li><a class="dropdown-item" href="../articles/getting-started.html">Getting Started with bidux</a></li>
     <li><a class="dropdown-item" href="../articles/introduction-to-bid.html">Introduction to the BID Framework</a></li>
+    <li><a class="dropdown-item" href="../articles/otel-integration.html">Using Shiny's Native OpenTelemetry with Bidux</a></li>
     <li><a class="dropdown-item" href="../articles/practical-examples.html">Practical Examples: Before and After Dashboard Transformations</a></li>
     <li><a class="dropdown-item" href="../articles/quick-start.html">Quick Start: Improve Your Shiny Dashboard in 15 Minutes</a></li>
-    <li><a class="dropdown-item" href="../articles/telemetry-integration.html">Integrating shiny.telemetry with bidux</a></li>
+    <li><a class="dropdown-item" href="../articles/telemetry-integration.html">Integrating {shiny.telemetry} with bidux</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -176,20 +177,7 @@ stage.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    personas : [{"name":"Sara, Data Analyst","goals":"Needs to quickly find patterns in data... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    suggestions : Your data story has all key elements. Focus on making each component compelli... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-11-19 21:33:47 </span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Legacy list format still works (with deprecation warning)</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="va">interpret_legacy</span> <span class="op">&lt;-</span> <span class="fu">bid_interpret</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  central_question <span class="op">=</span> <span class="st">"How can we improve UX?"</span>,</span></span>
-<span class="r-in"><span>  data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    hook <span class="op">=</span> <span class="st">"Users struggling"</span>,</span></span>
-<span class="r-in"><span>    context <span class="op">=</span> <span class="st">"Dashboard complexity"</span>,</span></span>
-<span class="r-in"><span>    tension <span class="op">=</span> <span class="st">"High abandonment rate"</span>,</span></span>
-<span class="r-in"><span>    resolution <span class="op">=</span> <span class="st">"Simplify interface"</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2026-02-05 19:58:38 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

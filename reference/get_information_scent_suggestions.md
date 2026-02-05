@@ -5,5 +5,5 @@ Generate Information Scent suggestions
 ## Usage
 
 ``` r
-get_information_scent_suggestions(chosen_layout, previous_stage)
+get_information_scent_suggestions(previous_stage)
 ```

@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">bidux</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,9 +44,10 @@
     <li><a class="dropdown-item" href="../articles/concepts-reference.html">BID Framework Concepts: Practical Implementation</a></li>
     <li><a class="dropdown-item" href="../articles/getting-started.html">Getting Started with bidux</a></li>
     <li><a class="dropdown-item" href="../articles/introduction-to-bid.html">Introduction to the BID Framework</a></li>
+    <li><a class="dropdown-item" href="../articles/otel-integration.html">Using Shiny's Native OpenTelemetry with Bidux</a></li>
     <li><a class="dropdown-item" href="../articles/practical-examples.html">Practical Examples: Before and After Dashboard Transformations</a></li>
     <li><a class="dropdown-item" href="../articles/quick-start.html">Quick Start: Improve Your Shiny Dashboard in 15 Minutes</a></li>
-    <li><a class="dropdown-item" href="../articles/telemetry-integration.html">Integrating shiny.telemetry with bidux</a></li>
+    <li><a class="dropdown-item" href="../articles/telemetry-integration.html">Integrating {shiny.telemetry} with bidux</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -457,10 +458,14 @@ intuitive, engaging, and effective for your users.</p>
 <div class="section level2">
 <h2 id="integrating-telemetry-data-new-in-0-3-1">Integrating Telemetry Data (New in 0.3.1)<a class="anchor" aria-label="anchor" href="#integrating-telemetry-data-new-in-0-3-1"></a>
 </h2>
-<p>If you have telemetry data from user interactions (e.g., from the
-<a href="https://appsilon.github.io/shiny.telemetry/" class="external-link">shiny.telemetry</a> package), <a href="https://jrwinget.github.io/bidux/">bidux</a> can help
-transform it into actionable BID insights by automatically detecting UX
-friction patterns.</p>
+<p>If you have telemetry data from user interactions,
+<a href="https://jrwinget.github.io/bidux/">bidux</a> can help transform it into actionable BID insights
+by automatically detecting UX friction patterns.</p>
+<p><strong>Note</strong>: Bidux supports both
+<a href="https://appsilon.github.io/shiny.telemetry/" class="external-link">shiny.telemetry</a> and Shiny’s native OpenTelemetry
+(v1.12+). The examples below work with either source;
+<a href="https://jrwinget.github.io/bidux/">bidux</a> automatically detects the format. For OpenTelemetry
+setup, see <code><a href="../articles/otel-integration.html">vignette("otel-integration")</a></code>.</p>
 <div class="section level3">
 <h3 id="understanding-the-two-telemetry-functions">Understanding the Two Telemetry Functions<a class="anchor" aria-label="anchor" href="#understanding-the-two-telemetry-functions"></a>
 </h3>
@@ -474,7 +479,8 @@ Best for new workflows and data exploration - Integrates seamlessly with
 API</strong> - Returns a hybrid object that works as both a list and
 enhanced object - Maintains backward compatibility with pre-0.3.1 code -
 Provides same analysis as <code><a href="../reference/bid_telemetry.html">bid_telemetry()</a></code> with additional
-list interface - Will be soft-deprecated in 0.4.0</p>
+list interface - Soft-deprecated as of 0.4.0 (will be removed in a
+future version)</p>
 <p>Both functions analyze the same telemetry patterns: - <strong>Unused
 inputs</strong> - UI controls rarely or never used - <strong>Delayed
 interactions</strong> - Users taking too long to engage - <strong>Error

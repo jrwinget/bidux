@@ -4,6 +4,12 @@ Preferred modern interface for telemetry analysis. Returns a clean
 tibble of identified issues without the legacy list structure. Use this
 function for new workflows that don't need backward compatibility.
 
+**OpenTelemetry Support**: For Shiny \>= 1.12.0 applications using
+native OpenTelemetry, pass the path to OTLP JSON exports or
+OTEL-formatted SQLite databases. Format is auto-detected. See
+[`vignette("otel-integration")`](https://jrwinget.github.io/bidux/articles/otel-integration.md)
+for complete setup guide.
+
 ## Usage
 
 ``` r
@@ -20,15 +26,22 @@ bid_telemetry(
 
 - source:
 
-  Either a file path to telemetry data (SQLite database or JSON log
-  file), or a DBI connection object to an already-open database. When a
-  connection is provided, it will not be closed by this function.
+  Either a file path to telemetry data or a DBI connection object.
+  Supports:
+
+  - SQLite databases (shiny.telemetry or OTEL format)
+
+  - JSON files (shiny.telemetry logs or OTLP JSON exports)
+
+  - DBI connections to databases with event or span tables When a
+    connection is provided, it will not be closed by this function.
 
 - format:
 
-  Optional format specification ("sqlite" or "json"). If NULL,
-  auto-detected from file extension (for file paths) or defaults to
-  "sqlite" for DBI connections.
+  Optional format specification ("sqlite", "json", "otlp_json",
+  "otel_sqlite"). If NULL (default), auto-detected from file extension
+  and structure. OTLP formats are automatically detected when file
+  contains OpenTelemetry span data.
 
 - events_table:
 
@@ -64,8 +77,13 @@ A tibble of class "bid_issues_tbl" with structured issue metadata
 
 ``` r
 if (FALSE) { # \dontrun{
-# Modern workflow
+# Works with shiny.telemetry
 issues <- bid_telemetry("telemetry.sqlite")
+
+# Works with Shiny OpenTelemetry (1.12+)
+issues <- bid_telemetry("otel_spans.json")
+
+# Same analysis workflow for both
 high_priority <- issues[issues$severity %in% c("critical", "high"), ]
 
 # Use DBI connection directly

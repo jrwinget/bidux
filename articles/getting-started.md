@@ -385,10 +385,16 @@ include:
 
 ## Integrating Telemetry Data (New in 0.3.1)
 
-If you have telemetry data from user interactions (e.g., from the
-[shiny.telemetry](https://appsilon.github.io/shiny.telemetry/) package),
+If you have telemetry data from user interactions,
 [bidux](https://jrwinget.github.io/bidux/) can help transform it into
 actionable BID insights by automatically detecting UX friction patterns.
+
+**Note**: Bidux supports both
+[shiny.telemetry](https://appsilon.github.io/shiny.telemetry/) and
+Shiny’s native OpenTelemetry (v1.12+). The examples below work with
+either source; [bidux](https://jrwinget.github.io/bidux/) automatically
+detects the format. For OpenTelemetry setup, see
+[`vignette("otel-integration")`](https://jrwinget.github.io/bidux/articles/otel-integration.md).
 
 ### Understanding the Two Telemetry Functions
 
@@ -405,7 +411,8 @@ Legacy Compatible API** - Returns a hybrid object that works as both a
 list and enhanced object - Maintains backward compatibility with
 pre-0.3.1 code - Provides same analysis as
 [`bid_telemetry()`](https://jrwinget.github.io/bidux/reference/bid_telemetry.md)
-with additional list interface - Will be soft-deprecated in 0.4.0
+with additional list interface - Soft-deprecated as of 0.4.0 (will be
+removed in a future version)
 
 Both functions analyze the same telemetry patterns: - **Unused
 inputs** - UI controls rarely or never used - **Delayed interactions** -

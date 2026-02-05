@@ -5,7 +5,7 @@ Build suggestions for a specific concept
 ## Usage
 
 ``` r
-build_concept_group(concept, chosen_layout, previous_stage)
+build_concept_group(concept, previous_stage)
 ```
 
 ## Arguments
@@ -13,10 +13,6 @@ build_concept_group(concept, chosen_layout, previous_stage)
 - concept:
 
   Name of the concept to generate suggestions for
-
-- chosen_layout:
-
-  Selected layout type
 
 - previous_stage:
 

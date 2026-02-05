@@ -5,5 +5,5 @@ Generate Principle of Proximity suggestions
 ## Usage
 
 ``` r
-get_proximity_suggestions(chosen_layout, previous_stage)
+get_proximity_suggestions(previous_stage)
 ```

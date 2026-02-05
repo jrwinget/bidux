@@ -53,23 +53,16 @@ stage.
 ``` r
 interpret_stage <- bid_interpret(
   central_question = "How can we improve selection efficiency?",
-  data_story = list(
+  data_story = new_data_story(
     hook = "Too many options",
     context = "Excessive choices",
     tension = "User frustration",
     resolution = "Simplify menu"
   )
 )
-#> Warning: ! Using deprecated list format for data_story parameter
-#> ℹ Please use new_data_story() constructor for new code
-#> ℹ Legacy format will be automatically migrated
-#> Warning: ! Using deprecated nested format for data_story
-#> ℹ The flat API is now recommended: new_data_story(hook, context, tension,
-#>   resolution)
-#> ℹ Nested format (variables, relationships) will be removed in bidux 0.4.0
 #> Stage 1 (Interpret) completed.
 #>   - Central question: How can we improve selection efficiency?
-#>   - Your data story is incomplete (25%). Consider adding these missing elements: hook, tension, resolution.
+#>   - Your data story has all key elements. Focus on making each component compelling and relevant.
 #>   - Your central question is appropriately scoped.
 #>   - No user personas defined 
 
@@ -87,37 +80,31 @@ notice_stage <- bid_notice(
 #>   - Next: Use bid_anticipate() for Stage 3 
 
 structure_info <- bid_structure(previous_stage = notice_stage)
-#> ℹ Auto-selected layout: breathable
-#> ℹ Selected 'breathable' as safe default to ensure clean, uncluttered layout.
-#> Warning: Layout auto-selection is deprecated and will be removed in bidux 0.4.0. The BID framework will focus on concept-based suggestions instead. Existing code will continue to work until 0.4.0.
 #> ℹ Tip: Learn more about any concept via bid_concept("<concept>").
 #> ℹ Stage numbering has been corrected in bidux 0.3.1:
 #>   Anticipate is now Stage 3, Structure is now Stage 4
 #>   This change improves logical workflow progression
 #>   All existing code remains backward compatible
 #> Stage 4 (Structure) completed.
-#>   - Auto-selected layout: breathable
 #>   - Concept groups generated: 4
 #>   - Total concepts: 4 
 
 # Let the function suggest bias mitigations based on previous stages
 bid_anticipate(previous_stage = structure_info)
-#> Warning: Layout-specific bias mitigations are deprecated and will be removed in bidux 0.4.0. Consider using concept-based bias mitigations instead.
-#> Automatically suggested bias mitigations: attention bias, belief perseverance, cognitive load, accessibility
+#> Automatically suggested bias mitigations: attention bias, belief perseverance, accessibility
 #> Concept 'attention bias' not found
-#> Found partial match: Cognitive Load Theory
 #> Found partial match: Accessibility Contrast
 #> Stage 3 (Anticipate) completed.
-#>   - Bias mitigations: 4 defined
+#>   - Bias mitigations: 3 defined
 #>   - Accessibility considerations included
-#>   - Key suggestions: Attention Bias mitigation: Consider how this bias affects user decisions, Belief Perseverance mitigation: Proactively show content that might disprove initial assumptions, Cognitive Load mitigation: Use tabs or collapsible sections to organize complex information 
+#>   - Key suggestions: Attention Bias mitigation: Consider how this bias affects user decisions, Belief Perseverance mitigation: Proactively show content that might disprove initial assumptions, Accessibility mitigation: Test color combinations with WebAIM's contrast checker to meet WCAG standards 
 #> BID Framework - Anticipate Stage
-#> Generated: 2025-11-19 21:33:45 
+#> Generated: 2026-02-05 19:58:36 
 #> Progress: 60 % (3/5) 
 #> 
-#> Bias Mitigations: 3 strategies defined 
+#> Bias Mitigations: 2 strategies defined 
 #> 
-#>  Suggestions: Attention Bias mitigation: Consider how this bias affects user decisions Belief Perseverance mitigation: Proactively show content that might disprove initial assumptions Cognitive Load mitigation: Use tabs or collapsible sections to organize complex information Accessibility mitigation: Test color combinations with WebAIM's contrast checker to meet WCAG standards Consider also addressing these common biases: anchoring, framing, confirmation Accessibility considerations have been included in bias mitigations 
+#>  Suggestions: Attention Bias mitigation: Consider how this bias affects user decisions Belief Perseverance mitigation: Proactively show content that might disprove initial assumptions Accessibility mitigation: Test color combinations with WebAIM's contrast checker to meet WCAG standards Consider also addressing these common biases: anchoring, framing, confirmation Accessibility considerations have been included in bias mitigations 
 #> 
 #>  Use summary() for detailed information 
 
@@ -152,7 +139,7 @@ summary(anticipate_result)
 #>    validation_status : completed 
 #>    bias_count : 4 
 #>    include_accessibility : Yes 
-#>    layout : breathable 
+#>    layout : NA 
 #>    concepts_count : 4 
 #>    auto_generated_biases : No 
 #>    stage_number_previous : 4 
@@ -161,9 +148,8 @@ summary(anticipate_result)
 #>    stage : Anticipate 
 #>    bias_mitigations : anchoring: Use context-aware references; framing: Toggle between positive and... 
 #>    accessibility : accessibility mitigation not specified 
-#>    previous_layout : breathable 
 #>    previous_concepts : Cognitive Load Theory, Visual Hierarchy, Progressive Disclosure, Hick's Law 
 #>    suggestions : Bias_type mitigation: Consider how this bias affects user decisions Mitigatio... 
 #> 
-#> Generated: 2025-11-19 21:33:45 
+#> Generated: 2026-02-05 19:58:36 
 ```

@@ -5,7 +5,7 @@ Rank and sort suggestions within each group
 ## Usage
 
 ``` r
-rank_and_sort_suggestions(groups, previous_stage, chosen_layout)
+rank_and_sort_suggestions(groups, previous_stage)
 ```
 
 ## Arguments
@@ -17,10 +17,6 @@ rank_and_sort_suggestions(groups, previous_stage, chosen_layout)
 - previous_stage:
 
   Previous stage data for scoring adjustments
-
-- chosen_layout:
-
-  Selected layout type
 
 ## Value
 

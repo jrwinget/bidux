@@ -125,18 +125,5 @@ summary(interpret_personas)
 #>    personas : [{"name":"Sara, Data Analyst","goals":"Needs to quickly find patterns in data... 
 #>    suggestions : Your data story has all key elements. Focus on making each component compelli... 
 #> 
-#> Generated: 2025-11-19 21:33:47 
-
-# Legacy list format still works (with deprecation warning)
-if (FALSE) { # \dontrun{
-interpret_legacy <- bid_interpret(
-  central_question = "How can we improve UX?",
-  data_story = list(
-    hook = "Users struggling",
-    context = "Dashboard complexity",
-    tension = "High abandonment rate",
-    resolution = "Simplify interface"
-  )
-)
-} # }
+#> Generated: 2026-02-05 19:58:38 
 ```

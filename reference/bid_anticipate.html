@@ -11,7 +11,7 @@ It also supports adding interaction hints and visual feedback elements."><meta p
 
     <a class="navbar-brand me-2" href="../index.html">bidux</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,9 +28,10 @@ It also supports adding interaction hints and visual feedback elements."><meta p
     <li><a class="dropdown-item" href="../articles/concepts-reference.html">BID Framework Concepts: Practical Implementation</a></li>
     <li><a class="dropdown-item" href="../articles/getting-started.html">Getting Started with bidux</a></li>
     <li><a class="dropdown-item" href="../articles/introduction-to-bid.html">Introduction to the BID Framework</a></li>
+    <li><a class="dropdown-item" href="../articles/otel-integration.html">Using Shiny's Native OpenTelemetry with Bidux</a></li>
     <li><a class="dropdown-item" href="../articles/practical-examples.html">Practical Examples: Before and After Dashboard Transformations</a></li>
     <li><a class="dropdown-item" href="../articles/quick-start.html">Quick Start: Improve Your Shiny Dashboard in 15 Minutes</a></li>
-    <li><a class="dropdown-item" href="../articles/telemetry-integration.html">Integrating shiny.telemetry with bidux</a></li>
+    <li><a class="dropdown-item" href="../articles/telemetry-integration.html">Integrating {shiny.telemetry} with bidux</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -104,23 +105,16 @@ stage.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">interpret_stage</span> <span class="op">&lt;-</span> <span class="fu"><a href="bid_interpret.html">bid_interpret</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  central_question <span class="op">=</span> <span class="st">"How can we improve selection efficiency?"</span>,</span></span>
-<span class="r-in"><span>  data_story <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  data_story <span class="op">=</span> <span class="fu"><a href="new_data_story.html">new_data_story</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    hook <span class="op">=</span> <span class="st">"Too many options"</span>,</span></span>
 <span class="r-in"><span>    context <span class="op">=</span> <span class="st">"Excessive choices"</span>,</span></span>
 <span class="r-in"><span>    tension <span class="op">=</span> <span class="st">"User frustration"</span>,</span></span>
 <span class="r-in"><span>    resolution <span class="op">=</span> <span class="st">"Simplify menu"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> Using deprecated list format for data_story parameter</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Please use new_data_story() constructor for new code</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Legacy format will be automatically migrated</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> Using deprecated nested format for data_story</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> The flat API is now recommended: new_data_story(hook, context, tension,</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span>   resolution)</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Nested format (variables, relationships) will be removed in bidux 0.4.0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Stage 1 (Interpret) completed.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Central question: How can we improve selection efficiency?</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Your data story is incomplete (25%). Consider adding these missing elements: hook, tension, resolution.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Your data story has all key elements. Focus on making each component compelling and relevant.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Your central question is appropriately scoped.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - No user personas defined </span>
 <span class="r-in"><span></span></span>
@@ -138,37 +132,31 @@ stage.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Next: Use bid_anticipate() for Stage 3 </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">structure_info</span> <span class="op">&lt;-</span> <span class="fu"><a href="bid_structure.html">bid_structure</a></span><span class="op">(</span>previous_stage <span class="op">=</span> <span class="va">notice_stage</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Auto-selected layout: breathable</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Selected 'breathable' as safe default to ensure clean, uncluttered layout.</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Layout auto-selection is deprecated and will be removed in bidux 0.4.0. The BID framework will focus on concept-based suggestions instead. Existing code will continue to work until 0.4.0.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Tip: Learn more about any concept via bid_concept("&lt;concept&gt;").</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Stage numbering has been corrected in bidux 0.3.1:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   Anticipate is now Stage 3, Structure is now Stage 4</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   This change improves logical workflow progression</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   All existing code remains backward compatible</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Stage 4 (Structure) completed.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Auto-selected layout: breathable</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Concept groups generated: 4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Total concepts: 4 </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Let the function suggest bias mitigations based on previous stages</span></span></span>
 <span class="r-in"><span><span class="fu">bid_anticipate</span><span class="op">(</span>previous_stage <span class="op">=</span> <span class="va">structure_info</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Layout-specific bias mitigations are deprecated and will be removed in bidux 0.4.0. Consider using concept-based bias mitigations instead.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Automatically suggested bias mitigations: attention bias, belief perseverance, cognitive load, accessibility</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Automatically suggested bias mitigations: attention bias, belief perseverance, accessibility</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Concept 'attention bias' not found</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Cognitive Load Theory</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Accessibility Contrast</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Stage 3 (Anticipate) completed.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Bias mitigations: 4 defined</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Bias mitigations: 3 defined</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - Accessibility considerations included</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Key suggestions: Attention Bias mitigation: Consider how this bias affects user decisions, Belief Perseverance mitigation: Proactively show content that might disprove initial assumptions, Cognitive Load mitigation: Use tabs or collapsible sections to organize complex information </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - Key suggestions: Attention Bias mitigation: Consider how this bias affects user decisions, Belief Perseverance mitigation: Proactively show content that might disprove initial assumptions, Accessibility mitigation: Test color combinations with WebAIM's contrast checker to meet WCAG standards </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB; font-weight: bold;">BID Framework</span> - <span style="font-weight: bold;">Anticipate</span> Stage</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-11-19 21:33:45 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2026-02-05 19:58:36 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Progress: 60 % (3/5) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Bias Mitigations:</span> 3 strategies defined </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Bias Mitigations:</span> 2 strategies defined </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="font-style: italic;">Suggestions:</span> Attention Bias mitigation: Consider how this bias affects user decisions Belief Perseverance mitigation: Proactively show content that might disprove initial assumptions Cognitive Load mitigation: Use tabs or collapsible sections to organize complex information Accessibility mitigation: Test color combinations with WebAIM's contrast checker to meet WCAG standards Consider also addressing these common biases: anchoring, framing, confirmation Accessibility considerations have been included in bias mitigations </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="font-style: italic;">Suggestions:</span> Attention Bias mitigation: Consider how this bias affects user decisions Belief Perseverance mitigation: Proactively show content that might disprove initial assumptions Accessibility mitigation: Test color combinations with WebAIM's contrast checker to meet WCAG standards Consider also addressing these common biases: anchoring, framing, confirmation Accessibility considerations have been included in bias mitigations </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="font-weight: 100;">Use summary() for detailed information</span> </span>
 <span class="r-in"><span></span></span>
@@ -203,7 +191,7 @@ stage.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    validation_status : completed </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    bias_count : 4 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    include_accessibility : Yes </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    layout : breathable </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    layout : NA </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    concepts_count : 4 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    auto_generated_biases : No </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    stage_number_previous : 4 </span>
@@ -212,11 +200,10 @@ stage.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    stage : Anticipate </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    bias_mitigations : anchoring: Use context-aware references; framing: Toggle between positive and... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    accessibility : accessibility mitigation not specified </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    previous_layout : breathable </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    previous_concepts : Cognitive Load Theory, Visual Hierarchy, Progressive Disclosure, Hick's Law </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    suggestions : Bias_type mitigation: Consider how this bias affects user decisions Mitigatio... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2025-11-19 21:33:45 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2026-02-05 19:58:36 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

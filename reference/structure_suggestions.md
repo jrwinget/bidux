@@ -7,12 +7,7 @@ relevance and grouped by concept for systematic implementation.
 ## Usage
 
 ``` r
-structure_suggestions(
-  previous_stage,
-  chosen_layout,
-  concepts = NULL,
-  quiet = NULL
-)
+structure_suggestions(previous_stage, concepts = NULL, quiet = NULL)
 ```
 
 ## Arguments
@@ -20,10 +15,6 @@ structure_suggestions(
 - previous_stage:
 
   A tibble or list output from an earlier BID stage
-
-- chosen_layout:
-
-  Character string with the selected layout type
 
 - concepts:
 

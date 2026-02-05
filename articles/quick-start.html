@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">bidux</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,9 +44,10 @@
     <li><a class="dropdown-item" href="../articles/concepts-reference.html">BID Framework Concepts: Practical Implementation</a></li>
     <li><a class="dropdown-item" href="../articles/getting-started.html">Getting Started with bidux</a></li>
     <li><a class="dropdown-item" href="../articles/introduction-to-bid.html">Introduction to the BID Framework</a></li>
+    <li><a class="dropdown-item" href="../articles/otel-integration.html">Using Shiny's Native OpenTelemetry with Bidux</a></li>
     <li><a class="dropdown-item" href="../articles/practical-examples.html">Practical Examples: Before and After Dashboard Transformations</a></li>
     <li><a class="dropdown-item" href="../articles/quick-start.html">Quick Start: Improve Your Shiny Dashboard in 15 Minutes</a></li>
-    <li><a class="dropdown-item" href="../articles/telemetry-integration.html">Integrating shiny.telemetry with bidux</a></li>
+    <li><a class="dropdown-item" href="../articles/telemetry-integration.html">Integrating {shiny.telemetry} with bidux</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -125,15 +126,14 @@ Now your sidebar is a mile long and users are paralyzed.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">filter_problem</span><span class="op">$</span><span class="va">theory</span><span class="op">)</span> <span class="co"># "Cognitive Load Theory"</span></span></code></pre></div>
 <p><strong>Get structure suggestions:</strong></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Get layout recommendations</span></span>
+<code class="sourceCode R"><span><span class="co"># Get structure recommendations</span></span>
 <span><span class="va">structure_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_structure.html">bid_structure</a></span><span class="op">(</span>previous_stage <span class="op">=</span> <span class="va">filter_problem</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># bidux recommends "breathable" layout to reduce cognitive load</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">structure_result</span><span class="op">$</span><span class="va">layout</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">structure_result</span><span class="op">$</span><span class="va">layout_rationale</span><span class="op">)</span></span>
-<span></span>
 <span><span class="co"># See concrete suggestions organized by UX concept</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/View.html" class="external-link">View</a></span><span class="op">(</span><span class="va">structure_result</span><span class="op">$</span><span class="va">suggestions</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/View.html" class="external-link">View</a></span><span class="op">(</span><span class="va">structure_result</span><span class="op">$</span><span class="va">suggestions</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Access flattened tibble for easier filtering</span></span>
+<span><span class="va">suggestions_flat</span> <span class="op">&lt;-</span> <span class="va">structure_result</span><span class="op">$</span><span class="va">suggestions_tbl</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span></code></pre></div>
 <p><strong>Apply the fix:</strong></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># BEFORE: All filters visible at once</span></span>
@@ -402,12 +402,11 @@ problems from real user behavior.</p>
 <span><span class="co"># Get structure suggestions for this specific issue</span></span>
 <span><span class="va">structure_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_structure.html">bid_structure</a></span><span class="op">(</span></span>
 <span>  previous_stage <span class="op">=</span> <span class="va">top_notice</span>,</span>
-<span>  telemetry_flags <span class="op">=</span> <span class="fu"><a href="../reference/bid_flags.html">bid_flags</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span> <span class="co"># Informs layout selection</span></span>
+<span>  telemetry_flags <span class="op">=</span> <span class="fu"><a href="../reference/bid_flags.html">bid_flags</a></span><span class="op">(</span><span class="va">issues</span><span class="op">)</span> <span class="co"># Informs suggestion scoring</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Review suggestions</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">structure_result</span><span class="op">$</span><span class="va">layout</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">structure_result</span><span class="op">$</span><span class="va">layout_rationale</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">structure_result</span><span class="op">$</span><span class="va">suggestions</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="step-4-use-flags-for-decision-making">Step 4: Use Flags for Decision Making<a class="anchor" aria-label="anchor" href="#step-4-use-flags-for-decision-making"></a>

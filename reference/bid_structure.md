@@ -1,9 +1,7 @@
 # Document Dashboard Structure Stage in BID Framework
 
-This function documents the structure of the dashboard with automatic
-layout selection and generates ranked, concept-grouped actionable UI/UX
-suggestions. Layout is intelligently chosen based on content analysis of
-previous stages using deterministic heuristics. Returns structured
+This function documents the structure of the dashboard and generates
+ranked, concept-grouped actionable UI/UX suggestions. Returns structured
 recommendations with specific component pointers and implementation
 rationales.
 
@@ -36,8 +34,7 @@ bid_structure(
 - telemetry_flags:
 
   Optional named list of telemetry flags from bid_flags(). Used to
-  adjust layout choice and suggestion scoring based on observed user
-  behavior patterns.
+  adjust suggestion scoring based on observed user behavior patterns.
 
 - quiet:
 
@@ -46,8 +43,7 @@ bid_structure(
 
 - ...:
 
-  Additional parameters. If `layout` is provided via `...`, the function
-  will abort with a helpful error message.
+  Additional parameters (reserved for future use).
 
 ## Value
 
@@ -56,10 +52,6 @@ A bid_stage object containing:
 - stage:
 
   "Structure"
-
-- layout:
-
-  Auto-selected layout type
 
 - suggestions:
 
@@ -76,34 +68,20 @@ A bid_stage object containing:
 
 ## Details
 
-**Layout Auto-Selection**: For backwards compatibility with versions \<
-0.3.0; to be removed in 0.4.0. Uses deterministic heuristics to analyze
-content from previous stages and select the most appropriate layout:
-
-- **breathable**: For information overload/confusion patterns
-
-- **dual_process**: For overview vs detail needs
-
-- **grid**: For grouping/comparison requirements
-
-- **card**: For modular/chunked content
-
-- **tabs**: For categorical organization (unless telemetry shows issues)
-
 **Suggestion Engine**: Generates ranked, actionable recommendations
 grouped by UX concepts. Each suggestion includes specific R dashboard
 components (Shiny, bslib, DT, plotly, etc.), implementation details, and
-rationale. Suggestions are scored based on relevance, layout
-appropriateness, and contextual factors. Component suggestions work with
-both Shiny applications and Quarto dashboards, with shiny-prefixed
-components (i.e., `shiny::`) requiring Shiny runtime.
+rationale. Suggestions are scored based on relevance and contextual
+factors. Component suggestions work with both Shiny applications and
+Quarto dashboards, with shiny-prefixed components (i.e., `shiny::`)
+requiring Shiny runtime.
 
 ## Examples
 
 ``` r
 notice_result <- bid_interpret(
   central_question = "How can we simplify data presentation?",
-  data_story = list(
+  data_story = new_data_story(
     hook = "Data is too complex",
     context = "Overloaded with charts",
     tension = "Confusing layout",
@@ -114,16 +92,9 @@ notice_result <- bid_interpret(
     problem = "Users struggle with information overload",
     evidence = "Survey results indicate delays"
   )
-#> Warning: ! Using deprecated list format for data_story parameter
-#> ℹ Please use new_data_story() constructor for new code
-#> ℹ Legacy format will be automatically migrated
-#> Warning: ! Using deprecated nested format for data_story
-#> ℹ The flat API is now recommended: new_data_story(hook, context, tension,
-#>   resolution)
-#> ℹ Nested format (variables, relationships) will be removed in bidux 0.4.0
 #> Stage 1 (Interpret) completed.
 #>   - Central question: How can we simplify data presentation?
-#>   - Your data story is incomplete (25%). Consider adding these missing elements: hook, tension, resolution.
+#>   - Your data story has all key elements. Focus on making each component compelling and relevant.
 #>   - Your central question is appropriately scoped.
 #>   - No user personas defined 
 #> Auto-suggested theory: Processing Fluency (confidence: 70%)
@@ -134,18 +105,12 @@ notice_result <- bid_interpret(
 #>   - Theory confidence: 70%
 #>   - Next: Use bid_anticipate() for Stage 3 
 
-# Auto-selected layout with concept-grouped suggestions
+# Generate concept-grouped suggestions
 structure_result <- bid_structure(previous_stage = notice_result)
-#> ℹ Auto-selected layout: breathable
-#> ℹ Detected information overload patterns; choosing 'breathable' to reduce cognitive load.
-#> Warning: Layout auto-selection is deprecated and will be removed in bidux 0.4.0. The BID framework will focus on concept-based suggestions instead. Existing code will continue to work until 0.4.0.
 #> ℹ Tip: Learn more about any concept via bid_concept("<concept>").
 #> Stage 4 (Structure) completed.
-#>   - Auto-selected layout: breathable
 #>   - Concept groups generated: 4
 #>   - Total concepts: 4 
-print(structure_result$layout) # Auto-selected layout
-#> [1] "breathable" "breathable" "breathable" "breathable"
 print(structure_result$suggestions) # Ranked suggestions by concept (nested)
 #> [[1]]
 #> [[1]]$concept
@@ -167,7 +132,7 @@ print(structure_result$suggestions) # Ranked suggestions by concept (nested)
 #> [1] "Reduces initial cognitive load for new users while preserving functionality."
 #> 
 #> [[1]]$suggestions[[1]]$score
-#> [1] 1
+#> [1] 0.92
 #> 
 #> 
 #> [[1]]$suggestions[[2]]
@@ -184,7 +149,7 @@ print(structure_result$suggestions) # Ranked suggestions by concept (nested)
 #> [1] "Prevents overwhelming users with too many options at once."
 #> 
 #> [[1]]$suggestions[[2]]$score
-#> [1] 0.91
+#> [1] 0.88
 #> 
 #> 
 #> [[1]]$suggestions[[3]]
@@ -201,7 +166,7 @@ print(structure_result$suggestions) # Ranked suggestions by concept (nested)
 #> [1] "Leverages the Default Effect to reduce cognitive burden."
 #> 
 #> [[1]]$suggestions[[3]]$score
-#> [1] 0.88
+#> [1] 0.85
 #> 
 #> 
 #> 
@@ -298,7 +263,7 @@ print(structure_result$suggestions) # Ranked suggestions by concept (nested)
 #> [1] "Apply Processing Fluency principles"
 #> 
 #> [[4]]$suggestions[[1]]$details
-#> [1] "Consider how Processing Fluency applies to your breathable layout design."
+#> [1] "Consider how Processing Fluency applies to your dashboard design."
 #> 
 #> [[4]]$suggestions[[1]]$components
 #> [1] "bslib::card"           "shiny::fluidRow"       "bslib::layout_columns"
@@ -319,14 +284,14 @@ print(suggestions_flat)
 #> # A tibble: 8 × 8
 #>   concept           title details components rationale score difficulty category
 #>   <chr>             <chr> <chr>   <chr>      <chr>     <dbl> <chr>      <chr>   
-#> 1 Cognitive Load T… Limi… Show o… bslib::ac… Reduces …  1    Hard       Interac…
-#> 2 Cognitive Load T… Use … Start … shiny::ta… Prevents…  0.91 Hard       Complex…
-#> 3 Visual Hierarchy  Esta… Use si… bslib::ca… Helps us…  0.9  Hard       Visual …
-#> 4 Cognitive Load T… Prov… Pre-se… shiny::se… Leverage…  0.88 Medium     Interac…
-#> 5 Progressive Disc… Use … Place … bslib::ac… Reveals …  0.88 Medium     Interac…
-#> 6 Visual Hierarchy  Grou… Use co… bslib::la… Leverage…  0.87 Medium     Visual …
+#> 1 Cognitive Load T… Limi… Show o… bslib::ac… Reduces …  0.92 Hard       Interac…
+#> 2 Visual Hierarchy  Esta… Use si… bslib::ca… Helps us…  0.9  Hard       Visual …
+#> 3 Cognitive Load T… Use … Start … shiny::ta… Prevents…  0.88 Hard       Complex…
+#> 4 Progressive Disc… Use … Place … bslib::ac… Reveals …  0.88 Medium     Interac…
+#> 5 Visual Hierarchy  Grou… Use co… bslib::la… Leverage…  0.87 Medium     Visual …
+#> 6 Cognitive Load T… Prov… Pre-se… shiny::se… Leverage…  0.85 Medium     Interac…
 #> 7 Progressive Disc… Impl… Allow … shiny::ac… Matches …  0.84 Medium     Navigat…
-#> 8 Processing Fluen… Appl… Consid… bslib::ca… Systemat…  0.75 Medium     Layout  
+#> 8 Processing Fluen… Appl… Consid… bslib::ca… Systemat…  0.75 Medium     General 
 
 # Filter by difficulty
 easy_suggestions <- suggestions_flat[suggestions_flat$difficulty == "Easy", ]
@@ -338,8 +303,6 @@ summary(structure_result)
 #> === BID Framework: Structure Stage Summary ===
 #> 
 #> Metadata:
-#>    layout_type : breathable 
-#>    auto_selected_layout : Yes 
 #>    concepts_count : 4 
 #>    suggestion_groups_count : 4 
 #>    stage_number : 4 
@@ -348,12 +311,11 @@ summary(structure_result)
 #> 
 #> Stage Data:
 #>    stage : Structure 
-#>    layout : breathable 
 #>    concepts : Cognitive Load Theory, Visual Hierarchy, Progressive Disclosure, Processing F... 
 #>    previous_problem : Users struggle with information overload 
 #>    previous_theory : Processing Fluency 
 #>    suggestions : list(concept = "Cognitive Load Theory", suggestions = list(list(title = "Limi... 
-#>    suggestions_tbl : list(concept = c("Cognitive Load Theory", "Cognitive Load Theory", "Visual Hi... 
+#>    suggestions_tbl : list(concept = c("Cognitive Load Theory", "Visual Hierarchy", "Cognitive Load... 
 #> 
-#> Generated: 2025-11-19 21:33:49 
+#> Generated: 2026-02-05 19:58:39 
 ```

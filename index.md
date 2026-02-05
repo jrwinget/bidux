@@ -105,19 +105,33 @@ bid_report(process, format = "html")
 
 ## Data-Driven UX with Telemetry
 
-**New in 0.3.2**: Enhanced telemetry workflow transforms real user
-behavior data into actionable BID insights.
+Enhanced telemetry workflows transform real user behavior data into
+actionable BID insights.
+
+**Telemetry Sources Supported:**
+
+- **[shiny.telemetry](https://appsilon.github.io/shiny.telemetry/)**:
+  [Appsilon’s package](https://github.com/Appsilon/shiny.telemetry) for
+  Shiny app telemetry
+- **Shiny OpenTelemetry** (NEW!): Native OTEL support in
+  [shiny](https://shiny.posit.co/) 1.12+ with rich performance data
+
+Both sources work seamlessly with the same API:
 
 ``` r
-# Modern approach: analyze telemetry data with bid_telemetry()
-# Returns a clean tibble of issues (without legacy list structure)
+# Works with {shiny.telemetry}
 issues <- bid_telemetry("telemetry.sqlite")
+
+# Works with Shiny OpenTelemetry (1.12+)
+issues <- bid_telemetry("otel_spans.json")
+
+# Same analysis workflow for both!
 print(issues)  # Shows organized issue summary with severity levels
 
 # Adjust sensitivity with presets
 strict_issues <- bid_telemetry(
   "telemetry.sqlite",
-  thresholds = bid_telemetry_presets("strict")    # or "moderate", "relaxed"
+  thresholds = bid_telemetry_presets("strict") # or "moderate", "relaxed"
 )
 
 # Focus on critical issues using tidy workflows
@@ -135,9 +149,10 @@ notices <- bid_notices(
 
 # Use telemetry flags to inform structure decisions
 flags <- bid_flags(issues)
+
 structure_result <- bid_structure(
   previous_stage = anticipate_result,
-  telemetry_flags = flags  # Influences layout selection
+  telemetry_flags = flags  # influences layout selection
 )
 ```
 
@@ -151,6 +166,34 @@ function automatically identifies five key friction indicators:
 - **Navigation Drop-offs**: Pages or tabs users rarely visit
 - **Confusion Patterns**: Rapid repeated changes indicating user
   uncertainty
+
+**OTEL Span Types Supported**: - `session_start`/`session_end` (user
+sessions) - `output:<id>` (output rendering with timing) -
+`reactive:<id>`, `observe:<id>` (reactive/observer execution) -
+`navigation` (page/tab navigation) - Span events with errors (automatic
+error detection)
+
+**OpenTelemetry Integration (Shiny 1.12+):**
+
+For modern Shiny applications, use native OpenTelemetry for richer
+insights:
+
+``` r
+# In your Shiny app - enable OTEL collection
+options(shiny.otel.collect = "all")
+
+# After collecting data, analyze with bidux
+issues <- bid_telemetry("otel_spans.json")
+```
+
+See
+[`vignette("otel-integration")`](https://jrwinget.github.io/bidux/articles/otel-integration.md)
+for complete setup guide including: - Span-to-event conversion details
+(session_start→login, output:*→output, reactive:*→input, etc.) - Column
+schema and ID extraction logic - OTEL configuration and export formats -
+Performance metrics integration - Comparison with
+[shiny.telemetry](https://appsilon.github.io/shiny.telemetry/) -
+Migration strategies
 
 **Function comparison:** -
 [`bid_telemetry()`](https://jrwinget.github.io/bidux/reference/bid_telemetry.md):
@@ -218,7 +261,10 @@ bid_concepts("cognitive") |>
   - [`vignette("introduction-to-bid")`](https://jrwinget.github.io/bidux/articles/introduction-to-bid.md):
     Framework overview and core principles
   - [`vignette("telemetry-integration")`](https://jrwinget.github.io/bidux/articles/telemetry-integration.md):
-    Data-driven UX workflows
+    Data-driven UX workflows with
+    [shiny.telemetry](https://appsilon.github.io/shiny.telemetry/)
+  - [`vignette("otel-integration")`](https://jrwinget.github.io/bidux/articles/otel-integration.md):
+    Using Shiny’s native OpenTelemetry (NEW!)
   - [`vignette("practical-examples")`](https://jrwinget.github.io/bidux/articles/practical-examples.md):
     Practical dashboard examples
   - [`vignette("getting-started")`](https://jrwinget.github.io/bidux/articles/getting-started.md):

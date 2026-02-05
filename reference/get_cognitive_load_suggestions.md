@@ -5,5 +5,5 @@ Generate Cognitive Load Theory suggestions
 ## Usage
 
 ``` r
-get_cognitive_load_suggestions(chosen_layout, previous_stage)
+get_cognitive_load_suggestions(previous_stage)
 ```

@@ -42,6 +42,8 @@
   : Constructor for BID stage objects
 - [`bid_structure()`](https://jrwinget.github.io/bidux/reference/bid_structure.md)
   : Document Dashboard Structure Stage in BID Framework
+- [`bid_suggest_analytics()`](https://jrwinget.github.io/bidux/reference/bid_suggest_analytics.md)
+  : Suggest alternative analytics solutions for static dashboards
 - [`bid_suggest_components()`](https://jrwinget.github.io/bidux/reference/bid_suggest_components.md)
   : Suggest UI Components Based on BID Framework Analysis
 - [`bid_telemetry()`](https://jrwinget.github.io/bidux/reference/bid_telemetry.md)
@@ -52,6 +54,8 @@
   : Document User Validation Stage in BID Framework
 - [`bid_with_quiet()`](https://jrwinget.github.io/bidux/reference/bid_with_quiet.md)
   : Temporarily suppress bidux messages
+- [`convert_otel_spans_to_events()`](https://jrwinget.github.io/bidux/reference/convert_otel_spans_to_events.md)
+  : Convert OTLP spans to bidux event schema
 - [`extract_stage()`](https://jrwinget.github.io/bidux/reference/extract_stage.md)
   : Extract specific stage from bid_result
 - [`get_accessibility_recommendations()`](https://jrwinget.github.io/bidux/reference/get_accessibility_recommendations.md)

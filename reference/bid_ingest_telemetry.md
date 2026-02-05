@@ -1,16 +1,33 @@
 # Ingest telemetry data and identify UX friction points
 
-This function ingests telemetry data from shiny.telemetry output (SQLite
-or JSON) and automatically identifies potential UX issues, translating
-them into BID framework Notice stages. It returns a hybrid object that
-is backward-compatible as a list of Notice stages while also providing
+This function ingests telemetry data from multiple sources and
+automatically identifies potential UX issues, translating them into BID
+framework Notice stages. It returns a hybrid object that is
+backward-compatible as a list of Notice stages while also providing
 enhanced functionality with tidy tibble access and flags extraction.
 
-**Note:** This function is designed for Shiny application telemetry. For
-Quarto dashboards, shiny.telemetry only works when using `server: shiny`
-in the Quarto YAML. Static Quarto dashboards and OJS-based dashboards do
-not support shiny.telemetry. Consider alternative analytics solutions
-(e.g., Plausible) for static dashboard usage tracking.
+**Supported telemetry sources:**
+
+- shiny.telemetry (SQLite or JSON)
+
+- Shiny native OpenTelemetry (Shiny \>= 1.12.0, OTLP JSON or SQLite)
+
+- DBI database connections
+
+Format is automatically detected based on file structure and content.
+
+**OpenTelemetry Support**: For Shiny \>= 1.12.0 applications using
+native OpenTelemetry, pass the path to OTLP JSON exports or
+OTEL-formatted SQLite databases. Spans are automatically converted to
+events for analysis. See
+[`vignette("otel-integration")`](https://jrwinget.github.io/bidux/articles/otel-integration.md)
+for complete setup guide.
+
+**Note:** For Quarto dashboards, shiny.telemetry only works when using
+`server: shiny` in the Quarto YAML. Static Quarto dashboards and
+OJS-based dashboards do not support shiny.telemetry. Consider
+alternative analytics solutions (e.g., Plausible) for static dashboard
+usage tracking.
 
 ## Usage
 
@@ -28,15 +45,22 @@ bid_ingest_telemetry(
 
 - source:
 
-  Either a file path to telemetry data (SQLite database or JSON log
-  file), or a DBI connection object to an already-open database. When a
-  connection is provided, it will not be closed by this function.
+  Either a file path to telemetry data or a DBI connection object.
+  Supports:
+
+  - SQLite databases (shiny.telemetry or OTEL format)
+
+  - JSON files (shiny.telemetry logs or OTLP JSON exports)
+
+  - DBI connections to databases with event or span tables When a
+    connection is provided, it will not be closed by this function.
 
 - format:
 
-  Optional format specification ("sqlite" or "json"). If NULL,
-  auto-detected from file extension (for file paths) or defaults to
-  "sqlite" for DBI connections.
+  Optional format specification ("sqlite", "json", "otlp_json",
+  "otel_sqlite"). If NULL (default), auto-detected from file extension
+  and structure. OTLP formats are automatically detected when file
+  contains OpenTelemetry span data.
 
 - events_table:
 
@@ -94,8 +118,11 @@ includes:
 
 ``` r
 if (FALSE) { # \dontrun{
-# Analyze SQLite telemetry database from file path
+# Works with shiny.telemetry SQLite
 issues <- bid_ingest_telemetry("telemetry.sqlite")
+
+# Works with Shiny OpenTelemetry (1.12+)
+issues <- bid_ingest_telemetry("otel_spans.json")
 
 # Use sensitivity presets for easier configuration
 strict_issues <- bid_ingest_telemetry(
@@ -125,7 +152,7 @@ issues <- bid_ingest_telemetry(
   table_name = "my_custom_events"
 )
 
-# Use results in BID workflow
+# Same analysis workflow for both shiny.telemetry and OTEL
 if (length(issues) > 0) {
   # Take first issue and continue with BID process
   interpret_result <- bid_interpret(
