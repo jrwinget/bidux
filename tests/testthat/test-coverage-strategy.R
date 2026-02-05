@@ -42,9 +42,9 @@ test_that("telemetry data normalization handles malformed data", {
   writeLines('{"invalid": json}', bad_json_file)
   on.exit(unlink(bad_json_file))
 
-  expect_warning(
+  expect_error(
     bid_ingest_telemetry(bad_json_file),
-    "No telemetry events found"
+    "Error reading JSON file"
   )
 
   # test empty JSON file

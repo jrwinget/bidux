@@ -580,8 +580,8 @@ convert_otel_spans_to_events <- function(spans_df) {
       next
     }
 
-    # create primary event record (append to list using length + 1)
-    events_list[[length(events_list) + 1]] <- tibble::tibble(
+    # create primary event record
+    events_list <- c(events_list, list(tibble::tibble(
       timestamp = timestamp,
       session_id = session_id,
       event_type = event_type,
@@ -591,11 +591,10 @@ convert_otel_spans_to_events <- function(spans_df) {
       output_id = output_id,
       navigation_id = navigation_id,
       duration_ms = duration_ms
-    )
+    )))
 
     # if this was an output/reactive with an error, also create a separate error event
     if (has_error && event_type %in% c("output", "input")) {
-      # append error event (will be added after primary event)
       error_event <- tibble::tibble(
         timestamp = timestamp,
         session_id = session_id,
@@ -607,8 +606,7 @@ convert_otel_spans_to_events <- function(spans_df) {
         navigation_id = NA_character_,
         duration_ms = duration_ms
       )
-      # use a unique index to add the error event
-      events_list[[length(events_list) + 1]] <- error_event
+      events_list <- c(events_list, list(error_event))
     }
   }
 

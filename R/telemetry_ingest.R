@@ -1027,6 +1027,16 @@ read_telemetry_json <- function(path) {
     cli::cli_abort("Package 'jsonlite' is required to read JSON telemetry data")
   }
 
+  # guard against excessively large files to prevent memory exhaustion
+  file_size_mb <- file.info(path)$size / 1024^2
+  if (!is.na(file_size_mb) && file_size_mb > 100) {
+    cli::cli_abort(c(
+      "JSON file exceeds maximum size limit",
+      "x" = "File size: {round(file_size_mb, 1)}MB (limit: 100MB)",
+      "i" = "Consider splitting large telemetry exports into smaller files"
+    ))
+  }
+
   # check if this is an otel json file
   if (detect_otel_json(path)) {
     cli::cli_alert_info("Detected OpenTelemetry JSON format")
@@ -1215,6 +1225,16 @@ check_json_depth <- function(obj, max_depth = 50, current_depth = 1) {
 read_otel_json <- function(path) {
   if (!requireNamespace("jsonlite", quietly = TRUE)) {
     cli::cli_abort("Package 'jsonlite' is required to read OTLP JSON data")
+  }
+
+  # guard against excessively large files to prevent memory exhaustion
+  file_size_mb <- file.info(path)$size / 1024^2
+  if (!is.na(file_size_mb) && file_size_mb > 100) {
+    cli::cli_abort(c(
+      "JSON file exceeds maximum size limit",
+      "x" = "File size: {round(file_size_mb, 1)}MB (limit: 100MB)",
+      "i" = "Consider splitting large telemetry exports into smaller files"
+    ))
   }
 
   tryCatch(

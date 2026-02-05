@@ -151,10 +151,10 @@ add_performance_context <- function(
     return(issue_evidence)
   }
 
-  # apply optional filter to get relevant events
+  # apply optional filter to get relevant events (use which() to handle NAs safely)
   filtered_events <- events
   if (!is.null(event_filter)) {
-    filtered_events <- events[event_filter, ]
+    filtered_events <- events[which(event_filter), ]
   }
 
   # extract duration data and remove NAs
