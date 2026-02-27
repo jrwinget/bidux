@@ -56,6 +56,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/jrwinget/bidux/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -71,7 +72,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Getting Started with bidux</h1>
             
       
-
+      <small class="dont-index">Source: <a href="https://github.com/jrwinget/bidux/blob/main/vignettes/getting-started.Rmd" class="external-link"><code>vignettes/getting-started.Rmd</code></a></small>
       <div class="d-none name"><code>getting-started.Rmd</code></div>
     </div>
 
@@ -256,11 +257,11 @@ implementation suggestions.</p>
 <span><span class="va">structure_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_structure.html">bid_structure</a></span><span class="op">(</span>previous_stage <span class="op">=</span> <span class="va">anticipate_result</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">structure_result</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">layout</span>, <span class="va">concepts</span>, <span class="va">suggestions</span><span class="op">)</span></span></code></pre></div>
-<p>The function automatically selects an appropriate layout based on the
-content from previous stages and provides ranked, actionable suggestions
-organized by UX concepts. The layout selection is transparent with clear
-rationale for why a particular layout was chosen.</p>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">concepts</span>, <span class="va">suggestions</span><span class="op">)</span></span></code></pre></div>
+<p>The function provides concept-grouped recommendations based on the
+accumulated context from previous stages, with ranked, actionable
+suggestions organized by UX concepts. Layout selection is left to the
+developer, informed by the suggestions and rationale provided.</p>
 <div class="section level4">
 <h4 id="working-with-suggestions-nested-vs-flattened-format">Working with Suggestions: Nested vs Flattened Format<a class="anchor" aria-label="anchor" href="#working-with-suggestions-nested-vs-flattened-format"></a>
 </h4>
@@ -456,7 +457,7 @@ intuitive, engaging, and effective for your users.</p>
 </ul>
 </div>
 <div class="section level2">
-<h2 id="integrating-telemetry-data-new-in-0-3-1">Integrating Telemetry Data (New in 0.3.1)<a class="anchor" aria-label="anchor" href="#integrating-telemetry-data-new-in-0-3-1"></a>
+<h2 id="integrating-telemetry-data">Integrating Telemetry Data<a class="anchor" aria-label="anchor" href="#integrating-telemetry-data"></a>
 </h2>
 <p>If you have telemetry data from user interactions,
 <a href="https://jrwinget.github.io/bidux/">bidux</a> can help transform it into actionable BID insights

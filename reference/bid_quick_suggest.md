@@ -151,7 +151,7 @@ suggestions <- bid_quick_suggest(
 #> Quick suggestions ready
 #>   - Found 9 suggestions (avg relevance: 0.88)
 #>   - Top concept: Cognitive Load Theory
-#>   - Use bid_concept() to learn more about any concept 
+#>   - Use bid_concept() to learn more about any concept
 print(suggestions)
 #> # A tibble: 9 × 7
 #>   title                    details components concept score difficulty rationale
@@ -179,7 +179,7 @@ suggestions <- bid_quick_suggest(
 #> Quick suggestions ready
 #>   - Found 5 suggestions (avg relevance: 0.93)
 #>   - Top concept: Cognitive Load Theory
-#>   - Use bid_concept() to learn more about any concept 
+#>   - Use bid_concept() to learn more about any concept
 
 # Filter to specific package
 bslib_suggestions <- bid_quick_suggest(
@@ -194,7 +194,7 @@ bslib_suggestions <- bid_quick_suggest(
 #> Quick suggestions ready
 #>   - Found 6 suggestions for package 'bslib' (avg relevance: 0.88)
 #>   - Top concept: Cognitive Load Theory
-#>   - Use bid_concept() to learn more about any concept 
+#>   - Use bid_concept() to learn more about any concept
 
 # Navigation issues
 nav_suggestions <- bid_quick_suggest(
@@ -208,7 +208,7 @@ nav_suggestions <- bid_quick_suggest(
 #> Quick suggestions ready
 #>   - Found 8 suggestions (avg relevance: 0.89)
 #>   - Top concept: Cognitive Load Theory
-#>   - Use bid_concept() to learn more about any concept 
+#>   - Use bid_concept() to learn more about any concept
 
 # Information overload
 overload_suggestions <- bid_quick_suggest(
@@ -222,5 +222,5 @@ overload_suggestions <- bid_quick_suggest(
 #> Quick suggestions ready
 #>   - Found 10 suggestions (avg relevance: 0.89)
 #>   - Top concept: Cognitive Load Theory
-#>   - Use bid_concept() to learn more about any concept 
+#>   - Use bid_concept() to learn more about any concept
 ```

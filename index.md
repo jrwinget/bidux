@@ -218,7 +218,7 @@ compatibility)
 - **Component Suggestions**: Get tailored recommendations for
   [bslib](https://rstudio.github.io/bslib/),
   [reactable](https://glin.github.io/reactable/),
-  [echarts4r](https://echarts4r.john-coene.com/), and more
+  [echarts4r](https://echarts4r.john-coene.com), and more
 - **Layout Selection**: Automatic layout recommendations based on
   content and telemetry flags
 - **Concept Dictionary**: Access 50+ behavioral science concepts with

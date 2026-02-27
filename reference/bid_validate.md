@@ -103,30 +103,30 @@ validate_result <- bid_interpret(
 #>   - Central question: How can we improve delivery efficiency?
 #>   - Your data story has all key elements. Focus on making each component compelling and relevant.
 #>   - Your central question is appropriately scoped.
-#>   - No user personas defined 
+#>   - No user personas defined
 #> Auto-suggested theory: Hick's Law (confidence: 90%)
 #> Stage 2 (Notice) completed. (40% complete)
 #>   - Problem: Issue with dropdown menus
 #>   - Theory: Hick's Law (auto-suggested)
 #>   - Evidence: User testing indicated delays
 #>   - Theory confidence: 90%
-#>   - Next: Use bid_anticipate() for Stage 3 
+#>   - Next: Use bid_anticipate() for Stage 3
 #> Warning: ! Using deprecated list format for bias_mitigations parameter
 #> ℹ Please use new_bias_mitigations() constructor for new code
 #> ℹ Legacy format will be automatically migrated
-#> Added accessibility mitigation based on layout context
-#> Concept 'bias_type' not found
-#> Concept 'mitigation_strategy' not found
-#> Concept 'confidence_level' not found
-#> Found partial match: Accessibility Contrast
+#> ℹ Added accessibility mitigation based on layout context.
+#> Concept "bias_type" not found.
+#> Concept "mitigation_strategy" not found.
+#> Concept "confidence_level" not found.
+#> Found partial match: "Accessibility Contrast".
 #> Stage 3 (Anticipate) completed.
 #>   - Bias mitigations: 4 defined
 #>   - Accessibility considerations included
-#>   - Key suggestions: Bias_type mitigation: Consider how this bias affects user decisions, Mitigation_strategy mitigation: Consider how this bias affects user decisions, Confidence_level mitigation: Consider how this bias affects user decisions 
+#>   - Key suggestions: Bias_type mitigation: Consider how this bias affects user decisions, Mitigation_strategy mitigation: Consider how this bias affects user decisions, Confidence_level mitigation: Consider how this bias affects user decisions
 #> ℹ Tip: Learn more about any concept via bid_concept("<concept>").
 #> Stage 4 (Structure) completed.
 #>   - Concept groups generated: 3
-#>   - Total concepts: 3 
+#>   - Total concepts: 3
 #> ℹ Suggested summary panel: Dashboard provides clear summary of key insights with actionable recommendations
 #> ℹ Suggested collaboration features: Enable team sharing and collaborative decision-making features
 #> ℹ Suggested next steps:
@@ -143,7 +143,7 @@ validate_result <- bid_interpret(
 #>   - Summary panel: Dashboard provides clear summary of key insight...
 #>   - Collaboration: Enable team sharing and collaborative decision-...
 #>   - Next steps: 8 items defined
-#>   - Consider adding user empowerment tools to enhance collaboration 
+#>   - Consider adding user empowerment tools to enhance collaboration
 
 summary(validate_result)
 #> === BID Framework: Validate Stage Summary ===
@@ -168,5 +168,5 @@ summary(validate_result)
 #>    previous_concepts : Cognitive Load Theory, Visual Hierarchy, Progressive Disclosure 
 #>    suggestions : Consider adding user empowerment tools to enhance collaboration 
 #> 
-#> Generated: 2026-02-05 19:58:40 
+#> Generated: 2026-02-27 21:33:18 
 ```

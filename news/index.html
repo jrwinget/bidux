@@ -32,6 +32,7 @@
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/jrwinget/bidux/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -40,11 +41,11 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Changelog</h1>
-
+      <small>Source: <a href="https://github.com/jrwinget/bidux/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.4.0" id="id_-bidux-040-2025-12-20"># bidux 0.4.0 (2025-12-20)<a class="anchor" aria-label="anchor" href="#id_-bidux-040-2025-12-20"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.4.0" id="id_-bidux-040-2026-02-27"># bidux 0.4.0 (2026-02-27)<a class="anchor" aria-label="anchor" href="#id_-bidux-040-2026-02-27"></a></h2>
 <div class="section level4">
 <h4 id="breaking-changes-0-4-0">BREAKING CHANGES<a class="anchor" aria-label="anchor" href="#breaking-changes-0-4-0"></a></h4>
 <ul><li><p><strong>Removed nested data_story format.</strong> The <code>variables</code> and <code>relationships</code> parameters have been removed from <code><a href="../reference/new_data_story.html">new_data_story()</a></code>. Use the flat API instead: <code>new_data_story(hook, context, tension, resolution)</code>. See <code><a href="../articles/api-modernization.html">vignette("api-modernization")</a></code> for migration guide.</p></li>
@@ -86,7 +87,7 @@
 <h2 class="pkg-version" data-toc-text="0.3.3" id="id_-bidux-033-2025-11-19"># bidux 0.3.3 (2025-11-19)<a class="anchor" aria-label="anchor" href="#id_-bidux-033-2025-11-19"></a></h2><p class="text-muted">CRAN release: 2025-11-19</p>
 <div class="section level4">
 <h4 id="new-features-0-3-3">NEW FEATURES<a class="anchor" aria-label="anchor" href="#new-features-0-3-3"></a></h4>
-<ul><li><p><strong>DBI connection support for telemetry ingestion.</strong> <code><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry()</a></code> and <code><a href="../reference/bid_telemetry.html">bid_telemetry()</a></code> now accept DBI connection objects in addition to file paths. This allows direct use of existing database connections and supports any DBI-compatible backend (SQLite, PostgreSQL, MySQL, etc.). New <code>table_name</code> parameter enables reading from custom table names instead of relying on auto-detection. Connections passed in remain open for caller management (fixes Issue #17).</p></li>
+<ul><li><p><strong>DBI connection support for telemetry ingestion.</strong> <code><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry()</a></code> and <code><a href="../reference/bid_telemetry.html">bid_telemetry()</a></code> now accept DBI connection objects in addition to file paths. This allows direct use of existing database connections and supports any DBI-compatible backend (SQLite, PostgreSQL, MySQL, etc.). New <code>table_name</code> parameter enables reading from custom table names instead of relying on auto-detection. Connections passed in remain open for caller management (fixes Issue <a href="https://github.com/jrwinget/bidux/issues/17" class="external-link">#17</a>).</p></li>
 <li><p><strong>Quick UX suggestions with <code><a href="../reference/bid_quick_suggest.html">bid_quick_suggest()</a></code>.</strong> New function provides immediate, actionable UX suggestions without going through the full 5-stage BID workflow. Simply describe your problem and get ranked component recommendations with implementation guidance. Ideal for rapid prototyping or quick fixes.</p></li>
 <li><p><strong>Flattened tibble format for Structure stage suggestions.</strong> <code><a href="../reference/bid_structure.html">bid_structure()</a></code> now returns both the nested suggestion format (<code>$suggestions</code>) and a new flattened tibble format (<code>$suggestions_tbl</code>). The tibble includes columns for <code>concept</code>, <code>title</code>, <code>details</code>, <code>components</code>, <code>rationale</code>, <code>score</code>, <code>difficulty</code>, and <code>category</code>, making it easy to filter and analyze suggestions using standard dplyr operations. Examples include filtering by difficulty (“Easy”, “Medium”, “Hard”), category (“Layout”, “Navigation”, “Content”, etc.), or score thresholds.</p></li>
 </ul></div>
@@ -341,8 +342,8 @@
 <h2 class="pkg-version" data-toc-text="0.2.0" id="id_-bidux-020-2025-08-05"># bidux 0.2.0 (2025-08-05)<a class="anchor" aria-label="anchor" href="#id_-bidux-020-2025-08-05"></a></h2>
 <div class="section level4">
 <h4 id="new-features-0-2-0">NEW FEATURES<a class="anchor" aria-label="anchor" href="#new-features-0-2-0"></a></h4>
-<ul><li><p><strong>Telemetry-driven UX friction detection.</strong> New <code><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry()</a></code> ingests <a href="https://appsilon.github.io/shiny.telemetry/" class="external-link">shiny.telemetry</a> data (SQLite or JSON), applies configurable thresholds, detects friction patterns (e.g., unused inputs, delayed interactions, error clusters, navigation drop-offs, confusion), and generates BID notices and reports. Includes robust input validation, format auto-detection, and clearer CLI summaries. (#18)</p></li>
-<li><p><strong>Telemetry integration vignette.</strong> A new vignette shows how to set up <a href="https://appsilon.github.io/shiny.telemetry/" class="external-link">shiny.telemetry</a>, run <code><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry()</a></code>, interpret indicators, and customize thresholds within the BID workflow. (#18)</p></li>
+<ul><li><p><strong>Telemetry-driven UX friction detection.</strong> New <code><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry()</a></code> ingests <a href="https://appsilon.github.io/shiny.telemetry/" class="external-link">shiny.telemetry</a> data (SQLite or JSON), applies configurable thresholds, detects friction patterns (e.g., unused inputs, delayed interactions, error clusters, navigation drop-offs, confusion), and generates BID notices and reports. Includes robust input validation, format auto-detection, and clearer CLI summaries. (<a href="https://github.com/jrwinget/bidux/issues/18" class="external-link">#18</a>)</p></li>
+<li><p><strong>Telemetry integration vignette.</strong> A new vignette shows how to set up <a href="https://appsilon.github.io/shiny.telemetry/" class="external-link">shiny.telemetry</a>, run <code><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry()</a></code>, interpret indicators, and customize thresholds within the BID workflow. (<a href="https://github.com/jrwinget/bidux/issues/18" class="external-link">#18</a>)</p></li>
 </ul></div>
 <div class="section level4">
 <h4 id="minor-improvements-0-2-0">MINOR IMPROVEMENTS<a class="anchor" aria-label="anchor" href="#minor-improvements-0-2-0"></a></h4>
@@ -362,9 +363,9 @@
 </ul></div>
 <div class="section level4">
 <h4 id="documentation-fixes-0-2-0">DOCUMENTATION FIXES<a class="anchor" aria-label="anchor" href="#documentation-fixes-0-2-0"></a></h4>
-<ul><li><p><strong>Docs &amp; guides.</strong> Added <strong>CONTRIBUTING</strong> guidelines and a <strong>Code of Conduct</strong>; standardized GitHub issue templates for clear, consistent reports. (#16)</p></li>
-<li><p><strong>README overhaul.</strong> Reorganized overview, features, installation, and a concise quick start; added a telemetry section; improved examples; suppressed noisy messages during README generation; added a CRAN downloads badge. (#15, #16)</p></li>
-<li><p><strong>Reference updates.</strong> Exported and documented <code><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry()</a></code>; refreshed <code>man/</code> pages and package index to reflect new modules and function locations. (#18)</p></li>
+<ul><li><p><strong>Docs &amp; guides.</strong> Added <strong>CONTRIBUTING</strong> guidelines and a <strong>Code of Conduct</strong>; standardized GitHub issue templates for clear, consistent reports. (<a href="https://github.com/jrwinget/bidux/issues/16" class="external-link">#16</a>)</p></li>
+<li><p><strong>README overhaul.</strong> Reorganized overview, features, installation, and a concise quick start; added a telemetry section; improved examples; suppressed noisy messages during README generation; added a CRAN downloads badge. (<a href="https://github.com/jrwinget/bidux/issues/15" class="external-link">#15</a>, <a href="https://github.com/jrwinget/bidux/issues/16" class="external-link">#16</a>)</p></li>
+<li><p><strong>Reference updates.</strong> Exported and documented <code><a href="../reference/bid_ingest_telemetry.html">bid_ingest_telemetry()</a></code>; refreshed <code>man/</code> pages and package index to reflect new modules and function locations. (<a href="https://github.com/jrwinget/bidux/issues/18" class="external-link">#18</a>)</p></li>
 </ul></div>
 <div class="section level4">
 <h4 id="refactoring--internals-no-user-facing-api-changes-0-2-0">REFACTORING &amp; INTERNALS (no user-facing API changes)<a class="anchor" aria-label="anchor" href="#refactoring--internals-no-user-facing-api-changes-0-2-0"></a></h4>

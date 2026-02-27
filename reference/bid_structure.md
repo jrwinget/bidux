@@ -96,21 +96,21 @@ notice_result <- bid_interpret(
 #>   - Central question: How can we simplify data presentation?
 #>   - Your data story has all key elements. Focus on making each component compelling and relevant.
 #>   - Your central question is appropriately scoped.
-#>   - No user personas defined 
+#>   - No user personas defined
 #> Auto-suggested theory: Processing Fluency (confidence: 70%)
 #> Stage 2 (Notice) completed. (40% complete)
 #>   - Problem: Users struggle with information overload
 #>   - Theory: Processing Fluency (auto-suggested)
 #>   - Evidence: Survey results indicate delays
 #>   - Theory confidence: 70%
-#>   - Next: Use bid_anticipate() for Stage 3 
+#>   - Next: Use bid_anticipate() for Stage 3
 
 # Generate concept-grouped suggestions
 structure_result <- bid_structure(previous_stage = notice_result)
 #> ℹ Tip: Learn more about any concept via bid_concept("<concept>").
 #> Stage 4 (Structure) completed.
 #>   - Concept groups generated: 4
-#>   - Total concepts: 4 
+#>   - Total concepts: 4
 print(structure_result$suggestions) # Ranked suggestions by concept (nested)
 #> [[1]]
 #> [[1]]$concept
@@ -317,5 +317,5 @@ summary(structure_result)
 #>    suggestions : list(concept = "Cognitive Load Theory", suggestions = list(list(title = "Limi... 
 #>    suggestions_tbl : list(concept = c("Cognitive Load Theory", "Visual Hierarchy", "Cognitive Load... 
 #> 
-#> Generated: 2026-02-05 19:58:39 
+#> Generated: 2026-02-27 21:33:17 
 ```

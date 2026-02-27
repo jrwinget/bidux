@@ -13,6 +13,8 @@ Useful links:
 
 - <https://jrwinget.github.io/bidux/>
 
+- Report bugs at <https://github.com/jrwinget/bidux/issues>
+
 ## Author
 
 **Maintainer**: Jeremy Winget <contact@jrwinget.com>

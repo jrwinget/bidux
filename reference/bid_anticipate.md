@@ -64,7 +64,7 @@ interpret_stage <- bid_interpret(
 #>   - Central question: How can we improve selection efficiency?
 #>   - Your data story has all key elements. Focus on making each component compelling and relevant.
 #>   - Your central question is appropriately scoped.
-#>   - No user personas defined 
+#>   - No user personas defined
 
 notice_stage <- bid_notice(
   previous_stage = interpret_stage,
@@ -77,7 +77,7 @@ notice_stage <- bid_notice(
 #>   - Theory: Hick's Law (auto-suggested)
 #>   - Evidence: User testing indicated delays
 #>   - Theory confidence: 90%
-#>   - Next: Use bid_anticipate() for Stage 3 
+#>   - Next: Use bid_anticipate() for Stage 3
 
 structure_info <- bid_structure(previous_stage = notice_stage)
 #> ℹ Tip: Learn more about any concept via bid_concept("<concept>").
@@ -87,19 +87,19 @@ structure_info <- bid_structure(previous_stage = notice_stage)
 #>   All existing code remains backward compatible
 #> Stage 4 (Structure) completed.
 #>   - Concept groups generated: 4
-#>   - Total concepts: 4 
+#>   - Total concepts: 4
 
 # Let the function suggest bias mitigations based on previous stages
 bid_anticipate(previous_stage = structure_info)
-#> Automatically suggested bias mitigations: attention bias, belief perseverance, accessibility
-#> Concept 'attention bias' not found
-#> Found partial match: Accessibility Contrast
+#> ℹ Automatically suggested bias mitigations: attention bias, belief perseverance, accessibility.
+#> Concept "attention bias" not found.
+#> Found partial match: "Accessibility Contrast".
 #> Stage 3 (Anticipate) completed.
 #>   - Bias mitigations: 3 defined
 #>   - Accessibility considerations included
-#>   - Key suggestions: Attention Bias mitigation: Consider how this bias affects user decisions, Belief Perseverance mitigation: Proactively show content that might disprove initial assumptions, Accessibility mitigation: Test color combinations with WebAIM's contrast checker to meet WCAG standards 
+#>   - Key suggestions: Attention Bias mitigation: Consider how this bias affects user decisions, Belief Perseverance mitigation: Proactively show content that might disprove initial assumptions, Accessibility mitigation: Test color combinations with WebAIM's contrast checker to meet WCAG standards
 #> BID Framework - Anticipate Stage
-#> Generated: 2026-02-05 19:58:36 
+#> Generated: 2026-02-27 21:33:14 
 #> Progress: 60 % (3/5) 
 #> 
 #> Bias Mitigations: 2 strategies defined 
@@ -120,15 +120,15 @@ anticipate_result <- bid_anticipate(
 #> Warning: ! Using deprecated list format for bias_mitigations parameter
 #> ℹ Please use new_bias_mitigations() constructor for new code
 #> ℹ Legacy format will be automatically migrated
-#> Added accessibility mitigation based on layout context
-#> Concept 'bias_type' not found
-#> Concept 'mitigation_strategy' not found
-#> Concept 'confidence_level' not found
-#> Found partial match: Accessibility Contrast
+#> ℹ Added accessibility mitigation based on layout context.
+#> Concept "bias_type" not found.
+#> Concept "mitigation_strategy" not found.
+#> Concept "confidence_level" not found.
+#> Found partial match: "Accessibility Contrast".
 #> Stage 3 (Anticipate) completed.
 #>   - Bias mitigations: 4 defined
 #>   - Accessibility considerations included
-#>   - Key suggestions: Bias_type mitigation: Consider how this bias affects user decisions, Mitigation_strategy mitigation: Consider how this bias affects user decisions, Confidence_level mitigation: Consider how this bias affects user decisions 
+#>   - Key suggestions: Bias_type mitigation: Consider how this bias affects user decisions, Mitigation_strategy mitigation: Consider how this bias affects user decisions, Confidence_level mitigation: Consider how this bias affects user decisions
 
 summary(anticipate_result)
 #> === BID Framework: Anticipate Stage Summary ===
@@ -151,5 +151,5 @@ summary(anticipate_result)
 #>    previous_concepts : Cognitive Load Theory, Visual Hierarchy, Progressive Disclosure, Hick's Law 
 #>    suggestions : Bias_type mitigation: Consider how this bias affects user decisions Mitigatio... 
 #> 
-#> Generated: 2026-02-05 19:58:36 
+#> Generated: 2026-02-27 21:33:14 
 ```

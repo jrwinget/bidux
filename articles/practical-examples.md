@@ -634,30 +634,15 @@ behavior.
 # Analyze telemetry data to identify real friction points
 library(bidux)
 
-# Example telemetry data structure (your actual data would come from shinymetrics, etc.)
-telemetry_data <- data.frame(
-  session_id = c(rep("s1", 10), rep("s2", 8), rep("s3", 12)),
-  input_id = c(
-    "date_filter", "region_filter", "product_filter", "date_filter",
-    "region_filter", "date_filter", "region_filter", "date_filter",
-    "advanced_options", "advanced_options",
-    "date_filter", "export_btn", "export_btn", "export_btn",
-    "date_filter", "date_filter", "date_filter", "date_filter",
-    "date_filter", "region_filter", "date_filter", "date_filter",
-    "help_btn", "export_btn", "export_btn", "export_btn",
-    "date_filter", "date_filter", "date_filter", "date_filter"
-  ),
-  timestamp = Sys.time() + 1:30,
-  error_occurred = c(rep(FALSE, 8), TRUE, TRUE, rep(FALSE, 20)),
-  stringsAsFactors = FALSE
-)
+# Telemetry is collected by instrumenting your Shiny app with shiny.telemetry
+# or Shiny's native OpenTelemetry support (v1.12+). The resulting SQLite file
+# (or JSON export) is passed directly to bid_telemetry() — no manual
+# data.frame construction is needed.
 
-# Use bidux telemetry analysis
+# Use bidux telemetry analysis with the moderate sensitivity preset
 issues <- bid_telemetry(
-  telemetry_data,
-  session_col = "session_id",
-  input_col = "input_id",
-  time_col = "timestamp"
+  source = "path/to/telemetry.sqlite",
+  thresholds = bid_telemetry_presets("moderate")
 )
 
 # Convert telemetry issues to Notice stage

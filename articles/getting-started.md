@@ -196,13 +196,13 @@ Now determine the layout and key design principles to implement:
 structure_result <- bid_structure(previous_stage = anticipate_result)
 
 structure_result |>
-  select(layout, concepts, suggestions)
+  select(concepts, suggestions)
 ```
 
-The function automatically selects an appropriate layout based on the
-content from previous stages and provides ranked, actionable suggestions
-organized by UX concepts. The layout selection is transparent with clear
-rationale for why a particular layout was chosen.
+The function provides concept-grouped recommendations based on the
+accumulated context from previous stages, with ranked, actionable
+suggestions organized by UX concepts. Layout selection is left to the
+developer, informed by the suggestions and rationale provided.
 
 #### Working with Suggestions: Nested vs Flattened Format
 
@@ -383,7 +383,7 @@ include:
 - A UI component library implementing BID principles
 - Testing and validation tools for dashboard evaluation
 
-## Integrating Telemetry Data (New in 0.3.1)
+## Integrating Telemetry Data
 
 If you have telemetry data from user interactions,
 [bidux](https://jrwinget.github.io/bidux/) can help transform it into

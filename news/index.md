@@ -1,6 +1,6 @@
 # Changelog
 
-## \# bidux 0.4.0 (2025-12-20)
+## \# bidux 0.4.0 (2026-02-27)
 
 #### BREAKING CHANGES
 
@@ -111,7 +111,8 @@ CRAN release: 2025-11-19
   DBI-compatible backend (SQLite, PostgreSQL, MySQL, etc.). New
   `table_name` parameter enables reading from custom table names instead
   of relying on auto-detection. Connections passed in remain open for
-  caller management (fixes Issue \#17).
+  caller management (fixes Issue
+  [\#17](https://github.com/jrwinget/bidux/issues/17)).
 
 - **Quick UX suggestions with
   [`bid_quick_suggest()`](https://jrwinget.github.io/bidux/reference/bid_quick_suggest.md).**
@@ -628,13 +629,14 @@ anticipate <- bid_anticipate(
   friction patterns (e.g., unused inputs, delayed interactions, error
   clusters, navigation drop-offs, confusion), and generates BID notices
   and reports. Includes robust input validation, format auto-detection,
-  and clearer CLI summaries. (#18)
+  and clearer CLI summaries.
+  ([\#18](https://github.com/jrwinget/bidux/issues/18))
 
 - **Telemetry integration vignette.** A new vignette shows how to set up
   [shiny.telemetry](https://appsilon.github.io/shiny.telemetry/), run
   [`bid_ingest_telemetry()`](https://jrwinget.github.io/bidux/reference/bid_ingest_telemetry.md),
   interpret indicators, and customize thresholds within the BID
-  workflow. (#18)
+  workflow. ([\#18](https://github.com/jrwinget/bidux/issues/18))
 
 #### MINOR IMPROVEMENTS
 
@@ -678,17 +680,19 @@ anticipate <- bid_anticipate(
 
 - **Docs & guides.** Added **CONTRIBUTING** guidelines and a **Code of
   Conduct**; standardized GitHub issue templates for clear, consistent
-  reports. (#16)
+  reports. ([\#16](https://github.com/jrwinget/bidux/issues/16))
 
 - **README overhaul.** Reorganized overview, features, installation, and
   a concise quick start; added a telemetry section; improved examples;
   suppressed noisy messages during README generation; added a CRAN
-  downloads badge. (#15, \#16)
+  downloads badge. ([\#15](https://github.com/jrwinget/bidux/issues/15),
+  [\#16](https://github.com/jrwinget/bidux/issues/16))
 
 - **Reference updates.** Exported and documented
   [`bid_ingest_telemetry()`](https://jrwinget.github.io/bidux/reference/bid_ingest_telemetry.md);
   refreshed `man/` pages and package index to reflect new modules and
-  function locations. (#18)
+  function locations.
+  ([\#18](https://github.com/jrwinget/bidux/issues/18))
 
 #### REFACTORING & INTERNALS (no user-facing API changes)
 

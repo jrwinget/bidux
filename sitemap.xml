@@ -54,11 +54,13 @@
 <url><loc>https://jrwinget.github.io/bidux/reference/calculate_span_duration_ms.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/check_json_depth.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/check_otel_available.html</loc></url>
+<url><loc>https://jrwinget.github.io/bidux/reference/classify_audience.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/convert_otel_spans_to_events.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/create_confusion_notice.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/create_delay_notice.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/create_error_notice.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/create_navigation_notice.html</loc></url>
+<url><loc>https://jrwinget.github.io/bidux/reference/create_telemetry_notice.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/create_unused_input_notice.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/deduplicate_warnings_suggestions.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/detect_otel_json.html</loc></url>
@@ -73,6 +75,7 @@
 <url><loc>https://jrwinget.github.io/bidux/reference/extract_navigation_id_from_span.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/extract_output_id_from_span.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/extract_session_id_from_span.html</loc></url>
+<url><loc>https://jrwinget.github.io/bidux/reference/extract_span_attribute.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/extract_stage.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/extract_stage1_theory.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/find_confusion_patterns.html</loc></url>
@@ -85,6 +88,7 @@
 <url><loc>https://jrwinget.github.io/bidux/reference/get_accessibility_recommendations.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/get_cognitive_load_suggestions.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/get_concept_bias_mappings.html</loc></url>
+<url><loc>https://jrwinget.github.io/bidux/reference/get_concept_keywords.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/get_concepts_data.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/get_consolidated_suggestion_rules.html</loc></url>
 <url><loc>https://jrwinget.github.io/bidux/reference/get_default_concepts_data.html</loc></url>

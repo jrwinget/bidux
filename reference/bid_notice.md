@@ -69,7 +69,7 @@ interpret_result <- bid_interpret(
 #>   - Central question: How can we improve user task completion?
 #>   - Your data story has all key elements. Focus on making each component compelling and relevant.
 #>   - Your central question is appropriately scoped.
-#>   - No user personas defined 
+#>   - No user personas defined
 
 # Auto-suggested theory
 bid_notice(
@@ -83,9 +83,9 @@ bid_notice(
 #>   - Theory: Hick's Law (auto-suggested)
 #>   - Evidence: User testing shows 65% abandonment rate on filter selection
 #>   - Theory confidence: 90%
-#>   - Next: Use bid_anticipate() for Stage 3 
+#>   - Next: Use bid_anticipate() for Stage 3
 #> BID Framework - Notice Stage
-#> Generated: 2026-02-05 19:58:38 
+#> Generated: 2026-02-27 21:33:16 
 #> Progress: 40 % (2/5) 
 #> 
 #> Problem: Users struggling with complex dropdowns and too many options 
@@ -107,7 +107,7 @@ notice_result <- bid_notice(
 #>   - Problem: Mobile interface is difficult to navigate
 #>   - Theory: Fitts's Law
 #>   - Evidence: Mobile users report frustration with small touch targets
-#>   - Next: Use bid_anticipate() for Stage 3 
+#>   - Next: Use bid_anticipate() for Stage 3
 
 summary(notice_result)
 #> === BID Framework: Notice Stage Summary ===
@@ -129,5 +129,5 @@ summary(notice_result)
 #>    evidence : Mobile users report frustration with small touch targets 
 #>    suggestions : Ensure your problem description is specific and supported by strong evidence 
 #> 
-#> Generated: 2026-02-05 19:58:38 
+#> Generated: 2026-02-27 21:33:16 
 ```

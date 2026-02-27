@@ -56,6 +56,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/jrwinget/bidux/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -71,7 +72,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Practical Examples: Before and After Dashboard Transformations</h1>
             
       
-
+      <small class="dont-index">Source: <a href="https://github.com/jrwinget/bidux/blob/main/vignettes/practical-examples.Rmd" class="external-link"><code>vignettes/practical-examples.Rmd</code></a></small>
       <div class="d-none name"><code>practical-examples.Rmd</code></div>
     </div>
 
@@ -744,30 +745,15 @@ behavior.</p>
 <code class="sourceCode R"><span><span class="co"># Analyze telemetry data to identify real friction points</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://jrwinget.github.io/bidux/">bidux</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Example telemetry data structure (your actual data would come from shinymetrics, etc.)</span></span>
-<span><span class="va">telemetry_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  session_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"s1"</span>, <span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"s2"</span>, <span class="fl">8</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"s3"</span>, <span class="fl">12</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  input_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>    <span class="st">"date_filter"</span>, <span class="st">"region_filter"</span>, <span class="st">"product_filter"</span>, <span class="st">"date_filter"</span>,</span>
-<span>    <span class="st">"region_filter"</span>, <span class="st">"date_filter"</span>, <span class="st">"region_filter"</span>, <span class="st">"date_filter"</span>,</span>
-<span>    <span class="st">"advanced_options"</span>, <span class="st">"advanced_options"</span>,</span>
-<span>    <span class="st">"date_filter"</span>, <span class="st">"export_btn"</span>, <span class="st">"export_btn"</span>, <span class="st">"export_btn"</span>,</span>
-<span>    <span class="st">"date_filter"</span>, <span class="st">"date_filter"</span>, <span class="st">"date_filter"</span>, <span class="st">"date_filter"</span>,</span>
-<span>    <span class="st">"date_filter"</span>, <span class="st">"region_filter"</span>, <span class="st">"date_filter"</span>, <span class="st">"date_filter"</span>,</span>
-<span>    <span class="st">"help_btn"</span>, <span class="st">"export_btn"</span>, <span class="st">"export_btn"</span>, <span class="st">"export_btn"</span>,</span>
-<span>    <span class="st">"date_filter"</span>, <span class="st">"date_filter"</span>, <span class="st">"date_filter"</span>, <span class="st">"date_filter"</span></span>
-<span>  <span class="op">)</span>,</span>
-<span>  timestamp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">:</span><span class="fl">30</span>,</span>
-<span>  error_occurred <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">FALSE</span>, <span class="fl">8</span><span class="op">)</span>, <span class="cn">TRUE</span>, <span class="cn">TRUE</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">FALSE</span>, <span class="fl">20</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span>
+<span><span class="co"># Telemetry is collected by instrumenting your Shiny app with shiny.telemetry</span></span>
+<span><span class="co"># or Shiny's native OpenTelemetry support (v1.12+). The resulting SQLite file</span></span>
+<span><span class="co"># (or JSON export) is passed directly to bid_telemetry() — no manual</span></span>
+<span><span class="co"># data.frame construction is needed.</span></span>
 <span></span>
-<span><span class="co"># Use bidux telemetry analysis</span></span>
+<span><span class="co"># Use bidux telemetry analysis with the moderate sensitivity preset</span></span>
 <span><span class="va">issues</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bid_telemetry.html">bid_telemetry</a></span><span class="op">(</span></span>
-<span>  <span class="va">telemetry_data</span>,</span>
-<span>  session_col <span class="op">=</span> <span class="st">"session_id"</span>,</span>
-<span>  input_col <span class="op">=</span> <span class="st">"input_id"</span>,</span>
-<span>  time_col <span class="op">=</span> <span class="st">"timestamp"</span></span>
+<span>  source <span class="op">=</span> <span class="st">"path/to/telemetry.sqlite"</span>,</span>
+<span>  thresholds <span class="op">=</span> <span class="fu"><a href="../reference/bid_telemetry_presets.html">bid_telemetry_presets</a></span><span class="op">(</span><span class="st">"moderate"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Convert telemetry issues to Notice stage</span></span>

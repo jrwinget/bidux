@@ -23,11 +23,9 @@ A bid_bias_mitigations S3 object (inherits from data.frame)
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
 mitigations <- new_bias_mitigations(data.frame(
   bias_type = c("confirmation_bias", "selection_bias"),
   mitigation_strategy = c("seek_disconfirming_evidence", "randomize_sample"),
   confidence_level = c(0.8, 0.7)
 ))
-} # }
 ```

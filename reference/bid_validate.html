@@ -34,6 +34,7 @@ refines the dashboard. It represents stage 5 in the BID framework."><meta proper
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/jrwinget/bidux/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -42,7 +43,7 @@ refines the dashboard. It represents stage 5 in the BID framework."><meta proper
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Document User Validation Stage in BID Framework</h1>
-
+      <small class="dont-index">Source: <a href="https://github.com/jrwinget/bidux/blob/main/R/bid_validate.R" class="external-link"><code>R/bid_validate.R</code></a></small>
       <div class="d-none name"><code>bid_validate.Rd</code></div>
     </div>
 
@@ -150,34 +151,34 @@ stage.</p>
 <span class="r-in"><span>    include_telemetry <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>    include_empower_tools <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Stage 1 (Interpret) completed.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Central question: How can we improve delivery efficiency?</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Your data story has all key elements. Focus on making each component compelling and relevant.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Your central question is appropriately scoped.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - No user personas defined </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Auto-suggested theory: Hick's Law (confidence: 90%)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Stage 2 (Notice) completed. (40% complete)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Problem: Issue with dropdown menus</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Theory: Hick's Law (auto-suggested)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Evidence: User testing indicated delays</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Theory confidence: 90%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Next: Use bid_anticipate() for Stage 3 </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Stage 1 (Interpret) completed.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   - Central question: How can we improve delivery efficiency?</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   - Your data story has all key elements. Focus on making each component compelling and relevant.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   - Your central question is appropriately scoped.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   - No user personas defined</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Auto-suggested theory: Hick's Law (confidence: 90%)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Stage 2 (Notice) completed. (40% complete)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   - Problem: Issue with dropdown menus</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   - Theory: Hick's Law (auto-suggested)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   - Evidence: User testing indicated delays</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   - Theory confidence: 90%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   - Next: Use bid_anticipate() for Stage 3</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> Using deprecated list format for bias_mitigations parameter</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Please use new_bias_mitigations() constructor for new code</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Legacy format will be automatically migrated</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Added accessibility mitigation based on layout context</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Concept 'bias_type' not found</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Concept 'mitigation_strategy' not found</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Concept 'confidence_level' not found</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: Accessibility Contrast</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Stage 3 (Anticipate) completed.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Bias mitigations: 4 defined</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Accessibility considerations included</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Key suggestions: Bias_type mitigation: Consider how this bias affects user decisions, Mitigation_strategy mitigation: Consider how this bias affects user decisions, Confidence_level mitigation: Consider how this bias affects user decisions </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Added accessibility mitigation based on layout context.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Concept <span style="color: #0000BB;">"bias_type"</span> not found.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Concept <span style="color: #0000BB;">"mitigation_strategy"</span> not found.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Concept <span style="color: #0000BB;">"confidence_level"</span> not found.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Found partial match: <span style="color: #0000BB;">"Accessibility Contrast"</span>.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Stage 3 (Anticipate) completed.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   - Bias mitigations: 4 defined</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   - Accessibility considerations included</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   - Key suggestions: Bias_type mitigation: Consider how this bias affects user decisions, Mitigation_strategy mitigation: Consider how this bias affects user decisions, Confidence_level mitigation: Consider how this bias affects user decisions</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Tip: Learn more about any concept via bid_concept("&lt;concept&gt;").</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Stage 4 (Structure) completed.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Concept groups generated: 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Total concepts: 3 </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Stage 4 (Structure) completed.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   - Concept groups generated: 3</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   - Total concepts: 3</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Suggested summary panel: Dashboard provides clear summary of key insights with actionable recommendations</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Suggested collaboration features: Enable team sharing and collaborative decision-making features</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Suggested next steps:</span>
@@ -190,11 +191,11 @@ stage.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> • Plan post-launch telemetry analysis to validate design improvements</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> • Document successful patterns and lessons learned for future projects</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> • Plan iterative improvements based on user feedback and analytics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Stage 5 (Validate) completed.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Summary panel: Dashboard provides clear summary of key insight...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Collaboration: Enable team sharing and collaborative decision-...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Next steps: 8 items defined</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - Consider adding user empowerment tools to enhance collaboration </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Stage 5 (Validate) completed.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   - Summary panel: Dashboard provides clear summary of key insight...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   - Collaboration: Enable team sharing and collaborative decision-...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   - Next steps: 8 items defined</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   - Consider adding user empowerment tools to enhance collaboration</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">validate_result</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB; font-weight: bold;">=== BID Framework:</span> <span style="font-weight: bold;">Validate</span> <span style="font-weight: bold;">Stage Summary ===</span></span>
@@ -219,7 +220,7 @@ stage.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    previous_concepts : Cognitive Load Theory, Visual Hierarchy, Progressive Disclosure </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    suggestions : Consider adding user empowerment tools to enhance collaboration </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2026-02-05 19:58:40 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Generated: 2026-02-27 21:33:18 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -69,7 +69,7 @@ interpret_result <- bid_interpret(
 #>   - Central question: What drives the decline in user engagement?
 #>   - Your data story has all key elements. Focus on making each component compelling and relevant.
 #>   - Your central question is appropriately scoped.
-#>   - No user personas defined 
+#>   - No user personas defined
 
 # With user personas (using data.frame)
 interpret_personas <- bid_interpret(
@@ -99,7 +99,7 @@ interpret_personas <- bid_interpret(
 #>   - Central question: How can we improve data discovery?
 #>   - Your data story has all key elements. Focus on making each component compelling and relevant.
 #>   - Your central question is appropriately scoped.
-#>   - User personas: 4 defined 
+#>   - User personas: 4 defined
 
 summary(interpret_personas)
 #> === BID Framework: Interpret Stage Summary ===
@@ -125,5 +125,5 @@ summary(interpret_personas)
 #>    personas : [{"name":"Sara, Data Analyst","goals":"Needs to quickly find patterns in data... 
 #>    suggestions : Your data story has all key elements. Focus on making each component compelli... 
 #> 
-#> Generated: 2026-02-05 19:58:38 
+#> Generated: 2026-02-27 21:33:16 
 ```

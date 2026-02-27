@@ -23,12 +23,10 @@ A bid_user_personas S3 object (inherits from data.frame)
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
 personas <- new_user_personas(data.frame(
   name = c("data analyst", "product manager"),
   goals = c("quick insights", "strategic overview"),
   pain_points = c("complex tools", "data delays"),
   technical_level = c("intermediate", "beginner")
 ))
-} # }
 ```
