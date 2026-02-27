@@ -125,5 +125,5 @@ summary(interpret_personas)
 #>    personas : [{"name":"Sara, Data Analyst","goals":"Needs to quickly find patterns in data... 
 #>    suggestions : Your data story has all key elements. Focus on making each component compelli... 
 #> 
-#> Generated: 2026-02-27 21:33:16 
+#> Generated: 2026-02-27 21:59:05 
 ```

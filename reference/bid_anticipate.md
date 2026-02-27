@@ -99,7 +99,7 @@ bid_anticipate(previous_stage = structure_info)
 #>   - Accessibility considerations included
 #>   - Key suggestions: Attention Bias mitigation: Consider how this bias affects user decisions, Belief Perseverance mitigation: Proactively show content that might disprove initial assumptions, Accessibility mitigation: Test color combinations with WebAIM's contrast checker to meet WCAG standards
 #> BID Framework - Anticipate Stage
-#> Generated: 2026-02-27 21:33:14 
+#> Generated: 2026-02-27 21:59:03 
 #> Progress: 60 % (3/5) 
 #> 
 #> Bias Mitigations: 2 strategies defined 
@@ -151,5 +151,5 @@ summary(anticipate_result)
 #>    previous_concepts : Cognitive Load Theory, Visual Hierarchy, Progressive Disclosure, Hick's Law 
 #>    suggestions : Bias_type mitigation: Consider how this bias affects user decisions Mitigatio... 
 #> 
-#> Generated: 2026-02-27 21:33:14 
+#> Generated: 2026-02-27 21:59:03 
 ```
