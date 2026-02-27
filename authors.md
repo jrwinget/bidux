@@ -8,7 +8,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/jrwinget/bidux/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/jrwinget/bidux/blob/0.4.0/DESCRIPTION)
 
 Winget J (2026). *bidux: Behavioral Insight Design: A Toolkit for
 Integrating Behavioral Science in UI/UX Design*. R package version
