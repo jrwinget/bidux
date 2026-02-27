@@ -39,22 +39,16 @@ validate_character_param_legacy <- function(
     if (allow_null) {
       return(invisible(NULL))
     }
-    stop(paste0("'", param_name, "' cannot be NULL"), call. = FALSE)
+    cli::cli_abort("{.arg {param_name}} cannot be NULL")
   }
 
   if (!is.character(value) || length(value) != 1) {
-    stop(
-      paste0("'", param_name, "' must be a single character string"),
-      call. = FALSE
-    )
+    cli::cli_abort("{.arg {param_name}} must be a single character string")
   }
 
   clean_value <- trimws(value)
   if (nchar(clean_value) < min_length) {
-    stop(
-      paste0("'", param_name, "' cannot be empty or contain only whitespace"),
-      call. = FALSE
-    )
+    cli::cli_abort("{.arg {param_name}} cannot be empty or contain only whitespace")
   }
 
   invisible(TRUE)
@@ -80,24 +74,18 @@ validate_list_param <- function(
     if (allow_null) {
       return(invisible(NULL))
     }
-    stop(paste0("'", param_name, "' cannot be NULL"), call. = FALSE)
+    cli::cli_abort("{.arg {param_name}} cannot be NULL")
   }
 
   if (!is.list(value)) {
-    stop(paste0("'", param_name, "' must be a list"), call. = FALSE)
+    cli::cli_abort("{.arg {param_name}} must be a list")
   }
 
   if (!is.null(required_names)) {
     missing_names <- setdiff(required_names, names(value))
     if (length(missing_names) > 0) {
-      stop(
-        paste0(
-          "'",
-          param_name,
-          "' is missing required elements: ",
-          paste(missing_names, collapse = ", ")
-        ),
-        call. = FALSE
+      cli::cli_abort(
+        "{.arg {param_name}} is missing required elements: {paste(missing_names, collapse = ', ')}"
       )
     }
   }
@@ -250,7 +238,7 @@ validate_previous_stage <- function(previous_stage = NULL, current_stage) {
   in_test_env <- identical(Sys.getenv("TESTTHAT"), "true")
   calling_test <- if (in_test_env) {
     # check if we're being called from a validation test by examining call stack
-    call_stack <- sapply(sys.calls(), function(x) paste(deparse(x), collapse = ""))
+    call_stack <- vapply(sys.calls(), function(x) paste(deparse(x), collapse = ""), character(1))
     any(grepl("validate_previous_stage.*works|utility.*functions.*integrate", call_stack))
   } else {
     FALSE
@@ -404,7 +392,7 @@ validate_logical_param <- function(value, param_name, allow_null = FALSE) {
 #' @noRd
 standard_error_msg <- function(message, context = NULL, suggestions = NULL, call = NULL) {
   if (!is.character(message) || length(message) != 1) {
-    stop("message must be a single character string", call. = FALSE)
+    cli::cli_abort("{.arg message} must be a single character string")
   }
 
   # build named character vector for cli formatting
@@ -593,7 +581,7 @@ validate_param <- function(
     choices = NULL) {
   # check if missing
   if (missing(value)) {
-    stop(sprintf("Argument '%s' is missing with no default", arg_name), call. = FALSE)
+    cli::cli_abort("{.arg {arg_name}} is missing with no default")
   }
 
   # type validation
@@ -605,33 +593,33 @@ validate_param <- function(
   )
 
   if (!type_check) {
-    stop(sprintf("Argument '%s' must be a %s vector", arg_name, type), call. = FALSE)
+    cli::cli_abort("{.arg {arg_name}} must be a {.cls {type}} vector")
   }
 
   # length validation
   if (length(value) < min_length) {
-    stop(sprintf("Argument '%s' must have at least %d element(s)", arg_name, min_length), call. = FALSE)
+    cli::cli_abort("{.arg {arg_name}} must have at least {min_length} element(s)")
   }
 
   if (length(value) > max_length) {
-    stop(sprintf("Argument '%s' must have at most %d element(s)", arg_name, max_length), call. = FALSE)
+    cli::cli_abort("{.arg {arg_name}} must have at most {max_length} element(s)")
   }
 
   # NA validation
   if (!allow_na && any(is.na(value))) {
-    stop(sprintf("Argument '%s' cannot contain NA values", arg_name), call. = FALSE)
+    cli::cli_abort("{.arg {arg_name}} cannot contain NA values")
   }
 
   # choice validation
   if (!is.null(choices) && type == "character" && length(choices) > 0) {
     if (!all(value %in% choices | is.na(value))) {
-      stop(sprintf("Argument '%s' must be one of: %s", arg_name, paste(choices, collapse = ", ")), call. = FALSE)
+      cli::cli_abort("{.arg {arg_name}} must be one of: {paste(choices, collapse = ', ')}")
     }
   }
 
   # special case for single logical values
   if (type == "logical" && max_length == 1 && (length(value) != 1 || is.na(value))) {
-    stop(sprintf("Argument '%s' must be a single logical value (TRUE or FALSE)", arg_name), call. = FALSE)
+    cli::cli_abort("{.arg {arg_name}} must be a single logical value (TRUE or FALSE)")
   }
 
   invisible(value)

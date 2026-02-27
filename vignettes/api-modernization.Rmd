@@ -175,12 +175,12 @@ notice_result <- result |>
     quiet = TRUE
   )
 
-# Anticipate potential user interactions and biases
+# Anticipate potential cognitive biases affecting form completion
 anticipate_result <- notice_result |>
   bid_anticipate(
-    interaction_modes = list(
-      primary = "Progressive form completion",
-      fallback = "Quick signup option"
+    bias_mitigations = list(
+      cognitive_overload = "Progressive form completion with clear step indicators",
+      choice_overload = "Offer quick signup option with minimal required fields"
     ),
     quiet = TRUE
   )
@@ -233,12 +233,12 @@ problem_analysis <- ui_analysis |>
     quiet = TRUE
   )
 
-# Step 3: Anticipate user interactions and cognitive biases
+# Step 3: Anticipate cognitive biases affecting user trust and decision-making
 interaction_analysis <- problem_analysis |>
   bid_anticipate(
-    interaction_modes = list(
-      primary = "Trust-based evaluation of product value",
-      secondary = "Quick decision under time pressure"
+    bias_mitigations = list(
+      social_proof = "Display trust signals and authentic user testimonials",
+      scarcity_bias = "Avoid artificial urgency tactics that undermine trust"
     ),
     quiet = TRUE
   )
@@ -250,10 +250,10 @@ recommendations <- bid_structure(
   quiet = TRUE
 )
 
-# Step 5: Validate design decisions
+# Step 5: Validate design decisions with experimental design
 validation_analysis <- bid_validate(
   previous_stage = recommendations,
-  validation_method = "expert_review",
+  include_exp_design = TRUE,
   quiet = TRUE
 )
 
@@ -404,13 +404,13 @@ All core functions now follow consistent patterns for better usability.
 
 ```{r consistency}
 # Consistent parameter patterns across functions
-bid_interpret_params <- c("text", "method", "context", "return_tibble", "quiet")
-bid_structure_params <- c("insights", "format", "priority", "context", "return_tibble", "quiet")
+bid_interpret_params <- c("previous_stage", "central_question", "data_story", "user_personas", "quiet")
+bid_structure_params <- c("previous_stage", "concepts", "telemetry_flags", "quiet")
 
 # Common parameters:
-# - return_tibble: Enable modern tibble output
-# - quiet: Control informational messages
-# - context: Provide analysis context
+# - previous_stage: Chain stages together through the BID pipeline
+# - quiet: control informational messages
+# - ...: pass additional named arguments through to the stage metadata
 
 # All functions return objects with:
 # - S3 classes for proper method dispatch

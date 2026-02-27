@@ -43,15 +43,12 @@ generate_stage_suggestions <- function(
 #' @noRd
 evaluate_suggestion_condition <- function(condition, context_data) {
   if (!is.function(condition)) {
-    warning("Condition is not a function, skipping", call. = FALSE)
+    cli::cli_warn("Condition is not a function, skipping.")
     return(FALSE)
   }
 
   if (!is.list(context_data) && !is.null(context_data)) {
-    warning(
-      "Context data is not a list or NULL, attempting to coerce",
-      call. = FALSE
-    )
+    cli::cli_warn("Context data is not a list or NULL, attempting to coerce.")
     context_data <- list(context_data)
   }
 
@@ -59,20 +56,13 @@ evaluate_suggestion_condition <- function(condition, context_data) {
     {
       result <- condition(context_data)
       if (!is.logical(result) || length(result) != 1) {
-        warning(
-          "Condition function returned non-logical or multi-value result",
-          call. = FALSE
-        )
+        cli::cli_warn("Condition function returned non-logical or multi-value result.")
         return(FALSE)
       }
       return(result)
     },
     error = function(e) {
-      warning(
-        "Error evaluating suggestion condition: ",
-        e$message,
-        call. = FALSE
-      )
+      cli::cli_warn("Error evaluating suggestion condition: {e$message}")
       FALSE
     }
   )

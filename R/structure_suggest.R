@@ -153,72 +153,12 @@ infer_concepts_from_story <- function(previous_stage) {
   detected_concepts <- character(0)
   story_lower <- tolower(story_text)
 
-  # keyword-based concept detection
-  concept_keywords <- list(
-    "Cognitive Load Theory" = c(
-      "overload",
-      "overwhelm",
-      "too many",
-      "complex",
-      "confusing",
-      "mental load"
-    ),
-    "Progressive Disclosure" = c(
-      "step",
-      "gradually",
-      "reveal",
-      "detail",
-      "progressive",
-      "stage",
-      "phase"
-    ),
-    "Visual Hierarchy" = c(
-      "hierarchy",
-      "priority",
-      "important",
-      "focus",
-      "attention",
-      "prominence"
-    ),
-    "Dual-Processing Theory" = c(
-      "quick",
-      "glance",
-      "summary",
-      "overview",
-      "detail",
-      "fast",
-      "thorough"
-    ),
-    "User Onboarding" = c(
-      "first time",
-      "new user",
-      "beginner",
-      "getting started",
-      "initial",
-      "welcome"
-    ),
-    "Information Scent" = c(
-      "find",
-      "search",
-      "locate",
-      "discover",
-      "navigation",
-      "scent",
-      "wayfinding"
-    ),
-    "Principle of Proximity" = c(
-      "group",
-      "related",
-      "together",
-      "proximity",
-      "close",
-      "associate"
-    )
-  )
+  # keyword-based concept detection — delegates to canonical map
+  concept_keywords <- get_concept_keywords()
 
   for (concept_name in names(concept_keywords)) {
     keywords <- concept_keywords[[concept_name]]
-    if (any(sapply(keywords, function(k) grepl(k, story_lower)))) {
+    if (any(vapply(keywords, function(k) grepl(k, story_lower), logical(1)))) {
       detected_concepts <- c(detected_concepts, concept_name)
     }
   }
@@ -536,15 +476,15 @@ rank_and_sort_suggestions <- function(groups, previous_stage) {
     }
 
     # sort suggestions by score (descending)
-    scores <- sapply(groups[[i]]$suggestions, function(s) s$score)
+    scores <- vapply(groups[[i]]$suggestions, function(s) s$score, numeric(1))
     order_idx <- order(scores, decreasing = TRUE)
     groups[[i]]$suggestions <- groups[[i]]$suggestions[order_idx]
   }
 
   # sort groups by highest suggestion score in each group
-  group_max_scores <- sapply(groups, function(g) {
-    max(sapply(g$suggestions, function(s) s$score))
-  })
+  group_max_scores <- vapply(groups, function(g) {
+    max(vapply(g$suggestions, function(s) s$score, numeric(1)))
+  }, numeric(1))
   group_order <- order(group_max_scores, decreasing = TRUE)
 
   return(groups[group_order])

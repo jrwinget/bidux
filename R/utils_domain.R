@@ -108,47 +108,84 @@ find_best_concept_match <- function(concept, d_all_concepts) {
   return(NULL)
 }
 
-#' Generic text analysis for concept detection
+#' Get the canonical concept keyword map for text-based concept detection
 #'
-#' @param text Text to analyze for concepts
-#' @param source_type Type of source (for logging)
+#' @description
+#' Returns the single authoritative mapping of behavioral science concept names
+#' to keyword vectors. This is the merged union of all keyword sets previously
+#' scattered across `infer_concepts_from_story()` and
+#' `detect_concepts_from_text()`.
 #'
-#' @return Character vector of detected concept names
-#'
+#' @return Named list mapping concept names to keyword vectors
 #' @keywords internal
-#' @noRd
-detect_concepts_from_text <- function(text, source_type = "general") {
-  if (is.na(text) || nchar(trimws(text)) == 0) {
-    return(character(0))
-  }
-
-  text_lower <- tolower(trimws(text))
-  detected_concepts <- character(0)
-
-  concept_keywords <- list(
+get_concept_keywords <- function() {
+  list(
+    # from both sources; union of unique keywords
+    "Cognitive Load Theory" = c(
+      "overload",
+      "overwhelm",
+      "too many",
+      "complex",
+      "confusing",
+      "mental load"
+    ),
+    "Progressive Disclosure" = c(
+      "step",
+      "gradually",
+      "reveal",
+      "detail",
+      "details",
+      "progressive",
+      "stage",
+      "phase",
+      "complexity",
+      "level"
+    ),
     "Visual Hierarchy" = c(
+      "hierarchy",
+      "priority",
+      "important",
       "focus",
       "attention",
-      "important",
-      "priority",
-      "hierarchy",
       "prominence"
+    ),
+    "Dual-Processing Theory" = c(
+      "quick",
+      "glance",
+      "summary",
+      "overview",
+      "detail",
+      "fast",
+      "thorough",
+      "depth",
+      "dig"
+    ),
+    "User Onboarding" = c(
+      "first time",
+      "new user",
+      "beginner",
+      "getting started",
+      "initial",
+      "welcome"
+    ),
+    "Information Scent" = c(
+      "find",
+      "search",
+      "locate",
+      "discover",
+      "navigation",
+      "scent",
+      "wayfinding"
     ),
     "Principle of Proximity" = c(
       "group",
       "related",
       "together",
       "proximity",
+      "close",
+      "associate",
       "association",
       "arrange"
-    ),
-    "Dual-Processing Theory" = c(
-      "overview",
-      "detail",
-      "quick",
-      "depth",
-      "glance",
-      "dig"
     ),
     "Breathable Layouts" = c(
       "space",
@@ -157,14 +194,6 @@ detect_concepts_from_text <- function(text, source_type = "general") {
       "simple",
       "uncluttered",
       "whitespace"
-    ),
-    "Progressive Disclosure" = c(
-      "gradually",
-      "reveal",
-      "step",
-      "complexity",
-      "details",
-      "level"
     ),
     "Default Effect" = c(
       "default",
@@ -182,10 +211,30 @@ detect_concepts_from_text <- function(text, source_type = "general") {
       "classify"
     )
   )
+}
+
+#' Generic text analysis for concept detection
+#'
+#' @param text Text to analyze for concepts
+#' @param source_type Type of source (for logging)
+#'
+#' @return Character vector of detected concept names
+#'
+#' @keywords internal
+#' @noRd
+detect_concepts_from_text <- function(text, source_type = "general") {
+  if (is.na(text) || nchar(trimws(text)) == 0) {
+    return(character(0))
+  }
+
+  text_lower <- tolower(trimws(text))
+  detected_concepts <- character(0)
+
+  concept_keywords <- get_concept_keywords()
 
   for (concept_name in names(concept_keywords)) {
     keywords <- concept_keywords[[concept_name]]
-    if (any(sapply(keywords, function(k) grepl(k, text_lower)))) {
+    if (any(vapply(keywords, function(k) grepl(k, text_lower), logical(1)))) {
       detected_concepts <- c(detected_concepts, concept_name)
     }
   }

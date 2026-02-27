@@ -126,9 +126,9 @@ bid_anticipate <- function(
         ))
         bias_mitigations <- NULL
       } else {
-        empty_values <- sapply(bias_mitigations, function(x) {
+        empty_values <- vapply(bias_mitigations, function(x) {
           is.null(x) || is.na(x) || (is.character(x) && nchar(trimws(x)) == 0)
-        })
+        }, logical(1))
 
         if (any(empty_values)) {
           cli::cli_warn(c(
@@ -287,7 +287,7 @@ bid_anticipate <- function(
         }
       }
 
-      valid_elements <- !sapply(story_elements, is.na)
+      valid_elements <- !vapply(story_elements, is.na, logical(1))
       if (any(valid_elements)) {
         combined_text <- tolower(paste(
           unlist(story_elements[valid_elements]),
@@ -323,7 +323,7 @@ bid_anticipate <- function(
 
         for (bias_name in names(bias_keywords)) {
           keywords <- bias_keywords[[bias_name]]
-          if (any(sapply(keywords, function(k) grepl(k, combined_text)))) {
+          if (any(vapply(keywords, function(k) grepl(k, combined_text), logical(1)))) {
             tension_field <- if (!is.na(story_elements$tension)) {
               "tension"
             } else {
@@ -379,11 +379,9 @@ bid_anticipate <- function(
 
     bias_mitigations <- suggested_biases
 
-    message(
-      paste0(
-        "Automatically suggested bias mitigations: ",
-        paste(names(bias_mitigations), collapse = ", ")
-      )
+    bid_alert_info(
+      "Automatically suggested bias mitigations: {paste(names(bias_mitigations), collapse = ', ')}.",
+      quiet = quiet
     )
   }
 
@@ -397,7 +395,7 @@ bid_anticipate <- function(
     accessibility_advice <- get_accessibility_advice(layout_context)
     bias_mitigations$accessibility <- accessibility_advice
 
-    message("Added accessibility mitigation based on layout context")
+    bid_alert_info("Added accessibility mitigation based on layout context.", quiet = quiet)
   }
 
   bias_suggestions <- character(0)

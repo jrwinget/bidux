@@ -154,8 +154,7 @@ test_that("bid_validate handles telemetry_refs parameter", {
 
   expect_s3_class(result, "bid_stage")
   expect_true(
-    "telemetry_refs" %in% names(result) ||
-      "next_steps" %in% names(result)
+    "telemetry_refs" %in% names(result) || "next_steps" %in% names(result)
   )
 })
 
@@ -313,14 +312,14 @@ test_that("bid_validate handles empty string parameters", {
 test_that("bid_validate handles NA parameters", {
   structure_result <- create_complete_bid_workflow()
 
-  # current implementation has an issue with NA handling in if() conditions
+  # NA values should produce a clear error message
   expect_error(
     bid_validate(
       previous_stage = structure_result,
       summary_panel = NA_character_,
       collaboration = NA_character_
     ),
-    "missing value where TRUE/FALSE needed"
+    "must not be.*NA"
   )
 })
 
@@ -470,7 +469,10 @@ test_that("generate_collaboration_suggestion handles different audiences", {
     audience = "Executive leadership team",
     timestamp = Sys.time()
   )
-  result_exec <- bidux:::generate_collaboration_suggestion(stage_exec, include_empower_tools = TRUE)
+  result_exec <- bidux:::generate_collaboration_suggestion(
+    stage_exec,
+    include_empower_tools = TRUE
+  )
   expect_match(result_exec, "Executive-focused")
 
   # test analyst audience
@@ -479,7 +481,10 @@ test_that("generate_collaboration_suggestion handles different audiences", {
     audience = "Data analysts and technical staff",
     timestamp = Sys.time()
   )
-  result_analyst <- bidux:::generate_collaboration_suggestion(stage_analyst, include_empower_tools = TRUE)
+  result_analyst <- bidux:::generate_collaboration_suggestion(
+    stage_analyst,
+    include_empower_tools = TRUE
+  )
   expect_match(result_analyst, "Advanced collaboration")
 
   # test team audience
@@ -488,7 +493,10 @@ test_that("generate_collaboration_suggestion handles different audiences", {
     audience = "Team members across departments",
     timestamp = Sys.time()
   )
-  result_team <- bidux:::generate_collaboration_suggestion(stage_team, include_empower_tools = TRUE)
+  result_team <- bidux:::generate_collaboration_suggestion(
+    stage_team,
+    include_empower_tools = TRUE
+  )
   expect_match(result_team, "Multi-user")
 
   # test client audience
@@ -497,7 +505,10 @@ test_that("generate_collaboration_suggestion handles different audiences", {
     audience = "External clients and customers",
     timestamp = Sys.time()
   )
-  result_client <- bidux:::generate_collaboration_suggestion(stage_client, include_empower_tools = TRUE)
+  result_client <- bidux:::generate_collaboration_suggestion(
+    stage_client,
+    include_empower_tools = TRUE
+  )
   expect_match(result_client, "Client-friendly")
 })
 
@@ -508,7 +519,10 @@ test_that("generate_collaboration_suggestion without empowerment tools", {
     timestamp = Sys.time()
   )
 
-  result <- bidux:::generate_collaboration_suggestion(stage_exec, include_empower_tools = FALSE)
+  result <- bidux:::generate_collaboration_suggestion(
+    stage_exec,
+    include_empower_tools = FALSE
+  )
   expect_match(result, "Executive-focused")
   expect_false(grepl("empowerment", result))
 })
@@ -551,7 +565,10 @@ test_that("generate_next_steps_suggestion varies by stage", {
     include_exp_design = FALSE,
     include_telemetry = FALSE
   )
-  expect_true(any(grepl("data storytelling|central question", result_interpret)))
+  expect_true(any(grepl(
+    "data storytelling|central question",
+    result_interpret
+  )))
 })
 
 test_that("generate_next_steps_suggestion includes experiment design when requested", {
@@ -740,4 +757,65 @@ test_that("bid_validate handles include_empower_tools parameter correctly", {
     include_empower_tools = FALSE
   )
   expect_s3_class(result_without, "bid_stage")
+})
+
+# ==============================================================================
+# IS.ATOMIC GUARD AND CLASSIFY_AUDIENCE COVERAGE
+# ==============================================================================
+
+test_that("bid_validate rejects NA for collaboration parameter individually", {
+  # exercise the is.atomic + is.na guard on collaboration specifically
+  structure_result <- create_complete_bid_workflow()
+
+  expect_error(
+    bid_validate(
+      previous_stage = structure_result,
+      summary_panel = "Valid summary",
+      collaboration = NA
+    ),
+    "collaboration.*must not be.*NA"
+  )
+})
+
+test_that("bid_validate rejects atomic NA for next_steps parameter", {
+  structure_result <- create_complete_bid_workflow()
+
+  expect_error(
+    bid_validate(
+      previous_stage = structure_result,
+      summary_panel = "Test",
+      next_steps = NA_character_
+    ),
+    "next_steps.*must not be.*NA"
+  )
+})
+
+test_that("generate_collaboration_suggestion uses classify_audience for marketing audience", {
+  # "marketing" audience type triggers the classify_audience "marketing" return
+  stage_marketing <- tibble::tibble(
+    stage = "Structure",
+    audience = "Marketing and sales team",
+    timestamp = Sys.time()
+  )
+  result <- bidux:::generate_collaboration_suggestion(
+    stage_marketing,
+    include_empower_tools = TRUE
+  )
+  expect_true(is.character(result))
+  expect_gt(nchar(result), 0)
+})
+
+test_that("generate_collaboration_suggestion uses classify_audience for operations audience", {
+  # "operations" audience type triggers the classify_audience "operations" return
+  stage_ops <- tibble::tibble(
+    stage = "Structure",
+    audience = "Operations and clinical staff",
+    timestamp = Sys.time()
+  )
+  result <- bidux:::generate_collaboration_suggestion(
+    stage_ops,
+    include_empower_tools = TRUE
+  )
+  expect_true(is.character(result))
+  expect_gt(nchar(result), 0)
 })

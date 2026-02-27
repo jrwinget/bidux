@@ -150,14 +150,12 @@ print.bid_data_story <- function(x, ...) {
 #' @return A bid_user_personas S3 object (inherits from data.frame)
 #'
 #' @examples
-#' \dontrun{
 #' personas <- new_user_personas(data.frame(
 #'   name = c("data analyst", "product manager"),
 #'   goals = c("quick insights", "strategic overview"),
 #'   pain_points = c("complex tools", "data delays"),
 #'   technical_level = c("intermediate", "beginner")
 #' ))
-#' }
 #'
 #' @export
 new_user_personas <- function(personas_df) {
@@ -193,31 +191,6 @@ new_user_personas <- function(personas_df) {
   )
 }
 
-#' Validate user personas object
-#'
-#' @param x Object to validate
-#'
-#' @return TRUE if valid, FALSE otherwise
-#'
-#' @keywords internal
-#' @noRd
-validate_user_personas <- function(x) {
-  if (!inherits(x, "bid_user_personas")) {
-    return(FALSE)
-  }
-
-  required_cols <- c("name", "goals", "pain_points", "technical_level")
-  if (!all(required_cols %in% names(x))) {
-    return(FALSE)
-  }
-
-  if (nrow(x) == 0) {
-    return(FALSE)
-  }
-
-  return(TRUE)
-}
-
 #' Print method for user personas objects
 #'
 #' @param x A bid_user_personas object
@@ -241,13 +214,11 @@ print.bid_user_personas <- function(x, ...) {
 #' @return A bid_bias_mitigations S3 object (inherits from data.frame)
 #'
 #' @examples
-#' \dontrun{
 #' mitigations <- new_bias_mitigations(data.frame(
 #'   bias_type = c("confirmation_bias", "selection_bias"),
 #'   mitigation_strategy = c("seek_disconfirming_evidence", "randomize_sample"),
 #'   confidence_level = c(0.8, 0.7)
 #' ))
-#' }
 #'
 #' @export
 new_bias_mitigations <- function(mitigations_df) {

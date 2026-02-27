@@ -8,30 +8,30 @@ test_that("validate_param works correctly for character inputs", {
   # missing parameter
   expect_error(
     validate_param(, "test_arg", "character"),
-    "Argument 'test_arg' is missing with no default"
+    "test_arg.*missing"
   )
 
   # wrong type
   expect_error(
     validate_param(123, "test_arg", "character"),
-    "Argument 'test_arg' must be a character vector"
+    "test_arg.*must be a.*character"
   )
 
   # length constraints
   expect_error(
     validate_param(character(0), "test_arg", "character", min_length = 1),
-    "Argument 'test_arg' must have at least 1 element"
+    "test_arg.*at least 1"
   )
 
   expect_error(
     validate_param(c("a", "b", "c"), "test_arg", "character", max_length = 2),
-    "Argument 'test_arg' must have at most 2 element"
+    "test_arg.*at most 2"
   )
 
   # na values
   expect_error(
     validate_param(c("a", NA), "test_arg", "character", allow_na = FALSE),
-    "Argument 'test_arg' cannot contain NA values"
+    "test_arg.*NA"
   )
 
   expect_silent(
@@ -41,7 +41,7 @@ test_that("validate_param works correctly for character inputs", {
   # choice validation
   expect_error(
     validate_param("invalid", "test_arg", "character", choices = c("a", "b")),
-    "Argument 'test_arg' must be one of: a, b"
+    "test_arg.*must be one of"
   )
 
   expect_silent(
@@ -57,18 +57,18 @@ test_that("validate_param works correctly for logical inputs", {
   # wrong type
   expect_error(
     validate_param("true", "test_arg", "logical"),
-    "Argument 'test_arg' must be a logical vector"
+    "test_arg.*must be a.*logical"
   )
 
   # single logical value requirement
   expect_error(
     validate_param(c(TRUE, FALSE), "test_arg", "logical", max_length = 1),
-    "Argument 'test_arg' must have at most 1 element"
+    "test_arg.*at most 1"
   )
 
   expect_error(
     validate_param(NA, "test_arg", "logical", max_length = 1),
-    "Argument 'test_arg' cannot contain NA values"
+    "test_arg.*NA"
   )
 })
 
@@ -80,7 +80,7 @@ test_that("validate_param works correctly for numeric inputs", {
   # wrong type
   expect_error(
     validate_param("123", "test_arg", "numeric"),
-    "Argument 'test_arg' must be a numeric vector"
+    "test_arg.*must be a.*numeric"
   )
 })
 

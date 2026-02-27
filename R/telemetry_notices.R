@@ -1,3 +1,14 @@
+#' Create a telemetry notice from problem and evidence
+#' @param central_question The central question for the interpret stage
+#' @param problem Problem description string
+#' @param evidence Evidence description string
+#' @return bid_stage object in the Notice stage
+#' @keywords internal
+create_telemetry_notice <- function(central_question, problem, evidence) {
+  interpret <- bid_interpret(central_question = central_question)
+  bid_notice(previous_stage = interpret, problem = problem, evidence = evidence)
+}
+
 #' Create notice stage for unused input
 #' @param input_info List with input usage information
 #' @param total_sessions Total number of sessions
@@ -34,18 +45,12 @@ create_unused_input_notice <- function(input_info, total_sessions, events = NULL
     evidence <- add_performance_context(evidence, events, event_filter)
   }
 
-  # create interpret stage first, then notice stage with auto-suggested theory
-  interpret <- bid_interpret(
-    central_question = "How can we improve user interaction with unused inputs?"
-  )
-
-  notice <- bid_notice(
-    previous_stage = interpret,
+  # create interpret then notice stages via shared factory
+  create_telemetry_notice(
+    central_question = "How can we improve user interaction with unused inputs?",
     problem = problem,
     evidence = evidence
   )
-
-  return(notice)
 }
 
 #' Create notice stage for delayed interactions
@@ -99,18 +104,12 @@ create_delay_notice <- function(delay_info, total_sessions, threshold, events = 
     evidence <- add_performance_context(evidence, events, event_filter)
   }
 
-  # create interpret stage first, then notice stage
-  interpret <- bid_interpret(
-    central_question = "How can we reduce user interaction delays?"
-  )
-
-  notice <- bid_notice(
-    previous_stage = interpret,
+  # create interpret then notice stages via shared factory
+  create_telemetry_notice(
+    central_question = "How can we reduce user interaction delays?",
     problem = problem,
     evidence = evidence
   )
-
-  return(notice)
 }
 
 #' Create notice stage for error patterns
@@ -156,18 +155,12 @@ create_error_notice <- function(error_info, total_sessions, events = NULL) {
     evidence_parts <- add_performance_context(evidence_parts, events, event_filter)
   }
 
-  # create interpret stage first, then notice stage
-  interpret <- bid_interpret(
-    central_question = "How can we reduce user errors and confusion?"
-  )
-
-  notice <- bid_notice(
-    previous_stage = interpret,
+  # create interpret then notice stages via shared factory
+  create_telemetry_notice(
+    central_question = "How can we reduce user errors and confusion?",
     problem = problem,
     evidence = evidence_parts
   )
-
-  return(notice)
 }
 
 #' Create notice stage for navigation issues
@@ -207,18 +200,12 @@ create_navigation_notice <- function(nav_info, total_sessions, events = NULL) {
     evidence <- add_performance_context(evidence, events, event_filter)
   }
 
-  # create interpret stage first, then notice stage
-  interpret <- bid_interpret(
-    central_question = "How can we improve user navigation flow?"
-  )
-
-  notice <- bid_notice(
-    previous_stage = interpret,
+  # create interpret then notice stages via shared factory
+  create_telemetry_notice(
+    central_question = "How can we improve user navigation flow?",
     problem = problem,
     evidence = evidence
   )
-
-  return(notice)
 }
 
 #' Create notice stage for confusion patterns
@@ -248,18 +235,12 @@ create_confusion_notice <- function(confusion_info, total_sessions, events = NUL
     evidence <- add_performance_context(evidence, events, event_filter)
   }
 
-  # create interpret stage first, then notice stage
-  interpret <- bid_interpret(
-    central_question = "How can we improve user navigation flow?"
-  )
-
-  notice <- bid_notice(
-    previous_stage = interpret,
+  # create interpret then notice stages via shared factory
+  create_telemetry_notice(
+    central_question = "How can we improve user navigation flow?",
     problem = problem,
     evidence = evidence
   )
-
-  return(notice)
 }
 
 #' Create tidy issues tibble from notice issues list
@@ -473,16 +454,8 @@ create_confusion_notice <- function(confusion_info, total_sessions, events = NUL
     }
   }
 
-  # determine severity based on impact rate
-  severity <- if (impact_rate >= 0.3) {
-    "critical"
-  } else if (impact_rate >= 0.1) {
-    "high"
-  } else if (impact_rate >= 0.05) {
-    "medium"
-  } else {
-    "low"
-  }
+  # delegate severity calculation to shared utility (single source of truth)
+  severity <- calculate_severity(impact_rate)
 
   list(
     severity = severity,

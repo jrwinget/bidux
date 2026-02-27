@@ -17,10 +17,8 @@ load_external_data <- function(
   # use custom data if provided and valid
   if (!is.null(custom_data)) {
     if (!all(required_cols %in% names(custom_data))) {
-      stop(
-        "Custom data must contain columns: ",
-        paste(required_cols, collapse = ", "),
-        call. = FALSE
+      cli::cli_abort(
+        "Custom data must contain columns: {paste(required_cols, collapse = ', ')}"
       )
     }
     return(custom_data)
@@ -37,17 +35,14 @@ load_external_data <- function(
         if (all(required_cols %in% names(data))) {
           return(data)
         } else {
-          warning(
-            "External file missing required columns, using defaults",
-            call. = FALSE
+          cli::cli_warn(
+            c("!" = "External file missing required columns, using defaults")
           )
         }
       },
       error = function(e) {
-        warning(
-          "Could not load external file: ",
-          e$message,
-          call. = FALSE
+        cli::cli_warn(
+          c("!" = "Could not load external file: {e$message}", "i" = "Falling back to defaults")
         )
       }
     )
@@ -120,10 +115,8 @@ suggest_theory_from_mappings <- function(
     # validate that 'mappings' has the required columns
     required_cols <- c("keywords", "theory", "confidence")
     if (!all(required_cols %in% names(mappings))) {
-      stop(
-        "Custom mappings must contain columns: ",
-        paste(required_cols, collapse = ", "),
-        call. = FALSE
+      cli::cli_abort(
+        "Custom mappings must contain columns: {paste(required_cols, collapse = ', ')}"
       )
     }
     # put user rows first so they take precedence
@@ -205,13 +198,9 @@ suggest_theory_from_mappings <- function(
 
   # display message if requested
   if (show_message) {
-    cat(paste0(
-      "Auto-suggested theory: ",
-      theory,
-      " (confidence: ",
-      janitor::round_half_up(theory_confidence * 100),
-      "%)\n"
-    ))
+    cli::cli_inform(
+      "Auto-suggested theory: {theory} (confidence: {janitor::round_half_up(theory_confidence * 100)}%)"
+    )
   }
 
   list(

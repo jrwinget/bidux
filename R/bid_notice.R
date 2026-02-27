@@ -95,24 +95,16 @@ bid_notice <- function(
   evidence_clean <- trimws(evidence)
 
   if (nchar(problem_clean) < 10) {
-    warning(
-      paste(
-        paste(
-          "Problem description is very short (< 10 characters).",
-          "Consider providing more detail."
-        )
-      ),
-      call. = FALSE
-    )
+    cli::cli_warn(c(
+      "!" = "Problem description is very short (< 10 characters).",
+      "i" = "Consider providing more detail."
+    ))
   }
   if (nchar(evidence_clean) < 10) {
-    warning(
-      paste(
-        "Evidence description is very short (< 10 characters).",
-        "Consider providing more detail."
-      ),
-      call. = FALSE
-    )
+    cli::cli_warn(c(
+      "!" = "Evidence description is very short (< 10 characters).",
+      "i" = "Consider providing more detail."
+    ))
   }
 
   auto_suggested_theory <- FALSE

@@ -14,6 +14,7 @@ Provides a framework and toolkit to guide R dashboard developers in implementing
 Useful links:
 \itemize{
   \item \url{https://jrwinget.github.io/bidux/}
+  \item Report bugs at \url{https://github.com/jrwinget/bidux/issues}
 }
 
 }

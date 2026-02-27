@@ -17,7 +17,7 @@ bid_concepts <- function(search = NULL, fuzzy_match = TRUE, max_distance = 2) {
   concepts_data <- get_concepts_data()
 
   if (is.null(search) || nchar(trimws(search)) == 0) {
-    message("Returning all ", nrow(concepts_data), " concepts")
+    cli::cli_inform("Returning all {nrow(concepts_data)} concept{?s}.")
     return(concepts_data)
   }
 
@@ -51,12 +51,12 @@ bid_concepts <- function(search = NULL, fuzzy_match = TRUE, max_distance = 2) {
   matches <- unique(matches)
 
   if (length(matches) == 0) {
-    message("No concepts found matching '", search, "'")
+    cli::cli_inform("No concepts found matching {.val {search}}.")
     return(concepts_data[0, ])
   }
 
   result <- concepts_data[matches, ]
-  message("Found ", nrow(result), " concept(s) matching '", search, "'")
+  cli::cli_inform("Found {nrow(result)} concept{?s} matching {.val {search}}.")
   return(result)
 }
 
@@ -74,7 +74,7 @@ bid_concepts <- function(search = NULL, fuzzy_match = TRUE, max_distance = 2) {
 #' @export
 bid_concept <- function(concept_name, add_recommendations = TRUE) {
   if (is.null(concept_name) || nchar(trimws(concept_name)) == 0) {
-    message("Please provide a concept name")
+    cli::cli_inform("Please provide a concept name.")
     return(get_concepts_data()[0, ])
   }
 
@@ -95,9 +95,9 @@ bid_concept <- function(concept_name, add_recommendations = TRUE) {
 
     if (length(partial_matches) > 0) {
       result <- concepts_data[partial_matches[1], ]
-      message("Found partial match: ", result$concept[1])
+      cli::cli_inform("Found partial match: {.val {result$concept[1]}}.")
     } else {
-      message("Concept '", concept_name, "' not found")
+      cli::cli_inform("Concept {.val {concept_name}} not found.")
       return(concepts_data[0, ])
     }
   }
@@ -205,6 +205,7 @@ validate_concepts_data_structure <- function(concepts_data) {
 #' Uses memoise to ensure data is only loaded once per session.
 #'
 #' @return A tibble with concepts data
+#' @importFrom memoise memoise
 #' @keywords internal
 load_concepts_data <- memoise::memoise(function() {
   concepts_file <- system.file("extdata", "bid_concepts_data.csv", package = "bidux")

@@ -191,11 +191,6 @@ find_error_patterns <- function(events, threshold_rate = error_rate_threshold) {
   result <- lapply(seq_len(nrow(error_patterns)), function(i) {
     pattern <- error_patterns[i, ]
 
-    # Helper for NA-safe comparison
-    na_safe_equal <- function(a, b) {
-      (is.na(a) & is.na(b)) | (!is.na(a) & !is.na(b) & a == b)
-    }
-
     # find inputs changed just before these errors
     error_sessions <- error_events[
       error_events$error_message == pattern$error_message &
@@ -389,7 +384,7 @@ find_confusion_patterns <- function(
 
   # count occurrences by input
   input_confusion_counts <- table(
-    sapply(confusion_patterns, function(x) x$input_id)
+    vapply(confusion_patterns, function(x) x$input_id, character(1))
   )
 
   # only return inputs with multiple confused sessions
@@ -404,16 +399,16 @@ find_confusion_patterns <- function(
   # create summary for systematic confusion patterns
   result <- lapply(systematic_inputs, function(input) {
     input_patterns <- confusion_patterns[
-      sapply(confusion_patterns, function(x) x$input_id == input)
+      vapply(confusion_patterns, function(x) x$input_id == input, logical(1))
     ]
 
     list(
       input_id = input,
       affected_sessions = length(input_patterns),
-      total_rapid_changes = sum(sapply(input_patterns, function(x) {
+      total_rapid_changes = sum(vapply(input_patterns, function(x) {
         x$change_count
-      })),
-      avg_time_window = mean(sapply(input_patterns, function(x) x$time_window))
+      }, numeric(1))),
+      avg_time_window = mean(vapply(input_patterns, function(x) x$time_window, numeric(1)))
     )
   })
 

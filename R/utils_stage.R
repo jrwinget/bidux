@@ -265,6 +265,20 @@ extract_previous_stage_fields <- function(previous_stage, fields) {
   return(result)
 }
 
+#' classify audience type from description text
+#' @param audience_text character string describing the audience
+#' @return character string: one of "executive", "analyst", "marketing", "operations", "general"
+#' @keywords internal
+classify_audience <- function(audience_text) {
+  if (is.null(audience_text) || !nzchar(trimws(audience_text))) return("general")
+  text_lower <- tolower(audience_text)
+  if (grepl("executive|leadership|manager|c-suite|director", text_lower)) return("executive")
+  if (grepl("analyst|data scientist|technical|developer|engineer|statistician", text_lower)) return("analyst")
+  if (grepl("marketing|sales|business development", text_lower)) return("marketing")
+  if (grepl("operations|clinical|field|frontline", text_lower)) return("operations")
+  "general"
+}
+
 #' Generate persona from audience string (DRY helper for bid_interpret)
 #'
 #' @param audience Audience string to analyze
@@ -280,29 +294,31 @@ generate_persona_from_audience <- function(audience) {
 
   audience_lower <- tolower(audience)
 
-  # determine user type
-  user_type <- if (grepl("analyst|data scientist|technical|developer|engineer", audience_lower)) {
-    "Data Analyst"
-  } else if (grepl("executive|manager|director|leadership|ceo|cfo|cto|vp", audience_lower)) {
-    "Executive"
-  } else if (grepl("market|advertis|campaign|brand", audience_lower)) {
-    "Marketing Professional"
-  } else if (grepl("sales|account|business develop", audience_lower)) {
-    "Sales Representative"
-  } else if (grepl("customer|client|user|consumer", audience_lower)) {
-    "End User"
-  } else {
-    "Dashboard User"
-  }
+  # use centralized classifier for user type and technical level
+  audience_type <- classify_audience(audience)
 
-  # determine technical level
-  technical_level <- if (grepl("analyst|data scientist|technical|developer|engineer", audience_lower)) {
-    "advanced"
-  } else if (grepl("executive|leadership|ceo|cfo", audience_lower)) {
-    "beginner"
-  } else {
+  user_type <- switch(audience_type,
+    "executive"   = "Executive",
+    "analyst"     = "Data Analyst",
+    "marketing"   = "Marketing Professional",
+    "operations"  = "Operations Specialist",
+    "general"     = {
+      # fall back to finer-grained heuristics not covered by classify_audience
+      if (grepl("sales|account|business develop", audience_lower)) {
+        "Sales Representative"
+      } else if (grepl("customer|client|user|consumer", audience_lower)) {
+        "End User"
+      } else {
+        "Dashboard User"
+      }
+    }
+  )
+
+  technical_level <- switch(audience_type,
+    "analyst"    = "advanced",
+    "executive"  = "beginner",
     "intermediate"
-  }
+  )
 
   # determine goals
   goals <- if (grepl("executive|leadership", audience_lower)) {

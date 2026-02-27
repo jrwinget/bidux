@@ -408,8 +408,8 @@ test_that("bid_quick_suggest respects quiet parameter", {
   expect_false(any(grepl("Quick suggestions ready", output, ignore.case = TRUE)))
 
   # with quiet = FALSE, should produce messages
-  # check for the summary message which uses cat() and is reliably captured
-  expect_output(
+  # check for the summary message which uses cli::cli_inform() via message stream
+  expect_message(
     result <- bid_quick_suggest(
       problem = "Users struggle with navigation",
       quiet = FALSE

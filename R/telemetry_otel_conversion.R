@@ -72,6 +72,63 @@ calculate_span_duration_ms <- function(start_time, end_time) {
   as.numeric(difftime(end_time, start_time, units = "secs")) * 1000
 }
 
+#' Extract an attribute value from span attributes by key names
+#'
+#' @param span_attributes The attributes object (data.frame, named list, or list-of-objects)
+#' @param key_names Character vector of possible key names to look for
+#' @return The extracted value as character, or NA_character_ if not found
+#' @keywords internal
+extract_span_attribute <- function(span_attributes, key_names) {
+  if (is.null(span_attributes) || length(span_attributes) == 0) {
+    return(NA_character_)
+  }
+
+  # data.frame format
+  if (is.data.frame(span_attributes)) {
+    for (key_name in key_names) {
+      if (key_name %in% names(span_attributes)) {
+        val <- span_attributes[[key_name]]
+        if (length(val) > 0 && !is.na(val[1])) return(as.character(val[1]))
+      }
+    }
+    # check key/value columns
+    if (all(c("key", "value") %in% names(span_attributes))) {
+      matches <- span_attributes$key %in% key_names
+      if (any(matches)) {
+        val <- span_attributes$value[which(matches)[1]]
+        if (!is.na(val)) return(as.character(val))
+      }
+    }
+    return(NA_character_)
+  }
+
+  # list format
+  if (is.list(span_attributes)) {
+    # named list
+    if (!is.null(names(span_attributes))) {
+      for (key_name in key_names) {
+        if (key_name %in% names(span_attributes)) {
+          val <- span_attributes[[key_name]]
+          if (!is.null(val) && !is.na(val[1])) return(as.character(val[1]))
+        }
+      }
+    }
+    # list-of-objects with $key/$value
+    for (attr in span_attributes) {
+      if (is.list(attr) && !is.null(attr$key)) {
+        if (attr$key %in% key_names) {
+          val <- attr$value
+          if (is.list(val) && !is.null(val$stringValue)) return(as.character(val$stringValue))
+          if (is.list(val) && !is.null(val$intValue)) return(as.character(val$intValue))
+          if (!is.null(val) && !is.na(val[1])) return(as.character(val[1]))
+        }
+      }
+    }
+  }
+
+  NA_character_
+}
+
 #' Extract session ID from span attributes
 #'
 #' @description
@@ -91,51 +148,7 @@ calculate_span_duration_ms <- function(start_time, end_time) {
 #' extract_session_id_from_span(attrs) # returns "abc123"
 #' }
 extract_session_id_from_span <- function(span_attributes) {
-  if (is.null(span_attributes) || length(span_attributes) == 0) {
-    return(NA_character_)
-  }
-
-  # handle data frame format (flattened attributes)
-  if (is.data.frame(span_attributes)) {
-    if ("session.id" %in% names(span_attributes)) {
-      return(as.character(span_attributes[["session.id"]][1]))
-    }
-    if ("session_id" %in% names(span_attributes)) {
-      return(as.character(span_attributes[["session_id"]][1]))
-    }
-  }
-
-  # handle list format (nested otlp structure or flattened named list)
-  if (is.list(span_attributes)) {
-    # check if this is a named list (flattened from read_otel_json)
-    if (!is.null(names(span_attributes))) {
-      if ("session.id" %in% names(span_attributes)) {
-        return(as.character(span_attributes[["session.id"]]))
-      }
-      if ("session_id" %in% names(span_attributes)) {
-        return(as.character(span_attributes[["session_id"]]))
-      }
-    }
-
-    # otherwise it's a list of attribute objects
-    for (attr in span_attributes) {
-      if (is.list(attr) && !is.null(attr$key)) {
-        if (attr$key == "session.id" || attr$key == "session_id") {
-          # extract value from nested structure
-          if (!is.null(attr$value)) {
-            if (!is.null(attr$value$stringValue)) {
-              return(as.character(attr$value$stringValue))
-            }
-            if (!is.null(attr$value$intValue)) {
-              return(as.character(attr$value$intValue))
-            }
-          }
-        }
-      }
-    }
-  }
-
-  return(NA_character_)
+  extract_span_attribute(span_attributes, c("session.id", "session_id", "shiny.session.id"))
 }
 
 #' Extract input ID from span name or attributes
@@ -179,45 +192,8 @@ extract_input_id_from_span <- function(span_name, span_attributes) {
     }
   }
 
-  # try to extract from attributes
-  if (is.null(span_attributes) || length(span_attributes) == 0) {
-    return(NA_character_)
-  }
-
-  # handle data frame format
-  if (is.data.frame(span_attributes)) {
-    if ("input_id" %in% names(span_attributes)) {
-      return(as.character(span_attributes[["input_id"]][1]))
-    }
-    if ("widget_id" %in% names(span_attributes)) {
-      return(as.character(span_attributes[["widget_id"]][1]))
-    }
-  }
-
-  # handle list format (nested otlp structure or flattened named list)
-  if (is.list(span_attributes)) {
-    # check if this is a named list (flattened from read_otel_json)
-    if (!is.null(names(span_attributes))) {
-      for (key_name in c("input_id", "widget_id", "element_id")) {
-        if (key_name %in% names(span_attributes)) {
-          return(as.character(span_attributes[[key_name]]))
-        }
-      }
-    }
-
-    # otherwise it's a list of attribute objects
-    for (attr in span_attributes) {
-      if (is.list(attr) && !is.null(attr$key)) {
-        if (attr$key %in% c("input_id", "widget_id", "element_id")) {
-          if (!is.null(attr$value$stringValue)) {
-            return(as.character(attr$value$stringValue))
-          }
-        }
-      }
-    }
-  }
-
-  return(NA_character_)
+  # fall back to attribute extraction
+  extract_span_attribute(span_attributes, c("input_id", "widget_id", "element_id"))
 }
 
 #' Extract output ID from span name or attributes
@@ -252,45 +228,8 @@ extract_output_id_from_span <- function(span_name, span_attributes) {
     }
   }
 
-  # try to extract from attributes
-  if (is.null(span_attributes) || length(span_attributes) == 0) {
-    return(NA_character_)
-  }
-
-  # handle data frame format
-  if (is.data.frame(span_attributes)) {
-    if ("output_id" %in% names(span_attributes)) {
-      return(as.character(span_attributes[["output_id"]][1]))
-    }
-    if ("target_id" %in% names(span_attributes)) {
-      return(as.character(span_attributes[["target_id"]][1]))
-    }
-  }
-
-  # handle list format (nested otlp structure or flattened named list)
-  if (is.list(span_attributes)) {
-    # check if this is a named list (flattened from read_otel_json)
-    if (!is.null(names(span_attributes))) {
-      for (key_name in c("output_id", "target_id", "output", "output.name")) {
-        if (key_name %in% names(span_attributes)) {
-          return(as.character(span_attributes[[key_name]]))
-        }
-      }
-    }
-
-    # otherwise it's a list of attribute objects
-    for (attr in span_attributes) {
-      if (is.list(attr) && !is.null(attr$key)) {
-        if (attr$key %in% c("output_id", "target_id", "output", "output.name")) {
-          if (!is.null(attr$value$stringValue)) {
-            return(as.character(attr$value$stringValue))
-          }
-        }
-      }
-    }
-  }
-
-  return(NA_character_)
+  # fall back to attribute extraction
+  extract_span_attribute(span_attributes, c("output_id", "target_id", "output", "output.name"))
 }
 
 #' Extract navigation ID from span attributes
@@ -302,43 +241,7 @@ extract_output_id_from_span <- function(span_name, span_attributes) {
 #' @return Character navigation ID, or NA if not found
 #' @keywords internal
 extract_navigation_id_from_span <- function(span_attributes) {
-  if (is.null(span_attributes) || length(span_attributes) == 0) {
-    return(NA_character_)
-  }
-
-  # handle data frame format
-  if (is.data.frame(span_attributes)) {
-    for (key_name in c("navigation_id", "navigation.target", "page", "target")) {
-      if (key_name %in% names(span_attributes)) {
-        return(as.character(span_attributes[[key_name]][1]))
-      }
-    }
-  }
-
-  # handle list format (nested otlp structure or flattened named list)
-  if (is.list(span_attributes)) {
-    # check if this is a named list (flattened from read_otel_json)
-    if (!is.null(names(span_attributes))) {
-      for (key_name in c("navigation_id", "navigation.target", "page", "target")) {
-        if (key_name %in% names(span_attributes)) {
-          return(as.character(span_attributes[[key_name]]))
-        }
-      }
-    }
-
-    # otherwise it's a list of attribute objects
-    for (attr in span_attributes) {
-      if (is.list(attr) && !is.null(attr$key)) {
-        if (attr$key %in% c("navigation_id", "navigation.target", "page", "target")) {
-          if (!is.null(attr$value$stringValue)) {
-            return(as.character(attr$value$stringValue))
-          }
-        }
-      }
-    }
-  }
-
-  return(NA_character_)
+  extract_span_attribute(span_attributes, c("navigation_id", "navigation.target", "page", "target"))
 }
 
 #' Extract error message from span events

@@ -127,6 +127,17 @@ bid_validate <- function(
   validate_logical_param(include_telemetry, "include_telemetry")
   validate_logical_param(include_empower_tools, "include_empower_tools")
 
+  # validate against NA values for nullable string parameters
+  if (!is.null(summary_panel) && is.atomic(summary_panel) && any(is.na(summary_panel))) {
+    cli::cli_abort("Parameter {.arg summary_panel} must not be {.val NA}. Provide a valid string or leave as NULL.")
+  }
+  if (!is.null(collaboration) && is.atomic(collaboration) && any(is.na(collaboration))) {
+    cli::cli_abort("Parameter {.arg collaboration} must not be {.val NA}. Provide a valid string or leave as NULL.")
+  }
+  if (!is.null(next_steps) && is.atomic(next_steps) && any(is.na(next_steps))) {
+    cli::cli_abort("Parameter {.arg next_steps} must not be {.val NA}. Provide a valid string or leave as NULL.")
+  }
+
   if (is.null(summary_panel)) {
     summary_panel <- generate_summary_panel_suggestion(previous_stage)
     bid_alert_info(
@@ -291,27 +302,31 @@ generate_collaboration_suggestion <- function(
 
   if (!is.na(audience) && nchar(trimws(audience)) > 0) {
     audience_lower <- tolower(audience)
+    audience_type <- classify_audience(audience)
 
     empowerment_suffix <- if (include_empower_tools) {
-      if (grepl("executive|leadership|manager", audience_lower)) {
-        " with executive empowerment tools like annotated insights and decision history"
-      } else if (grepl("analyst|technical|data", audience_lower)) {
-        " with analyst empowerment features like exploratory chat and methodology explanations"
-      } else if (grepl("team|group|multiple", audience_lower)) {
-        " with team empowerment via shared workspaces and collaborative insights"
-      } else {
-        " with user empowerment through guided explanations and contextual help"
-      }
+      switch(audience_type,
+        "executive"  = " with executive empowerment tools like annotated insights and decision history",
+        "analyst"    = " with analyst empowerment features like exploratory chat and methodology explanations",
+        # fall back to inline check for team/group which classify_audience doesn't distinguish
+        {
+          if (grepl("team|group|multiple", audience_lower)) {
+            " with team empowerment via shared workspaces and collaborative insights"
+          } else {
+            " with user empowerment through guided explanations and contextual help"
+          }
+        }
+      )
     } else {
       ""
     }
 
-    if (grepl("executive|leadership|manager", audience_lower)) {
+    if (audience_type == "executive") {
       return(paste0(
         "Executive-focused collaboration with summary sharing and decision tracking",
         empowerment_suffix
       ))
-    } else if (grepl("analyst|technical|data", audience_lower)) {
+    } else if (audience_type == "analyst") {
       return(paste0(
         "Advanced collaboration tools including data export, annotation, and methodology sharing",
         empowerment_suffix

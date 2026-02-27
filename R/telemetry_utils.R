@@ -99,11 +99,11 @@ calculate_severity <- function(
 #' @noRd
 calculate_session_rates <- function(session_counts, total_sessions) {
   if (!is.numeric(session_counts) || !is.numeric(total_sessions)) {
-    stop("session_counts and total_sessions must be numeric", call. = FALSE)
+    cli::cli_abort("{.arg session_counts} and {.arg total_sessions} must be numeric")
   }
 
   if (length(total_sessions) != 1 || total_sessions < 0) {
-    stop("total_sessions must be a single non-negative number", call. = FALSE)
+    cli::cli_abort("{.arg total_sessions} must be a single non-negative number")
   }
 
   if (total_sessions == 0) {
