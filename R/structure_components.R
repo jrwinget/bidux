@@ -610,14 +610,15 @@ extract_additional_context <- function(bid_stage) {
   audience_fields <- c("audience", "target_audience", "previous_audience")
   for (field in audience_fields) {
     if (field %in% names(bid_stage) && !is.na(bid_stage[[field]][1])) {
-      audience <- tolower(bid_stage[[field]][1])
-      if (grepl("executive|manager|leadership", audience)) {
+      audience_val <- bid_stage[[field]][1]
+      audience_type <- classify_audience(audience_val)
+      if (audience_type == "executive") {
         context_terms <- c(context_terms, "value_box", "card", "summary")
       }
-      if (grepl("analyst|technical|developer", audience)) {
+      if (audience_type == "analyst") {
         context_terms <- c(context_terms, "datatable", "plotly", "interactive")
       }
-      if (grepl("mobile|field", audience)) {
+      if (audience_type == "operations" || grepl("mobile|field", tolower(audience_val))) {
         context_terms <- c(context_terms, "responsive", "touch", "mobile")
       }
     }

@@ -284,9 +284,9 @@ bid_quick_suggest <- function(
   # filter by package if specified
   if (!is.null(package) && nrow(filtered_suggestions) > 0) {
     package_clean <- tolower(trimws(package))
-    package_match <- sapply(filtered_suggestions$components, function(comp_vec) {
+    package_match <- vapply(filtered_suggestions$components, function(comp_vec) {
       any(grepl(package_clean, tolower(comp_vec), fixed = TRUE))
-    })
+    }, logical(1))
     filtered_suggestions <- filtered_suggestions[package_match, ]
   }
 
@@ -395,7 +395,7 @@ bid_quick_suggest <- function(
 
   for (concept_name in names(concept_patterns)) {
     keywords <- concept_patterns[[concept_name]]
-    if (any(sapply(keywords, function(k) grepl(k, text_lower, fixed = TRUE)))) {
+    if (any(vapply(keywords, function(k) grepl(k, text_lower, fixed = TRUE), logical(1)))) {
       detected <- c(detected, concept_name)
     }
   }
@@ -553,13 +553,13 @@ bid_quick_suggest <- function(
   }
 
   result <- tibble::tibble(
-    title = sapply(all_rows, function(x) x$title),
-    details = sapply(all_rows, function(x) x$details),
+    title = vapply(all_rows, function(x) x$title, character(1)),
+    details = vapply(all_rows, function(x) x$details, character(1)),
     components = lapply(all_rows, function(x) x$components[[1]]),
-    concept = sapply(all_rows, function(x) x$concept),
-    score = sapply(all_rows, function(x) x$score),
-    difficulty = sapply(all_rows, function(x) x$difficulty),
-    rationale = sapply(all_rows, function(x) x$rationale)
+    concept = vapply(all_rows, function(x) x$concept, character(1)),
+    score = vapply(all_rows, function(x) x$score, numeric(1)),
+    difficulty = vapply(all_rows, function(x) x$difficulty, character(1)),
+    rationale = vapply(all_rows, function(x) x$rationale, character(1))
   )
 
   # sort by score descending
@@ -587,7 +587,7 @@ bid_quick_suggest <- function(
     "shiny::helptext", "bslib::card_header",
     "bslib::value_box", "shiny::actionbutton"
   )
-  if (any(sapply(easy_patterns, function(p) grepl(p, components_str, fixed = TRUE)))) {
+  if (any(vapply(easy_patterns, function(p) grepl(p, components_str, fixed = TRUE), logical(1)))) {
     return("easy")
   }
 
@@ -597,7 +597,7 @@ bid_quick_suggest <- function(
     "shiny::modaldialog", "shinyjs", "plotly",
     "shiny::observeevent"
   )
-  if (any(sapply(advanced_patterns, function(p) grepl(p, components_str, fixed = TRUE)))) {
+  if (any(vapply(advanced_patterns, function(p) grepl(p, components_str, fixed = TRUE), logical(1)))) {
     return("advanced")
   }
 
@@ -641,9 +641,10 @@ bid_quick_suggest <- function(
 
   # boost if keywords match
   if (length(problem_keywords) > 0) {
-    matches <- sum(sapply(
+    matches <- sum(vapply(
       problem_keywords,
-      function(k) grepl(k, suggestion_text, fixed = TRUE)
+      function(k) grepl(k, suggestion_text, fixed = TRUE),
+      logical(1)
     ))
     if (matches > 0) {
       score <- score + (0.03 * matches)

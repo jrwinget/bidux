@@ -139,10 +139,10 @@ test_that("bid_interpret handles NULL/empty central_question by auto-suggestion"
 })
 
 test_that("bid_interpret handles NA central_question", {
-  # Current implementation has an issue with NA handling
+  # NA values should produce a clear error message
   expect_error(
     bid_interpret(central_question = NA),
-    "missing value where TRUE/FALSE needed"
+    "must not be.*NA"
   )
 })
 

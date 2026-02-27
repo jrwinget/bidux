@@ -5,8 +5,14 @@
 .Renviron
 .DS_Store
 inst/doc
-/doc/
-/Meta/
-.cache
+revdep/checks
+revdep/library
+TAGS
+.httr-oauth
 docs
+compile_commands.json
+.cache
 .vscode
+
+.claude
+CLAUDE.md

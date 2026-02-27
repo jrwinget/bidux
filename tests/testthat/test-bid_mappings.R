@@ -293,7 +293,7 @@ test_that(".suggest_theory_from_text internal helper works correctly", {
 })
 
 test_that(".suggest_theory_from_text shows messages when requested", {
-  expect_output(
+  expect_message(
     result <- bidux:::.suggest_theory_from_text(
       "Complex interface design",
       "Users report confusion",

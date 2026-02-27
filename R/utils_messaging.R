@@ -46,7 +46,7 @@ bid_message <- function(title, ..., quiet = NULL) {
     "\n",
     paste0("  - ", valid_bullets, collapse = "\n")
   )
-  cat(msg, "\n")
+  cli::cli_inform(msg)
   invisible(NULL)
 }
 
@@ -198,7 +198,7 @@ bid_alert_info <- function(..., quiet = NULL) {
     return(invisible(NULL))
   }
 
-  # otherwise, show the alert
-  cli::cli_alert_info(...)
+  # otherwise, show the alert (evaluate glue expressions in caller's environment)
+  cli::cli_alert_info(..., .envir = parent.frame())
   invisible(NULL)
 }

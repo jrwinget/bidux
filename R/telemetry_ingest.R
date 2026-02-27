@@ -1074,7 +1074,7 @@ read_telemetry_json <- function(path) {
           )
         })
 
-        events_list <- events_list[!sapply(events_list, is.null)]
+        events_list <- events_list[!vapply(events_list, is.null, logical(1))]
 
         if (length(events_list) == 0) {
           cli::cli_abort("No valid JSON could be parsed from file")
@@ -1089,7 +1089,7 @@ read_telemetry_json <- function(path) {
           return(NULL)
         })
 
-        valid_events <- valid_events[!sapply(valid_events, is.null)]
+        valid_events <- valid_events[!vapply(valid_events, is.null, logical(1))]
 
         if (length(valid_events) == 0) {
           cli::cli_abort("No valid events found in JSON file")

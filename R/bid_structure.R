@@ -81,7 +81,7 @@ bid_structure <- function(
     quiet = quiet
   )
 
-  concepts_detected <- sapply(suggestion_groups, function(g) g$concept)
+  concepts_detected <- vapply(suggestion_groups, function(g) g$concept, character(1))
   if (length(concepts_detected) == 0) {
     concepts_detected <- character(0)
   }

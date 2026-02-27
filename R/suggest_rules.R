@@ -20,10 +20,10 @@ get_consolidated_suggestion_rules <- function() {
             return(TRUE)
           }
 
-          complete_fields <- sum(sapply(story_fields, function(field) {
+          complete_fields <- sum(vapply(story_fields, function(field) {
             val <- story_data[[field]]
             !is.null(val) && !is.na(val) && nchar(trimws(as.character(val))) > 0
-          }))
+          }, logical(1)))
 
           complete_fields < 3 # less than 3 complete fields
         },
@@ -50,10 +50,10 @@ get_consolidated_suggestion_rules <- function() {
       list(
         condition = function(ctx) {
           audience_fields <- c("audience", "target_audience", "personas")
-          has_audience <- any(sapply(audience_fields, function(field) {
+          has_audience <- any(vapply(audience_fields, function(field) {
             val <- ctx[[field]]
             !is.null(val) && !is.na(val) && nchar(trimws(as.character(val))) > 0
-          }))
+          }, logical(1)))
           !has_audience
         },
         message = "Define your target audience or user personas to improve design focus"

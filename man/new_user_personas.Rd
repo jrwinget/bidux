@@ -18,13 +18,11 @@ Creates a structured user personas tibble for use in bidux functions.
 Replaces nested list structures with a validated data.frame structure.
 }
 \examples{
-\dontrun{
 personas <- new_user_personas(data.frame(
   name = c("data analyst", "product manager"),
   goals = c("quick insights", "strategic overview"),
   pain_points = c("complex tools", "data delays"),
   technical_level = c("intermediate", "beginner")
 ))
-}
 
 }

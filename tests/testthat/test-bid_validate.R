@@ -313,14 +313,14 @@ test_that("bid_validate handles empty string parameters", {
 test_that("bid_validate handles NA parameters", {
   structure_result <- create_complete_bid_workflow()
 
-  # current implementation has an issue with NA handling in if() conditions
+  # NA values should produce a clear error message
   expect_error(
     bid_validate(
       previous_stage = structure_result,
       summary_panel = NA_character_,
       collaboration = NA_character_
     ),
-    "missing value where TRUE/FALSE needed"
+    "must not be.*NA"
   )
 })
 

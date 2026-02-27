@@ -580,7 +580,7 @@ is_complete <- function(x) {
     "Anticipate",
     "Validate"
   )
-  present_stages <- sapply(x, get_stage)
+  present_stages <- vapply(x, get_stage, character(1))
 
   all(required_stages %in% present_stages)
 }

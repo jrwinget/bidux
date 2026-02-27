@@ -18,12 +18,10 @@ Creates a structured bias mitigations tibble for use in bidux functions.
 Replaces nested list structures with a validated data.frame structure.
 }
 \examples{
-\dontrun{
 mitigations <- new_bias_mitigations(data.frame(
   bias_type = c("confirmation_bias", "selection_bias"),
   mitigation_strategy = c("seek_disconfirming_evidence", "randomize_sample"),
   confidence_level = c(0.8, 0.7)
 ))
-}
 
 }

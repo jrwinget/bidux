@@ -108,15 +108,15 @@ test_that("bid_message respects quiet mode", {
 
   # test with quiet = FALSE
   options(bidux.quiet = FALSE)
-  expect_output(bid_message("Title", "Message 1", "Message 2"), "Title")
-  expect_output(bid_message("Title", "Message 1", "Message 2"), "Message 1")
+  expect_message(bid_message("Title", "Message 1", "Message 2"), "Title")
+  expect_message(bid_message("Title", "Message 1", "Message 2"), "Message 1")
 
   # test with quiet = TRUE
   options(bidux.quiet = TRUE)
   expect_silent(bid_message("Title", "Message 1", "Message 2"))
 
   # test parameter override
-  expect_output(bid_message("Title", "Message", quiet = FALSE), "Title")
+  expect_message(bid_message("Title", "Message", quiet = FALSE), "Title")
   expect_silent(bid_message("Title", "Message", quiet = TRUE))
 
   # test edge cases
