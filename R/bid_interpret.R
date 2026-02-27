@@ -89,7 +89,7 @@ bid_interpret <- function(
 
 
   # validate against NA values
-  if (!missing(central_question) && !is.null(central_question) && any(is.na(central_question))) {
+  if (!missing(central_question) && !is.null(central_question) && is.atomic(central_question) && any(is.na(central_question))) {
     cli::cli_abort(
       "Parameter {.arg central_question} must not be {.val NA}. Provide a valid question or omit to auto-generate."
     )

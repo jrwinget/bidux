@@ -46,7 +46,7 @@ bid_message <- function(title, ..., quiet = NULL) {
     "\n",
     paste0("  - ", valid_bullets, collapse = "\n")
   )
-  cli::cli_inform(msg)
+  message(msg)
   invisible(NULL)
 }
 

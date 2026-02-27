@@ -128,13 +128,13 @@ bid_validate <- function(
   validate_logical_param(include_empower_tools, "include_empower_tools")
 
   # validate against NA values for nullable string parameters
-  if (!is.null(summary_panel) && any(is.na(summary_panel))) {
+  if (!is.null(summary_panel) && is.atomic(summary_panel) && any(is.na(summary_panel))) {
     cli::cli_abort("Parameter {.arg summary_panel} must not be {.val NA}. Provide a valid string or leave as NULL.")
   }
-  if (!is.null(collaboration) && any(is.na(collaboration))) {
+  if (!is.null(collaboration) && is.atomic(collaboration) && any(is.na(collaboration))) {
     cli::cli_abort("Parameter {.arg collaboration} must not be {.val NA}. Provide a valid string or leave as NULL.")
   }
-  if (!is.null(next_steps) && any(is.na(next_steps))) {
+  if (!is.null(next_steps) && is.atomic(next_steps) && any(is.na(next_steps))) {
     cli::cli_abort("Parameter {.arg next_steps} must not be {.val NA}. Provide a valid string or leave as NULL.")
   }
 
