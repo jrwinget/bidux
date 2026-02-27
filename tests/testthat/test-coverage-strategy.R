@@ -162,14 +162,17 @@ test_that("formatting functions handle unicode and special characters", {
 
 test_that("print methods handle missing or NA values gracefully", {
   # test stage with many NA values
-  sparse_stage <- bid_stage("Notice", tibble::tibble(
-    stage = "Notice",
-    problem = "Test problem",
-    theory = NA,
-    evidence = NA,
-    suggestions = NA,
-    timestamp = Sys.time()
-  ))
+  sparse_stage <- bid_stage(
+    "Notice",
+    tibble::tibble(
+      stage = "Notice",
+      problem = "Test problem",
+      theory = NA,
+      evidence = NA,
+      suggestions = NA,
+      timestamp = Sys.time()
+    )
+  )
 
   expect_output(print(sparse_stage), "BID Framework")
   expect_output(print(sparse_stage), "Problem:")
@@ -233,17 +236,23 @@ test_that("concept detection handles complex text inputs", {
 
 test_that("workflow state handling covers edge cases", {
   # test workflow with out-of-order stages
-  stage1 <- bid_stage("Validate", tibble::tibble(
-    stage = "Validate",
-    summary_panel = "Test summary",
-    timestamp = Sys.time()
-  ))
+  stage1 <- bid_stage(
+    "Validate",
+    tibble::tibble(
+      stage = "Validate",
+      summary_panel = "Test summary",
+      timestamp = Sys.time()
+    )
+  )
 
-  stage2 <- bid_stage("Notice", tibble::tibble(
-    stage = "Notice",
-    problem = "Test problem",
-    timestamp = Sys.time()
-  ))
+  stage2 <- bid_stage(
+    "Notice",
+    tibble::tibble(
+      stage = "Notice",
+      problem = "Test problem",
+      timestamp = Sys.time()
+    )
+  )
 
   workflow <- bid_result(list(stage1, stage2))
   expect_false(is_complete(workflow))
@@ -255,12 +264,97 @@ test_that("workflow state handling covers edge cases", {
 
 test_that("metadata generation handles edge cases", {
   # test metadata with unusual custom fields
-  unusual_metadata <- get_stage_metadata(1, list(
-    unicode_field = "🎉 emoji value",
-    null_field = NULL,
-    nested_field = list(inner = "value")
-  ))
+  unusual_metadata <- get_stage_metadata(
+    1,
+    list(
+      unicode_field = "🎉 emoji value",
+      null_field = NULL,
+      nested_field = list(inner = "value")
+    )
+  )
 
   expect_type(unusual_metadata, "list")
   expect_equal(unusual_metadata$stage_number, 1)
+})
+
+# ==============================================================================
+# MAPPINGS ERROR AND WARNING PATH TESTS
+# ==============================================================================
+
+test_that("load_external_data errors when custom data missing required columns", {
+  # custom_data that lacks the required columns should trigger cli_abort
+  bad_custom <- data.frame(wrong_col = "value", stringsAsFactors = FALSE)
+
+  expect_error(
+    bidux:::load_external_data(
+      "theory_mappings.csv",
+      c("keywords", "theory", "confidence"),
+      bidux:::get_default_theory_mappings,
+      custom_data = bad_custom
+    ),
+    "Custom data must contain columns"
+  )
+})
+
+test_that("load_external_data returns custom data when columns present", {
+  # custom_data with correct columns should pass through
+  good_custom <- data.frame(
+    keywords = "test",
+    theory = "Test Theory",
+    confidence = 0.9,
+    stringsAsFactors = FALSE
+  )
+
+  result <- bidux:::load_external_data(
+    "theory_mappings.csv",
+    c("keywords", "theory", "confidence"),
+    bidux:::get_default_theory_mappings,
+    custom_data = good_custom
+  )
+
+  expect_equal(result$theory, "Test Theory")
+})
+
+test_that("suggest_theory_from_mappings errors when custom mappings missing required columns", {
+  # custom mappings without the required columns
+  bad_mappings <- data.frame(
+    bad_col = "test",
+    stringsAsFactors = FALSE
+  )
+
+  expect_error(
+    suggest_theory_from_mappings("too many options", mappings = bad_mappings),
+    "Custom mappings must contain columns"
+  )
+})
+
+test_that("suggest_theory_from_mappings works with valid custom mappings", {
+  custom_mappings <- data.frame(
+    keywords = "custom_keyword",
+    theory = "Custom Theory",
+    confidence = 0.95,
+    stringsAsFactors = FALSE
+  )
+
+  result <- suggest_theory_from_mappings(
+    "this has custom_keyword in it",
+    mappings = custom_mappings
+  )
+  expect_equal(result, "Custom Theory")
+})
+
+test_that("suggest_theory_from_mappings uses literal token matching for non-regex custom keywords", {
+  # custom mappings with plain text (no regex metacharacters)
+  custom_mappings <- data.frame(
+    keywords = "dashboard",
+    theory = "Dashboard Theory",
+    confidence = 0.85,
+    stringsAsFactors = FALSE
+  )
+
+  result <- suggest_theory_from_mappings(
+    "we need to fix the dashboard layout",
+    mappings = custom_mappings
+  )
+  expect_equal(result, "Dashboard Theory")
 })

@@ -128,7 +128,11 @@ test_that("deduplicate_warnings_suggestions handles empty inputs", {
 })
 
 test_that("deduplicate_warnings_suggestions handles different similarity thresholds", {
-  warnings <- c("Add more detail", "Include additional details", "Use different approach")
+  warnings <- c(
+    "Add more detail",
+    "Include additional details",
+    "Use different approach"
+  )
 
   # high threshold - less deduplication
   result_high <- deduplicate_warnings_suggestions(warnings, character(0), 0.9)
@@ -181,7 +185,10 @@ test_that("interpret stage rules work correctly", {
 
   # test central question rules
   short_question_context <- list(central_question = "Short?")
-  short_suggestions <- apply_suggestion_rules("interpret", short_question_context)
+  short_suggestions <- apply_suggestion_rules(
+    "interpret",
+    short_question_context
+  )
   expect_true(is.character(short_suggestions))
 
   long_question_context <- list(
@@ -192,7 +199,10 @@ test_that("interpret stage rules work correctly", {
 
   # test audience definition rules
   no_audience_context <- list(central_question = "Test question")
-  audience_suggestions <- apply_suggestion_rules("interpret", no_audience_context)
+  audience_suggestions <- apply_suggestion_rules(
+    "interpret",
+    no_audience_context
+  )
   expect_true(is.character(audience_suggestions))
 })
 
@@ -205,7 +215,10 @@ test_that("notice stage rules work correctly", {
 
   # test evidence strength rules
   short_evidence_context <- list(evidence = "Short")
-  evidence_suggestions <- apply_suggestion_rules("notice", short_evidence_context)
+  evidence_suggestions <- apply_suggestion_rules(
+    "notice",
+    short_evidence_context
+  )
   expect_true(is.character(evidence_suggestions))
 
   # test evidence with no quantitative data
@@ -218,7 +231,10 @@ test_that("notice stage rules work correctly", {
     problem = "Too many choices overwhelm users",
     theory = ""
   )
-  theory_suggestions <- apply_suggestion_rules("notice", complexity_problem_context)
+  theory_suggestions <- apply_suggestion_rules(
+    "notice",
+    complexity_problem_context
+  )
   expect_true(is.character(theory_suggestions))
 
   # test evidence-theory alignment
@@ -251,7 +267,10 @@ test_that("validate stage rules work correctly", {
   no_timeline_context <- list(
     validation_steps = "Test with users and collect feedback"
   )
-  timeline_suggestions <- apply_suggestion_rules("validate", no_timeline_context)
+  timeline_suggestions <- apply_suggestion_rules(
+    "validate",
+    no_timeline_context
+  )
   expect_true(is.character(timeline_suggestions))
 
   # test user testing integration rules
@@ -285,8 +304,14 @@ test_that("apply_suggestion_rules handles rule evaluation errors", {
 # test edge cases in deduplicate_warnings_suggestions
 test_that("deduplicate_warnings_suggestions handles edge cases", {
   # test with very similar warnings and suggestions
-  warnings <- c("Add more detail to your analysis", "Include more detailed analysis")
-  suggestions <- c("Consider adding detailed analysis", "Try more comprehensive approach")
+  warnings <- c(
+    "Add more detail to your analysis",
+    "Include more detailed analysis"
+  )
+  suggestions <- c(
+    "Consider adding detailed analysis",
+    "Try more comprehensive approach"
+  )
 
   result <- deduplicate_warnings_suggestions(warnings, suggestions, 0.6)
   expect_true(is.list(result))
@@ -296,7 +321,10 @@ test_that("deduplicate_warnings_suggestions handles edge cases", {
   # test with single item arrays
   single_warning <- "Single warning"
   single_suggestion <- "Single suggestion"
-  single_result <- deduplicate_warnings_suggestions(single_warning, single_suggestion)
+  single_result <- deduplicate_warnings_suggestions(
+    single_warning,
+    single_suggestion
+  )
   expect_equal(length(single_result$warnings), 1)
   expect_equal(length(single_result$suggestions), 1)
 
@@ -310,7 +338,13 @@ test_that("deduplicate_warnings_suggestions handles edge cases", {
 # test get_fallback_suggestion for edge cases
 test_that("get_fallback_suggestion handles all cases", {
   # test known stages
-  known_stages <- c("Interpret", "Notice", "Anticipate", "Structure", "Validate")
+  known_stages <- c(
+    "Interpret",
+    "Notice",
+    "Anticipate",
+    "Structure",
+    "Validate"
+  )
   for (stage in known_stages) {
     fallback <- get_fallback_suggestion(stage)
     expect_true(is.character(fallback))
@@ -343,9 +377,15 @@ test_that("deduplicate_warnings_suggestions word overlap works", {
   no_overlap_warnings <- c("Check your calculations")
   no_overlap_suggestions <- c("Review user feedback")
 
-  no_overlap_result <- deduplicate_warnings_suggestions(no_overlap_warnings, no_overlap_suggestions)
+  no_overlap_result <- deduplicate_warnings_suggestions(
+    no_overlap_warnings,
+    no_overlap_suggestions
+  )
   expect_equal(length(no_overlap_result$warnings), length(no_overlap_warnings))
-  expect_equal(length(no_overlap_result$suggestions), length(no_overlap_suggestions))
+  expect_equal(
+    length(no_overlap_result$suggestions),
+    length(no_overlap_suggestions)
+  )
 })
 
 # test all rule conditions can be evaluated
@@ -383,7 +423,11 @@ test_that("all consolidated rules have valid conditions", {
 
     for (i in seq_along(stage_rules)) {
       rule <- stage_rules[[i]]
-      if (is.list(rule) && "condition" %in% names(rule) && "message" %in% names(rule)) {
+      if (
+        is.list(rule) &&
+          "condition" %in% names(rule) &&
+          "message" %in% names(rule)
+      ) {
         # should not throw error
         expect_silent({
           if (is.function(rule$condition)) {
@@ -424,4 +468,49 @@ test_that("apply_suggestion_rules handles different context structures", {
   )
   nested_suggestions <- apply_suggestion_rules("interpret", nested_context)
   expect_true(is.character(nested_suggestions))
+})
+
+# ==============================================================================
+# EVALUATE_SUGGESTION_CONDITION WARNING PATH COVERAGE
+# ==============================================================================
+
+test_that("evaluate_suggestion_condition warns on non-function condition", {
+  context <- list(problem = "test")
+  expect_warning(
+    result <- bidux:::evaluate_suggestion_condition("not a function", context),
+    "not a function"
+  )
+  expect_false(result)
+})
+
+test_that("evaluate_suggestion_condition warns on non-logical condition result", {
+  # condition that returns a character instead of logical
+  bad_condition <- function(ctx) "not logical"
+  context <- list(problem = "test")
+  expect_warning(
+    result <- bidux:::evaluate_suggestion_condition(bad_condition, context),
+    "non-logical"
+  )
+  expect_false(result)
+})
+
+test_that("evaluate_suggestion_condition warns on multi-value condition result", {
+  # condition that returns a vector of length > 1
+  multi_condition <- function(ctx) c(TRUE, FALSE)
+  context <- list(problem = "test")
+  expect_warning(
+    result <- bidux:::evaluate_suggestion_condition(multi_condition, context),
+    "multi-value"
+  )
+  expect_false(result)
+})
+
+test_that("evaluate_suggestion_condition warns on error during evaluation", {
+  error_condition <- function(ctx) stop("intentional test error")
+  context <- list(problem = "test")
+  expect_warning(
+    result <- bidux:::evaluate_suggestion_condition(error_condition, context),
+    "Error evaluating"
+  )
+  expect_false(result)
 })

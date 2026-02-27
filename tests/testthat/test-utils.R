@@ -3,9 +3,10 @@
 # ==============================================================================
 
 create_test_stage <- function(
-    stage_name = "Notice",
-    problem = "Test problem",
-    evidence = "Test evidence") {
+  stage_name = "Notice",
+  problem = "Test problem",
+  evidence = "Test evidence"
+) {
   tibble::tibble(
     stage = stage_name,
     problem = problem,
@@ -320,13 +321,21 @@ test_that("safe_df_check works correctly", {
 })
 
 test_that("safe_column_access works correctly", {
-  test_df <- data.frame(a = c(1, 2), b = c("x", "y"), c = c(NA, "z"), d = c(NA, NA))
+  test_df <- data.frame(
+    a = c(1, 2),
+    b = c("x", "y"),
+    c = c(NA, "z"),
+    d = c(NA, NA)
+  )
 
   expect_equal(safe_column_access(test_df, "a"), 1)
   expect_equal(safe_column_access(test_df, "b"), "x")
   expect_equal(safe_column_access(test_df, "missing", "default"), "default")
   expect_equal(safe_column_access(NULL, "a", "default"), "default")
-  expect_equal(safe_column_access(test_df, "c", default = "custom"), NA_character_)
+  expect_equal(
+    safe_column_access(test_df, "c", default = "custom"),
+    NA_character_
+  )
   expect_equal(safe_column_access(test_df, "d", "custom"), "custom")
 })
 
@@ -540,7 +549,10 @@ test_that("safe_data_story_access works with new_data_story format", {
 
   expect_equal(safe_data_story_access(data_story, "hook"), "Test hook")
   expect_equal(safe_data_story_access(data_story, "context"), "Test context")
-  expect_equal(safe_data_story_access(data_story, "resolution"), "Test resolution")
+  expect_equal(
+    safe_data_story_access(data_story, "resolution"),
+    "Test resolution"
+  )
   expect_true(is.na(safe_data_story_access(data_story, "missing")))
   expect_true(is.na(safe_data_story_access(NULL, "hook")))
 })
@@ -557,11 +569,26 @@ test_that("safe_data_story_access works with new flat format", {
   )
 
   expect_equal(safe_data_story_access(data_story_flat, "hook"), "Flat hook")
-  expect_equal(safe_data_story_access(data_story_flat, "context"), "Flat context")
-  expect_equal(safe_data_story_access(data_story_flat, "tension"), "Flat tension")
-  expect_equal(safe_data_story_access(data_story_flat, "resolution"), "Flat resolution")
-  expect_equal(safe_data_story_access(data_story_flat, "audience"), "test audience")
-  expect_equal(safe_data_story_access(data_story_flat, "metrics"), "metric1, metric2")
+  expect_equal(
+    safe_data_story_access(data_story_flat, "context"),
+    "Flat context"
+  )
+  expect_equal(
+    safe_data_story_access(data_story_flat, "tension"),
+    "Flat tension"
+  )
+  expect_equal(
+    safe_data_story_access(data_story_flat, "resolution"),
+    "Flat resolution"
+  )
+  expect_equal(
+    safe_data_story_access(data_story_flat, "audience"),
+    "test audience"
+  )
+  expect_equal(
+    safe_data_story_access(data_story_flat, "metrics"),
+    "metric1, metric2"
+  )
 })
 
 
@@ -718,4 +745,140 @@ test_that("functions are deterministic and consistent", {
   expect_silent(
     validate_required_params(problem = test_problem, evidence = "test")
   )
+})
+
+# ==============================================================================
+# VALIDATE_CHARACTER_PARAM_LEGACY ERROR BRANCH COVERAGE
+# ==============================================================================
+
+test_that("validate_character_param_legacy errors on NULL when not allowed", {
+  expect_error(
+    bidux:::validate_character_param_legacy(NULL, "my_param"),
+    "my_param.*cannot be NULL"
+  )
+})
+
+test_that("validate_character_param_legacy allows NULL when allow_null is TRUE", {
+  expect_silent(
+    bidux:::validate_character_param_legacy(NULL, "my_param", allow_null = TRUE)
+  )
+})
+
+test_that("validate_character_param_legacy errors on non-character input", {
+  expect_error(
+    bidux:::validate_character_param_legacy(123, "my_param"),
+    "my_param.*must be a single character string"
+  )
+})
+
+test_that("validate_character_param_legacy errors on vector of length > 1", {
+  expect_error(
+    bidux:::validate_character_param_legacy(c("a", "b"), "my_param"),
+    "my_param.*must be a single character string"
+  )
+})
+
+test_that("validate_character_param_legacy errors on empty/whitespace string", {
+  expect_error(
+    bidux:::validate_character_param_legacy("", "my_param"),
+    "my_param.*cannot be empty"
+  )
+  expect_error(
+    bidux:::validate_character_param_legacy("   ", "my_param"),
+    "my_param.*cannot be empty"
+  )
+})
+
+# ==============================================================================
+# VALIDATE_LIST_PARAM ERROR BRANCH COVERAGE
+# ==============================================================================
+
+test_that("validate_list_param errors on NULL when allow_null is FALSE", {
+  expect_error(
+    bidux:::validate_list_param(NULL, "my_list", allow_null = FALSE),
+    "my_list.*cannot be NULL"
+  )
+})
+
+test_that("validate_list_param errors on non-list input", {
+  expect_error(
+    bidux:::validate_list_param("not a list", "my_list"),
+    "my_list.*must be a list"
+  )
+  expect_error(
+    bidux:::validate_list_param(42, "my_list"),
+    "my_list.*must be a list"
+  )
+})
+
+test_that("validate_list_param errors when required names are missing", {
+  test_list <- list(a = 1, b = 2)
+  expect_error(
+    bidux:::validate_list_param(
+      test_list,
+      "my_list",
+      required_names = c("a", "c")
+    ),
+    "my_list.*missing required elements.*c"
+  )
+})
+
+# ==============================================================================
+# VALIDATE_PARAM EDGE CASES FOR COVERAGE
+# ==============================================================================
+
+test_that("validate_param detects wrong logical type", {
+  expect_error(
+    validate_param("true", "flag", "logical"),
+    "flag.*must be a.*logical"
+  )
+})
+
+test_that("validate_param enforces single logical with max_length = 1", {
+  # NA logical with max_length = 1 triggers special case
+  expect_error(
+    validate_param(NA, "flag", "logical", max_length = 1),
+    "flag"
+  )
+})
+
+# ==============================================================================
+# CLASSIFY_AUDIENCE BRANCH COVERAGE
+# ==============================================================================
+
+test_that("classify_audience returns all 5 categories", {
+  # executive
+
+  expect_equal(
+    bidux:::classify_audience("Executive leadership team"),
+    "executive"
+  )
+  expect_equal(bidux:::classify_audience("C-suite directors"), "executive")
+
+  # analyst
+  expect_equal(bidux:::classify_audience("Data scientist team"), "analyst")
+  expect_equal(bidux:::classify_audience("Statistician group"), "analyst")
+
+  # marketing
+  expect_equal(bidux:::classify_audience("Marketing department"), "marketing")
+  expect_equal(
+    bidux:::classify_audience("Sales and business development"),
+    "marketing"
+  )
+
+  # operations
+  expect_equal(bidux:::classify_audience("Operations team"), "operations")
+  expect_equal(
+    bidux:::classify_audience("Clinical frontline workers"),
+    "operations"
+  )
+
+  # general (fallback)
+  expect_equal(bidux:::classify_audience("General public"), "general")
+  expect_equal(bidux:::classify_audience("Random users"), "general")
+
+  # edge cases
+  expect_equal(bidux:::classify_audience(NULL), "general")
+  expect_equal(bidux:::classify_audience(""), "general")
+  expect_equal(bidux:::classify_audience("   "), "general")
 })

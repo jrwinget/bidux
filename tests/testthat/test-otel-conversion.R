@@ -8,7 +8,11 @@ test_that("session_start span converts to login event", {
   skip_if_no_otel()
 
   # create session_start span
-  spans <- create_mock_otel_spans(sessions = 1, reactives_per_session = 0, outputs_per_session = 0)
+  spans <- create_mock_otel_spans(
+    sessions = 1,
+    reactives_per_session = 0,
+    outputs_per_session = 0
+  )
   session_span <- spans[spans$name == "session_start", ]
 
   # convert to events
@@ -34,7 +38,11 @@ test_that("session_start span converts to login event", {
 test_that("session_end span converts correctly", {
   skip_if_no_otel()
 
-  spans <- create_mock_otel_spans(sessions = 1, reactives_per_session = 0, outputs_per_session = 0)
+  spans <- create_mock_otel_spans(
+    sessions = 1,
+    reactives_per_session = 0,
+    outputs_per_session = 0
+  )
   end_span <- spans[spans$name == "session_end", ]
 
   events <- bidux:::convert_otel_spans_to_events(end_span)
@@ -50,7 +58,11 @@ test_that("session_end span converts correctly", {
 test_that("output span converts to output event", {
   skip_if_no_otel()
 
-  spans <- create_mock_otel_spans(sessions = 1, reactives_per_session = 0, outputs_per_session = 3)
+  spans <- create_mock_otel_spans(
+    sessions = 1,
+    reactives_per_session = 0,
+    outputs_per_session = 3
+  )
   output_spans <- spans[grepl("^output:", spans$name), ]
 
   expect_gt(nrow(output_spans), 0)
@@ -73,13 +85,19 @@ test_that("output span converts to output event", {
 test_that("output span calculates duration_ms correctly", {
   skip_if_no_otel()
 
-  spans <- create_mock_otel_spans(sessions = 1, reactives_per_session = 0, outputs_per_session = 2)
+  spans <- create_mock_otel_spans(
+    sessions = 1,
+    reactives_per_session = 0,
+    outputs_per_session = 2
+  )
   output_spans <- spans[grepl("^output:", spans$name), ]
 
   events <- bidux:::convert_otel_spans_to_events(output_spans)
 
   # verify duration calculation
-  expect_true("duration_ms" %in% names(events) || "render_time" %in% names(events))
+  expect_true(
+    "duration_ms" %in% names(events) || "render_time" %in% names(events)
+  )
 
   # duration should be positive
   if ("duration_ms" %in% names(events)) {
@@ -95,7 +113,11 @@ test_that("output span calculates duration_ms correctly", {
 test_that("reactive span converts to input event", {
   skip_if_no_otel()
 
-  spans <- create_mock_otel_spans(sessions = 1, reactives_per_session = 5, outputs_per_session = 0)
+  spans <- create_mock_otel_spans(
+    sessions = 1,
+    reactives_per_session = 5,
+    outputs_per_session = 0
+  )
   reactive_spans <- spans[spans$name == "reactive", ]
 
   expect_gt(nrow(reactive_spans), 0)
@@ -114,7 +136,11 @@ test_that("reactive span converts to input event", {
 test_that("reactive span extracts input_id from attributes", {
   skip_if_no_otel()
 
-  spans <- create_mock_otel_spans(sessions = 1, reactives_per_session = 3, outputs_per_session = 0)
+  spans <- create_mock_otel_spans(
+    sessions = 1,
+    reactives_per_session = 3,
+    outputs_per_session = 0
+  )
   reactive_spans <- spans[spans$name == "reactive", ]
 
   events <- bidux:::convert_otel_spans_to_events(reactive_spans)
@@ -244,7 +270,11 @@ test_that("unix nanosecond to POSIXct conversion is accurate", {
   events <- bidux:::convert_otel_spans_to_events(test_span)
 
   # converted timestamp should match original
-  expect_equal(as.numeric(events$timestamp[1]), as.numeric(test_time), tolerance = 1)
+  expect_equal(
+    as.numeric(events$timestamp[1]),
+    as.numeric(test_time),
+    tolerance = 1
+  )
 })
 
 test_that("span timestamp timezone handling", {
@@ -356,7 +386,9 @@ test_that("navigation span converts correctly", {
     events <- bidux:::convert_otel_spans_to_events(nav_spans)
 
     # should create navigation events
-    expect_true("navigation" %in% events$event_type || "nav" %in% events$event_type)
+    expect_true(
+      "navigation" %in% events$event_type || "nav" %in% events$event_type
+    )
 
     # should have navigation_id
     expect_true("navigation_id" %in% names(events) || "page" %in% names(events))
@@ -411,7 +443,11 @@ test_that("trace_id preserved for correlation", {
 test_that("conversion handles all shiny span types", {
   skip_if_no_otel()
 
-  spans <- create_mock_otel_spans(sessions = 2, reactives_per_session = 5, outputs_per_session = 3)
+  spans <- create_mock_otel_spans(
+    sessions = 2,
+    reactives_per_session = 5,
+    outputs_per_session = 3
+  )
 
   events <- bidux:::convert_otel_spans_to_events(spans)
 
@@ -505,7 +541,11 @@ test_that("ExtendedTask spans convert correctly", {
 test_that("conversion preserves all required shiny.telemetry fields", {
   skip_if_no_otel()
 
-  spans <- create_mock_otel_spans(sessions = 1, reactives_per_session = 3, outputs_per_session = 2)
+  spans <- create_mock_otel_spans(
+    sessions = 1,
+    reactives_per_session = 3,
+    outputs_per_session = 2
+  )
 
   events <- bidux:::convert_otel_spans_to_events(spans)
 
@@ -629,4 +669,142 @@ test_that("conversion de-duplicates identical spans", {
   # should not double-count events (if de-duplication implemented)
   # or should handle gracefully
   expect_true(is.data.frame(events))
+})
+
+# ============================================================================
+# extract_span_attribute BRANCH COVERAGE TESTS
+# ============================================================================
+
+test_that("extract_span_attribute returns NA for NULL or empty input", {
+  # null input
+
+  result_null <- bidux:::extract_span_attribute(NULL, c("key1"))
+  expect_equal(result_null, NA_character_)
+
+  # empty list
+  result_empty <- bidux:::extract_span_attribute(list(), c("key1"))
+  expect_equal(result_empty, NA_character_)
+
+  # zero-length vector
+  result_zero <- bidux:::extract_span_attribute(character(0), c("key1"))
+  expect_equal(result_zero, NA_character_)
+})
+
+test_that("extract_span_attribute handles data.frame with direct column names", {
+  # data.frame where the key is a column name with a value in it
+  attrs_df <- data.frame(
+    session.id = "sess_001",
+    input_id = "slider1",
+    stringsAsFactors = FALSE
+  )
+
+  result <- bidux:::extract_span_attribute(attrs_df, c("session.id"))
+  expect_equal(result, "sess_001")
+
+  result2 <- bidux:::extract_span_attribute(attrs_df, c("input_id"))
+  expect_equal(result2, "slider1")
+
+  # key not found
+  result_missing <- bidux:::extract_span_attribute(attrs_df, c("nonexistent"))
+  expect_equal(result_missing, NA_character_)
+})
+
+test_that("extract_span_attribute handles data.frame with key/value columns", {
+  # data.frame in key/value format (e.g., from sqlite attribute tables)
+  attrs_kv <- data.frame(
+    key = c("session.id", "input_id", "output_id"),
+    value = c("sess_002", "slider1", "plot1"),
+    stringsAsFactors = FALSE
+  )
+
+  result <- bidux:::extract_span_attribute(attrs_kv, c("session.id"))
+  expect_equal(result, "sess_002")
+
+  result2 <- bidux:::extract_span_attribute(
+    attrs_kv,
+    c("input_id", "widget_id")
+  )
+  expect_equal(result2, "slider1")
+
+  # key not found in key/value columns
+  result_missing <- bidux:::extract_span_attribute(attrs_kv, c("nonexistent"))
+  expect_equal(result_missing, NA_character_)
+})
+
+test_that("extract_span_attribute handles named list", {
+  # named list (simple key=value pairs)
+  attrs_named <- list(
+    session.id = "sess_003",
+    input_id = "text_input"
+  )
+
+  result <- bidux:::extract_span_attribute(attrs_named, c("session.id"))
+  expect_equal(result, "sess_003")
+
+  result2 <- bidux:::extract_span_attribute(attrs_named, c("input_id"))
+  expect_equal(result2, "text_input")
+
+  # key not present
+  result_missing <- bidux:::extract_span_attribute(attrs_named, c("missing"))
+  expect_equal(result_missing, NA_character_)
+})
+
+test_that("extract_span_attribute handles list-of-objects with stringValue", {
+  # otlp-style list of {key, value: {stringValue: ...}} objects
+  attrs_otlp <- list(
+    list(key = "session.id", value = list(stringValue = "sess_004")),
+    list(key = "input_id", value = list(stringValue = "dropdown1"))
+  )
+
+  result <- bidux:::extract_span_attribute(attrs_otlp, c("session.id"))
+  expect_equal(result, "sess_004")
+
+  result2 <- bidux:::extract_span_attribute(attrs_otlp, c("input_id"))
+  expect_equal(result2, "dropdown1")
+})
+
+test_that("extract_span_attribute handles list-of-objects with intValue fallback", {
+  # otlp-style attribute with intValue instead of stringValue
+  attrs_int <- list(
+    list(key = "http.status_code", value = list(intValue = 200)),
+    list(key = "request.size", value = list(intValue = 1024))
+  )
+
+  result <- bidux:::extract_span_attribute(attrs_int, c("http.status_code"))
+  expect_equal(result, "200")
+
+  result2 <- bidux:::extract_span_attribute(attrs_int, c("request.size"))
+  expect_equal(result2, "1024")
+})
+
+test_that("extract_span_attribute handles list-of-objects with plain value", {
+  # otlp-style attribute with plain value (no stringValue/intValue wrapper)
+  attrs_plain <- list(
+    list(key = "custom.attr", value = "plain_value")
+  )
+
+  result <- bidux:::extract_span_attribute(attrs_plain, c("custom.attr"))
+  expect_equal(result, "plain_value")
+})
+
+test_that("extract_span_attribute tries multiple key names in order", {
+  # should find first matching key from the provided vector
+  attrs <- list(
+    list(key = "widget_id", value = list(stringValue = "found_widget"))
+  )
+
+  # "input_id" not present but "widget_id" is the second candidate
+  result <- bidux:::extract_span_attribute(attrs, c("input_id", "widget_id"))
+  expect_equal(result, "found_widget")
+})
+
+test_that("extract_span_attribute skips NA values in data.frame columns", {
+  # data.frame where the matched column has NA
+  attrs_na <- data.frame(
+    session.id = NA_character_,
+    stringsAsFactors = FALSE
+  )
+
+  result <- bidux:::extract_span_attribute(attrs_na, c("session.id"))
+  expect_equal(result, NA_character_)
 })
