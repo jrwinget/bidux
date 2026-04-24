@@ -210,6 +210,65 @@ suggest_theory_from_mappings <- function(
   )
 }
 
+#' Load pattern-to-concept mappings from external file or defaults
+#'
+#' @description
+#' Loads the structured mapping table used by `match_signal_to_concept()`
+#' to resolve telemetry pattern signals to BID concepts. Mirrors the
+#' conventions of the other `load_*_mappings()` helpers in this file.
+#'
+#' @param custom_mappings Optional custom mappings data frame.
+#' @return Data frame with pattern-to-concept mappings.
+#' @keywords internal
+#' @noRd
+load_pattern_concept_mappings <- function(custom_mappings = NULL) {
+  load_external_data(
+    "pattern_concept_mappings.csv",
+    c(
+      "pattern_type", "subtype", "feature_predicate",
+      "concept", "stage", "confidence"
+    ),
+    get_default_pattern_concept_mappings,
+    custom_mappings
+  )
+}
+
+#' Get default pattern-to-concept mappings (fallback when CSV is absent).
+#'
+#' @return Data frame with the same columns as the shipped CSV.
+#' @keywords internal
+#' @noRd
+get_default_pattern_concept_mappings <- function() {
+  data.frame(
+    pattern_type = c(
+      "unused_input",
+      "delayed_interaction",
+      "error_pattern",
+      "navigation_dropoff",
+      "confusion_pattern"
+    ),
+    subtype = rep(NA_character_, 5),
+    feature_predicate = rep(NA_character_, 5),
+    concept = c(
+      "Cognitive Load Theory",
+      "Cognitive Load Theory",
+      "Hick's Law",
+      "Information Scent",
+      "Cognitive Load Theory"
+    ),
+    stage = rep("Notice", 5),
+    confidence = c(0.7, 0.8, 0.8, 0.8, 0.8),
+    rationale_citation = c(
+      "Sweller (1988)",
+      "Sweller (1988)",
+      "Hick (1952)",
+      "Pirolli & Card (1999)",
+      "Sweller (1988)"
+    ),
+    stringsAsFactors = FALSE
+  )
+}
+
 #' Load concept-bias mappings
 #'
 #' @param custom_mappings Optional custom mappings data frame

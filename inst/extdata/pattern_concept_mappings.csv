@@ -1,0 +1,6 @@
+pattern_type,subtype,feature_predicate,concept,stage,confidence,rationale_citation
+unused_input,,,Cognitive Load Theory,Notice,0.7,Sweller (1988)
+delayed_interaction,,,Cognitive Load Theory,Notice,0.8,Sweller (1988)
+error_pattern,,,Hick's Law,Notice,0.8,Hick (1952)
+navigation_dropoff,,,Information Scent,Notice,0.8,Pirolli & Card (1999)
+confusion_pattern,,,Cognitive Load Theory,Notice,0.8,Sweller (1988)
