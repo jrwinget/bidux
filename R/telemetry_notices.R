@@ -25,6 +25,46 @@ create_telemetry_notice <- function(
   )
 }
 
+#' Create a Notice stage for an entry-anchoring pattern
+#'
+#' @param info List returned by `find_entry_anchoring()`.
+#' @return `bid_stage` object in the Notice stage.
+#' @keywords internal
+#' @noRd
+create_entry_anchoring_notice <- function(info) {
+  signal <- bid_pattern_signal(
+    pattern_type = "entry_anchor",
+    features = list(
+      anchored_rate = as.numeric(info$anchored_rate),
+      anchored_count = as.integer(info$anchored_count),
+      qualifying_sessions = as.integer(info$qualifying_sessions),
+      min_navs = as.integer(info$min_navs),
+      fixation_threshold = as.numeric(info$fixation_threshold)
+    )
+  )
+  theory <- match_signal_to_concept(signal)$concept
+
+  problem <- paste(
+    "Users tend to anchor on the entry page rather than exploring",
+    "the rest of the dashboard"
+  )
+
+  evidence <- sprintf(
+    "%d of %d multi-page sessions (%.1f%%) spent at least %.0f%% of their navigation on the entry page",
+    info$anchored_count,
+    info$qualifying_sessions,
+    info$anchored_rate * 100,
+    info$fixation_threshold * 100
+  )
+
+  create_telemetry_notice(
+    central_question = "How can we encourage users to explore beyond the entry view?",
+    problem = problem,
+    evidence = evidence,
+    theory = theory
+  )
+}
+
 #' Create a Notice stage for a peak-end pattern
 #'
 #' @param peak_end_info List returned by `find_peak_end_patterns()`.
@@ -407,6 +447,7 @@ create_confusion_notice <- function(confusion_info, total_sessions, events = NUL
     has_confusion_patterns = any(grepl("confusion", issues_tbl$issue_type), na.rm = TRUE),
     has_delay_issues = any(grepl("delay", issues_tbl$issue_type), na.rm = TRUE),
     has_peak_end_issues = any(grepl("peak_end", issues_tbl$issue_type), na.rm = TRUE),
+    has_entry_anchoring = any(grepl("entry_anchor", issues_tbl$issue_type), na.rm = TRUE),
     session_count = length(unique(events$session_id)),
     analysis_timestamp = Sys.time()
   )
@@ -441,6 +482,9 @@ create_confusion_notice <- function(confusion_info, total_sessions, events = NUL
   }
   if (grepl("^peak_end", issue_key)) {
     return("peak_end_experience")
+  }
+  if (grepl("^entry_anchor", issue_key)) {
+    return("entry_anchoring")
   }
   return("unknown")
 }
@@ -542,9 +586,10 @@ create_confusion_notice <- function(confusion_info, total_sessions, events = NUL
     } else {
       0.0
     }
-  } else if (grepl("^peak_end", issue_key)) {
-    # extract the session count from the evidence text
-    # (evidence format: "N of M sessions (X.X%) had an error in the last S seconds")
+  } else if (grepl("^peak_end", issue_key) || grepl("^entry_anchor", issue_key)) {
+    # both patterns emit evidence of the form "... (X.X%) ...", where the
+    # pct is the fraction of sessions the pattern affects. extract it and
+    # fall back to a conservative estimate if parsing fails.
     rate <- NA_real_
     if (
       is.data.frame(notice) && "evidence" %in% names(notice) &&
