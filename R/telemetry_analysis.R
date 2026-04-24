@@ -23,10 +23,21 @@ confusion_min_sessions <- 2 # minimum affected sessions
 )
 
 #' Find unused or under-used inputs
-#' @param events Telemetry events data frame
-#' @param threshold Percentage threshold for considering input unused
-#' @return List of unused input information
+#'
+#' @description
+#' Flags inputs whose session-level usage rate is at or below `threshold`.
+#' Each flagged record is then classified into a subtype that downstream
+#' notice construction routes to a specific BID concept via the signal
+#' matcher (see `classify_unused_input_subtype()`).
+#'
+#' @param events Telemetry events data frame.
+#' @param threshold Usage-rate threshold at or below which an input is
+#'   considered unused.
+#' @return List of per-input records, each with `input_id`, `sessions_used`,
+#'   `usage_rate`, `subtype`, and `features` (a named list of measured
+#'   features for signal matching).
 #' @keywords internal
+#' @noRd
 find_unused_inputs <- function(events, threshold = unused_input_threshold) {
   input_events <- events[events$event_type == "input", ]
 
@@ -46,9 +57,9 @@ find_unused_inputs <- function(events, threshold = unused_input_threshold) {
       is_unused = usage_rate <= threshold
     )
 
-  # also find inputs that appear in UI but were never used
-  # (this would require knowledge of all available inputs, which we don't have
-  # from telemetry alone, so we focus on rarely used inputs)
+  # we can only see inputs that were touched at least once in telemetry.
+  # inputs that rendered but were never touched by anyone are invisible to
+  # the detector and would require UI-side introspection to recover.
 
   unused_inputs <- input_usage[input_usage$is_unused, ]
 
@@ -56,16 +67,104 @@ find_unused_inputs <- function(events, threshold = unused_input_threshold) {
     return(list())
   }
 
-  # convert to list format for easier processing
-  result <- lapply(seq_len(nrow(unused_inputs)), function(i) {
+  lapply(seq_len(nrow(unused_inputs)), function(i) {
+    input_id <- unused_inputs$input_id[i]
+    sessions_used <- unused_inputs$sessions_used[i]
+    usage_rate <- unused_inputs$usage_rate[i]
+
+    classification <- classify_unused_input_subtype(
+      input_id = input_id,
+      events = events,
+      sessions_used = sessions_used,
+      total_sessions = total_sessions
+    )
+
     list(
-      input_id = unused_inputs$input_id[i],
-      sessions_used = unused_inputs$sessions_used[i],
-      usage_rate = unused_inputs$usage_rate[i]
+      input_id = input_id,
+      sessions_used = sessions_used,
+      usage_rate = usage_rate,
+      subtype = classification$subtype,
+      features = classification$features
     )
   })
+}
 
-  return(result)
+#' Classify an unused input into a behavioral subtype
+#'
+#' @description
+#' Given a flagged input, inspect its event trace to decide which subtype
+#' best matches the observed behavior: `default_kept` (all touches land
+#' on a single value), `touched_once_abandoned` (median touches per
+#' session is 1 and values varied), or `rarely_used` (catch-all).
+#'
+#' @param input_id The input identifier.
+#' @param events Full events data frame.
+#' @param sessions_used Count of distinct sessions that touched the input.
+#' @param total_sessions Total distinct sessions in the analysis window.
+#'
+#' @return A list with `subtype` (character) and `features` (named list
+#'   of scalar measurements for signal matching).
+#' @keywords internal
+#' @noRd
+classify_unused_input_subtype <- function(
+    input_id,
+    events,
+    sessions_used,
+    total_sessions) {
+  input_events <- events[
+    events$event_type == "input" &
+      !is.na(events$input_id) &
+      events$input_id == input_id,
+    ,
+    drop = FALSE
+  ]
+
+  # per-session touch counts among sessions that touched this input
+  sess_counts <- if (nrow(input_events) > 0L) {
+    as.integer(table(input_events$session_id))
+  } else {
+    integer(0L)
+  }
+  touch_count_median <- if (length(sess_counts) > 0L) {
+    stats::median(sess_counts)
+  } else {
+    NA_real_
+  }
+
+  # unique non-empty value count (only if the value column exists)
+  value_unique <- NA_integer_
+  if ("value" %in% names(events) && nrow(input_events) > 0L) {
+    vals <- as.character(input_events$value)
+    non_na <- vals[!is.na(vals) & nzchar(vals)]
+    if (length(non_na) > 0L) {
+      value_unique <- length(unique(non_na))
+    }
+  }
+
+  features <- list(
+    sessions_used = as.integer(sessions_used),
+    usage_rate = if (total_sessions > 0L) {
+      sessions_used / total_sessions
+    } else {
+      0
+    }
+  )
+  if (!is.na(touch_count_median)) {
+    features$per_session_touch_count_median <- as.numeric(touch_count_median)
+  }
+  if (!is.na(value_unique)) {
+    features$unique_value_count <- as.integer(value_unique)
+  }
+
+  # priority: value-constancy wins over touch-count pattern, which wins
+  # over the catch-all.
+  if (!is.na(value_unique) && value_unique == 1L && sessions_used >= 1L) {
+    return(list(subtype = "default_kept", features = features))
+  }
+  if (!is.na(touch_count_median) && touch_count_median == 1) {
+    return(list(subtype = "touched_once_abandoned", features = features))
+  }
+  list(subtype = "rarely_used", features = features)
 }
 
 #' Find sessions with delayed first interaction
