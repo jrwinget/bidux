@@ -821,6 +821,17 @@ bid_ingest_telemetry <- function(
     }
   }
 
+  # find peak-end negative experiences (Kahneman et al. 1993)
+  peak_end_info <- find_peak_end_patterns(
+    events,
+    window_secs = thresholds$peak_end_window_secs %||% peak_end_window_secs,
+    negative_rate_threshold = thresholds$peak_end_negative_rate_threshold %||%
+      peak_end_negative_rate_threshold
+  )
+  if (!is.null(peak_end_info) && isTRUE(peak_end_info$has_issues)) {
+    notice_issues[["peak_end"]] <- create_peak_end_notice(peak_end_info)
+  }
+
   # summary
   if (length(notice_issues) == 0) {
     cli::cli_alert_success(

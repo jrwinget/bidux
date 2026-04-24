@@ -25,6 +25,42 @@ create_telemetry_notice <- function(
   )
 }
 
+#' Create a Notice stage for a peak-end pattern
+#'
+#' @param peak_end_info List returned by `find_peak_end_patterns()`.
+#' @return `bid_stage` object in the Notice stage.
+#' @keywords internal
+#' @noRd
+create_peak_end_notice <- function(peak_end_info) {
+  signal <- bid_pattern_signal(
+    pattern_type = "peak_end",
+    features = list(
+      negative_end_rate = as.numeric(peak_end_info$negative_end_rate),
+      negative_end_count = as.integer(peak_end_info$negative_end_count),
+      total_sessions = as.integer(peak_end_info$total_sessions),
+      window_secs = as.numeric(peak_end_info$window_secs)
+    )
+  )
+  theory <- match_signal_to_concept(signal)$concept
+
+  problem <- "User sessions frequently end on a negative experience"
+
+  evidence <- sprintf(
+    "%d of %d sessions (%.1f%%) had an error in the last %d seconds",
+    peak_end_info$negative_end_count,
+    peak_end_info$total_sessions,
+    peak_end_info$negative_end_rate * 100,
+    as.integer(peak_end_info$window_secs)
+  )
+
+  create_telemetry_notice(
+    central_question = "How do final-moment experiences shape user perception of the dashboard?",
+    problem = problem,
+    evidence = evidence,
+    theory = theory
+  )
+}
+
 #' Build a subtype-specific problem statement for an unused input.
 #' @keywords internal
 #' @noRd
@@ -370,6 +406,7 @@ create_confusion_notice <- function(confusion_info, total_sessions, events = NUL
     has_error_patterns = any(grepl("error", issues_tbl$issue_type), na.rm = TRUE),
     has_confusion_patterns = any(grepl("confusion", issues_tbl$issue_type), na.rm = TRUE),
     has_delay_issues = any(grepl("delay", issues_tbl$issue_type), na.rm = TRUE),
+    has_peak_end_issues = any(grepl("peak_end", issues_tbl$issue_type), na.rm = TRUE),
     session_count = length(unique(events$session_id)),
     analysis_timestamp = Sys.time()
   )
@@ -401,6 +438,9 @@ create_confusion_notice <- function(confusion_info, total_sessions, events = NUL
   }
   if (grepl("^confusion", issue_key)) {
     return("confusion_pattern")
+  }
+  if (grepl("^peak_end", issue_key)) {
+    return("peak_end_experience")
   }
   return("unknown")
 }
@@ -502,6 +542,26 @@ create_confusion_notice <- function(confusion_info, total_sessions, events = NUL
     } else {
       0.0
     }
+  } else if (grepl("^peak_end", issue_key)) {
+    # extract the session count from the evidence text
+    # (evidence format: "N of M sessions (X.X%) had an error in the last S seconds")
+    rate <- NA_real_
+    if (
+      is.data.frame(notice) && "evidence" %in% names(notice) &&
+        !is.na(notice$evidence[1])
+    ) {
+      match <- regmatches(
+        notice$evidence[1],
+        regexpr("\\(([0-9.]+)%\\)", notice$evidence[1])
+      )
+      if (length(match) == 1L && nzchar(match)) {
+        rate <- suppressWarnings(
+          as.numeric(sub("\\(([0-9.]+)%\\)", "\\1", match)) / 100
+        )
+      }
+    }
+    impact_rate <- if (!is.na(rate)) rate else 0.25
+    affected_sessions <- janitor::round_half_up(total_sessions * impact_rate)
   }
 
   # delegate severity calculation to shared utility (single source of truth)
