@@ -11,6 +11,8 @@ nav_dropoff_threshold <- 0.2 # 20% visit rate
 confusion_window_secs <- 10 # rapid change window
 confusion_min_changes <- 5 # minimum changes to flag
 confusion_min_sessions <- 2 # minimum affected sessions
+peak_end_window_secs <- 60 # window for end-of-session experience
+peak_end_negative_rate_threshold <- 0.2 # flag when >=20% end negatively
 
 # centralized default thresholds list for bid_ingest_telemetry and bid_telemetry_presets
 .default_telemetry_thresholds <- list(
@@ -19,7 +21,9 @@ confusion_min_sessions <- 2 # minimum affected sessions
   error_rate_threshold = error_rate_threshold,
   navigation_threshold = nav_dropoff_threshold,
   rapid_change_window = confusion_window_secs,
-  rapid_change_count = confusion_min_changes
+  rapid_change_count = confusion_min_changes,
+  peak_end_window_secs = peak_end_window_secs,
+  peak_end_negative_rate_threshold = peak_end_negative_rate_threshold
 )
 
 #' Find unused or under-used inputs
