@@ -1,0 +1,3 @@
+# store all text files with LF line endings in the repo.
+# windows/WSL shared checkouts otherwise produce full-repo CRLF diffs.
+* text=auto eol=lf
