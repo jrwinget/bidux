@@ -1,3 +1,12 @@
+# bidux 0.4.1
+=============
+
+### IMPROVEMENTS
+
+* **Structured telemetry pattern signals.** New internal `bid_pattern_signal` S3 class and `match_signal_to_concept()` resolver let telemetry detectors emit structured pattern descriptions and map them to BID concepts via a shipped mapping table (`inst/extdata/pattern_concept_mappings.csv`). This is the foundation for extending telemetry coverage beyond the current Stage-1 concepts — see issues #48–#52. The existing prose-based `suggest_theory_from_mappings()` path remains the fallback for hand-authored `bid_notice()` calls, so there is no user-visible behavior change.
+
+* **Line-ending normalization.** Added `.gitattributes` to pin text files to LF in the repository, eliminating repo-wide CRLF diffs caused by Windows/WSL shared checkouts.
+
 # bidux 0.4.0 (2026-02-27)
 ==========================
 
