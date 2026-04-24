@@ -1,4 +1,6 @@
 pattern_type,subtype,feature_predicate,concept,stage,confidence,rationale_citation
+unused_input,default_kept,unique_value_count == 1 && sessions_used >= 1,Default Effect,Structure,0.85,Samuelson & Zeckhauser (1988)
+unused_input,touched_once_abandoned,per_session_touch_count_median == 1,Processing Fluency,Interpret,0.75,Alter & Oppenheimer (2009)
 unused_input,,,Cognitive Load Theory,Notice,0.7,Sweller (1988)
 delayed_interaction,,,Cognitive Load Theory,Notice,0.8,Sweller (1988)
 error_pattern,,,Hick's Law,Notice,0.8,Hick (1952)

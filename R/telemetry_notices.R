@@ -1,12 +1,47 @@
 #' Create a telemetry notice from problem and evidence
-#' @param central_question The central question for the interpret stage
-#' @param problem Problem description string
-#' @param evidence Evidence description string
-#' @return bid_stage object in the Notice stage
+#'
+#' @param central_question The central question for the interpret stage.
+#' @param problem Problem description string.
+#' @param evidence Evidence description string.
+#' @param theory Optional character scalar naming an explicit BID theory
+#'   to attach to the notice. When `NULL` (default), `bid_notice()`
+#'   auto-suggests one from the prose via the existing theory mappings,
+#'   preserving the pre-signal behavior.
+#'
+#' @return `bid_stage` object in the Notice stage.
 #' @keywords internal
-create_telemetry_notice <- function(central_question, problem, evidence) {
+#' @noRd
+create_telemetry_notice <- function(
+    central_question,
+    problem,
+    evidence,
+    theory = NULL) {
   interpret <- bid_interpret(central_question = central_question)
-  bid_notice(previous_stage = interpret, problem = problem, evidence = evidence)
+  bid_notice(
+    previous_stage = interpret,
+    problem = problem,
+    theory = theory,
+    evidence = evidence
+  )
+}
+
+#' Build a subtype-specific problem statement for an unused input.
+#' @keywords internal
+#' @noRd
+.unused_input_problem_text <- function(input_id, subtype) {
+  switch(
+    subtype %||% "rarely_used",
+    default_kept = sprintf(
+      "Users are not changing the '%s' input from its default value",
+      input_id
+    ),
+    touched_once_abandoned = sprintf(
+      "Users touch the '%s' input once and then abandon it",
+      input_id
+    ),
+    # rarely_used and any unrecognized subtype retain the legacy wording
+    sprintf("Users are not interacting with the '%s' input control", input_id)
+  )
 }
 
 #' Create notice stage for unused input
@@ -16,10 +51,12 @@ create_telemetry_notice <- function(central_question, problem, evidence) {
 #' @return bid_stage object
 #' @keywords internal
 create_unused_input_notice <- function(input_info, total_sessions, events = NULL) {
-  problem <- sprintf(
-    "Users are not interacting with the '%s' input control",
-    input_info$input_id
-  )
+  # subtype is populated by find_unused_inputs() in the signal-aware path.
+  # legacy callers that omit it fall through to the rarely_used wording and
+  # the package-fallback theory, matching pre-signal behavior.
+  subtype <- input_info$subtype %||% "rarely_used"
+
+  problem <- .unused_input_problem_text(input_info$input_id, subtype)
 
   if (input_info$sessions_used == 0) {
     evidence <- sprintf(
@@ -45,11 +82,24 @@ create_unused_input_notice <- function(input_info, total_sessions, events = NULL
     evidence <- add_performance_context(evidence, events, event_filter)
   }
 
-  # create interpret then notice stages via shared factory
+  # resolve concept via the structured signal matcher when features are
+  # available. legacy callers without features get NULL theory and fall
+  # back to the existing prose-based auto-suggestion inside bid_notice().
+  theory <- NULL
+  if (!is.null(input_info$features)) {
+    signal <- bid_pattern_signal(
+      pattern_type = "unused_input",
+      subtype = subtype,
+      features = input_info$features
+    )
+    theory <- match_signal_to_concept(signal)$concept
+  }
+
   create_telemetry_notice(
     central_question = "How can we improve user interaction with unused inputs?",
     problem = problem,
-    evidence = evidence
+    evidence = evidence,
+    theory = theory
   )
 }
 
