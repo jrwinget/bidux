@@ -370,7 +370,9 @@ test_that("bid_telemetry_presets returns correct structure", {
     "rapid_change_window",
     "rapid_change_count",
     "peak_end_window_secs",
-    "peak_end_negative_rate_threshold"
+    "peak_end_negative_rate_threshold",
+    "entry_anchor_min_navs",
+    "entry_anchor_rate_threshold"
   ))
 
   # test all three preset types

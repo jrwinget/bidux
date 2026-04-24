@@ -832,6 +832,19 @@ bid_ingest_telemetry <- function(
     notice_issues[["peak_end"]] <- create_peak_end_notice(peak_end_info)
   }
 
+  # find entry-page anchoring (Tversky & Kahneman 1974)
+  entry_anchor_info <- find_entry_anchoring(
+    events,
+    min_navs = thresholds$entry_anchor_min_navs %||% entry_anchor_min_navs,
+    rate_threshold = thresholds$entry_anchor_rate_threshold %||%
+      entry_anchor_rate_threshold
+  )
+  if (!is.null(entry_anchor_info) && isTRUE(entry_anchor_info$has_issues)) {
+    notice_issues[["entry_anchor"]] <- create_entry_anchoring_notice(
+      entry_anchor_info
+    )
+  }
+
   # summary
   if (length(notice_issues) == 0) {
     cli::cli_alert_success(
